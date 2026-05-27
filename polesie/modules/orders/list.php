@@ -124,7 +124,7 @@ foreach ($statuses as $status) {
 }
 
 // Получение контрагентов для фильтра
-$contractors = $pdo->query("SELECT id, name FROM contractors ORDER BY name LIMIT 100")->fetchAll();
+$contractors = $pdo->query("SELECT id, name FROM contractors WHERE type IN ('customer', 'both') ORDER BY name LIMIT 100")->fetchAll();
 
 // Статистика
 $newOrdersCount = $statusCounts['new'] ?? 0;

@@ -51,11 +51,11 @@ $orderData = $orderStats->fetch();
 $prodStats = $pdo->prepare("
     SELECT 
         COUNT(*) as total_tasks,
-        SUM(CASE WHEN status_id = 1 THEN 1 ELSE 0 END) as planned_count,
-        SUM(CASE WHEN status_id = 2 THEN 1 ELSE 0 END) as in_progress_count,
-        SUM(CASE WHEN status_id = 4 THEN 1 ELSE 0 END) as completed_count,
-        SUM(quantity_planned) as total_quantity
-    FROM production_orders 
+        SUM(CASE WHEN status = 'planned' THEN 1 ELSE 0 END) as planned_count,
+        SUM(CASE WHEN status = 'in_progress' THEN 1 ELSE 0 END) as in_progress_count,
+        SUM(CASE WHEN status = 'completed' THEN 1 ELSE 0 END) as completed_count,
+        SUM(quantity_plan) as total_quantity
+    FROM production_tasks 
     WHERE created_at BETWEEN ? AND ?
 ");
 $prodStats->execute([$dateFrom, $dateTo]);
@@ -65,8 +65,8 @@ $prodData = $prodStats->fetch();
 $qualityStats = $pdo->prepare("
     SELECT 
         COUNT(*) as total,
-        SUM(CASE WHEN result = 'passed' THEN 1 ELSE 0 END) as passed_count,
-        SUM(CASE WHEN result = 'failed' THEN 1 ELSE 0 END) as failed_count
+        SUM(CASE WHEN result = 'pass' THEN 1 ELSE 0 END) as passed_count,
+        SUM(CASE WHEN result = 'fail' THEN 1 ELSE 0 END) as failed_count
     FROM quality_checks 
     WHERE check_date BETWEEN ? AND ?
 ");

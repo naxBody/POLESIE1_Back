@@ -18,25 +18,26 @@ $pageTitle = 'Контроль качества';
 
 $status = $_GET['status'] ?? '';
 
-$sql = "SELECT qi.*, po.quantity_planned as task_quantity, p.name as product_name, 
+$sql = "SELECT pt.*, pt.quantity_plan as task_quantity, p.name as product_name, 
                u.full_name as inspector_name,
-               CASE WHEN qi.id IS NOT NULL THEN TRUE ELSE FALSE END as is_inspected
-        FROM production_orders po 
-        JOIN products p ON po.product_id = p.id 
-        LEFT JOIN quality_checks qi ON po.id = qi.production_order_id
-        LEFT JOIN users u ON qi.inspector_id = u.id
-        WHERE po.status_id IN (2, 3)";
+               qc.id as check_id, qc.result, qc.inspection_date,
+               CASE WHEN qc.id IS NOT NULL THEN TRUE ELSE FALSE END as is_inspected
+        FROM production_tasks pt 
+        JOIN products p ON pt.product_id = p.id 
+        LEFT JOIN quality_checks qc ON pt.id = qc.task_id
+        LEFT JOIN users u ON qc.inspector_id = u.id
+        WHERE pt.status IN ('in_progress', 'completed')";
 $params = [];
 
 if ($status === 'pending') {
-    $sql .= " AND qi.id IS NULL";
+    $sql .= " AND qc.id IS NULL";
 } elseif ($status === 'passed') {
-    $sql .= " AND qi.result = 'passed'";
+    $sql .= " AND qc.result = 'pass'";
 } elseif ($status === 'failed') {
-    $sql .= " AND qi.result = 'failed'";
+    $sql .= " AND qc.result = 'fail'";
 }
 
-$sql .= " ORDER BY po.created_at DESC";
+$sql .= " ORDER BY pt.created_at DESC";
 
 $stmt = $pdo->prepare($sql);
 $stmt->execute($params);

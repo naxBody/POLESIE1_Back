@@ -383,26 +383,28 @@ $pageTitle = 'Заказ №' . e($order['order_number']);
                                             <td><?= e($item['article'] ?? '—') ?></td>
                                             <td>
                                                 <strong><?= e($item['product_name']) ?></strong>
-                                                <?php if ($item['description']): ?>
+                                                <?php if (!empty($item['description'])): ?>
                                                 <div style="font-size: 12px; color: var(--text-secondary);"><?= e($item['description']) ?></div>
                                                 <?php endif; ?>
                                             </td>
                                             <td><?= e($item['unit_name'] ?? 'шт.') ?></td>
                                             <td><strong><?= $item['quantity'] ?></strong></td>
                                             <td><?= formatMoney($item['price']) ?></td>
-                                            <td><strong><?= formatMoney($item['amount']) ?></strong></td>
+                                            <td><strong><?= formatMoney($item['total']) ?></strong></td>
                                             <td>
                                                 <?php
-                                                $itemTask = array_filter($tasks, fn($t) => $t['order_item_id'] == $item['id']);
-                                                if (!empty($itemTask)):
-                                                    $task = reset($itemTask);
+                                                $prodStatus = $item['production_status'] ?? 'not_started';
+                                                $statusLabels = [
+                                                    'not_started' => ['Не начато', '#95a5a6'],
+                                                    'in_progress' => ['В работе', '#f39c12'],
+                                                    'completed' => ['Готово', '#27ae60'],
+                                                    'packed' => ['Упаковано', '#9b59b6']
+                                                ];
+                                                $labelData = $statusLabels[$prodStatus] ?? ['Нет данных', '#95a5a6'];
                                                 ?>
-                                                <span class="badge" style="background: <?= e($task['task_status_color']) ?>20; color: <?= e($task['task_status_color']) ?>">
-                                                    <?= e($task['task_status_name']) ?>
+                                                <span class="badge" style="background: <?= e($labelData[1]) ?>20; color: <?= e($labelData[1]) ?>">
+                                                    <?= e($labelData[0]) ?>
                                                 </span>
-                                                <?php else: ?>
-                                                <span class="badge" style="background: #95a5a620; color: #95a5a6">Нет заданий</span>
-                                                <?php endif; ?>
                                             </td>
                                         </tr>
                                         <?php endforeach; ?>

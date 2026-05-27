@@ -1,6 +1,6 @@
 <?php
 /**
- * Паспорта продуктов - просмотр спецификаций и материалов
+ * Паспорта продуктов - просмотр спецификаций и материалов из БД
  */
 
 require_once __DIR__ . '/../../config/config.php';
@@ -16,43 +16,58 @@ $pdo = getDbConnection();
 
 $pageTitle = 'Паспорта продуктов';
 
-// Получение паспортов из JSON
-$passportsFile = __DIR__ . '/../../../passports.json';
-$passportsData = [];
-if (file_exists($passportsFile)) {
-    $passportsData = json_decode(file_get_contents($passportsFile), true);
-}
-
-$passports = $passportsData['passports'] ?? [];
-$totalProducts = $passportsData['total_products'] ?? 0;
-
-// Фильтрация
+// Получение паспортов из базы данных
 $search = $_GET['search'] ?? '';
 $categoryFilter = $_GET['category'] ?? '';
 
-if ($search || $categoryFilter) {
-    $passports = array_filter($passports, function($p) use ($search, $categoryFilter) {
-        $matchSearch = empty($search) || 
-            stripos($p['sku'], $search) !== false ||
-            stripos($p['basic_info']['name_full'] ?? '', $search) !== false ||
-            stripos($p['basic_info']['name_short'] ?? '', $search) !== false;
-        
-        $matchCategory = empty($categoryFilter) || 
-            ($p['basic_info']['category_code'] ?? '') === $categoryFilter;
-        
-        return $matchSearch && $matchCategory;
-    });
+$query = "
+    SELECT 
+        pp.id as passport_id,
+        p.id as product_id,
+        p.article as sku,
+        p.name as product_name,
+        pc.name_ru as category_name,
+        pc.code as category_code,
+        pp.total_weight_kg,
+        pp.warranty_months,
+        pp.is_serial_tracked,
+        pp.production_notes,
+        pp.quality_requirements,
+        p.specifications
+    FROM product_passports pp
+    JOIN products p ON pp.product_id = p.id
+    LEFT JOIN product_categories pc ON p.category_id = pc.id
+    WHERE p.is_active = TRUE
+";
+
+$params = [];
+
+if ($search) {
+    $query .= " AND (p.article LIKE :search OR p.name LIKE :search)";
+    $params[':search'] = "%{$search}%";
 }
 
-// Получение уникальных категорий
-$categories = [];
-foreach ($passportsData['passports'] ?? [] as $p) {
-    $catCode = $p['basic_info']['category_code'] ?? 'OTHER';
-    $catName = $p['basic_info']['category'] ?? 'Другое';
-    if (!isset($categories[$catCode])) {
-        $categories[$catCode] = $catName;
-    }
+if ($categoryFilter) {
+    $query .= " AND pc.code = :category";
+    $params[':category'] = $categoryFilter;
 }
+
+$query .= " ORDER BY pc.name_ru, p.name";
+
+$stmt = $pdo->prepare($query);
+$stmt->execute($params);
+$passports = $stmt->fetchAll();
+
+// Получение уникальных категорий для фильтра
+$catQuery = "SELECT DISTINCT pc.code, pc.name_ru 
+             FROM product_categories pc
+             JOIN products p ON p.category_id = pc.id
+             JOIN product_passports pp ON pp.product_id = p.id
+             WHERE p.is_active = TRUE
+             ORDER BY pc.name_ru";
+$categories = $pdo->query($catQuery)->fetchAll();
+
+$totalProducts = count($passports);
 ?>
 <!DOCTYPE html>
 <html lang="ru">
@@ -321,8 +336,8 @@ foreach ($passportsData['passports'] ?? [] as $p) {
                                            style="flex: 1; padding: 10px 14px; border: 1px solid var(--border-color); border-radius: var(--border-radius);">
                                     <select name="category" style="width: 250px; padding: 10px 14px; border: 1px solid var(--border-color); border-radius: var(--border-radius);">
                                         <option value="">Все категории</option>
-                                        <?php foreach ($categories as $code => $name): ?>
-                                            <option value="<?= e($code) ?>" <?= $categoryFilter == $code ? 'selected' : '' ?>><?= e($name) ?></option>
+                                        <?php foreach ($categories as $cat): ?>
+                                            <option value="<?= e($cat['code']) ?>" <?= $categoryFilter == $cat['code'] ? 'selected' : '' ?>><?= e($cat['name_ru']) ?></option>
                                         <?php endforeach; ?>
                                     </select>
                                     <button type="submit" class="btn btn-secondary">Фильтр</button>
@@ -336,38 +351,83 @@ foreach ($passportsData['passports'] ?? [] as $p) {
                                     <div class="empty-state">
                                         <div class="empty-state-icon">📄</div>
                                         <h3>Паспорта не найдены</h3>
-                                        <p>Запустите генератор паспортов или измените параметры поиска</p>
+                                        <p>Паспорта продуктов создаются в базе данных или измените параметры поиска</p>
                                     </div>
                                 <?php else: ?>
                                     <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 16px;">
                                         <?php foreach ($passports as $index => $passport): ?>
-                                            <div class="passport-card" data-passport-index="<?= $index ?>" onclick="openPassportModalByIndex(this)">
+                                            <?php
+                                            // Получение материалов для паспорта
+                                            $matStmt = $pdo->prepare("
+                                                SELECT 
+                                                    ppm.quantity,
+                                                    ppm.unit,
+                                                    m.code as material_code,
+                                                    m.name_full as material_name,
+                                                    pc.name_ru as material_category
+                                                FROM product_passport_materials ppm
+                                                JOIN materials m ON ppm.material_id = m.id
+                                                LEFT JOIN material_categories mc ON m.category_id = mc.id
+                                                LEFT JOIN product_categories pc ON mc.parent_id = pc.id OR mc.id = pc.id
+                                                WHERE ppm.passport_id = :passport_id
+                                                ORDER BY ppm.sort_order, m.name_full
+                                            ");
+                                            $matStmt->execute([':passport_id' => $passport['passport_id']]);
+                                            $materials = $matStmt->fetchAll();
+                                            
+                                            // Получение этапов производства из маршрутной карты
+                                            $stageStmt = $pdo->prepare("
+                                                SELECT 
+                                                    rco.operation_number,
+                                                    rco.name as operation_name,
+                                                    rco.description,
+                                                    rco.time_norm_hours,
+                                                    ps.name as stage_name,
+                                                    ps.color as stage_color,
+                                                    rco.work_center,
+                                                    rco.equipment
+                                                FROM route_card_operations rco
+                                                LEFT JOIN production_stages ps ON rco.stage_id = ps.id
+                                                WHERE rco.route_card_id IN (
+                                                    SELECT id FROM route_cards WHERE product_id = :product_id AND is_active = TRUE
+                                                )
+                                                ORDER BY rco.sort_order, rco.operation_number
+                                            ");
+                                            $stageStmt->execute([':product_id' => $passport['product_id']]);
+                                            $stages = $stageStmt->fetchAll();
+                                            
+                                            // Декодирование JSON полей
+                                            $productionNotes = $passport['production_notes'] ? json_decode($passport['production_notes'], true) : [];
+                                            $qualityRequirements = $passport['quality_requirements'] ? json_decode($passport['quality_requirements'], true) : [];
+                                            $specifications = $passport['specifications'] ? json_decode($passport['specifications'], true) : [];
+                                            ?>
+                                            <div class="passport-card" data-passport-id="<?= $passport['passport_id'] ?>" onclick="openPassportModal(this)">
                                                 <div class="passport-card-header">
                                                     <div>
                                                         <span class="passport-sku"><?= e($passport['sku']) ?></span>
-                                                        <div class="passport-title"><?= e($passport['basic_info']['name_short'] ?? 'Без названия') ?></div>
-                                                        <div class="passport-category"><?= e($passport['basic_info']['category'] ?? '') ?></div>
+                                                        <div class="passport-title"><?= e($passport['product_name']) ?></div>
+                                                        <div class="passport-category"><?= e($passport['category_name'] ?? 'Без категории') ?></div>
                                                     </div>
                                                 </div>
                                                 <div class="passport-card-body">
                                                     <div style="display: flex; justify-content: space-between; align-items: center;">
-                                                        <span class="weight-badge">⚖️ <?= number_format($passport['total_weight_kg'], 2, ',', ' ') ?> кг</span>
+                                                        <span class="weight-badge">⚖️ <?= number_format($passport['total_weight_kg'] ?? 0, 2, ',', ' ') ?> кг</span>
                                                         <span style="font-size: 13px; color: var(--text-secondary);">
-                                                            📦 <?= count($passport['materials']) ?> материалов
+                                                            📦 <?= count($materials) ?> материалов
                                                         </span>
                                                     </div>
                                                     
                                                     <div class="materials-preview">
                                                         <?php 
-                                                        $materials = array_slice($passport['materials'], 0, 3);
-                                                        foreach ($materials as $mat): 
+                                                        $previewMaterials = array_slice($materials, 0, 3);
+                                                        foreach ($previewMaterials as $mat): 
                                                         ?>
                                                             <span class="material-tag">
-                                                                <strong><?= number_format($mat['quantity'], 1) ?></strong> <?= $mat['unit'] ?>
+                                                                <strong><?= number_format($mat['quantity'], 1) ?></strong> <?= e($mat['unit']) ?>
                                                             </span>
                                                         <?php endforeach; ?>
-                                                        <?php if (count($passport['materials']) > 3): ?>
-                                                            <span class="material-tag">+ ещё <?= count($passport['materials']) - 3 ?></span>
+                                                        <?php if (count($materials) > 3): ?>
+                                                            <span class="material-tag">+ ещё <?= count($materials) - 3 ?></span>
                                                         <?php endif; ?>
                                                     </div>
                                                 </div>
@@ -400,70 +460,39 @@ foreach ($passportsData['passports'] ?? [] as $p) {
     </div>
 
     <script>
-        // Данные паспортов из PHP - передаем через data-атрибут для отладки
+        // Данные для паспортов передаем через PHP в JS
         console.log('=== PASSPORTS DEBUG ===');
         console.log('Passports count:', <?= count($passports) ?>);
-        var passportsData = <?= json_encode($passports, JSON_UNESCAPED_UNICODE | JSON_HEX_APOS) ?>;
-        console.log('Passports data loaded:', passportsData.length, 'items');
-        console.log('First passport:', passportsData[0]);
-        console.log('======================');
         
-        // Проверка после загрузки DOM
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('DOM loaded, checking cards...');
-            var cards = document.querySelectorAll('.passport-card');
-            console.log('Found', cards.length, 'passport cards');
-            cards.forEach(function(card, idx) {
-                console.log('Card', idx, 'index:', card.getAttribute('data-passport-index'));
-            });
-        });
-        
-        // Примерные этапы производства для продуктов (можно загружать из БД)
-        var productionStagesTemplate = {
-            'MOTORS_3PHASE': [
-                { name: 'Изготовление статора', duration: '4 дня' },
-                { name: 'Изготовление ротора', duration: '4 дня' },
-                { name: 'Намотка обмотки', duration: '3 дня' },
-                { name: 'Сборка', duration: '3 дня' },
-                { name: 'Испытания', duration: '2 дня' }
-            ],
-            'PUMPS': [
-                { name: 'Литьё корпуса', duration: '2 дня' },
-                { name: 'Механическая обработка', duration: '3 дня' },
-                { name: 'Сборка гидравлической части', duration: '2 дня' },
-                { name: 'Установка электродвигателя', duration: '1 день' },
-                { name: 'Гидравлические испытания', duration: '1 день' }
-            ],
-            'ELECTRIC_HOB': [
-                { name: 'Изготовление нагревательного элемента', duration: '2 дня' },
-                { name: 'Литьё корпуса', duration: '2 дня' },
-                { name: 'Сборка', duration: '2 дня' },
-                { name: 'Электрические испытания', duration: '1 день' }
-            ],
-            'TRANSFORMERS': [
-                { name: 'Изготовление магнитопровода', duration: '3 дня' },
-                { name: 'Намотка обмоток', duration: '4 дня' },
-                { name: 'Сборка активной части', duration: '2 дня' },
-                { name: 'Сушка и пропитка', duration: '3 дня' },
-                { name: 'Испытания', duration: '2 дня' }
-            ]
-        };
-        
-        function openPassportModalByIndex(element) {
-            var index = element.getAttribute('data-passport-index');
-            var passport = passportsData[index];
-            if (!passport) {
-                console.error('Паспорт не найден по индексу:', index);
+        // Функция открытия модального окна с данными из БД
+        function openPassportModal(element) {
+            var passportId = element.getAttribute('data-passport-id');
+            if (!passportId) {
+                console.error('passport_id не найден');
                 return;
             }
-            openPassportModal(passport);
+            
+            // Загружаем данные паспорта через AJAX
+            fetch('api_passport.php?id=' + passportId)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        renderPassportModal(data.passport);
+                    } else {
+                        alert('Ошибка загрузки паспорта: ' + data.error);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Ошибка загрузки данных паспорта');
+                });
         }
         
-        function openPassportModal(passport) {
+        function renderPassportModal(passport) {
             console.log('Opening passport:', passport.sku);
             console.log('Full passport data:', passport);
             
-            document.getElementById('modalPassportTitle').textContent = passport.basic_info.name_full || 'Без названия';
+            document.getElementById('modalPassportTitle').textContent = passport.product_name || 'Без названия';
             document.getElementById('modalPassportSKU').textContent = 'SKU: ' + (passport.sku || '—');
             
             var html = '';
@@ -473,7 +502,7 @@ foreach ($passportsData['passports'] ?? [] as $p) {
             html += '<div class="passport-section-title">📊 Основная информация</div>';
             html += '<div class="specs-list">';
             html += '<div class="spec-item"><div class="spec-name">Артикул</div><div class="spec-value">' + escapeHtml(passport.sku) + '</div></div>';
-            html += '<div class="spec-item"><div class="spec-name">Категория</div><div class="spec-value">' + escapeHtml(passport.basic_info.category || '—') + '</div></div>';
+            html += '<div class="spec-item"><div class="spec-name">Категория</div><div class="spec-value">' + escapeHtml(passport.category_name || '—') + '</div></div>';
             html += '<div class="spec-item"><div class="spec-name">Общий вес</div><div class="spec-value">' + (passport.total_weight_kg || '0') + ' кг</div></div>';
             html += '<div class="spec-item"><div class="spec-name">Гарантия</div><div class="spec-value">' + (passport.warranty_months || 24) + ' мес.</div></div>';
             html += '<div class="spec-item"><div class="spec-name">Серийный учёт</div><div class="spec-value">' + (passport.is_serial_tracked ? '✅ Да' : '❌ Нет') + '</div></div>';
@@ -501,48 +530,64 @@ foreach ($passportsData['passports'] ?? [] as $p) {
                 html += '</div>';
             }
             
-            // Этапы производства
+            // Этапы производства из БД
             html += '<div class="passport-section">';
             html += '<div class="passport-section-title">🏭 Этапы производства</div>';
-            var categoryCode = passport.basic_info.category_code || 'OTHER';
-            var stages = productionStagesTemplate[categoryCode] || productionStagesTemplate['MOTORS_3PHASE'];
-            html += '<div style="display: flex; flex-direction: column; gap: 10px;">';
-            for (var i = 0; i < stages.length; i++) {
-                var stage = stages[i];
-                html += '<div style="display: flex; align-items: center; gap: 12px; padding: 12px; background: var(--bg-tertiary); border-radius: 8px;">';
-                html += '<div style="width: 32px; height: 32px; background: var(--primary-color); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700;">' + (i + 1) + '</div>';
-                html += '<div style="flex: 1;">';
-                html += '<div style="font-weight: 600; color: var(--text-primary);">' + escapeHtml(stage.name) + '</div>';
+            if (passport.stages && passport.stages.length > 0) {
+                html += '<div style="display: flex; flex-direction: column; gap: 10px;">';
+                for (var i = 0; i < passport.stages.length; i++) {
+                    var stage = passport.stages[i];
+                    html += '<div style="display: flex; align-items: center; gap: 12px; padding: 12px; background: var(--bg-tertiary); border-radius: 8px;">';
+                    html += '<div style="width: 32px; height: 32px; background: ' + (stage.stage_color || '#3498db') + '; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700;">' + (i + 1) + '</div>';
+                    html += '<div style="flex: 1;">';
+                    html += '<div style="font-weight: 600; color: var(--text-primary);">' + escapeHtml(stage.operation_name) + '</div>';
+                    if (stage.description) {
+                        html += '<div style="font-size: 12px; color: var(--text-secondary);">' + escapeHtml(stage.description) + '</div>';
+                    }
+                    html += '</div>';
+                    if (stage.work_center || stage.equipment) {
+                        html += '<div style="text-align: right; font-size: 12px; color: var(--text-secondary);">';
+                        if (stage.work_center) html += '<div>📍 ' + escapeHtml(stage.work_center) + '</div>';
+                        if (stage.equipment) html += '<div>🔧 ' + escapeHtml(stage.equipment) + '</div>';
+                        if (stage.time_norm_hours) html += '<div>⏱️ ' + parseFloat(stage.time_norm_hours).toFixed(1) + ' ч</div>';
+                    } else if (stage.time_norm_hours) {
+                        html += '<div style="font-size: 13px; color: var(--text-secondary);">⏱️ ' + parseFloat(stage.time_norm_hours).toFixed(1) + ' ч</div>';
+                    }
+                    html += '</div>';
+                }
                 html += '</div>';
-                html += '<div style="font-size: 13px; color: var(--text-secondary);">⏱️ ' + escapeHtml(stage.duration) + '</div>';
+            } else {
+                html += '<div style="padding: 20px; text-align: center; color: var(--text-secondary); background: var(--bg-tertiary); border-radius: 8px;">';
+                html += 'ℹ️ Этапы производства не заданы в маршрутной карте';
                 html += '</div>';
             }
             html += '</div>';
-            html += '</div>';
             
-            // Материалы
+            // Материалы из БД
             html += '<div class="passport-section">';
-            html += '<div class="passport-section-title">📦 Материалы для производства (' + Object.keys(passport.materials).length + ' поз.)</div>';
-            html += '<table class="materials-table">';
-            html += '<thead><tr><th>№</th><th>Материал</th><th>Код</th><th>Количество</th><th>Ед.</th><th>Категория</th></tr></thead>';
-            html += '<tbody>';
-            var matIndex = 0;
-            for (var matKey in passport.materials) {
-                if (passport.materials.hasOwnProperty(matKey)) {
-                    matIndex++;
-                    var mat = passport.materials[matKey];
+            html += '<div class="passport-section-title">📦 Материалы для производства (' + (passport.materials ? passport.materials.length : 0) + ' поз.)</div>';
+            if (passport.materials && passport.materials.length > 0) {
+                html += '<table class="materials-table">';
+                html += '<thead><tr><th>№</th><th>Материал</th><th>Код</th><th>Количество</th><th>Ед.</th><th>Категория</th></tr></thead>';
+                html += '<tbody>';
+                for (var i = 0; i < passport.materials.length; i++) {
+                    var mat = passport.materials[i];
                     html += '<tr>';
-                    html += '<td>' + matIndex + '</td>';
-                    html += '<td><strong>' + escapeHtml(mat.name) + '</strong></td>';
+                    html += '<td>' + (i + 1) + '</td>';
+                    html += '<td><strong>' + escapeHtml(mat.material_name) + '</strong></td>';
                     html += '<td><code>' + escapeHtml(mat.material_code) + '</code></td>';
                     html += '<td>' + Number(mat.quantity).toFixed(2).replace('.', ',') + '</td>';
                     html += '<td>' + escapeHtml(mat.unit) + '</td>';
-                    html += '<td>' + escapeHtml(mat.category) + '</td>';
+                    html += '<td>' + escapeHtml(mat.material_category || '—') + '</td>';
                     html += '</tr>';
                 }
+                html += '</tbody>';
+                html += '</table>';
+            } else {
+                html += '<div style="padding: 20px; text-align: center; color: var(--text-secondary); background: var(--bg-tertiary); border-radius: 8px;">';
+                html += 'ℹ️ Материалы не указаны в паспорте';
+                html += '</div>';
             }
-            html += '</tbody>';
-            html += '</table>';
             html += '</div>';
             
             // Примечания к производству

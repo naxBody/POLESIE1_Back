@@ -16,6 +16,147 @@ if (!isLoggedIn()) {
 $user = getCurrentUser();
 $pdo = getDbConnection();
 
+// API endpoint для получения детальной информации о заказе (должен быть ДО любого вывода HTML)
+if (isset($_GET['api_order_detail'])) {
+    header('Content-Type: application/json');
+    $orderId = (int)$_GET['order_id'];
+    
+    // Основная информация о заказе
+    $stmt = $pdo->prepare("
+        SELECT o.*, c.name as contractor_name, u.full_name as responsible_name,
+            CASE o.status
+                WHEN 'new' THEN 'Новый'
+                WHEN 'processing' THEN 'В работе'
+                WHEN 'ready' THEN 'Готов'
+                WHEN 'shipped' THEN 'Отгружен'
+                WHEN 'cancelled' THEN 'Отменен'
+                ELSE o.status
+            END as status_name,
+            CASE o.status
+                WHEN 'new' THEN '#3498db'
+                WHEN 'processing' THEN '#f39c12'
+                WHEN 'ready' THEN '#27ae60'
+                WHEN 'shipped' THEN '#9b59b6'
+                WHEN 'cancelled' THEN '#e74c3c'
+                ELSE '#95a5a6'
+            END as status_color
+        FROM orders o
+        LEFT JOIN contractors c ON o.customer_id = c.id
+        LEFT JOIN users u ON o.responsible_user_id = u.id
+        WHERE o.id = ?
+    ");
+    $stmt->execute([$orderId]);
+    $orderInfo = $stmt->fetch();
+    
+    if (!$orderInfo) {
+        http_response_code(404);
+        echo json_encode(['error' => 'Заказ не найден'], JSON_UNESCAPED_UNICODE);
+        exit;
+    }
+    
+    // Позиции заказа
+    $stmt = $pdo->prepare("
+        SELECT oi.*, p.name as product_name, p.article as product_article,
+            CASE oi.production_status
+                WHEN 'not_started' THEN 'Не начато'
+                WHEN 'in_progress' THEN 'В работе'
+                WHEN 'completed' THEN 'Готово'
+                WHEN 'packed' THEN 'Упаковано'
+                ELSE 'Нет данных'
+            END as production_status_name,
+            CASE oi.production_status
+                WHEN 'not_started' THEN '#95a5a6'
+                WHEN 'in_progress' THEN '#f39c12'
+                WHEN 'completed' THEN '#27ae60'
+                WHEN 'packed' THEN '#9b59b6'
+                ELSE '#95a5a6'
+            END as production_status_color
+        FROM order_items oi
+        JOIN products p ON oi.product_id = p.id
+        WHERE oi.order_id = ?
+    ");
+    $stmt->execute([$orderId]);
+    $items = $stmt->fetchAll();
+    
+    // Производственные задания по заказу
+    $stmt = $pdo->prepare("
+        SELECT pt.*, p.name as product_name,
+            CASE pt.status
+                WHEN 'planned' THEN 'Запланировано'
+                WHEN 'in_progress' THEN 'В работе'
+                WHEN 'completed' THEN 'Завершено'
+                WHEN 'cancelled' THEN 'Отменено'
+                ELSE pt.status
+            END as status_name,
+            CASE pt.status
+                WHEN 'planned' THEN '#3498db'
+                WHEN 'in_progress' THEN '#f39c12'
+                WHEN 'completed' THEN '#27ae60'
+                WHEN 'cancelled' THEN '#e74c3c'
+                ELSE '#95a5a6'
+            END as status_color
+        FROM production_tasks pt
+        JOIN products p ON pt.product_id = p.id
+        WHERE pt.order_id = ?
+        ORDER BY pt.created_at DESC
+    ");
+    $stmt->execute([$orderId]);
+    $tasks = $stmt->fetchAll();
+    
+    // Материалы по заданиям (что хватает/не хватает)
+    foreach ($tasks as &$task) {
+        $stmt = $pdo->prepare("
+            SELECT ptm.*, m.name as material_name, m.article as material_article, mu.symbol as unit_name,
+                   CASE 
+                       WHEN ptm.quantity_available >= ptm.quantity_required THEN 'sufficient'
+                       ELSE 'insufficient'
+                   END as availability_status
+            FROM production_tasks_materials ptm
+            JOIN materials m ON ptm.material_id = m.id
+            LEFT JOIN base_units mu ON m.base_unit_id = mu.id
+            WHERE ptm.task_id = ?
+        ");
+        $stmt->execute([$task['id']]);
+        $task['materials'] = $stmt->fetchAll();
+        
+        // Этапы выполнения для каждого задания
+        $stmt = $pdo->prepare("
+            SELECT pts.*, ps.name as stage_name, ps.color as stage_color, ps.sort_order,
+                CASE pts.status
+                    WHEN 'pending' THEN 'Ожидает'
+                    WHEN 'in_progress' THEN 'В работе'
+                    WHEN 'completed' THEN 'Завершено'
+                    WHEN 'skipped' THEN 'Пропущено'
+                    ELSE pts.status
+                END as status_name
+            FROM production_task_stages pts
+            JOIN production_stages ps ON pts.stage_id = ps.id
+            WHERE pts.task_id = ?
+            ORDER BY ps.sort_order
+        ");
+        $stmt->execute([$task['id']]);
+        $task['stages'] = $stmt->fetchAll();
+        
+        // Прогресс выполнения задания
+        $totalStages = count($task['stages']);
+        $completedStages = 0;
+        foreach ($task['stages'] as $stage) {
+            if ($stage['status'] === 'completed') {
+                $completedStages++;
+            }
+        }
+        $task['progress_percent'] = $totalStages > 0 ? round(($completedStages / $totalStages) * 100) : 0;
+    }
+    unset($task);
+    
+    echo json_encode([
+        'order' => $orderInfo,
+        'items' => $items, 
+        'tasks' => $tasks
+    ], JSON_UNESCAPED_UNICODE);
+    exit;
+}
+
 $pageTitle = 'План выпуска';
 
 // Получение фильтров
@@ -130,156 +271,23 @@ foreach ($orders as $order) {
     if ($order['status'] === 'ready') $stats['ready']++;
 }
 
-// API endpoint для получения детальной информации о заказе
-if (isset($_GET['api_order_detail'])) {
-    header('Content-Type: application/json');
-    $orderId = (int)$_GET['order_id'];
-    
-    // Основная информация о заказе
-    $stmt = $pdo->prepare("
-        SELECT o.*, c.name as contractor_name, u.full_name as responsible_name,
-            CASE o.status
-                WHEN 'new' THEN 'Новый'
-                WHEN 'processing' THEN 'В работе'
-                WHEN 'ready' THEN 'Готов'
-                WHEN 'shipped' THEN 'Отгружен'
-                WHEN 'cancelled' THEN 'Отменен'
-                ELSE o.status
-            END as status_name,
-            CASE o.status
-                WHEN 'new' THEN '#3498db'
-                WHEN 'processing' THEN '#f39c12'
-                WHEN 'ready' THEN '#27ae60'
-                WHEN 'shipped' THEN '#9b59b6'
-                WHEN 'cancelled' THEN '#e74c3c'
-                ELSE '#95a5a6'
-            END as status_color
-        FROM orders o
-        LEFT JOIN contractors c ON o.customer_id = c.id
-        LEFT JOIN users u ON o.responsible_user_id = u.id
-        WHERE o.id = ?
-    ");
-    $stmt->execute([$orderId]);
-    $orderInfo = $stmt->fetch();
-    
-    // Позиции заказа
-    $stmt = $pdo->prepare("
-        SELECT oi.*, p.name as product_name, p.article as product_article,
-            CASE oi.production_status
-                WHEN 'not_started' THEN 'Не начато'
-                WHEN 'in_progress' THEN 'В работе'
-                WHEN 'completed' THEN 'Готово'
-                WHEN 'packed' THEN 'Упаковано'
-                ELSE 'Нет данных'
-            END as production_status_name,
-            CASE oi.production_status
-                WHEN 'not_started' THEN '#95a5a6'
-                WHEN 'in_progress' THEN '#f39c12'
-                WHEN 'completed' THEN '#27ae60'
-                WHEN 'packed' THEN '#9b59b6'
-                ELSE '#95a5a6'
-            END as production_status_color
-        FROM order_items oi
-        JOIN products p ON oi.product_id = p.id
-        WHERE oi.order_id = ?
-    ");
-    $stmt->execute([$orderId]);
-    $items = $stmt->fetchAll();
-    
-    // Производственные задания по заказу
-    $stmt = $pdo->prepare("
-        SELECT pt.*, p.name as product_name,
-            CASE pt.status
-                WHEN 'planned' THEN 'Запланировано'
-                WHEN 'in_progress' THEN 'В работе'
-                WHEN 'completed' THEN 'Завершено'
-                WHEN 'cancelled' THEN 'Отменено'
-                ELSE pt.status
-            END as status_name,
-            CASE pt.status
-                WHEN 'planned' THEN '#3498db'
-                WHEN 'in_progress' THEN '#f39c12'
-                WHEN 'completed' THEN '#27ae60'
-                WHEN 'cancelled' THEN '#e74c3c'
-                ELSE '#95a5a6'
-            END as status_color
-        FROM production_tasks pt
-        JOIN products p ON pt.product_id = p.id
-        WHERE pt.order_id = ?
-        ORDER BY pt.created_at DESC
-    ");
-    $stmt->execute([$orderId]);
-    $tasks = $stmt->fetchAll();
-    
-    // Материалы по заданиям (что хватает/не хватает)
-    foreach ($tasks as &$task) {
-        $stmt = $pdo->prepare("
-            SELECT ptm.*, m.name as material_name, m.article as material_article, mu.symbol as unit_name,
-                   CASE 
-                       WHEN ptm.quantity_available >= ptm.quantity_required THEN 'sufficient'
-                       ELSE 'insufficient'
-                   END as availability_status
-            FROM production_tasks_materials ptm
-            JOIN materials m ON ptm.material_id = m.id
-            LEFT JOIN base_units mu ON m.base_unit_id = mu.id
-            WHERE ptm.task_id = ?
-        ");
-        $stmt->execute([$task['id']]);
-        $task['materials'] = $stmt->fetchAll();
-        
-        // Этапы выполнения для каждого задания
-        $stmt = $pdo->prepare("
-            SELECT pts.*, ps.name as stage_name, ps.color as stage_color, ps.sort_order,
-                CASE pts.status
-                    WHEN 'pending' THEN 'Ожидает'
-                    WHEN 'in_progress' THEN 'В работе'
-                    WHEN 'completed' THEN 'Завершено'
-                    WHEN 'skipped' THEN 'Пропущено'
-                    ELSE pts.status
-                END as status_name
-            FROM production_task_stages pts
-            JOIN production_stages ps ON pts.stage_id = ps.id
-            WHERE pts.task_id = ?
-            ORDER BY ps.sort_order
-        ");
-        $stmt->execute([$task['id']]);
-        $task['stages'] = $stmt->fetchAll();
-        
-        // Прогресс выполнения задания
-        $totalStages = count($task['stages']);
-        $completedStages = 0;
-        foreach ($task['stages'] as $stage) {
-            if ($stage['status'] === 'completed') {
-                $completedStages++;
-            }
-        }
-        $task['progress_percent'] = $totalStages > 0 ? round(($completedStages / $totalStages) * 100) : 0;
-    }
-    unset($task);
-    
-    echo json_encode([
-        'order' => $orderInfo,
-        'items' => $items, 
-        'tasks' => $tasks
-    ], JSON_UNESCAPED_UNICODE);
-    exit;
-}
-
 // Подсчет статистики по задачам
-$stmt = $pdo->prepare("
-    SELECT 
-        COUNT(*) as total,
-        SUM(CASE WHEN pt.status = 'in_progress' THEN 1 ELSE 0 END) as in_progress,
-        SUM(CASE WHEN pt.status = 'completed' THEN 1 ELSE 0 END) as completed
-    FROM production_tasks pt
-    JOIN orders o ON pt.order_id = o.id
-    WHERE o.id IN (" . implode(',', array_fill(0, count($orders), '?')) . ")
-");
-$stmt->execute(array_map(fn($o) => $o['id'], $orders));
-$tasksStats = $stmt->fetch();
-$stats['total_tasks'] = $tasksStats['total'] ?? 0;
-$stats['tasks_in_progress'] = $tasksStats['in_progress'] ?? 0;
-$stats['tasks_completed'] = $tasksStats['completed'] ?? 0;
+if (count($orders) > 0) {
+    $stmt = $pdo->prepare("
+        SELECT 
+            COUNT(*) as total,
+            SUM(CASE WHEN pt.status = 'in_progress' THEN 1 ELSE 0 END) as in_progress,
+            SUM(CASE WHEN pt.status = 'completed' THEN 1 ELSE 0 END) as completed
+        FROM production_tasks pt
+        JOIN orders o ON pt.order_id = o.id
+        WHERE o.id IN (" . implode(',', array_fill(0, count($orders), '?')) . ")
+    ");
+    $stmt->execute(array_map(fn($o) => $o['id'], $orders));
+    $tasksStats = $stmt->fetch();
+    $stats['total_tasks'] = $tasksStats['total'] ?? 0;
+    $stats['tasks_in_progress'] = $tasksStats['in_progress'] ?? 0;
+    $stats['tasks_completed'] = $tasksStats['completed'] ?? 0;
+}
 ?>
 <!DOCTYPE html>
 <html lang="ru">

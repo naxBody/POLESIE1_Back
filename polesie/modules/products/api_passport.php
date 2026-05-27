@@ -31,7 +31,7 @@ try {
             p.id as product_id,
             p.article as sku,
             p.name as product_name,
-            pc.name_ru as category_name,
+            pc.name as category_name,
             pc.code as category_code,
             pp.total_weight_kg,
             pp.warranty_months,
@@ -59,7 +59,7 @@ try {
             ppm.unit,
             m.code as material_code,
             m.name_full as material_name,
-            mc.name_ru as material_category
+            mc.name as material_category
         FROM product_passport_materials ppm
         JOIN materials m ON ppm.material_id = m.id
         LEFT JOIN material_categories mc ON m.category_id = mc.id

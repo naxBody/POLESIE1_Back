@@ -121,9 +121,9 @@ if (isset($_GET['api_order_detail'])) {
         $stmt = $pdo->prepare("
             SELECT ptm.id, ptm.task_id, ptm.material_id, ptm.quantity_required, ptm.quantity_used,
                    m.name as material_name, m.article as material_article, mu.symbol as unit_name,
-                   (SELECT SUM(w.quantity) FROM warehouse_stock w WHERE w.material_id = m.id) as quantity_available,
+                   COALESCE(m.current_stock, 0) as quantity_available,
                    CASE 
-                       WHEN (SELECT SUM(w.quantity) FROM warehouse_stock w WHERE w.material_id = m.id) >= ptm.quantity_required THEN 'sufficient'
+                       WHEN COALESCE(m.current_stock, 0) >= ptm.quantity_required THEN 'sufficient'
                        ELSE 'insufficient'
                    END as availability_status
             FROM production_tasks_materials ptm
@@ -136,7 +136,7 @@ if (isset($_GET['api_order_detail'])) {
         
         // Этапы выполнения для каждого задания
         $stmt = $pdo->prepare("
-            SELECT pts.*, ps.name as stage_name, ps.color as stage_color, ps.sort_order,
+            SELECT pts.id, pts.task_id, pts.stage_id, pts.status, ps.name as stage_name, ps.color as stage_color, ps.sort_order,
                 CASE pts.status
                     WHEN 'pending' THEN 'Ожидает'
                     WHEN 'in_progress' THEN 'В работе'
@@ -396,7 +396,7 @@ if (!empty($orders)) {
             
             // Материалы
             $sqlMat = "SELECT m.name as material_name, ptm.quantity_required as required_qty, 
-                              (SELECT COALESCE(SUM(w.quantity), 0) FROM warehouse_stock w WHERE w.material_id = m.id) as available_qty
+                              COALESCE(m.current_stock, 0) as available_qty
                        FROM production_tasks_materials ptm
                        JOIN materials m ON ptm.material_id = m.id
                        WHERE ptm.task_id = ?";
@@ -408,7 +408,7 @@ if (!empty($orders)) {
             }
 
             // Этапы
-            $sqlStages = "SELECT ps.name as stage_name, pts.status, pts.completed_at as date_completed, ps.sort_order 
+            $sqlStages = "SELECT ps.name as stage_name, pts.status, NULL as date_completed, ps.sort_order 
                           FROM production_task_stages pts
                           JOIN production_stages ps ON pts.stage_id = ps.id
                           WHERE pts.task_id = ?

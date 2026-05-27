@@ -26,7 +26,7 @@ $query = "
         p.id as product_id,
         p.article as sku,
         p.name as product_name,
-        pc.name_ru as category_name,
+        pc.name as category_name,
         pc.code as category_code,
         pp.total_weight_kg,
         pp.warranty_months,
@@ -52,19 +52,19 @@ if ($categoryFilter) {
     $params[':category'] = $categoryFilter;
 }
 
-$query .= " ORDER BY pc.name_ru, p.name";
+$query .= " ORDER BY pc.name, p.name";
 
 $stmt = $pdo->prepare($query);
 $stmt->execute($params);
 $passports = $stmt->fetchAll();
 
 // Получение уникальных категорий для фильтра
-$catQuery = "SELECT DISTINCT pc.code, pc.name_ru 
+$catQuery = "SELECT DISTINCT pc.code, pc.name 
              FROM product_categories pc
              JOIN products p ON p.category_id = pc.id
              JOIN product_passports pp ON pp.product_id = p.id
              WHERE p.is_active = TRUE
-             ORDER BY pc.name_ru";
+             ORDER BY pc.name";
 $categories = $pdo->query($catQuery)->fetchAll();
 
 $totalProducts = count($passports);
@@ -337,7 +337,7 @@ $totalProducts = count($passports);
                                     <select name="category" style="width: 250px; padding: 10px 14px; border: 1px solid var(--border-color); border-radius: var(--border-radius);">
                                         <option value="">Все категории</option>
                                         <?php foreach ($categories as $cat): ?>
-                                            <option value="<?= e($cat['code']) ?>" <?= $categoryFilter == $cat['code'] ? 'selected' : '' ?>><?= e($cat['name_ru']) ?></option>
+                                            <option value="<?= e($cat['code']) ?>" <?= $categoryFilter == $cat['code'] ? 'selected' : '' ?>><?= e($cat['name']) ?></option>
                                         <?php endforeach; ?>
                                     </select>
                                     <button type="submit" class="btn btn-secondary">Фильтр</button>
@@ -364,11 +364,10 @@ $totalProducts = count($passports);
                                                     ppm.unit,
                                                     m.code as material_code,
                                                     m.name_full as material_name,
-                                                    pc.name_ru as material_category
+                                                    mc.name as material_category
                                                 FROM product_passport_materials ppm
                                                 JOIN materials m ON ppm.material_id = m.id
                                                 LEFT JOIN material_categories mc ON m.category_id = mc.id
-                                                LEFT JOIN product_categories pc ON mc.parent_id = pc.id OR mc.id = pc.id
                                                 WHERE ppm.passport_id = :passport_id
                                                 ORDER BY ppm.sort_order, m.name_full
                                             ");

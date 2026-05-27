@@ -319,6 +319,189 @@ $stats['tasks_completed'] = $tasksStats['completed'] ?? 0;
         .expand-btn { background: none; border: none; cursor: pointer; font-size: 18px; color: #7f8c8d; }
         .task-details { display: none; margin-top: 16px; padding-top: 16px; border-top: 1px solid #e9ecef; }
         .task-details.show { display: block; }
+        
+        /* Стили для модального окна деталей заказа */
+        .passport-modal-overlay { 
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0; 
+            background: rgba(0, 0, 0, 0.6); 
+            display: flex; align-items: center; justify-content: center; 
+            z-index: 10000; 
+            backdrop-filter: blur(3px);
+        }
+        .passport-modal { 
+            background: #fff; 
+            border-radius: 16px; 
+            max-width: 1200px; 
+            width: 95%; 
+            max-height: 90vh; 
+            overflow: hidden; 
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: modalSlideIn 0.3s ease-out;
+        }
+        @keyframes modalSlideIn {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .passport-modal-header { 
+            padding: 24px 32px; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+            color: white; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+        }
+        .passport-modal-title { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
+        .passport-modal-subtitle { font-size: 14px; opacity: 0.9; }
+        .passport-modal-close { 
+            background: rgba(255,255,255,0.2); 
+            border: none; 
+            color: white; 
+            font-size: 28px; 
+            width: 40px; 
+            height: 40px; 
+            border-radius: 50%; 
+            cursor: pointer; 
+            transition: all 0.2s;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .passport-modal-close:hover { background: rgba(255,255,255,0.3); transform: rotate(90deg); }
+        .passport-modal-body { 
+            padding: 32px; 
+            overflow-y: auto; 
+            max-height: calc(90vh - 100px);
+        }
+        .passport-section { 
+            margin-bottom: 32px; 
+            background: #f8f9fa; 
+            border-radius: 12px; 
+            padding: 20px;
+        }
+        .passport-section-title { 
+            font-size: 16px; 
+            font-weight: 700; 
+            color: #2c3e50; 
+            margin-bottom: 16px; 
+            padding-bottom: 12px;
+            border-bottom: 2px solid #667eea;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .specs-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; }
+        .spec-row { display: flex; flex-direction: column; }
+        .spec-label { font-size: 12px; color: #7f8c8d; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .spec-value { font-size: 14px; color: #2c3e50; font-weight: 500; }
+        
+        /* Таблицы в модальном окне */
+        .materials-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        .materials-table th, .materials-table td { padding: 12px; text-align: left; border-bottom: 1px solid #e9ecef; }
+        .materials-table th { background: #f8f9fa; font-weight: 600; color: #495057; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .materials-table tr:hover { background: #f8f9fa; }
+        
+        /* Карточка задания в модальном окне */
+        .modal-task-card { 
+            background: white; 
+            border: 1px solid #e9ecef; 
+            border-radius: 12px; 
+            padding: 20px; 
+            margin-bottom: 16px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            transition: all 0.2s;
+        }
+        .modal-task-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .modal-task-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+        .modal-task-title { font-size: 16px; font-weight: 600; color: #2c3e50; display: flex; align-items: center; gap: 10px; }
+        .modal-task-progress { margin: 16px 0; }
+        .modal-progress-bar { height: 10px; background: #e9ecef; border-radius: 5px; overflow: hidden; }
+        .modal-progress-fill { height: 100%; background: linear-gradient(90deg, #667eea, #764ba2); transition: width 0.5s ease; border-radius: 5px; }
+        
+        /* Этапы производства - timeline */
+        .production-timeline { 
+            display: flex; 
+            flex-wrap: wrap; 
+            gap: 12px; 
+            margin-top: 16px;
+            padding: 16px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        .timeline-stage { 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            padding: 12px 16px;
+            border-radius: 8px;
+            min-width: 120px;
+            position: relative;
+            border: 2px solid transparent;
+            transition: all 0.2s;
+        }
+        .timeline-stage:hover { transform: translateY(-2px); }
+        .timeline-stage.completed { background: #d4edda; border-color: #28a745; }
+        .timeline-stage.in_progress { background: #fff3cd; border-color: #ffc107; animation: pulse 2s infinite; }
+        .timeline-stage.pending { background: #e9ecef; border-color: #dee2e6; }
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(255, 193, 7, 0.4); }
+            50% { box-shadow: 0 0 0 8px rgba(255, 193, 7, 0); }
+        }
+        .timeline-stage-icon { font-size: 24px; margin-bottom: 8px; }
+        .timeline-stage-name { font-size: 13px; font-weight: 600; color: #2c3e50; text-align: center; margin-bottom: 4px; }
+        .timeline-stage-status { font-size: 11px; color: #7f8c8d; text-transform: uppercase; }
+        .timeline-stage.completed .timeline-stage-status { color: #155724; }
+        .timeline-stage.in_progress .timeline-stage-status { color: #856404; }
+        
+        /* Материалы - индикаторы */
+        .material-status { display: flex; align-items: center; gap: 6px; }
+        .material-status-indicator { width: 10px; height: 10px; border-radius: 50%; }
+        .material-status-indicator.sufficient { background: #28a745; }
+        .material-status-indicator.insufficient { background: #dc3545; }
+        .material-shortage-warning { 
+            background: #f8d7da; 
+            color: #721c24; 
+            padding: 12px 16px; 
+            border-radius: 8px; 
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-left: 4px solid #dc3545;
+        }
+        
+        /* Бейджи */
+        .badge { 
+            padding: 6px 12px; 
+            border-radius: 20px; 
+            font-size: 12px; 
+            font-weight: 600; 
+            display: inline-block;
+        }
+        .badge-success { background: #d4edda; color: #155724; }
+        .badge-warning { background: #fff3cd; color: #856404; }
+        .badge-danger { background: #f8d7da; color: #721c24; }
+        .badge-info { background: #d1ecf1; color: #0c5460; }
+        .badge-primary { background: #cce5ff; color: #004085; }
+        
+        /* Кнопка раскрытия */
+        .toggle-details-btn { 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+            border: none; 
+            color: white; 
+            padding: 8px 16px; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .toggle-details-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4); }
+        .toggle-details-btn.active { background: linear-gradient(135deg, #764ba2 0%, #667eea 100%); }
+        
+        /* Анимация появления контента */
+        .fade-in { animation: fadeIn 0.3s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
 </head>
 <body>
@@ -520,34 +703,64 @@ $stats['tasks_completed'] = $tasksStats['completed'] ?? 0;
             const order = data.order || {};
             let html = '';
             
+            // Обновляем заголовок модального окна
+            document.getElementById('modalOrderNumber').textContent = 'Заказ №' + (order.order_number || '—');
+            document.getElementById('modalOrderStatus').textContent = 'Статус: ' + (order.status_name || '—');
+            
+            // Проверка на проблемы с материалами
+            let hasMaterialShortages = false;
+            if (data.tasks) {
+                data.tasks.forEach(function(task) {
+                    if (task.materials) {
+                        task.materials.forEach(function(mat) {
+                            if (mat.availability_status === 'insufficient') {
+                                hasMaterialShortages = true;
+                            }
+                        });
+                    }
+                });
+            }
+            
+            // Предупреждение о нехватке материалов
+            if (hasMaterialShortages) {
+                html += '<div class="material-shortage-warning fade-in">';
+                html += '<span style="font-size: 20px;">⚠️</span>';
+                html += '<div><strong>Внимание! По этому заказу есть нехватка материалов!</strong><br>Проверьте информацию в производственных заданиях ниже</div>';
+                html += '</div>';
+            }
+            
             // Основная информация о заказе
-            html += '<div class="passport-section">';
+            html += '<div class="passport-section fade-in">';
             html += '<div class="passport-section-title">📋 Информация о заказе</div>';
             html += '<div class="specs-list">';
             html += '<div class="spec-row"><div class="spec-label">№ заказа</div><div class="spec-value"><strong>' + escapeHtml(order.order_number || '—') + '</strong></div></div>';
-            html += '<div class="spec-row"><div class="spec-label">Статус</div><div class="spec-value"><span class="badge" style="background: ' + (order.status_color || '#95a5a6') + '20; color: ' + (order.status_color || '#95a5a6') + '">' + escapeHtml(order.status_name || '—') + '</span></div></div>';
+            html += '<div class="spec-row"><div class="spec-label">Статус</div><div class="spec-value"><span class="badge badge-primary" style="background: ' + (order.status_color || '#95a5a6') + '; color: white;">' + escapeHtml(order.status_name || '—') + '</span></div></div>';
             html += '<div class="spec-row"><div class="spec-label">Заказчик</div><div class="spec-value">' + escapeHtml(order.contractor_name || '—') + '</div></div>';
             html += '<div class="spec-row"><div class="spec-label">Ответственный</div><div class="spec-value">' + escapeHtml(order.responsible_name || '—') + '</div></div>';
             if (order.delivery_date) {
-                html += '<div class="spec-row"><div class="spec-label">Дата доставки</div><div class="spec-value">' + formatDate(order.delivery_date) + '</div></div>';
+                var daysUntil = order.days_until_delivery !== undefined ? order.days_until_delivery : Math.floor((new Date(order.delivery_date) - new Date()) / (1000 * 60 * 60 * 24));
+                var daysColor = daysUntil < 0 ? '#e74c3c' : (daysUntil <= 3 ? '#f39c12' : '#27ae60');
+                var daysText = daysUntil < 0 ? 'Просрочено на ' + Math.abs(daysUntil) + ' дн.' : 'Через ' + daysUntil + ' дн.';
+                html += '<div class="spec-row"><div class="spec-label">Дата доставки</div><div class="spec-value">' + formatDate(order.delivery_date) + ' <span style="color: ' + daysColor + '; font-size: 12px;">(' + daysText + ')</span></div></div>';
             }
             html += '</div></div>';
             
             // Позиции заказа
             if (data.items && data.items.length > 0) {
-                html += '<div class="passport-section">';
-                html += '<div class="passport-section-title">📦 Позиции заказа (' + data.items.length + ' шт.)</div>';
+                html += '<div class="passport-section fade-in">';
+                html += '<div class="passport-section-title">📦 Состав заказа <span style="font-size: 14px; font-weight: 400; color: #7f8c8d;">(' + data.items.length + ' поз.)</span></div>';
                 html += '<table class="materials-table">';
-                html += '<thead><tr><th>Продукция</th><th>Артикул</th><th>Кол-во</th><th>Цена</th><th>Сумма</th><th>Статус</th></tr></thead>';
+                html += '<thead><tr><th>Продукция</th><th>Артикул</th><th style="text-align: center;">Кол-во</th><th>Цена</th><th>Сумма</th><th>Статус производства</th></tr></thead>';
                 html += '<tbody>';
                 data.items.forEach(function(item) {
+                    var statusBadgeClass = item.production_status === 'completed' ? 'badge-success' : (item.production_status === 'in_progress' ? 'badge-warning' : (item.production_status === 'packed' ? 'badge-info' : 'badge-secondary'));
                     html += '<tr>';
                     html += '<td><strong>' + escapeHtml(item.product_name) + '</strong></td>';
-                    html += '<td><code>' + escapeHtml(item.product_article) + '</code></td>';
-                    html += '<td>' + item.quantity + '</td>';
+                    html += '<td><code style="background: #f8f9fa; padding: 2px 6px; border-radius: 4px;">' + escapeHtml(item.product_article) + '</code></td>';
+                    html += '<td style="text-align: center; font-weight: 600;">' + item.quantity + '</td>';
                     html += '<td>' + formatMoney(item.price) + '</td>';
-                    html += '<td>' + formatMoney(item.total) + '</td>';
-                    html += '<td><span class="badge" style="background: ' + item.production_status_color + '20; color: ' + item.production_status_color + '">' + escapeHtml(item.production_status_name) + '</span></td>';
+                    html += '<td><strong>' + formatMoney(item.total) + '</strong></td>';
+                    html += '<td><span class="badge" style="background: ' + item.production_status_color + '; color: white;">' + escapeHtml(item.production_status_name) + '</span></td>';
                     html += '</tr>';
                 });
                 html += '</tbody></table></div>';
@@ -555,70 +768,121 @@ $stats['tasks_completed'] = $tasksStats['completed'] ?? 0;
             
             // Производственные задания
             if (data.tasks && data.tasks.length > 0) {
-                html += '<div class="passport-section">';
-                html += '<div class="passport-section-title">🏭 Производственные задания (' + data.tasks.length + ')</div>';
+                html += '<div class="passport-section fade-in">';
+                html += '<div class="passport-section-title">🏭 Производственные задания <span style="font-size: 14px; font-weight: 400; color: #7f8c8d;">(' + data.tasks.length + ')</span></div>';
                 
                 data.tasks.forEach(function(task, index) {
-                    html += '<div class="task-card" style="background: #fafbfc; border: 1px solid #e9ecef; border-radius: 6px; padding: 16px; margin-bottom: 12px;">';
+                    var hasShortage = false;
+                    if (task.materials) {
+                        task.materials.forEach(function(mat) {
+                            if (mat.availability_status === 'insufficient') hasShortage = true;
+                        });
+                    }
+                    
+                    html += '<div class="modal-task-card fade-in" style="animation-delay: ' + (index * 0.1) + 's;">';
                     
                     // Заголовок задания
-                    html += '<div class="task-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">';
+                    html += '<div class="modal-task-header">';
+                    html += '<div class="modal-task-title">';
+                    html += '<span style="font-size: 20px;">🔧</span>';
                     html += '<div>';
-                    html += '<span class="task-title" style="font-weight: 600; color: #2c3e50;">#' + escapeHtml(task.id) + ' - ' + escapeHtml(task.product_name) + '</span>';
-                    html += '<span style="margin-left: 12px;" class="badge" style="background: ' + task.status_color + '20; color: ' + task.status_color + '">' + escapeHtml(task.status_name) + '</span>';
+                    html += '<div style="font-size: 14px; color: #7f8c8d;">Задание №' + escapeHtml(task.id) + '</div>';
+                    html += '<div style="font-size: 16px; font-weight: 600;">' + escapeHtml(task.product_name) + '</div>';
                     html += '</div>';
-                    html += '<button class="expand-btn" onclick="toggleTaskDetails(' + task.id + ')" style="background: none; border: none; cursor: pointer; font-size: 18px; color: #7f8c8d;">▼</button>';
+                    html += '</div>';
+                    html += '<div style="display: flex; align-items: center; gap: 10px;">';
+                    html += '<span class="badge" style="background: ' + task.status_color + '; color: white;">' + escapeHtml(task.status_name) + '</span>';
+                    html += '<button class="toggle-details-btn" onclick="toggleTaskDetails(' + task.id + ', this)" data-task-id="' + task.id + '">';
+                    html += '<span>📋</span><span class="btn-text">Подробнее</span>';
+                    html += '</button>';
+                    html += '</div>';
                     html += '</div>';
                     
                     // Прогресс
+                    html += '<div class="modal-task-progress">';
                     html += '<div style="display: flex; justify-content: space-between; font-size: 13px; color: #7f8c8d; margin-bottom: 8px;">';
-                    html += '<span>План: ' + (task.quantity_plan || '—') + ' шт.</span>';
-                    html += '<span>Факт: ' + (task.quantity_fact || '0') + ' шт.</span>';
+                    html += '<span>📊 План: <strong>' + (task.quantity_plan || '—') + ' шт.</strong></span>';
+                    html += '<span>✅ Факт: <strong>' + (task.quantity_fact || '0') + ' шт.</strong></span>';
                     if (task.planned_start) {
-                        html += '<span>' + formatDate(task.planned_start) + ' - ' + formatDate(task.planned_end) + '</span>';
+                        html += '<span>📅 ' + formatDate(task.planned_start) + ' - ' + formatDate(task.planned_end) + '</span>';
                     }
                     html += '</div>';
                     
-                    html += '<div class="progress-bar" style="height: 8px; background: #e9ecef; border-radius: 4px; overflow: hidden; margin: 8px 0;">';
-                    html += '<div class="progress-fill" style="height: 100%; background: linear-gradient(90deg, #3498db, #2ecc71); width: ' + task.progress_percent + '%;"></div>';
+                    html += '<div class="modal-progress-bar">';
+                    html += '<div class="modal-progress-fill" style="width: ' + task.progress_percent + '%;"></div>';
                     html += '</div>';
-                    html += '<div style="font-size: 12px; color: #7f8c8d; text-align: right;">Выполнено: ' + task.progress_percent + '%</div>';
+                    html += '<div style="font-size: 13px; color: #7f8c8d; text-align: right; margin-top: 6px;">Выполнено: <strong style="color: #667eea;">' + task.progress_percent + '%</strong></div>';
+                    html += '</div>';
+                    
+                    // Предупреждение о нехватке материалов для этого задания
+                    if (hasShortage) {
+                        html += '<div class="material-shortage-warning" style="margin-top: 12px; padding: 10px 14px; font-size: 13px;">';
+                        html += '<span style="font-size: 16px;">⚠️</span>';
+                        html += '<div><strong>Есть нехватка материалов!</strong></div>';
+                        html += '</div>';
+                    }
                     
                     // Детали (материалы и этапы)
-                    html += '<div class="task-details" id="task-details-' + task.id + '" style="display: none; margin-top: 16px; padding-top: 16px; border-top: 1px solid #e9ecef;">';
+                    html += '<div class="task-details" id="task-details-' + task.id + '" style="display: none; margin-top: 20px; padding-top: 20px; border-top: 2px dashed #e9ecef;">';
                     
                     // Материалы
                     if (task.materials && task.materials.length > 0) {
-                        html += '<h5 style="margin-bottom: 8px; font-size: 13px; color: #2c3e50;">📦 Материалы:</h5>';
-                        html += '<table class="materials-table" style="font-size: 13px;">';
-                        html += '<thead><tr><th>Материал</th><th>Артикул</th><th>Требуется</th><th>Доступно</th><th>Ед.</th><th>Статус</th></tr></thead>';
+                        html += '<div style="margin-bottom: 20px;">';
+                        html += '<h5 style="margin-bottom: 12px; font-size: 14px; color: #2c3e50; display: flex; align-items: center; gap: 8px;">';
+                        html += '<span style="font-size: 18px;">📦</span> Материалы для производства:';
+                        html += '</h5>';
+                        html += '<table class="materials-table">';
+                        html += '<thead><tr><th>Материал</th><th>Артикул</th><th style="text-align: center;">Требуется</th><th style="text-align: center;">Доступно</th><th>Ед.</th><th>Статус</th></tr></thead>';
                         html += '<tbody>';
                         task.materials.forEach(function(mat) {
-                            var statusBadge = mat.availability_status === 'sufficient' 
-                                ? '<span class="badge" style="background: #d4edda; color: #155724;">✓ Хватает</span>'
-                                : '<span class="badge" style="background: #f8d7da; color: #721c24;">⚠️ Не хватает</span>';
-                            html += '<tr>';
+                            var isSufficient = mat.availability_status === 'sufficient';
+                            var statusHtml = isSufficient 
+                                ? '<span class="badge badge-success"><span class="material-status-indicator sufficient"></span> Хватает</span>'
+                                : '<span class="badge badge-danger"><span class="material-status-indicator insufficient"></span> Не хватает (' + (mat.quantity_required - mat.quantity_available) + ')</span>';
+                            html += '<tr style="' + (!isSufficient ? 'background: #fff5f5;' : '') + '">';
                             html += '<td><strong>' + escapeHtml(mat.material_name) + '</strong></td>';
-                            html += '<td><code>' + escapeHtml(mat.material_article || '—') + '</code></td>';
-                            html += '<td>' + mat.quantity_required + '</td>';
-                            html += '<td>' + mat.quantity_available + '</td>';
+                            html += '<td><code style="background: #f8f9fa; padding: 2px 6px; border-radius: 4px; font-size: 12px;">' + escapeHtml(mat.material_article || '—') + '</code></td>';
+                            html += '<td style="text-align: center; font-weight: 600;">' + mat.quantity_required + '</td>';
+                            html += '<td style="text-align: center; font-weight: 600; color: ' + (isSufficient ? '#27ae60' : '#e74c3c') + ';">' + mat.quantity_available + '</td>';
                             html += '<td>' + escapeHtml(mat.unit_name || '—') + '</td>';
-                            html += '<td>' + statusBadge + '</td>';
+                            html += '<td>' + statusHtml + '</td>';
                             html += '</tr>';
                         });
                         html += '</tbody></table>';
+                        html += '</div>';
                     }
                     
-                    // Этапы производства
+                    // Этапы производства - Timeline
                     if (task.stages && task.stages.length > 0) {
-                        html += '<h5 style="margin: 16px 0 8px 0; font-size: 13px; color: #2c3e50;">🔄 Этапы производства:</h5>';
-                        html += '<div class="stages-list" style="display: flex; flex-wrap: wrap; gap: 8px;">';
+                        html += '<div>';
+                        html += '<h5 style="margin-bottom: 12px; font-size: 14px; color: #2c3e50; display: flex; align-items: center; gap: 8px;">';
+                        html += '<span style="font-size: 18px;">🔄</span> Этапы производства:';
+                        html += '</h5>';
+                        html += '<div class="production-timeline">';
+                        
+                        // Определяем иконки для этапов
+                        var stageIcons = {
+                            'Раскрой': '✂️',
+                            'Сварка': '🔥',
+                            'Сборка': '🔧',
+                            'Покраска': '🎨',
+                            'Упаковка': '📦',
+                            'Контроль качества': '✅',
+                            'Готово': '✔️'
+                        };
+                        
                         task.stages.forEach(function(stage) {
-                            var badgeClass = stage.status === 'completed' ? 'completed' : (stage.status === 'in_progress' ? 'in_progress' : 'pending');
-                            var stageBg = stage.status === 'completed' ? '#d4edda' : (stage.status === 'in_progress' ? '#fff3cd' : '#e9ecef');
-                            var stageColor = stage.status === 'completed' ? '#155724' : (stage.status === 'in_progress' ? '#856404' : '#495057');
-                            html += '<span class="stage-badge ' + badgeClass + '" style="padding: 6px 12px; border-radius: 12px; font-size: 12px; background: ' + stageBg + '; color: ' + stageColor + '; border: 1px solid ' + (stage.stage_color || '#ddd') + ';">' + escapeHtml(stage.stage_name) + ': ' + escapeHtml(stage.status_name) + '</span>';
+                            var stageClass = stage.status === 'completed' ? 'completed' : (stage.status === 'in_progress' ? 'in_progress' : 'pending');
+                            var icon = stageIcons[stage.stage_name] || '📍';
+                            
+                            html += '<div class="timeline-stage ' + stageClass + '">';
+                            html += '<div class="timeline-stage-icon">' + icon + '</div>';
+                            html += '<div class="timeline-stage-name">' + escapeHtml(stage.stage_name) + '</div>';
+                            html += '<div class="timeline-stage-status">' + escapeHtml(stage.status_name) + '</div>';
+                            html += '</div>';
                         });
+                        
+                        html += '</div>';
                         html += '</div>';
                     }
                     
@@ -630,10 +894,20 @@ $stats['tasks_completed'] = $tasksStats['completed'] ?? 0;
             body.innerHTML = html;
         }
         
-        function toggleTaskDetails(taskId) {
+        function toggleTaskDetails(taskId, btn) {
             const details = document.getElementById('task-details-' + taskId);
             if (details) {
-                details.style.display = details.style.display === 'none' ? 'block' : 'none';
+                const isHidden = details.style.display === 'none';
+                details.style.display = isHidden ? 'block' : 'none';
+                
+                // Обновляем кнопку
+                if (btn) {
+                    btn.classList.toggle('active', isHidden);
+                    var btnText = btn.querySelector('.btn-text');
+                    if (btnText) {
+                        btnText.textContent = isHidden ? 'Свернуть' : 'Подробнее';
+                    }
+                }
             }
         }
         

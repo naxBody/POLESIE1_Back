@@ -323,19 +323,18 @@ $stats['tasks_completed'] = $tasksStats['completed'] ?? 0;
         /* Стили для модального окна деталей заказа */
         .passport-modal-overlay { 
             position: fixed; top: 0; left: 0; right: 0; bottom: 0; 
-            background: rgba(0, 0, 0, 0.6); 
+            background: rgba(0, 0, 0, 0.5); 
             display: flex; align-items: center; justify-content: center; 
-            z-index: 10000; 
-            backdrop-filter: blur(3px);
+            z-index: 10000;
         }
         .passport-modal { 
             background: #fff; 
-            border-radius: 16px; 
-            max-width: 1200px; 
+            border-radius: 8px; 
+            max-width: 1100px; 
             width: 95%; 
             max-height: 90vh; 
             overflow: hidden; 
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
             animation: modalSlideIn 0.3s ease-out;
         }
         @keyframes modalSlideIn {
@@ -343,135 +342,123 @@ $stats['tasks_completed'] = $tasksStats['completed'] ?? 0;
             to { opacity: 1; transform: translateY(0); }
         }
         .passport-modal-header { 
-            padding: 24px 32px; 
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
-            color: white; 
+            padding: 16px 20px; 
+            background: #f8f9fa; 
+            border-bottom: 1px solid #e9ecef; 
             display: flex; 
             justify-content: space-between; 
             align-items: center;
         }
-        .passport-modal-title { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
-        .passport-modal-subtitle { font-size: 14px; opacity: 0.9; }
+        .passport-modal-title { font-size: 18px; font-weight: 600; color: #2c3e50; margin-bottom: 4px; }
+        .passport-modal-subtitle { font-size: 13px; color: #7f8c8d; }
         .passport-modal-close { 
-            background: rgba(255,255,255,0.2); 
+            background: none; 
             border: none; 
-            color: white; 
-            font-size: 28px; 
-            width: 40px; 
-            height: 40px; 
-            border-radius: 50%; 
+            color: #7f8c8d; 
+            font-size: 24px; 
+            width: 32px; 
+            height: 32px; 
             cursor: pointer; 
             transition: all 0.2s;
             display: flex; align-items: center; justify-content: center;
         }
-        .passport-modal-close:hover { background: rgba(255,255,255,0.3); transform: rotate(90deg); }
+        .passport-modal-close:hover { color: #2c3e50; background: #e9ecef; border-radius: 4px; }
         .passport-modal-body { 
-            padding: 32px; 
+            padding: 20px; 
             overflow-y: auto; 
-            max-height: calc(90vh - 100px);
+            max-height: calc(90vh - 80px);
         }
         .passport-section { 
-            margin-bottom: 32px; 
+            margin-bottom: 20px; 
             background: #f8f9fa; 
-            border-radius: 12px; 
-            padding: 20px;
+            border-radius: 6px; 
+            padding: 16px;
         }
         .passport-section-title { 
-            font-size: 16px; 
-            font-weight: 700; 
+            font-size: 14px; 
+            font-weight: 600; 
             color: #2c3e50; 
-            margin-bottom: 16px; 
-            padding-bottom: 12px;
-            border-bottom: 2px solid #667eea;
-            display: flex;
-            align-items: center;
-            gap: 8px;
+            margin-bottom: 12px; 
+            padding-bottom: 8px;
+            border-bottom: 1px solid #dee2e6;
         }
-        .specs-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; }
+        .specs-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; }
         .spec-row { display: flex; flex-direction: column; }
-        .spec-label { font-size: 12px; color: #7f8c8d; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
-        .spec-value { font-size: 14px; color: #2c3e50; font-weight: 500; }
+        .spec-label { font-size: 11px; color: #7f8c8d; margin-bottom: 4px; }
+        .spec-value { font-size: 13px; color: #2c3e50; font-weight: 500; }
         
         /* Таблицы в модальном окне */
         .materials-table { width: 100%; border-collapse: collapse; font-size: 13px; }
-        .materials-table th, .materials-table td { padding: 12px; text-align: left; border-bottom: 1px solid #e9ecef; }
-        .materials-table th { background: #f8f9fa; font-weight: 600; color: #495057; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .materials-table th, .materials-table td { padding: 8px 10px; text-align: left; border-bottom: 1px solid #e9ecef; }
+        .materials-table th { background: #f8f9fa; font-weight: 600; color: #495057; font-size: 12px; }
         .materials-table tr:hover { background: #f8f9fa; }
         
         /* Карточка задания в модальном окне */
         .modal-task-card { 
             background: white; 
             border: 1px solid #e9ecef; 
-            border-radius: 12px; 
-            padding: 20px; 
-            margin-bottom: 16px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-            transition: all 0.2s;
+            border-radius: 6px; 
+            padding: 16px; 
+            margin-bottom: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
-        .modal-task-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-        .modal-task-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
-        .modal-task-title { font-size: 16px; font-weight: 600; color: #2c3e50; display: flex; align-items: center; gap: 10px; }
-        .modal-task-progress { margin: 16px 0; }
-        .modal-progress-bar { height: 10px; background: #e9ecef; border-radius: 5px; overflow: hidden; }
-        .modal-progress-fill { height: 100%; background: linear-gradient(90deg, #667eea, #764ba2); transition: width 0.5s ease; border-radius: 5px; }
+        .modal-task-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+        .modal-task-title { font-size: 14px; font-weight: 600; color: #2c3e50; display: flex; align-items: center; gap: 8px; }
+        .modal-task-progress { margin: 12px 0; }
+        .modal-progress-bar { height: 8px; background: #e9ecef; border-radius: 4px; overflow: hidden; }
+        .modal-progress-fill { height: 100%; background: #3498db; transition: width 0.3s; border-radius: 4px; }
         
         /* Этапы производства - timeline */
         .production-timeline { 
             display: flex; 
             flex-wrap: wrap; 
-            gap: 12px; 
-            margin-top: 16px;
-            padding: 16px;
-            background: #f8f9fa;
-            border-radius: 8px;
+            gap: 8px; 
+            margin-top: 12px;
+            padding: 12px;
+            background: #fff;
+            border-radius: 6px;
+            border: 1px solid #e9ecef;
         }
         .timeline-stage { 
             display: flex; 
             flex-direction: column; 
             align-items: center; 
-            padding: 12px 16px;
-            border-radius: 8px;
-            min-width: 120px;
-            position: relative;
-            border: 2px solid transparent;
-            transition: all 0.2s;
+            padding: 8px 12px;
+            border-radius: 6px;
+            min-width: 100px;
+            border: 1px solid transparent;
         }
-        .timeline-stage:hover { transform: translateY(-2px); }
         .timeline-stage.completed { background: #d4edda; border-color: #28a745; }
-        .timeline-stage.in_progress { background: #fff3cd; border-color: #ffc107; animation: pulse 2s infinite; }
-        .timeline-stage.pending { background: #e9ecef; border-color: #dee2e6; }
-        @keyframes pulse {
-            0%, 100% { box-shadow: 0 0 0 0 rgba(255, 193, 7, 0.4); }
-            50% { box-shadow: 0 0 0 8px rgba(255, 193, 7, 0); }
-        }
-        .timeline-stage-icon { font-size: 24px; margin-bottom: 8px; }
-        .timeline-stage-name { font-size: 13px; font-weight: 600; color: #2c3e50; text-align: center; margin-bottom: 4px; }
-        .timeline-stage-status { font-size: 11px; color: #7f8c8d; text-transform: uppercase; }
+        .timeline-stage.in_progress { background: #fff3cd; border-color: #ffc107; }
+        .timeline-stage.pending { background: #f8f9fa; border-color: #dee2e6; }
+        .timeline-stage-icon { font-size: 20px; margin-bottom: 4px; }
+        .timeline-stage-name { font-size: 12px; font-weight: 600; color: #2c3e50; text-align: center; margin-bottom: 2px; }
+        .timeline-stage-status { font-size: 10px; color: #7f8c8d; text-transform: uppercase; }
         .timeline-stage.completed .timeline-stage-status { color: #155724; }
         .timeline-stage.in_progress .timeline-stage-status { color: #856404; }
         
         /* Материалы - индикаторы */
-        .material-status { display: flex; align-items: center; gap: 6px; }
-        .material-status-indicator { width: 10px; height: 10px; border-radius: 50%; }
+        .material-status-indicator { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 4px; }
         .material-status-indicator.sufficient { background: #28a745; }
         .material-status-indicator.insufficient { background: #dc3545; }
         .material-shortage-warning { 
             background: #f8d7da; 
             color: #721c24; 
-            padding: 12px 16px; 
-            border-radius: 8px; 
-            margin-bottom: 16px;
+            padding: 10px 12px; 
+            border-radius: 4px; 
+            margin-bottom: 12px;
             display: flex;
             align-items: center;
-            gap: 10px;
-            border-left: 4px solid #dc3545;
+            gap: 8px;
+            border-left: 3px solid #dc3545;
+            font-size: 13px;
         }
         
         /* Бейджи */
         .badge { 
-            padding: 6px 12px; 
-            border-radius: 20px; 
-            font-size: 12px; 
+            padding: 4px 10px; 
+            border-radius: 12px; 
+            font-size: 11px; 
             font-weight: 600; 
             display: inline-block;
         }
@@ -483,21 +470,20 @@ $stats['tasks_completed'] = $tasksStats['completed'] ?? 0;
         
         /* Кнопка раскрытия */
         .toggle-details-btn { 
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
-            border: none; 
-            color: white; 
-            padding: 8px 16px; 
-            border-radius: 8px; 
+            background: #f8f9fa; 
+            border: 1px solid #dee2e6; 
+            color: #495057; 
+            padding: 6px 12px; 
+            border-radius: 4px; 
             cursor: pointer; 
-            font-size: 13px;
-            font-weight: 500;
+            font-size: 12px;
             transition: all 0.2s;
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 4px;
         }
-        .toggle-details-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4); }
-        .toggle-details-btn.active { background: linear-gradient(135deg, #764ba2 0%, #667eea 100%); }
+        .toggle-details-btn:hover { background: #e9ecef; }
+        .toggle-details-btn.active { background: #3498db; color: white; border-color: #3498db; }
         
         /* Анимация появления контента */
         .fade-in { animation: fadeIn 0.3s ease-in; }
@@ -658,7 +644,7 @@ $stats['tasks_completed'] = $tasksStats['completed'] ?? 0;
                 
                 <!-- Модальное окно деталей заказа -->
                 <div id="orderDetailModalOverlay" class="passport-modal-overlay" onclick="closeOrderDetailModal(event)" style="display: none;">
-                    <div class="passport-modal" style="max-width: 1100px;">
+                    <div class="passport-modal">
                         <div class="passport-modal-header">
                             <div>
                                 <div class="passport-modal-title" id="modalOrderNumber">Заказ №—</div>
@@ -666,10 +652,9 @@ $stats['tasks_completed'] = $tasksStats['completed'] ?? 0;
                             </div>
                             <button class="passport-modal-close" onclick="closeOrderDetailModalDirect()">×</button>
                         </div>
-                        <div class="passport-modal-body" id="modalOrderBody" style="max-height: 70vh; overflow-y: auto;">
+                        <div class="passport-modal-body" id="modalOrderBody">
                             <div style="text-align: center; padding: 40px;">
-                                <div style="font-size: 32px; margin-bottom: 16px;">⏳</div>
-                                <p>Загрузка информации...</p>
+                                <p>Загрузка...</p>
                             </div>
                         </div>
                     </div>
@@ -685,16 +670,21 @@ $stats['tasks_completed'] = $tasksStats['completed'] ?? 0;
             const body = document.getElementById('modalOrderBody');
             
             modal.style.display = 'flex';
-            body.innerHTML = '<div style="text-align: center; padding: 40px;"><div style="font-size: 32px; margin-bottom: 16px;">⏳</div><p>Загрузка информации...</p></div>';
+            body.innerHTML = '<div style="text-align: center; padding: 40px;"><p>Загрузка информации...</p></div>';
             
             fetch('?api_order_detail=1&order_id=' + orderId)
-                .then(response => response.json())
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('HTTP error! status: ' + response.status);
+                    }
+                    return response.json();
+                })
                 .then(data => {
                     renderOrderDetailModal(data, orderId);
                 })
                 .catch(error => {
                     console.error('Error:', error);
-                    body.innerHTML = '<div style="text-align: center; padding: 40px; color: #e74c3c;">Ошибка загрузки данных</div>';
+                    body.innerHTML = '<div style="text-align: center; padding: 40px; color: #e74c3c;">Ошибка загрузки данных<br><small>' + error.message + '</small></div>';
                 });
         }
         
@@ -731,7 +721,7 @@ $stats['tasks_completed'] = $tasksStats['completed'] ?? 0;
             
             // Основная информация о заказе
             html += '<div class="passport-section fade-in">';
-            html += '<div class="passport-section-title">📋 Информация о заказе</div>';
+            html += '<div class="passport-section-title">Информация о заказе</div>';
             html += '<div class="specs-list">';
             html += '<div class="spec-row"><div class="spec-label">№ заказа</div><div class="spec-value"><strong>' + escapeHtml(order.order_number || '—') + '</strong></div></div>';
             html += '<div class="spec-row"><div class="spec-label">Статус</div><div class="spec-value"><span class="badge badge-primary" style="background: ' + (order.status_color || '#95a5a6') + '; color: white;">' + escapeHtml(order.status_name || '—') + '</span></div></div>';
@@ -741,25 +731,24 @@ $stats['tasks_completed'] = $tasksStats['completed'] ?? 0;
                 var daysUntil = order.days_until_delivery !== undefined ? order.days_until_delivery : Math.floor((new Date(order.delivery_date) - new Date()) / (1000 * 60 * 60 * 24));
                 var daysColor = daysUntil < 0 ? '#e74c3c' : (daysUntil <= 3 ? '#f39c12' : '#27ae60');
                 var daysText = daysUntil < 0 ? 'Просрочено на ' + Math.abs(daysUntil) + ' дн.' : 'Через ' + daysUntil + ' дн.';
-                html += '<div class="spec-row"><div class="spec-label">Дата доставки</div><div class="spec-value">' + formatDate(order.delivery_date) + ' <span style="color: ' + daysColor + '; font-size: 12px;">(' + daysText + ')</span></div></div>';
+                html += '<div class="spec-row"><div class="spec-label">Дата доставки</div><div class="spec-value">' + formatDate(order.delivery_date) + ' <span style="color: ' + daysColor + '; font-size: 11px;">(' + daysText + ')</span></div></div>';
             }
             html += '</div></div>';
             
             // Позиции заказа
             if (data.items && data.items.length > 0) {
                 html += '<div class="passport-section fade-in">';
-                html += '<div class="passport-section-title">📦 Состав заказа <span style="font-size: 14px; font-weight: 400; color: #7f8c8d;">(' + data.items.length + ' поз.)</span></div>';
+                html += '<div class="passport-section-title">Состав заказа (' + data.items.length + ' поз.)</div>';
                 html += '<table class="materials-table">';
-                html += '<thead><tr><th>Продукция</th><th>Артикул</th><th style="text-align: center;">Кол-во</th><th>Цена</th><th>Сумма</th><th>Статус производства</th></tr></thead>';
+                html += '<thead><tr><th>Продукция</th><th>Артикул</th><th style="text-align: center;">Кол-во</th><th style="text-align: right;">Цена</th><th style="text-align: right;">Сумма</th><th>Статус</th></tr></thead>';
                 html += '<tbody>';
                 data.items.forEach(function(item) {
-                    var statusBadgeClass = item.production_status === 'completed' ? 'badge-success' : (item.production_status === 'in_progress' ? 'badge-warning' : (item.production_status === 'packed' ? 'badge-info' : 'badge-secondary'));
                     html += '<tr>';
                     html += '<td><strong>' + escapeHtml(item.product_name) + '</strong></td>';
-                    html += '<td><code style="background: #f8f9fa; padding: 2px 6px; border-radius: 4px;">' + escapeHtml(item.product_article) + '</code></td>';
+                    html += '<td><code style="background: #f8f9fa; padding: 2px 6px; border-radius: 4px; font-size: 11px;">' + escapeHtml(item.product_article) + '</code></td>';
                     html += '<td style="text-align: center; font-weight: 600;">' + item.quantity + '</td>';
-                    html += '<td>' + formatMoney(item.price) + '</td>';
-                    html += '<td><strong>' + formatMoney(item.total) + '</strong></td>';
+                    html += '<td style="text-align: right;">' + formatMoney(item.price) + '</td>';
+                    html += '<td style="text-align: right;"><strong>' + formatMoney(item.total) + '</strong></td>';
                     html += '<td><span class="badge" style="background: ' + item.production_status_color + '; color: white;">' + escapeHtml(item.production_status_name) + '</span></td>';
                     html += '</tr>';
                 });
@@ -769,7 +758,7 @@ $stats['tasks_completed'] = $tasksStats['completed'] ?? 0;
             // Производственные задания
             if (data.tasks && data.tasks.length > 0) {
                 html += '<div class="passport-section fade-in">';
-                html += '<div class="passport-section-title">🏭 Производственные задания <span style="font-size: 14px; font-weight: 400; color: #7f8c8d;">(' + data.tasks.length + ')</span></div>';
+                html += '<div class="passport-section-title">Производственные задания (' + data.tasks.length + ')</div>';
                 
                 data.tasks.forEach(function(task, index) {
                     var hasShortage = false;
@@ -779,18 +768,17 @@ $stats['tasks_completed'] = $tasksStats['completed'] ?? 0;
                         });
                     }
                     
-                    html += '<div class="modal-task-card fade-in" style="animation-delay: ' + (index * 0.1) + 's;">';
+                    html += '<div class="modal-task-card fade-in">';
                     
                     // Заголовок задания
                     html += '<div class="modal-task-header">';
                     html += '<div class="modal-task-title">';
-                    html += '<span style="font-size: 20px;">🔧</span>';
                     html += '<div>';
-                    html += '<div style="font-size: 14px; color: #7f8c8d;">Задание №' + escapeHtml(task.id) + '</div>';
-                    html += '<div style="font-size: 16px; font-weight: 600;">' + escapeHtml(task.product_name) + '</div>';
+                    html += '<div style="font-size: 12px; color: #7f8c8d;">Задание #' + escapeHtml(task.id) + '</div>';
+                    html += '<div style="font-size: 14px; font-weight: 600;">' + escapeHtml(task.product_name) + '</div>';
                     html += '</div>';
                     html += '</div>';
-                    html += '<div style="display: flex; align-items: center; gap: 10px;">';
+                    html += '<div style="display: flex; align-items: center; gap: 8px;">';
                     html += '<span class="badge" style="background: ' + task.status_color + '; color: white;">' + escapeHtml(task.status_name) + '</span>';
                     html += '<button class="toggle-details-btn" onclick="toggleTaskDetails(' + task.id + ', this)" data-task-id="' + task.id + '">';
                     html += '<span>📋</span><span class="btn-text">Подробнее</span>';
@@ -800,48 +788,46 @@ $stats['tasks_completed'] = $tasksStats['completed'] ?? 0;
                     
                     // Прогресс
                     html += '<div class="modal-task-progress">';
-                    html += '<div style="display: flex; justify-content: space-between; font-size: 13px; color: #7f8c8d; margin-bottom: 8px;">';
-                    html += '<span>📊 План: <strong>' + (task.quantity_plan || '—') + ' шт.</strong></span>';
-                    html += '<span>✅ Факт: <strong>' + (task.quantity_fact || '0') + ' шт.</strong></span>';
+                    html += '<div style="display: flex; justify-content: space-between; font-size: 12px; color: #7f8c8d; margin-bottom: 6px;">';
+                    html += '<span>План: <strong>' + (task.quantity_plan || '—') + ' шт.</strong></span>';
+                    html += '<span>Факт: <strong>' + (task.quantity_fact || '0') + ' шт.</strong></span>';
                     if (task.planned_start) {
-                        html += '<span>📅 ' + formatDate(task.planned_start) + ' - ' + formatDate(task.planned_end) + '</span>';
+                        html += '<span>' + formatDate(task.planned_start) + ' - ' + formatDate(task.planned_end) + '</span>';
                     }
                     html += '</div>';
                     
                     html += '<div class="modal-progress-bar">';
                     html += '<div class="modal-progress-fill" style="width: ' + task.progress_percent + '%;"></div>';
                     html += '</div>';
-                    html += '<div style="font-size: 13px; color: #7f8c8d; text-align: right; margin-top: 6px;">Выполнено: <strong style="color: #667eea;">' + task.progress_percent + '%</strong></div>';
+                    html += '<div style="font-size: 12px; color: #7f8c8d; text-align: right; margin-top: 4px;">Выполнено: <strong>' + task.progress_percent + '%</strong></div>';
                     html += '</div>';
                     
                     // Предупреждение о нехватке материалов для этого задания
                     if (hasShortage) {
-                        html += '<div class="material-shortage-warning" style="margin-top: 12px; padding: 10px 14px; font-size: 13px;">';
-                        html += '<span style="font-size: 16px;">⚠️</span>';
+                        html += '<div class="material-shortage-warning" style="margin-top: 10px; padding: 8px 12px; font-size: 12px;">';
+                        html += '<span>⚠️</span>';
                         html += '<div><strong>Есть нехватка материалов!</strong></div>';
                         html += '</div>';
                     }
                     
                     // Детали (материалы и этапы)
-                    html += '<div class="task-details" id="task-details-' + task.id + '" style="display: none; margin-top: 20px; padding-top: 20px; border-top: 2px dashed #e9ecef;">';
+                    html += '<div class="task-details" id="task-details-' + task.id + '" style="display: none; margin-top: 16px; padding-top: 16px; border-top: 1px dashed #e9ecef;">';
                     
                     // Материалы
                     if (task.materials && task.materials.length > 0) {
-                        html += '<div style="margin-bottom: 20px;">';
-                        html += '<h5 style="margin-bottom: 12px; font-size: 14px; color: #2c3e50; display: flex; align-items: center; gap: 8px;">';
-                        html += '<span style="font-size: 18px;">📦</span> Материалы для производства:';
-                        html += '</h5>';
+                        html += '<div style="margin-bottom: 16px;">';
+                        html += '<h5 style="margin-bottom: 10px; font-size: 13px; color: #2c3e50; font-weight: 600;">Материалы:</h5>';
                         html += '<table class="materials-table">';
                         html += '<thead><tr><th>Материал</th><th>Артикул</th><th style="text-align: center;">Требуется</th><th style="text-align: center;">Доступно</th><th>Ед.</th><th>Статус</th></tr></thead>';
                         html += '<tbody>';
                         task.materials.forEach(function(mat) {
                             var isSufficient = mat.availability_status === 'sufficient';
                             var statusHtml = isSufficient 
-                                ? '<span class="badge badge-success"><span class="material-status-indicator sufficient"></span> Хватает</span>'
-                                : '<span class="badge badge-danger"><span class="material-status-indicator insufficient"></span> Не хватает (' + (mat.quantity_required - mat.quantity_available) + ')</span>';
+                                ? '<span class="badge badge-success"><span class="material-status-indicator sufficient"></span>Хватает</span>'
+                                : '<span class="badge badge-danger"><span class="material-status-indicator insufficient"></span>Не хватает (' + (mat.quantity_required - mat.quantity_available) + ')</span>';
                             html += '<tr style="' + (!isSufficient ? 'background: #fff5f5;' : '') + '">';
                             html += '<td><strong>' + escapeHtml(mat.material_name) + '</strong></td>';
-                            html += '<td><code style="background: #f8f9fa; padding: 2px 6px; border-radius: 4px; font-size: 12px;">' + escapeHtml(mat.material_article || '—') + '</code></td>';
+                            html += '<td><code style="background: #f8f9fa; padding: 2px 4px; border-radius: 3px; font-size: 10px;">' + escapeHtml(mat.material_article || '—') + '</code></td>';
                             html += '<td style="text-align: center; font-weight: 600;">' + mat.quantity_required + '</td>';
                             html += '<td style="text-align: center; font-weight: 600; color: ' + (isSufficient ? '#27ae60' : '#e74c3c') + ';">' + mat.quantity_available + '</td>';
                             html += '<td>' + escapeHtml(mat.unit_name || '—') + '</td>';
@@ -855,9 +841,7 @@ $stats['tasks_completed'] = $tasksStats['completed'] ?? 0;
                     // Этапы производства - Timeline
                     if (task.stages && task.stages.length > 0) {
                         html += '<div>';
-                        html += '<h5 style="margin-bottom: 12px; font-size: 14px; color: #2c3e50; display: flex; align-items: center; gap: 8px;">';
-                        html += '<span style="font-size: 18px;">🔄</span> Этапы производства:';
-                        html += '</h5>';
+                        html += '<h5 style="margin-bottom: 10px; font-size: 13px; color: #2c3e50; font-weight: 600;">Этапы производства:</h5>';
                         html += '<div class="production-timeline">';
                         
                         // Определяем иконки для этапов

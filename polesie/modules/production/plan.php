@@ -46,15 +46,7 @@ $orders = $pdo->query("
 foreach ($orders as &$order) {
     // Позиции заказа
     $order['items'] = $pdo->prepare("
-        SELECT oi.*, p.name as product_name, p.article as product_article,
-            oi.production_status,
-            CASE oi.production_status
-                WHEN 'not_started' THEN 'Не начато'
-                WHEN 'in_progress' THEN 'В производстве'
-                WHEN 'completed' THEN 'Готово'
-                WHEN 'packed' THEN 'Упаковано'
-                ELSE oi.production_status
-            END as production_status_name
+        SELECT oi.*, p.name as product_name, p.article as product_article
         FROM order_items oi
         JOIN products p ON oi.product_id = p.id
         WHERE oi.order_id = ?
@@ -287,11 +279,8 @@ foreach ($orders as $order) {
                                     <td><?= formatMoney($item['price']) ?></td>
                                     <td><?= formatMoney($item['total']) ?></td>
                                     <td>
-                                        <span class="badge" style="background: 
-                                            <?= $item['production_status'] === 'completed' ? '#d4edda; color: #155724' : 
-                                               ($item['production_status'] === 'in_progress' ? '#fff3cd; color: #856404' : 
-                                               '#e9ecef; color: #495057') ?>">
-                                            <?= e($item['production_status_name']) ?>
+                                        <span class="badge" style="background: #e9ecef; color: #495057">
+                                            Нет данных
                                         </span>
                                     </td>
                                 </tr>

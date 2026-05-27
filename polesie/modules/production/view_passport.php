@@ -25,7 +25,7 @@ if (!$id) {
 $stmt = $pdo->prepare("
     SELECT sn.*, p.name as product_name, p.article as product_article, 
            p.description as product_description, p.specifications as product_specifications,
-           c.name as category_name, u.name as unit_name,
+           c.name as category_name, u.symbol as unit_name,
            po.production_number
     FROM product_serial_numbers sn
     JOIN products p ON sn.product_id = p.id

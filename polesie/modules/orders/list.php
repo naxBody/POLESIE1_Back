@@ -106,17 +106,31 @@ $stmt = $pdo->prepare($sql);
 $stmt->execute($params);
 $orders = $stmt->fetchAll();
 
-// Получение статусов для фильтра
+// Получение статусов для фильтра и статистики
 $statuses = [
-    ['status' => 'new', 'name' => 'Новый'],
-    ['status' => 'processing', 'name' => 'В работе'],
-    ['status' => 'ready', 'name' => 'Готов'],
-    ['status' => 'shipped', 'name' => 'Отгружен'],
-    ['status' => 'cancelled', 'name' => 'Отменен']
+    ['status' => 'new', 'name' => 'Новый', 'color' => '#3498db', 'icon' => '🆕'],
+    ['status' => 'processing', 'name' => 'В работе', 'color' => '#f39c12', 'icon' => '⚙️'],
+    ['status' => 'ready', 'name' => 'Готов', 'color' => '#27ae60', 'icon' => '✅'],
+    ['status' => 'shipped', 'name' => 'Отгружен', 'color' => '#9b59b6', 'icon' => '📦'],
+    ['status' => 'cancelled', 'name' => 'Отменен', 'color' => '#e74c3c', 'icon' => '❌']
 ];
 
+// Подсчет заказов по статусам
+$statusCounts = [];
+foreach ($statuses as $status) {
+    $stmt = $pdo->prepare("SELECT COUNT(*) FROM orders WHERE status = ?");
+    $stmt->execute([$status['status']]);
+    $statusCounts[$status['status']] = $stmt->fetchColumn();
+}
+
 // Получение контрагентов для фильтра
-$contractors = $pdo->query("SELECT id, name FROM contractors WHERE is_active = TRUE ORDER BY name LIMIT 100")->fetchAll();
+$contractors = $pdo->query("SELECT id, name FROM contractors ORDER BY name LIMIT 100")->fetchAll();
+
+// Статистика
+$newOrdersCount = $statusCounts['new'] ?? 0;
+$inWorkCount = $statusCounts['processing'] ?? 0;
+$readyCount = $statusCounts['ready'] ?? 0;
+$totalActive = $newOrdersCount + $inWorkCount;
 
 $pageTitle = 'Заказы';
 ?>
@@ -137,6 +151,26 @@ $pageTitle = 'Заказы';
             <?php require_once BASE_PATH . '/includes/topbar.php'; ?>
             
             <div class="content-area">
+                <!-- Статистика по заказам -->
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px;">
+                    <div class="stat-card" style="background: linear-gradient(135deg, #3498db, #2980b9); color: white; padding: 24px; border-radius: 12px; text-align: center;">
+                        <div style="font-size: 36px; font-weight: 700; margin-bottom: 8px;"><?= $newOrdersCount ?></div>
+                        <div style="font-size: 14px; opacity: 0.9;">🆕 Новые заказы</div>
+                    </div>
+                    <div class="stat-card" style="background: linear-gradient(135deg, #f39c12, #e67e22); color: white; padding: 24px; border-radius: 12px; text-align: center;">
+                        <div style="font-size: 36px; font-weight: 700; margin-bottom: 8px;"><?= $inWorkCount ?></div>
+                        <div style="font-size: 14px; opacity: 0.9;">⚙️ В работе</div>
+                    </div>
+                    <div class="stat-card" style="background: linear-gradient(135deg, #27ae60, #229954); color: white; padding: 24px; border-radius: 12px; text-align: center;">
+                        <div style="font-size: 36px; font-weight: 700; margin-bottom: 8px;"><?= $readyCount ?></div>
+                        <div style="font-size: 14px; opacity: 0.9;">✅ Готовы к отгрузке</div>
+                    </div>
+                    <div class="stat-card" style="background: linear-gradient(135deg, #9b59b6, #8e44ad); color: white; padding: 24px; border-radius: 12px; text-align: center;">
+                        <div style="font-size: 36px; font-weight: 700; margin-bottom: 8px;"><?= $totalRecords ?></div>
+                        <div style="font-size: 14px; opacity: 0.9;">📋 Всего заказов</div>
+                    </div>
+                </div>
+                
                 <!-- Фильтры -->
                 <div class="card" style="margin-bottom: 24px;">
                     <div class="card-body">
@@ -151,7 +185,7 @@ $pageTitle = 'Заказы';
                                 <select name="status" class="form-control">
                                     <option value="">Все статусы</option>
                                     <?php foreach ($statuses as $s): ?>
-                                    <option value="<?= $s['id'] ?>" <?= $statusId == $s['id'] ? 'selected' : '' ?>><?= e($s['name']) ?></option>
+                                    <option value="<?= $s['status'] ?>" <?= $statusId == $s['status'] ? 'selected' : '' ?>><?= e($s['name']) ?></option>
                                     <?php endforeach; ?>
                                 </select>
                             </div>
@@ -236,8 +270,7 @@ $pageTitle = 'Заказы';
                                             </td>
                                             <td><?= e($order['responsible_name'] ?? '—') ?></td>
                                             <td class="table-actions">
-                                                <a href="view.php?id=<?= $order['id'] ?>" class="btn btn-sm btn-secondary" title="Просмотр">👁️</a>
-                                                <a href="edit.php?id=<?= $order['id'] ?>" class="btn btn-sm btn-secondary" title="Редактировать">✏️</a>
+                                                <a href="view.php?id=<?= $order['id'] ?>" class="btn btn-sm btn-primary" title="Просмотр">👁️ Подробнее</a>
                                                 <a href="print.php?id=<?= $order['id'] ?>" class="btn btn-sm btn-secondary" title="Печать" target="_blank">🖨️</a>
                                             </td>
                                         </tr>

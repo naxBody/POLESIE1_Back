@@ -2,6 +2,7 @@
 /**
  * План выпуска - все заказы и производственные задания
  * Отображение статуса производства по каждому заказу
+ * Компактная таблица с детальной информацией по клику
  */
 
 require_once __DIR__ . '/../../config/config.php';
@@ -46,7 +47,7 @@ if ($priorityFilter) {
 
 $whereClause = !empty($whereConditions) ? "WHERE " . implode(" AND ", $whereConditions) : "";
 
-// Получение всех заказов с информацией о производстве
+// Получение всех заказов с основной информацией (компактно)
 $ordersQuery = "
     SELECT o.*, c.name as contractor_name, u.full_name as responsible_name,
         CASE o.status
@@ -65,7 +66,10 @@ $ordersQuery = "
             WHEN 'cancelled' THEN '#e74c3c'
             ELSE '#95a5a6'
         END as status_color,
-        DATEDIFF(o.delivery_date, CURDATE()) as days_until_delivery
+        DATEDIFF(o.delivery_date, CURDATE()) as days_until_delivery,
+        (SELECT COUNT(*) FROM order_items WHERE order_id = o.id) as items_count,
+        (SELECT COUNT(*) FROM production_tasks WHERE order_id = o.id) as tasks_count,
+        (SELECT GROUP_CONCAT(DISTINCT pt.status SEPARATOR ',') FROM production_tasks pt WHERE pt.order_id = o.id) as tasks_statuses
     FROM orders o
     LEFT JOIN contractors c ON o.customer_id = c.id
     LEFT JOIN users u ON o.responsible_user_id = u.id
@@ -85,7 +89,6 @@ $orders = [];
 foreach ($allOrders as $order) {
     // Если включен фильтр проблем с материалами
     if ($materialIssueFilter) {
-        $hasMaterialIssues = false;
         $stmt = $pdo->prepare("
             SELECT COUNT(*) FROM production_tasks pt
             JOIN production_tasks_materials ptm ON ptm.task_id = pt.id
@@ -93,13 +96,13 @@ foreach ($allOrders as $order) {
         ");
         $stmt->execute([$order['id']]);
         $materialCount = $stmt->fetchColumn();
-        if ($materialCount == 0) continue; // Пропускаем заказы без проблем с материалами
+        if ($materialCount == 0) continue;
         $order['material_shortages'] = $materialCount;
     }
     
     // Если включен фильтр просроченных
     if ($overdueFilter && $order['days_until_delivery'] >= 0) {
-        continue; // Пропускаем заказы, которые не просрочены
+        continue;
     }
     
     $orders[] = $order;
@@ -110,8 +113,28 @@ if (!$materialIssueFilter && !$overdueFilter) {
     $orders = $allOrders;
 }
 
-// Для каждого заказа получаем позиции и статус производства
-foreach ($orders as &$order) {
+// Общая статистика
+$stats = [
+    'total_orders' => count($orders),
+    'new_orders' => 0,
+    'in_production' => 0,
+    'ready' => 0,
+    'total_tasks' => 0,
+    'tasks_in_progress' => 0,
+    'tasks_completed' => 0
+];
+
+foreach ($orders as $order) {
+    if ($order['status'] === 'new') $stats['new_orders']++;
+    if ($order['status'] === 'processing') $stats['in_production']++;
+    if ($order['status'] === 'ready') $stats['ready']++;
+}
+
+// API endpoint для получения детальной информации о заказе
+if (isset($_GET['api_order_detail'])) {
+    header('Content-Type: application/json');
+    $orderId = (int)$_GET['order_id'];
+    
     // Позиции заказа
     $stmt = $pdo->prepare("
         SELECT oi.*, p.name as product_name, p.article as product_article,
@@ -133,8 +156,8 @@ foreach ($orders as &$order) {
         JOIN products p ON oi.product_id = p.id
         WHERE oi.order_id = ?
     ");
-    $stmt->execute([$order['id']]);
-    $order['items'] = $stmt->fetchAll();
+    $stmt->execute([$orderId]);
+    $items = $stmt->fetchAll();
     
     // Производственные задания по заказу
     $stmt = $pdo->prepare("
@@ -158,11 +181,11 @@ foreach ($orders as &$order) {
         WHERE pt.order_id = ?
         ORDER BY pt.created_at DESC
     ");
-    $stmt->execute([$order['id']]);
-    $order['tasks'] = $stmt->fetchAll();
+    $stmt->execute([$orderId]);
+    $tasks = $stmt->fetchAll();
     
     // Этапы выполнения для каждого задания
-    foreach ($order['tasks'] as &$task) {
+    foreach ($tasks as &$task) {
         $stmt = $pdo->prepare("
             SELECT pts.*, ps.name as stage_name, ps.color as stage_color, ps.sort_order,
                 CASE pts.status
@@ -191,31 +214,26 @@ foreach ($orders as &$order) {
         $task['progress_percent'] = $totalStages > 0 ? round(($completedStages / $totalStages) * 100) : 0;
     }
     unset($task);
-}
-unset($order);
-
-// Общая статистика
-$stats = [
-    'total_orders' => count($orders),
-    'new_orders' => 0,
-    'in_production' => 0,
-    'ready' => 0,
-    'total_tasks' => 0,
-    'tasks_in_progress' => 0,
-    'tasks_completed' => 0
-];
-
-foreach ($orders as $order) {
-    if ($order['status'] === 'new') $stats['new_orders']++;
-    if ($order['status'] === 'processing') $stats['in_production']++;
-    if ($order['status'] === 'ready') $stats['ready']++;
     
-    foreach ($order['tasks'] as $task) {
-        $stats['total_tasks']++;
-        if ($task['status'] === 'in_progress') $stats['tasks_in_progress']++;
-        if ($task['status'] === 'completed') $stats['tasks_completed']++;
-    }
+    echo json_encode(['items' => $items, 'tasks' => $tasks], JSON_UNESCAPED_UNICODE);
+    exit;
 }
+
+// Подсчет статистики по задачам
+$stmt = $pdo->prepare("
+    SELECT 
+        COUNT(*) as total,
+        SUM(CASE WHEN status = 'in_progress' THEN 1 ELSE 0 END) as in_progress,
+        SUM(CASE WHEN status = 'completed' THEN 1 ELSE 0 END) as completed
+    FROM production_tasks pt
+    JOIN orders o ON pt.order_id = o.id
+    WHERE o.id IN (" . implode(',', array_fill(0, count($orders), '?')) . ")
+");
+$stmt->execute(array_map(fn($o) => $o['id'], $orders));
+$tasksStats = $stmt->fetch();
+$stats['total_tasks'] = $tasksStats['total'] ?? 0;
+$stats['tasks_in_progress'] = $tasksStats['in_progress'] ?? 0;
+$stats['tasks_completed'] = $tasksStats['completed'] ?? 0;
 ?>
 <!DOCTYPE html>
 <html lang="ru">
@@ -337,147 +355,64 @@ foreach ($orders as $order) {
                     </div>
                 </div>
                 
-                <!-- Заказы -->
-                <?php foreach ($orders as $order): 
-                    $isOverdue = isset($order['days_until_delivery']) && $order['days_until_delivery'] < 0;
-                    $hasMaterialIssues = isset($order['material_shortages']) && $order['material_shortages'] > 0;
-                ?>
-                <div class="order-card" style="<?= $isOverdue ? 'border-left: 4px solid #e74c3c;' : '' ?><?= $hasMaterialIssues ? 'border-left: 4px solid #f39c12;' : '' ?>">
-                    <div class="order-card-header">
-                        <div>
-                            <strong style="font-size: 16px;"><?= e($order['order_number']) ?></strong>
-                            <span class="badge" style="background: <?= e($order['status_color']) ?>20; color: <?= e($order['status_color']) ?>; margin-left: 8px;">
-                                <?= e($order['status_name']) ?>
-                            </span>
-                            <?php if ($isOverdue): ?>
-                                <span class="badge" style="background: #e74c3c; color: white; margin-left: 8px;">ПРОСРОЧЕНО</span>
-                            <?php endif; ?>
-                            <?php if ($hasMaterialIssues): ?>
-                                <span class="badge" style="background: #f39c12; color: white; margin-left: 8px;">НЕХВАТКА МАТЕРИАЛОВ</span>
-                            <?php endif; ?>
-                        </div>
-                        <div style="display: flex; gap: 12px; align-items: center;">
-                            <span style="font-size: 14px; color: var(--text-secondary);">
-                                📅 <?= formatDate($order['order_date']) ?>
-                                <?php if ($order['delivery_date']): ?>
-                                    → <?= formatDate($order['delivery_date']) ?>
-                                    <?php if (isset($order['days_until_delivery'])): ?>
-                                        <span style="color: <?= $order['days_until_delivery'] < 0 ? '#e74c3c' : ($order['days_until_delivery'] <= 3 ? '#f39c12' : '#27ae60') ?>; font-weight: 600;">
-                                            (<?= $order['days_until_delivery'] ?> дн.)
-                                        </span>
-                                    <?php endif; ?>
-                                <?php endif; ?>
-                            </span>
-                            <a href="<?= pageUrl('modules/orders/view.php?id=' . $order['id']) ?>" class="btn btn-sm btn-secondary">Детали</a>
-                        </div>
-                    </div>
-                    
-                    <div class="order-card-body">
-                        <!-- Информация о заказе -->
-                        <div class="order-info-grid">
-                            <div class="info-item">
-                                <label>Заказчик</label>
-                                <value><?= e($order['contractor_name'] ?? '—') ?></value>
-                            </div>
-                            <div class="info-item">
-                                <label>Ответственный</label>
-                                <value><?= e($order['responsible_name'] ?? '—') ?></value>
-                            </div>
-                            <div class="info-item">
-                                <label>Сумма</label>
-                                <value><?= formatMoney($order['total_amount']) ?></value>
-                            </div>
-                            <div class="info-item">
-                                <label>Позиций</label>
-                                <value><?= count($order['items']) ?> шт.</value>
-                            </div>
-                        </div>
-                        
-                        <!-- Позиции заказа -->
-                        <table class="items-table">
+                <!-- Заказы (компактная таблица) -->
+                <div class="card" style="margin-bottom: 24px;">
+                    <div class="card-body" style="padding: 0;">
+                        <table class="items-table" style="margin: 0;">
                             <thead>
                                 <tr>
-                                    <th>Продукция</th>
-                                    <th>Артикул</th>
-                                    <th>Кол-во</th>
-                                    <th>Цена</th>
-                                    <th>Сумма</th>
-                                    <th>Статус производства</th>
+                                    <th>№ заказа</th>
+                                    <th>Статус</th>
+                                    <th>Заказчик</th>
+                                    <th>Дата доставки</th>
+                                    <th>Позиций</th>
+                                    <th>Заданий</th>
+                                    <th>Ответственный</th>
+                                    <th style="width: 80px;"></th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <?php foreach ($order['items'] as $item): ?>
-                                <tr>
-                                    <td><strong><?= e($item['product_name']) ?></strong></td>
-                                    <td><?= e($item['product_article']) ?></td>
-                                    <td><?= $item['quantity'] ?></td>
-                                    <td><?= formatMoney($item['price']) ?></td>
-                                    <td><?= formatMoney($item['total']) ?></td>
+                                <?php foreach ($orders as $order): 
+                                    $isOverdue = isset($order['days_until_delivery']) && $order['days_until_delivery'] < 0;
+                                    $hasMaterialIssues = isset($order['material_shortages']) && $order['material_shortages'] > 0;
+                                ?>
+                                <tr style="cursor: pointer;" onclick="openOrderDetailModal(<?= $order['id'] ?>)" 
+                                    class="<?= $isOverdue ? 'row-overdue' : '' ?> <?= $hasMaterialIssues ? 'row-material-issue' : '' ?>">
+                                    <td><strong><?= e($order['order_number']) ?></strong></td>
                                     <td>
-                                        <span class="badge" style="background: <?= e($item['production_status_color']) ?>20; color: <?= e($item['production_status_color']) ?>">
-                                            <?= e($item['production_status_name']) ?>
+                                        <span class="badge" style="background: <?= e($order['status_color']) ?>20; color: <?= e($order['status_color']) ?>">
+                                            <?= e($order['status_name']) ?>
                                         </span>
+                                        <?php if ($isOverdue): ?>
+                                            <span class="badge" style="background: #e74c3c; color: white; font-size: 10px;">⚠️</span>
+                                        <?php endif; ?>
+                                        <?php if ($hasMaterialIssues): ?>
+                                            <span class="badge" style="background: #f39c12; color: white; font-size: 10px;">📦</span>
+                                        <?php endif; ?>
+                                    </td>
+                                    <td><?= e($order['contractor_name'] ?? '—') ?></td>
+                                    <td>
+                                        <?php if ($order['delivery_date']): ?>
+                                            <?= formatDate($order['delivery_date']) ?>
+                                            <span style="color: <?= $order['days_until_delivery'] < 0 ? '#e74c3c' : ($order['days_until_delivery'] <= 3 ? '#f39c12' : '#27ae60') ?>; font-size: 12px;">
+                                                (<?= $order['days_until_delivery'] ?> дн.)
+                                            </span>
+                                        <?php else: ?>
+                                            —
+                                        <?php endif; ?>
+                                    </td>
+                                    <td><?= $order['items_count'] ?? 0 ?></td>
+                                    <td><?= $order['tasks_count'] ?? 0 ?></td>
+                                    <td><?= e($order['responsible_name'] ?? '—') ?></td>
+                                    <td onclick="event.stopPropagation();">
+                                        <button class="btn btn-sm btn-primary" onclick="openOrderDetailModal(<?= $order['id'] ?>)">👁️</button>
                                     </td>
                                 </tr>
                                 <?php endforeach; ?>
                             </tbody>
                         </table>
-                        
-                        <!-- Производственные задания -->
-                        <?php if (!empty($order['tasks'])): ?>
-                        <div class="tasks-section">
-                            <h4 style="margin-bottom: 12px; font-size: 14px; color: var(--text-secondary);">🏭 Производственные задания</h4>
-                            
-                            <?php foreach ($order['tasks'] as $task): ?>
-                            <div class="task-card">
-                                <div class="task-header">
-                                    <div>
-                                        <span class="task-title"><?= e($task['task_number']) ?></span>
-                                        <span style="margin-left: 12px; color: var(--text-secondary);"><?= e($task['product_name']) ?></span>
-                                    </div>
-                                    <div style="display: flex; gap: 8px; align-items: center;">
-                                        <span class="badge" style="background: <?= e($task['status_color']) ?>20; color: <?= e($task['status_color']) ?>">
-                                            <?= e($task['status_name']) ?>
-                                        </span>
-                                        <button class="expand-btn" onclick="toggleTaskDetails(<?= $task['id'] ?>)">▼</button>
-                                    </div>
-                                </div>
-                                
-                                <div style="display: flex; justify-content: space-between; font-size: 13px; color: var(--text-secondary);">
-                                    <span>План: <?= $task['quantity_plan'] ?> шт.</span>
-                                    <span>Факт: <?= $task['quantity_fact'] ?> шт.</span>
-                                    <span>
-                                        <?php if ($task['planned_start']): ?>
-                                            <?= date('d.m.Y', strtotime($task['planned_start'])) ?> - <?= date('d.m.Y', strtotime($task['planned_end'])) ?>
-                                        <?php endif; ?>
-                                    </span>
-                                </div>
-                                
-                                <div class="progress-bar">
-                                    <div class="progress-fill" style="width: <?= $task['progress_percent'] ?>%"></div>
-                                </div>
-                                <div style="font-size: 12px; color: var(--text-secondary); text-align: right;">
-                                    Выполнено: <?= $task['progress_percent'] ?>%
-                                </div>
-                                
-                                <!-- Детали этапов -->
-                                <div class="task-details" id="task-details-<?= $task['id'] ?>">
-                                    <h5 style="margin-bottom: 8px; font-size: 13px;">Этапы производства:</h5>
-                                    <div class="stages-list">
-                                        <?php foreach ($task['stages'] as $stage): ?>
-                                        <span class="stage-badge <?= $stage['status'] ?>" style="<?= $stage['status'] !== 'pending' ? 'border-color: ' . e($stage['stage_color']) . '; border: 1px solid;' : '' ?>">
-                                            <?= e($stage['stage_name']) ?>: <?= e($stage['status_name']) ?>
-                                        </span>
-                                        <?php endforeach; ?>
-                                    </div>
-                                </div>
-                            </div>
-                            <?php endforeach; ?>
-                        </div>
-                        <?php endif; ?>
                     </div>
                 </div>
-                <?php endforeach; ?>
                 
                 <?php if (empty($orders)): ?>
                 <div class="card">
@@ -491,17 +426,177 @@ foreach ($orders as $order) {
                     </div>
                 </div>
                 <?php endif; ?>
+                
+                <!-- Модальное окно деталей заказа -->
+                <div id="orderDetailModalOverlay" class="passport-modal-overlay" onclick="closeOrderDetailModal(event)" style="display: none;">
+                    <div class="passport-modal" style="max-width: 1100px;">
+                        <div class="passport-modal-header">
+                            <div>
+                                <div class="passport-modal-title" id="modalOrderNumber">Заказ №—</div>
+                                <div class="passport-modal-subtitle" id="modalOrderStatus">Статус: —</div>
+                            </div>
+                            <button class="passport-modal-close" onclick="closeOrderDetailModalDirect()">×</button>
+                        </div>
+                        <div class="passport-modal-body" id="modalOrderBody" style="max-height: 70vh; overflow-y: auto;">
+                            <div style="text-align: center; padding: 40px;">
+                                <div style="font-size: 32px; margin-bottom: 16px;">⏳</div>
+                                <p>Загрузка информации...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
     
     <script>
+        // Открытие модального окна с деталями заказа
+        function openOrderDetailModal(orderId) {
+            const modal = document.getElementById('orderDetailModalOverlay');
+            const body = document.getElementById('modalOrderBody');
+            
+            modal.style.display = 'flex';
+            body.innerHTML = '<div style="text-align: center; padding: 40px;"><div style="font-size: 32px; margin-bottom: 16px;">⏳</div><p>Загрузка информации...</p></div>';
+            
+            fetch('?api_order_detail=1&order_id=' + orderId)
+                .then(response => response.json())
+                .then(data => {
+                    renderOrderDetailModal(data, orderId);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    body.innerHTML = '<div style="text-align: center; padding: 40px; color: #e74c3c;">Ошибка загрузки данных</div>';
+                });
+        }
+        
+        function renderOrderDetailModal(data, orderId) {
+            const body = document.getElementById('modalOrderBody');
+            let html = '';
+            
+            // Основная информация о заказе
+            html += '<div class="passport-section">';
+            html += '<div class="passport-section-title">📋 Информация о заказе</div>';
+            html += '<div class="specs-list">';
+            html += '<div class="spec-item"><div class="spec-name">Позиций</div><div class="spec-value">' + (data.items ? data.items.length : 0) + ' шт.</div></div>';
+            html += '<div class="spec-item"><div class="spec-name">Производственных заданий</div><div class="spec-value">' + (data.tasks ? data.tasks.length : 0) + '</div></div>';
+            html += '</div>';
+            html += '</div>';
+            
+            // Позиции заказа
+            if (data.items && data.items.length > 0) {
+                html += '<div class="passport-section">';
+                html += '<div class="passport-section-title">📦 Позиции заказа</div>';
+                html += '<table class="materials-table">';
+                html += '<thead><tr><th>Продукция</th><th>Артикул</th><th>Кол-во</th><th>Цена</th><th>Сумма</th><th>Статус</th></tr></thead>';
+                html += '<tbody>';
+                data.items.forEach(function(item) {
+                    html += '<tr>';
+                    html += '<td><strong>' + escapeHtml(item.product_name) + '</strong></td>';
+                    html += '<td><code>' + escapeHtml(item.product_article) + '</code></td>';
+                    html += '<td>' + item.quantity + '</td>';
+                    html += '<td>' + formatMoney(item.price) + '</td>';
+                    html += '<td>' + formatMoney(item.total) + '</td>';
+                    html += '<td><span class="badge" style="background: ' + item.production_status_color + '20; color: ' + item.production_status_color + '">' + escapeHtml(item.production_status_name) + '</span></td>';
+                    html += '</tr>';
+                });
+                html += '</tbody></table>';
+                html += '</div>';
+            }
+            
+            // Производственные задания
+            if (data.tasks && data.tasks.length > 0) {
+                html += '<div class="passport-section">';
+                html += '<div class="passport-section-title">🏭 Производственные задания</div>';
+                data.tasks.forEach(function(task, index) {
+                    html += '<div class="task-card" style="background: #fafbfc; border: 1px solid #e9ecef; border-radius: 6px; padding: 16px; margin-bottom: 12px;">';
+                    html += '<div class="task-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">';
+                    html += '<div>';
+                    html += '<span class="task-title" style="font-weight: 600; color: #2c3e50;">' + escapeHtml(task.task_number) + '</span>';
+                    html += '<span style="margin-left: 12px; color: #7f8c8d;">' + escapeHtml(task.product_name) + '</span>';
+                    html += '</div>';
+                    html += '<div style="display: flex; gap: 8px; align-items: center;">';
+                    html += '<span class="badge" style="background: ' + task.status_color + '20; color: ' + task.status_color + '">' + escapeHtml(task.status_name) + '</span>';
+                    html += '<button class="expand-btn" onclick="toggleTaskDetails(' + task.id + ')" style="background: none; border: none; cursor: pointer; font-size: 18px; color: #7f8c8d;">▼</button>';
+                    html += '</div>';
+                    html += '</div>';
+                    
+                    html += '<div style="display: flex; justify-content: space-between; font-size: 13px; color: #7f8c8d;">';
+                    html += '<span>План: ' + task.quantity_plan + ' шт.</span>';
+                    html += '<span>Факт: ' + task.quantity_fact + ' шт.</span>';
+                    if (task.planned_start) {
+                        html += '<span>' + formatDate(task.planned_start) + ' - ' + formatDate(task.planned_end) + '</span>';
+                    }
+                    html += '</div>';
+                    
+                    html += '<div class="progress-bar" style="height: 8px; background: #e9ecef; border-radius: 4px; overflow: hidden; margin: 10px 0;">';
+                    html += '<div class="progress-fill" style="height: 100%; background: linear-gradient(90deg, #3498db, #2ecc71); width: ' + task.progress_percent + '%;"></div>';
+                    html += '</div>';
+                    html += '<div style="font-size: 12px; color: #7f8c8d; text-align: right;">Выполнено: ' + task.progress_percent + '%</div>';
+                    
+                    // Этапы
+                    if (task.stages && task.stages.length > 0) {
+                        html += '<div class="task-details" id="task-details-' + task.id + '" style="display: none; margin-top: 16px; padding-top: 16px; border-top: 1px solid #e9ecef;">';
+                        html += '<h5 style="margin-bottom: 8px; font-size: 13px;">Этапы производства:</h5>';
+                        html += '<div class="stages-list" style="display: flex; flex-wrap: wrap; gap: 8px;">';
+                        task.stages.forEach(function(stage) {
+                            var badgeClass = stage.status === 'completed' ? 'completed' : (stage.status === 'in_progress' ? 'in_progress' : 'pending');
+                            var borderStyle = stage.status !== 'pending' ? 'border-color: ' + stage.stage_color + '; border: 1px solid;' : '';
+                            html += '<span class="stage-badge ' + badgeClass + '" style="padding: 4px 10px; border-radius: 12px; font-size: 12px; background: ' + (stage.status === 'completed' ? '#d4edda' : (stage.status === 'in_progress' ? '#fff3cd' : '#e9ecef')) + '; color: ' + (stage.status === 'completed' ? '#155724' : (stage.status === 'in_progress' ? '#856404' : '#495057')) + '; ' + borderStyle + '">' + escapeHtml(stage.stage_name) + ': ' + escapeHtml(stage.status_name) + '</span>';
+                        });
+                        html += '</div></div>';
+                    }
+                    
+                    html += '</div>';
+                });
+                html += '</div>';
+            }
+            
+            body.innerHTML = html;
+        }
+        
         function toggleTaskDetails(taskId) {
             const details = document.getElementById('task-details-' + taskId);
             if (details) {
-                details.classList.toggle('show');
+                details.style.display = details.style.display === 'none' ? 'block' : 'none';
             }
         }
+        
+        function closeOrderDetailModal(event) {
+            if (event.target === document.getElementById('orderDetailModalOverlay')) {
+                closeOrderDetailModalDirect();
+            }
+        }
+        
+        function closeOrderDetailModalDirect() {
+            document.getElementById('orderDetailModalOverlay').style.display = 'none';
+        }
+        
+        function formatMoney(amount) {
+            if (!amount) return '—';
+            return Number(amount).toFixed(2).replace('.', ',') + ' BYN';
+        }
+        
+        function formatDate(dateStr) {
+            if (!dateStr) return '—';
+            var date = new Date(dateStr);
+            return date.toLocaleDateString('ru-RU');
+        }
+        
+        function escapeHtml(text) {
+            if (!text) return '';
+            var div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                var modal = document.getElementById('orderDetailModalOverlay');
+                if (modal && modal.style.display === 'flex') {
+                    closeOrderDetailModalDirect();
+                }
+            }
+        });
     </script>
     <script src="<?= asset('assets/js/main.js') ?>"></script>
 </body>

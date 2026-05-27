@@ -319,6 +319,87 @@ if (count($orders) > 0) {
     $stats['tasks_in_progress'] = $tasksStats['in_progress'] ?? 0;
     $stats['tasks_completed'] = $tasksStats['completed'] ?? 0;
 }
+
+// ============================================================================
+// ПОДГОТОВКА ДАННЫХ ДЛЯ МОДАЛЬНЫХ ОКОН (Прямо из БД, без JSON API)
+// ============================================================================
+$ordersData = [];
+if (!empty($orders)) {
+    $orderIds = array_map(fn($o) => (int)$o['id'], $orders);
+    $orderIdsStr = implode(',', $orderIds);
+
+    // 1. Основная информация о заказах
+    $sqlOrders = "SELECT o.id, o.order_number, o.status, 
+                         COALESCE(c.name, 'Не указан') as client_name, 
+                         COALESCE(u.full_name, 'Не назначен') as manager_name, 
+                         o.delivery_date 
+                  FROM orders o 
+                  LEFT JOIN contractors c ON o.customer_id = c.id
+                  LEFT JOIN users u ON o.responsible_user_id = u.id
+                  WHERE o.id IN ($orderIdsStr)";
+    $resOrders = $db->query($sqlOrders);
+    
+    while ($row = $resOrders->fetch_assoc()) {
+        $orderId = (int)$row['id'];
+        $ordersData[$orderId] = [
+            'info' => $row,
+            'items' => [],
+            'tasks' => []
+        ];
+    }
+
+    // 2. Состав заказов (продукция)
+    $sqlItems = "SELECT oi.id, oi.order_id, oi.product_name, oi.article, oi.quantity, oi.price 
+                 FROM order_items oi 
+                 WHERE oi.order_id IN ($orderIdsStr)";
+    $resItems = $db->query($sqlItems);
+    while ($row = $resItems->fetch_assoc()) {
+        $oid = (int)$row['order_id'];
+        if (isset($ordersData[$oid])) {
+            $ordersData[$oid]['items'][] = $row;
+        }
+    }
+
+    // 3. Производственные задания для этих заказов
+    $sqlTasks = "SELECT pt.id, pt.order_id, pt.product_name, pt.plan_qty, pt.done_qty, pt.status as task_status, pt.start_date, pt.end_date 
+                 FROM production_tasks pt 
+                 WHERE pt.order_id IN ($orderIdsStr)";
+    $resTasks = $db->query($sqlTasks);
+    while ($row = $resTasks->fetch_assoc()) {
+        $oid = (int)$row['order_id'];
+        if (isset($ordersData[$oid])) {
+            $row['materials'] = [];
+            $row['stages'] = [];
+            $ordersData[$oid]['tasks'][] = $row;
+        }
+    }
+
+    // 4. Материалы и этапы для заданий
+    foreach ($ordersData as &$ord) {
+        foreach ($ord['tasks'] as &$task) {
+            $tid = (int)$task['id'];
+            
+            // Материалы
+            $sqlMat = "SELECT pm.material_name, pm.required_qty, pm.available_qty 
+                       FROM production_materials pm 
+                       WHERE pm.task_id = $tid";
+            $resMat = $db->query($sqlMat);
+            while ($row = $resMat->fetch_assoc()) {
+                $task['materials'][] = $row;
+            }
+
+            // Этапы
+            $sqlStages = "SELECT ps.stage_name, ps.status, ps.date_completed 
+                          FROM production_stages ps 
+                          WHERE ps.task_id = $tid
+                          ORDER BY ps.sort_order ASC";
+            $resStages = $db->query($sqlStages);
+            while ($row = $resStages->fetch_assoc()) {
+                $task['stages'][] = $row;
+            }
+        }
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="ru">
@@ -703,41 +784,38 @@ if (count($orders) > 0) {
     </div>
     
     <script>
-        // Открытие модального окна с деталями заказа
+        // Данные из базы уже загружены в PHP массив ordersData
+        // Преобразуем его в JS объект для использования
+        var ordersData = <?php echo json_encode($ordersData, JSON_UNESCAPED_UNICODE); ?>;
+        
+        // Открытие модального окна с деталями заказа (без AJAX, данные уже загружены)
         function openOrderDetailModal(orderId) {
             const modal = document.getElementById('orderDetailModalOverlay');
             const body = document.getElementById('modalOrderBody');
             
             modal.style.display = 'flex';
-            body.innerHTML = '<div style="text-align: center; padding: 40px;"><p>Загрузка информации...</p></div>';
             
-            const url = window.location.pathname + '?api_order_detail=1&order_id=' + orderId;
-            fetch(url)
-                .then(response => {
-                    if (!response.ok) {
-                        return response.text().then(text => {
-                            throw new Error('Ответ сервера: ' + (text.substring(0, 200) || response.status));
-                        });
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    renderOrderDetailModal(data, orderId);
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    body.innerHTML = '<div style="text-align: center; padding: 40px; color: #e74c3c;">Ошибка загрузки данных<br><small>' + error.message + '</small></div>';
-                });
+            // Получаем данные из заранее загруженного массива
+            var data = ordersData[orderId];
+            
+            if (!data) {
+                body.innerHTML = '<div style="text-align: center; padding: 40px; color: #e74c3c;">Данные о заказе не найдены</div>';
+                return;
+            }
+            
+            renderOrderDetailModal(data, orderId);
         }
         
         function renderOrderDetailModal(data, orderId) {
             const body = document.getElementById('modalOrderBody');
-            const order = data.order || {};
+            // data - это объект заказа с полями: info, items, tasks
+            
+            const order = data.info || {};
             let html = '';
             
             // Обновляем заголовок модального окна
             document.getElementById('modalOrderNumber').textContent = 'Заказ №' + (order.order_number || '—');
-            document.getElementById('modalOrderStatus').textContent = 'Статус: ' + (order.status_name || '—');
+            document.getElementById('modalOrderStatus').textContent = 'Статус: ' + (order.status || '—');
             
             // Проверка на проблемы с материалами
             let hasMaterialShortages = false;
@@ -745,7 +823,7 @@ if (count($orders) > 0) {
                 data.tasks.forEach(function(task) {
                     if (task.materials) {
                         task.materials.forEach(function(mat) {
-                            if (mat.availability_status === 'insufficient') {
+                            if (mat.available_qty < mat.required_qty) {
                                 hasMaterialShortages = true;
                             }
                         });
@@ -766,14 +844,11 @@ if (count($orders) > 0) {
             html += '<div class="passport-section-title">Информация о заказе</div>';
             html += '<div class="specs-list">';
             html += '<div class="spec-row"><div class="spec-label">№ заказа</div><div class="spec-value"><strong>' + escapeHtml(order.order_number || '—') + '</strong></div></div>';
-            html += '<div class="spec-row"><div class="spec-label">Статус</div><div class="spec-value"><span class="badge badge-primary" style="background: ' + (order.status_color || '#95a5a6') + '; color: white;">' + escapeHtml(order.status_name || '—') + '</span></div></div>';
-            html += '<div class="spec-row"><div class="spec-label">Заказчик</div><div class="spec-value">' + escapeHtml(order.contractor_name || '—') + '</div></div>';
-            html += '<div class="spec-row"><div class="spec-label">Ответственный</div><div class="spec-value">' + escapeHtml(order.responsible_name || '—') + '</div></div>';
+            html += '<div class="spec-row"><div class="spec-label">Статус</div><div class="spec-value"><span class="badge badge-primary">' + escapeHtml(order.status || '—') + '</span></div></div>';
+            html += '<div class="spec-row"><div class="spec-label">Заказчик</div><div class="spec-value">' + escapeHtml(order.client_name || '—') + '</div></div>';
+            html += '<div class="spec-row"><div class="spec-label">Ответственный</div><div class="spec-value">' + escapeHtml(order.manager_name || '—') + '</div></div>';
             if (order.delivery_date) {
-                var daysUntil = order.days_until_delivery !== undefined ? order.days_until_delivery : Math.floor((new Date(order.delivery_date) - new Date()) / (1000 * 60 * 60 * 24));
-                var daysColor = daysUntil < 0 ? '#e74c3c' : (daysUntil <= 3 ? '#f39c12' : '#27ae60');
-                var daysText = daysUntil < 0 ? 'Просрочено на ' + Math.abs(daysUntil) + ' дн.' : 'Через ' + daysUntil + ' дн.';
-                html += '<div class="spec-row"><div class="spec-label">Дата доставки</div><div class="spec-value">' + formatDate(order.delivery_date) + ' <span style="color: ' + daysColor + '; font-size: 11px;">(' + daysText + ')</span></div></div>';
+                html += '<div class="spec-row"><div class="spec-label">Дата доставки</div><div class="spec-value">' + formatDate(order.delivery_date) + '</div></div>';
             }
             html += '</div></div>';
             
@@ -782,19 +857,20 @@ if (count($orders) > 0) {
                 html += '<div class="passport-section fade-in">';
                 html += '<div class="passport-section-title">Состав заказа (' + data.items.length + ' поз.)</div>';
                 html += '<table class="materials-table">';
-                html += '<thead><tr><th>Продукция</th><th>Артикул</th><th style="text-align: center;">Кол-во</th><th style="text-align: right;">Цена</th><th style="text-align: right;">Сумма</th><th>Статус</th></tr></thead>';
+                html += '<thead><tr><th>Продукция</th><th>Артикул</th><th style="text-align: center;">Кол-во</th><th style="text-align: right;">Цена</th><th style="text-align: right;">Сумма</th></tr></thead>';
                 html += '<tbody>';
                 data.items.forEach(function(item) {
                     html += '<tr>';
                     html += '<td><strong>' + escapeHtml(item.product_name) + '</strong></td>';
-                    html += '<td><code style="background: #f8f9fa; padding: 2px 6px; border-radius: 4px; font-size: 11px;">' + escapeHtml(item.product_article) + '</code></td>';
+                    html += '<td><code style="background: #f8f9fa; padding: 2px 6px; border-radius: 4px; font-size: 11px;">' + escapeHtml(item.article) + '</code></td>';
                     html += '<td style="text-align: center; font-weight: 600;">' + item.quantity + '</td>';
                     html += '<td style="text-align: right;">' + formatMoney(item.price) + '</td>';
-                    html += '<td style="text-align: right;"><strong>' + formatMoney(item.total) + '</strong></td>';
-                    html += '<td><span class="badge" style="background: ' + item.production_status_color + '; color: white;">' + escapeHtml(item.production_status_name) + '</span></td>';
+                    html += '<td style="text-align: right;"><strong>' + formatMoney(item.quantity * item.price) + '</strong></td>';
                     html += '</tr>';
                 });
                 html += '</tbody></table></div>';
+            } else {
+                html += '<div class="passport-section fade-in"><div class="passport-section-title">Состав заказа</div><p style="color: #95a5a6;">Нет данных</p></div>';
             }
             
             // Производственные задания
@@ -806,7 +882,7 @@ if (count($orders) > 0) {
                     var hasShortage = false;
                     if (task.materials) {
                         task.materials.forEach(function(mat) {
-                            if (mat.availability_status === 'insufficient') hasShortage = true;
+                            if (mat.available_qty < mat.required_qty) hasShortage = true;
                         });
                     }
                     
@@ -821,7 +897,7 @@ if (count($orders) > 0) {
                     html += '</div>';
                     html += '</div>';
                     html += '<div style="display: flex; align-items: center; gap: 8px;">';
-                    html += '<span class="badge" style="background: ' + task.status_color + '; color: white;">' + escapeHtml(task.status_name) + '</span>';
+                    html += '<span class="badge">' + escapeHtml(task.task_status || '—') + '</span>';
                     html += '<button class="toggle-details-btn" onclick="toggleTaskDetails(' + task.id + ', this)" data-task-id="' + task.id + '">';
                     html += '<span>📋</span><span class="btn-text">Подробнее</span>';
                     html += '</button>';
@@ -831,17 +907,17 @@ if (count($orders) > 0) {
                     // Прогресс
                     html += '<div class="modal-task-progress">';
                     html += '<div style="display: flex; justify-content: space-between; font-size: 12px; color: #7f8c8d; margin-bottom: 6px;">';
-                    html += '<span>План: <strong>' + (task.quantity_plan || '—') + ' шт.</strong></span>';
-                    html += '<span>Факт: <strong>' + (task.quantity_fact || '0') + ' шт.</strong></span>';
+                    html += '<span>План: <strong>' + (task.plan_qty || '—') + ' шт.</strong></span>';
+                    html += '<span>Факт: <strong>' + (task.done_qty || '0') + ' шт.</strong></span>';
                     if (task.planned_start) {
                         html += '<span>' + formatDate(task.planned_start) + ' - ' + formatDate(task.planned_end) + '</span>';
                     }
                     html += '</div>';
                     
                     html += '<div class="modal-progress-bar">';
-                    html += '<div class="modal-progress-fill" style="width: ' + task.progress_percent + '%;"></div>';
+                    html += '<div class="modal-progress-fill" style="width: ' + percent + '%;"></div>';
                     html += '</div>';
-                    html += '<div style="font-size: 12px; color: #7f8c8d; text-align: right; margin-top: 4px;">Выполнено: <strong>' + task.progress_percent + '%</strong></div>';
+                    html += '<div style="font-size: 12px; color: #7f8c8d; text-align: right; margin-top: 4px;">Выполнено: <strong>' + percent + '%</strong></div>';
                     html += '</div>';
                     
                     // Предупреждение о нехватке материалов для этого задания
@@ -860,18 +936,18 @@ if (count($orders) > 0) {
                         html += '<div style="margin-bottom: 16px;">';
                         html += '<h5 style="margin-bottom: 10px; font-size: 13px; color: #2c3e50; font-weight: 600;">Материалы:</h5>';
                         html += '<table class="materials-table">';
-                        html += '<thead><tr><th>Материал</th><th>Артикул</th><th style="text-align: center;">Требуется</th><th style="text-align: center;">Доступно</th><th>Ед.</th><th>Статус</th></tr></thead>';
+                        html += '<thead><tr><th>Материал</th><th>Статус</th></tr></thead>';
                         html += '<tbody>';
                         task.materials.forEach(function(mat) {
-                            var isSufficient = mat.availability_status === 'sufficient';
+                            var isSufficient = mat.available_qty >= mat.required_qty;
                             var statusHtml = isSufficient 
                                 ? '<span class="badge badge-success"><span class="material-status-indicator sufficient"></span>Хватает</span>'
-                                : '<span class="badge badge-danger"><span class="material-status-indicator insufficient"></span>Не хватает (' + (mat.quantity_required - mat.quantity_available) + ')</span>';
+                                : '<span class="badge badge-danger"><span class="material-status-indicator insufficient"></span>Не хватает (' + (mat.required_qty - mat.available_qty) + ')</span>';
                             html += '<tr style="' + (!isSufficient ? 'background: #fff5f5;' : '') + '">';
                             html += '<td><strong>' + escapeHtml(mat.material_name) + '</strong></td>';
-                            html += '<td><code style="background: #f8f9fa; padding: 2px 4px; border-radius: 3px; font-size: 10px;">' + escapeHtml(mat.material_article || '—') + '</code></td>';
-                            html += '<td style="text-align: center; font-weight: 600;">' + mat.quantity_required + '</td>';
-                            html += '<td style="text-align: center; font-weight: 600; color: ' + (isSufficient ? '#27ae60' : '#e74c3c') + ';">' + mat.quantity_available + '</td>';
+                            html += '<td><code style="background: #f8f9fa; padding: 2px 4px; border-radius: 3px; font-size: 10px;">' + escapeHtml('—' || '—') + '</code></td>';
+                            html += '';
+                            html += '';
                             html += '<td>' + escapeHtml(mat.unit_name || '—') + '</td>';
                             html += '<td>' + statusHtml + '</td>';
                             html += '</tr>';

@@ -21,7 +21,8 @@ $orderId = $_GET['order'] ?? '';
 
 $sql = "SELECT pt.*, o.order_number, p.name as product_name, p.article as product_article, 
                c.name as category_name, u.symbol as unit_name,
-               u2.full_name as responsible_name, u3.full_name as worker_name
+               u2.full_name as responsible_name, u3.full_name as worker_name,
+               pt.quantity_plan as quantity, pt.planned_start as planned_date
         FROM production_tasks pt
         JOIN orders o ON pt.order_id = o.id
         JOIN products p ON pt.product_id = p.id
@@ -152,7 +153,7 @@ $tasks = $stmt->fetchAll();
                                         <td><strong><?= e($t['product_name']) ?></strong></td>
                                         <td><?= e($t['order_number']) ?></td>
                                         <td><?= e($t['quantity'] ?? '—') ?></td>
-                                        <td><?= $t['planned_date'] ? date('d.m.Y', strtotime($t['planned_date'])) : '—' ?></td>
+                                        <td><?= !empty($t['planned_date']) ? date('d.m.Y', strtotime($t['planned_date'])) : '—' ?></td>
                                         <td>
                                             <?php if ($t['status'] === 'planned'): ?>
                                                 <span class="badge badge-warning">Планируется</span>
@@ -229,7 +230,8 @@ $tasks = $stmt->fetchAll();
             html += '<div class="product-spec-item"><div class="product-spec-name">№ задания</div><div class="product-spec-value">#' + (task.id || '—') + '</div></div>';
             html += '<div class="product-spec-item"><div class="product-spec-name">Заказ</div><div class="product-spec-value">' + (task.order_number || '—') + '</div></div>';
             html += '<div class="product-spec-item"><div class="product-spec-name">Количество</div><div class="product-spec-value">' + (task.quantity || '—') + '</div></div>';
-            html += '<div class="product-spec-item"><div class="product-spec-name">План. дата</div><div class="product-spec-value">' + (task.planned_date || '—') + '</div></div>';
+            var plannedDateDisplay = task.planned_date && task.planned_date !== '' ? task.planned_date : '—';
+            html += '<div class="product-spec-item"><div class="product-spec-name">План. дата</div><div class="product-spec-value">' + plannedDateDisplay + '</div></div>';
             html += '<div class="product-spec-item"><div class="product-spec-name">Статус</div><div class="product-spec-value">' + (task.status || '—') + '</div></div>';
             html += '<div class="product-spec-item"><div class="product-spec-name">Ответственный</div><div class="product-spec-value">' + (task.responsible_name || '—') + '</div></div>';
             html += '</div>';

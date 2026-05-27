@@ -67,10 +67,6 @@
                 <span class="sidebar-nav-icon">📋</span>
                 <span>План выпуска</span>
             </a>
-            <a href="<?= pageUrl('modules/production/serial_numbers.php') ?>" class="sidebar-nav-item <?= $relativePath === 'modules/production/serial_numbers.php' ? 'active' : '' ?>">
-                <span class="sidebar-nav-icon">🔢</span>
-                <span>Серийные номера</span>
-            </a>
             <a href="<?= pageUrl('modules/products/list.php') ?>" class="sidebar-nav-item <?= $relativePath === 'modules/products/list.php' ? 'active' : '' ?>">
                 <span class="sidebar-nav-icon">🔧</span>
                 <span>Продукция</span>

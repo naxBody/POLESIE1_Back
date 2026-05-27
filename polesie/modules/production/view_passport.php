@@ -41,6 +41,32 @@ if (!$serialData) {
     die('Серийный номер не найден');
 }
 
+// Явно загружаем технические характеристики из JSON полей
+$technicalSpecs = [];
+$productSpecs = [];
+$passportDataArr = [];
+
+if (!empty($serialData['technical_specs'])) {
+    $decoded = json_decode($serialData['technical_specs'], true);
+    if (is_array($decoded)) {
+        $technicalSpecs = $decoded;
+    }
+}
+
+if (!empty($serialData['product_specifications'])) {
+    $decoded = json_decode($serialData['product_specifications'], true);
+    if (is_array($decoded)) {
+        $productSpecs = $decoded;
+    }
+}
+
+if (!empty($serialData['passport_data'])) {
+    $decoded = json_decode($serialData['passport_data'], true);
+    if (is_array($decoded)) {
+        $passportDataArr = $decoded;
+    }
+}
+
 // Получение документов
 $docsStmt = $pdo->prepare("SELECT * FROM product_documents WHERE serial_number_id = ? ORDER BY uploaded_at DESC");
 $docsStmt->execute([$id]);
@@ -56,11 +82,6 @@ $dynamicPassportData = null;
 $dynStmt = $pdo->prepare("SELECT * FROM passport_dynamic_data WHERE serial_number_id = ?");
 $dynStmt->execute([$id]);
 $dynamicPassportData = $dynStmt->fetch();
-
-// Декодирование JSON
-$technicalSpecs = !empty($serialData['technical_specs']) ? json_decode($serialData['technical_specs'], true) : [];
-$productSpecs = !empty($serialData['product_specifications']) ? json_decode($serialData['product_specifications'], true) : [];
-$passportData = !empty($serialData['passport_data']) ? json_decode($serialData['passport_data'], true) : [];
 
 // Если есть динамические данные, используем их
 if ($dynamicPassportData) {
@@ -79,7 +100,10 @@ if ($dynamicPassportData) {
     }
     // Также переопределяем технические характеристики из динамического паспорта
     if (!empty($dynamicPassportData['technical_specs_custom'])) {
-        $technicalSpecs = json_decode($dynamicPassportData['technical_specs_custom'], true) ?: $technicalSpecs;
+        $decodedTech = json_decode($dynamicPassportData['technical_specs_custom'], true);
+        if (is_array($decodedTech)) {
+            $technicalSpecs = $decodedTech;
+        }
     }
     if (!empty($dynamicPassportData['product_name_custom'])) {
         $serialData['product_name'] = $dynamicPassportData['product_name_custom'];

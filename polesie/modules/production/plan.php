@@ -120,7 +120,7 @@ if (isset($_GET['api_order_detail'])) {
     foreach ($tasks as &$task) {
         $stmt = $pdo->prepare("
             SELECT ptm.id, ptm.task_id, ptm.material_id, ptm.quantity_required, ptm.quantity_used,
-                   m.name as material_name, m.article as material_article, mu.symbol as unit_name,
+                   m.name_full as material_name, m.code as material_article, mu.symbol as unit_name,
                    COALESCE(m.current_stock, 0) as quantity_available,
                    CASE 
                        WHEN COALESCE(m.current_stock, 0) >= ptm.quantity_required THEN 'sufficient'
@@ -395,7 +395,7 @@ if (!empty($orders)) {
             $tid = (int)$task['id'];
             
             // Материалы
-            $sqlMat = "SELECT m.name as material_name, ptm.quantity_required as required_qty, 
+            $sqlMat = "SELECT m.name_full as material_name, ptm.quantity_required as required_qty, 
                               COALESCE(m.current_stock, 0) as available_qty
                        FROM production_tasks_materials ptm
                        JOIN materials m ON ptm.material_id = m.id

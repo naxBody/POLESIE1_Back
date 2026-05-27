@@ -30,8 +30,8 @@ $stmt = $pdo->prepare("
     FROM product_serial_numbers sn
     JOIN products p ON sn.product_id = p.id
     LEFT JOIN product_categories c ON p.category_id = c.id
-    LEFT JOIN units u ON p.unit_id = u.id
-    LEFT JOIN production_orders po ON sn.production_order_id = po.id
+    LEFT JOIN base_units u ON p.base_unit_id = u.id
+    LEFT JOIN production_tasks po ON sn.task_id = po.id
     WHERE sn.id = ?
 ");
 $stmt->execute([$id]);

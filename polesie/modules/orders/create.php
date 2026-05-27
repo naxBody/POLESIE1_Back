@@ -23,12 +23,21 @@ $success = false;
 
 // Получение справочников
 $contractors = $pdo->query("SELECT * FROM contractors WHERE is_active = TRUE ORDER BY name")->fetchAll();
-$products = $pdo->query("SELECT p.*, pc.name as category_name, u.short_name as unit_name 
+$products = $pdo->query("SELECT p.*, pc.name as category_name, u.symbol as unit_name 
                          FROM products p 
                          LEFT JOIN product_categories pc ON p.category_id = pc.id 
-                         LEFT JOIN units u ON p.unit_id = u.id 
+                         LEFT JOIN base_units u ON p.base_unit_id = u.id 
                          WHERE p.is_active = TRUE ORDER BY p.name")->fetchAll();
-$statuses = $pdo->query("SELECT * FROM order_statuses WHERE is_active = TRUE ORDER BY sort_order")->fetchAll();
+$statuses = $pdo->query("SELECT DISTINCT status, 
+                                CASE status
+                                    WHEN 'new' THEN 'Новый'
+                                    WHEN 'processing' THEN 'В работе'
+                                    WHEN 'ready' THEN 'Готов'
+                                    WHEN 'shipped' THEN 'Отгружен'
+                                    WHEN 'cancelled' THEN 'Отменен'
+                                    ELSE status
+                                END as name
+                         FROM orders ORDER BY name")->fetchAll();
 
 // Обработка формы
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -36,7 +45,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $pdo->beginTransaction();
         
         $contractorId = (int)($_POST['contractor_id'] ?? 0);
-        $statusId = (int)($_POST['status_id'] ?? 1);
+        $status = $_POST['status'] ?? 'new';
         $orderDate = $_POST['order_date'] ?? date('Y-m-d');
         $deliveryDate = $_POST['delivery_date'] ?: null;
         $deliveryAddress = trim($_POST['delivery_address'] ?? '');
@@ -62,16 +71,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             
             // Создание заказа
             $stmt = $pdo->prepare("
-                INSERT INTO orders (order_number, contractor_id, status_id, order_date, delivery_date, 
-                                   delivery_address, payment_terms, notes, contract_number, contract_date,
-                                   responsible_user_id, created_by, total_amount, currency)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, 'BYN')
+                INSERT INTO orders (order_number, customer_id, status, order_date, delivery_date, 
+                                   notes, responsible_user_id, created_at, total_amount, currency)
+                VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), 0, 'BYN')
             ");
             
             $stmt->execute([
-                $orderNumber, $contractorId, $statusId, $orderDate, $deliveryDate,
-                $deliveryAddress, $paymentTerms, $notes, $contractNumber, $contractDate,
-                $responsibleUserId, $user['id']
+                $orderNumber, $contractorId, $status, $orderDate, $deliveryDate,
+                $notes, $responsibleUserId
             ]);
             
             $orderId = $pdo->lastInsertId();
@@ -179,9 +186,9 @@ $pageTitle = 'Новый заказ';
                                 
                                 <div class="form-group">
                                     <label class="form-label">Статус</label>
-                                    <select name="status_id" class="form-control">
+                                    <select name="status" class="form-control">
                                         <?php foreach ($statuses as $s): ?>
-                                        <option value="<?= $s['id'] ?>" <?= (($_POST['status_id'] ?? 1) == $s['id']) ? 'selected' : '' ?>>
+                                        <option value="<?= $s['status'] ?>" <?= (($_POST['status'] ?? 'new') == $s['status']) ? 'selected' : '' ?>>
                                             <?= e($s['name']) ?>
                                         </option>
                                         <?php endforeach; ?>

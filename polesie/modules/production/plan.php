@@ -354,39 +354,43 @@ if (!empty($orders)) {
     }
 
     // 2. Состав заказов (продукция)
-    $sqlItems = "SELECT oi.id, oi.order_id, 
-                        p.name as product_name, 
-                        p.article as article, 
-                        oi.quantity, oi.price 
-                 FROM order_items oi 
-                 JOIN products p ON oi.product_id = p.id
-                 WHERE oi.order_id IN ($orderIdsPlaceholder)";
-    $stmtItems = $pdo->prepare($sqlItems);
-    $stmtItems->execute($orderIds);
-    $resItems = $stmtItems->fetchAll();
-    foreach ($resItems as $row) {
-        $oid = (string)$row['order_id'];
-        if (isset($ordersData[$oid])) {
-            $ordersData[$oid]['items'][] = $row;
+    if (!empty($ordersData)) {
+        $sqlItems = "SELECT oi.id, oi.order_id, 
+                            p.name as product_name, 
+                            p.article as article, 
+                            oi.quantity, oi.price 
+                     FROM order_items oi 
+                     JOIN products p ON oi.product_id = p.id
+                     WHERE oi.order_id IN ($orderIdsPlaceholder)";
+        $stmtItems = $pdo->prepare($sqlItems);
+        $stmtItems->execute($orderIds);
+        $resItems = $stmtItems->fetchAll();
+        foreach ($resItems as $row) {
+            $oid = (string)$row['order_id'];
+            if (isset($ordersData[$oid])) {
+                $ordersData[$oid]['items'][] = $row;
+            }
         }
     }
 
     // 3. Производственные задания для этих заказов
-    $sqlTasks = "SELECT pt.id, pt.order_id, 
-                        p.name as product_name, 
-                        pt.quantity_plan as plan_qty, pt.quantity_fact as done_qty, pt.status as task_status, pt.start_date, pt.end_date 
-                 FROM production_tasks pt 
-                 JOIN products p ON pt.product_id = p.id
-                 WHERE pt.order_id IN ($orderIdsPlaceholder)";
-    $stmtTasks = $pdo->prepare($sqlTasks);
-    $stmtTasks->execute($orderIds);
-    $resTasks = $stmtTasks->fetchAll();
-    foreach ($resTasks as $row) {
-        $oid = (string)$row['order_id'];
-        if (isset($ordersData[$oid])) {
-            $row['materials'] = [];
-            $row['stages'] = [];
-            $ordersData[$oid]['tasks'][] = $row;
+    if (!empty($ordersData)) {
+        $sqlTasks = "SELECT pt.id, pt.order_id, 
+                            p.name as product_name, 
+                            pt.quantity_plan as plan_qty, pt.quantity_fact as done_qty, pt.status as task_status, pt.start_date, pt.end_date 
+                     FROM production_tasks pt 
+                     JOIN products p ON pt.product_id = p.id
+                     WHERE pt.order_id IN ($orderIdsPlaceholder)";
+        $stmtTasks = $pdo->prepare($sqlTasks);
+        $stmtTasks->execute($orderIds);
+        $resTasks = $stmtTasks->fetchAll();
+        foreach ($resTasks as $row) {
+            $oid = (string)$row['order_id'];
+            if (isset($ordersData[$oid])) {
+                $row['materials'] = [];
+                $row['stages'] = [];
+                $ordersData[$oid]['tasks'][] = $row;
+            }
         }
     }
 
@@ -422,6 +426,12 @@ if (!empty($orders)) {
             }
         }
     }
+}
+
+// Отладка: выводим количество загруженных заказов
+error_log('DEBUG: Loaded ' . count($ordersData) . ' orders into ordersData');
+foreach ($ordersData as $oid => $data) {
+    error_log('DEBUG: Order ' . $oid . ' has ' . count($data['items']) . ' items and ' . count($data['tasks']) . ' tasks');
 }
 ?>
 <!DOCTYPE html>
@@ -734,7 +744,7 @@ if (!empty($orders)) {
                                     $isOverdue = isset($order['days_until_delivery']) && $order['days_until_delivery'] < 0;
                                     $hasMaterialIssues = isset($order['material_shortages']) && $order['material_shortages'] > 0;
                                 ?>
-                                <tr style="cursor: pointer;" onclick="openOrderDetailModal(<?= $order['id'] ?>)" 
+                                <tr style="cursor: pointer;" onclick="openOrderDetailModal('<?= $order['id'] ?>')" 
                                     class="<?= $isOverdue ? 'row-overdue' : '' ?> <?= $hasMaterialIssues ? 'row-material-issue' : '' ?>">
                                     <td><strong><?= e($order['order_number']) ?></strong></td>
                                     <td>
@@ -763,7 +773,7 @@ if (!empty($orders)) {
                                     <td><?= $order['tasks_count'] ?? 0 ?></td>
                                     <td><?= e($order['responsible_name'] ?? '—') ?></td>
                                     <td onclick="event.stopPropagation();">
-                                        <button class="btn btn-sm btn-primary" onclick="openOrderDetailModal(<?= $order['id'] ?>)">👁️</button>
+                                        <button class="btn btn-sm btn-primary" onclick="openOrderDetailModal('<?= $order['id'] ?>')">👁️</button>
                                     </td>
                                 </tr>
                                 <?php endforeach; ?>
@@ -811,8 +821,7 @@ if (!empty($orders)) {
         // Преобразуем его в JS объект для использования
         var ordersData = <?php echo json_encode($ordersData, JSON_UNESCAPED_UNICODE); ?>;
         
-        console.log('Orders data loaded:', ordersData);
-        console.log('Order IDs:', Object.keys(ordersData));
+        console.log('Orders data loaded:', Object.keys(ordersData).length, 'orders');
         
         // Открытие модального окна с деталями заказа (без AJAX, данные уже загружены)
         function openOrderDetailModal(orderId) {
@@ -822,21 +831,24 @@ if (!empty($orders)) {
             modal.style.display = 'flex';
             
             // Получаем данные из заранее загруженного массива
-            var data = ordersData[String(orderId)];
+            var orderIdStr = String(orderId);
+            var data = ordersData[orderIdStr];
             
-            console.log('Opening order:', orderId, 'Data found:', !!data, 'Keys:', data ? Object.keys(data) : []);
+            console.log('Opening order:', orderIdStr, 'Data found:', !!data);
             
-            if (!data) {
+            if (!data || !data.info) {
                 body.innerHTML = '<div style="text-align: center; padding: 40px; color: #e74c3c;">Данные о заказе не найдены</div>';
                 return;
             }
             
-            renderOrderDetailModal(data, orderId);
+            renderOrderDetailModal(data, orderIdStr);
         }
         
         function renderOrderDetailModal(data, orderId) {
             const body = document.getElementById('modalOrderBody');
             // data - это объект заказа с полями: info, items, tasks
+            
+            console.log('Rendering order:', orderId, 'Data:', data);
             
             const order = data.info || {};
             let html = '';
@@ -913,6 +925,13 @@ if (!empty($orders)) {
                             if (mat.available_qty < mat.required_qty) hasShortage = true;
                         });
                     }
+                    
+                    // Рассчитываем процент выполнения
+                    var percent = 0;
+                    if (task.plan_qty && task.plan_qty > 0) {
+                        percent = Math.round((task.done_qty / task.plan_qty) * 100);
+                    }
+                    if (percent > 100) percent = 100;
                     
                     html += '<div class="modal-task-card fade-in">';
                     
@@ -1067,11 +1086,17 @@ if (!empty($orders)) {
         }
         
         function escapeHtml(text) {
-            if (!text) return '';
+            if (!text && text !== 0) return '';
             var div = document.createElement('div');
-            div.textContent = text;
+            div.textContent = String(text);
             return div.innerHTML;
         }
+        
+        // Проверка данных при загрузке страницы
+        window.addEventListener('DOMContentLoaded', function() {
+            console.log('Page loaded. Orders data keys:', Object.keys(ordersData));
+            console.log('Sample order data:', ordersData[Object.keys(ordersData)[0]]);
+        });
         
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {

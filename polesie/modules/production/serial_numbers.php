@@ -100,11 +100,11 @@ $productFilter = $_GET['product'] ?? '';
 $search = $_GET['search'] ?? '';
 
 $sql = "SELECT sn.*, p.name as product_name, p.article as product_article,
-               po.production_number,
+               pt.task_number,
                u.full_name as created_by_name
         FROM product_serial_numbers sn
         JOIN products p ON sn.product_id = p.id
-        LEFT JOIN production_orders po ON sn.production_order_id = po.id
+        LEFT JOIN production_tasks pt ON sn.task_id = pt.id
         LEFT JOIN users u ON sn.created_by = u.id
         WHERE 1=1";
 $params = [];

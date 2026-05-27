@@ -22,12 +22,12 @@ $errors = [];
 $success = false;
 
 // Получение справочников
-$contractors = $pdo->query("SELECT * FROM contractors WHERE is_active = TRUE ORDER BY name")->fetchAll();
+$contractors = $pdo->query("SELECT * FROM contractors WHERE type IN ('customer', 'both') ORDER BY name")->fetchAll();
 $products = $pdo->query("SELECT p.*, pc.name as category_name, u.symbol as unit_name 
                          FROM products p 
                          LEFT JOIN product_categories pc ON p.category_id = pc.id 
                          LEFT JOIN base_units u ON p.base_unit_id = u.id 
-                         WHERE p.is_active = TRUE ORDER BY p.name")->fetchAll();
+                         WHERE 1=1 ORDER BY p.name")->fetchAll();
 $statuses = $pdo->query("SELECT DISTINCT status, 
                                 CASE status
                                     WHEN 'new' THEN 'Новый'

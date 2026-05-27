@@ -20,11 +20,11 @@ $pageTitle = 'Контрагенты';
 $search = $_GET['search'] ?? '';
 $type = $_GET['type'] ?? '';
 
-$sql = "SELECT * FROM contractors WHERE is_active = TRUE";
+$sql = "SELECT * FROM contractors WHERE 1=1";
 $params = [];
 
 if ($search) {
-    $sql .= " AND (name LIKE ? OR unp LIKE ? OR contact_person LIKE ?)";
+    $sql .= " AND (name LIKE ? OR inn LIKE ? OR contact_person LIKE ?)";
     $params = ["%$search%", "%$search%", "%$search%"];
 }
 

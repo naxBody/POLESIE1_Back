@@ -39,23 +39,37 @@ $orders = $pdo->query("
     FROM orders o
     LEFT JOIN contractors c ON o.customer_id = c.id
     LEFT JOIN users u ON o.responsible_user_id = u.id
-    ORDER BY o.order_date DESC
+    ORDER BY o.order_date DESC, o.created_at DESC
 ")->fetchAll();
 
 // Для каждого заказа получаем позиции и статус производства
 foreach ($orders as &$order) {
     // Позиции заказа
-    $order['items'] = $pdo->prepare("
-        SELECT oi.*, p.name as product_name, p.article as product_article
+    $stmt = $pdo->prepare("
+        SELECT oi.*, p.name as product_name, p.article as product_article,
+            CASE oi.production_status
+                WHEN 'not_started' THEN 'Не начато'
+                WHEN 'in_progress' THEN 'В работе'
+                WHEN 'completed' THEN 'Готово'
+                WHEN 'packed' THEN 'Упаковано'
+                ELSE 'Нет данных'
+            END as production_status_name,
+            CASE oi.production_status
+                WHEN 'not_started' THEN '#95a5a6'
+                WHEN 'in_progress' THEN '#f39c12'
+                WHEN 'completed' THEN '#27ae60'
+                WHEN 'packed' THEN '#9b59b6'
+                ELSE '#95a5a6'
+            END as production_status_color
         FROM order_items oi
         JOIN products p ON oi.product_id = p.id
         WHERE oi.order_id = ?
     ");
-    $order['items']->execute([$order['id']]);
-    $order['items'] = $order['items']->fetchAll();
+    $stmt->execute([$order['id']]);
+    $order['items'] = $stmt->fetchAll();
     
     // Производственные задания по заказу
-    $order['tasks'] = $pdo->prepare("
+    $stmt = $pdo->prepare("
         SELECT pt.*, p.name as product_name,
             CASE pt.status
                 WHEN 'planned' THEN 'Запланировано'
@@ -76,13 +90,13 @@ foreach ($orders as &$order) {
         WHERE pt.order_id = ?
         ORDER BY pt.created_at DESC
     ");
-    $order['tasks']->execute([$order['id']]);
-    $order['tasks'] = $order['tasks']->fetchAll();
+    $stmt->execute([$order['id']]);
+    $order['tasks'] = $stmt->fetchAll();
     
     // Этапы выполнения для каждого задания
     foreach ($order['tasks'] as &$task) {
-        $task['stages'] = $pdo->prepare("
-            SELECT pts.*, ps.name as stage_name, ps.color as stage_color,
+        $stmt = $pdo->prepare("
+            SELECT pts.*, ps.name as stage_name, ps.color as stage_color, ps.sort_order,
                 CASE pts.status
                     WHEN 'pending' THEN 'Ожидает'
                     WHEN 'in_progress' THEN 'В работе'
@@ -95,8 +109,8 @@ foreach ($orders as &$order) {
             WHERE pts.task_id = ?
             ORDER BY ps.sort_order
         ");
-        $task['stages']->execute([$task['id']]);
-        $task['stages'] = $task['stages']->fetchAll();
+        $stmt->execute([$task['id']]);
+        $task['stages'] = $stmt->fetchAll();
         
         // Прогресс выполнения задания
         $totalStages = count($task['stages']);
@@ -279,8 +293,8 @@ foreach ($orders as $order) {
                                     <td><?= formatMoney($item['price']) ?></td>
                                     <td><?= formatMoney($item['total']) ?></td>
                                     <td>
-                                        <span class="badge" style="background: #e9ecef; color: #495057">
-                                            Нет данных
+                                        <span class="badge" style="background: <?= e($item['production_status_color']) ?>20; color: <?= e($item['production_status_color']) ?>">
+                                            <?= e($item['production_status_name']) ?>
                                         </span>
                                     </td>
                                 </tr>

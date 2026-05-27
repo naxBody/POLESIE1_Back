@@ -266,7 +266,8 @@ foreach ($allOrders as $order) {
         $stmt = $pdo->prepare("
             SELECT COUNT(*) FROM production_tasks pt
             JOIN production_tasks_materials ptm ON ptm.task_id = pt.id
-            WHERE pt.order_id = ? AND ptm.quantity_required > ptm.quantity_available
+            JOIN materials m ON ptm.material_id = m.id
+            WHERE pt.order_id = ? AND ptm.quantity_required > COALESCE(m.current_stock, 0)
         ");
         $stmt->execute([$order['id']]);
         $materialCount = $stmt->fetchColumn();
@@ -808,7 +809,7 @@ if (!empty($orders)) {
     <script>
         // Данные из базы уже загружены в PHP массив ordersData
         // Преобразуем его в JS объект для использования
-        var ordersData = <?php echo json_encode($ordersData, JSON_UNESCAPED_UNICODE); ?>;
+        var ordersData = <?php echo json_encode($ordersData, JSON_UNESCAPED_UNICODE | JSON_FORCE_OBJECT); ?>;
         
         // Открытие модального окна с деталями заказа (без AJAX, данные уже загружены)
         function openOrderDetailModal(orderId) {
@@ -818,7 +819,7 @@ if (!empty($orders)) {
             modal.style.display = 'flex';
             
             // Получаем данные из заранее загруженного массива
-            var data = ordersData[orderId];
+            var data = ordersData[String(orderId)];
             
             if (!data) {
                 body.innerHTML = '<div style="text-align: center; padding: 40px; color: #e74c3c;">Данные о заказе не найдены</div>';

@@ -5,20 +5,29 @@
  * Компактная таблица с детальной информацией по клику
  */
 
-require_once __DIR__ . '/../../config/config.php';
-require_once __DIR__ . '/../../includes/auth.php';
-session_start();
-
-if (!isLoggedIn()) {
-    redirect(pageUrl('login.php'));
-}
-
-$user = getCurrentUser();
-$pdo = getDbConnection();
-
-// API endpoint для получения детальной информации о заказе (должен быть ДО любого вывода HTML)
+// API endpoint для получения детальной информации о заказе (должен быть В САМОМ НАЧАЛЕ до любых подключений и вывода)
 if (isset($_GET['api_order_detail'])) {
+    // Сначала включаем буферизацию чтобы перехватить любой вывод
+    ob_start();
+    
+    require_once __DIR__ . '/../../config/config.php';
+    require_once __DIR__ . '/../../includes/auth.php';
+    
+    // Очищаем буфер от любого случайного вывода при подключении файлов
+    ob_end_clean();
+    
+    if (!isLoggedIn()) {
+        http_response_code(403);
+        $jsonError = json_encode(['error' => 'Доступ запрещен'], JSON_UNESCAPED_UNICODE);
+        if (ob_get_level()) {
+            ob_end_clean();
+        }
+        echo $jsonError;
+        exit;
+    }
+    
     header('Content-Type: application/json');
+    $pdo = getDbConnection();
     $orderId = (int)$_GET['order_id'];
     
     // Основная информация о заказе
@@ -50,7 +59,11 @@ if (isset($_GET['api_order_detail'])) {
     
     if (!$orderInfo) {
         http_response_code(404);
-        echo json_encode(['error' => 'Заказ не найден'], JSON_UNESCAPED_UNICODE);
+        $jsonError = json_encode(['error' => 'Заказ не найден'], JSON_UNESCAPED_UNICODE);
+        if (ob_get_level()) {
+            ob_end_clean();
+        }
+        echo $jsonError;
         exit;
     }
     
@@ -149,13 +162,31 @@ if (isset($_GET['api_order_detail'])) {
     }
     unset($task);
     
-    echo json_encode([
+    $jsonResult = json_encode([
         'order' => $orderInfo,
         'items' => $items, 
         'tasks' => $tasks
     ], JSON_UNESCAPED_UNICODE);
+    
+    // Очищаем буфер и выводим только JSON
+    if (ob_get_level()) {
+        ob_end_clean();
+    }
+    echo $jsonResult;
     exit;
 }
+
+// Основной код страницы (только если это не API запрос)
+require_once __DIR__ . '/../../config/config.php';
+require_once __DIR__ . '/../../includes/auth.php';
+session_start();
+
+if (!isLoggedIn()) {
+    redirect(pageUrl('login.php'));
+}
+
+$user = getCurrentUser();
+$pdo = getDbConnection();
 
 $pageTitle = 'План выпуска';
 
@@ -680,10 +711,13 @@ if (count($orders) > 0) {
             modal.style.display = 'flex';
             body.innerHTML = '<div style="text-align: center; padding: 40px;"><p>Загрузка информации...</p></div>';
             
-            fetch('?api_order_detail=1&order_id=' + orderId)
+            const url = window.location.pathname + '?api_order_detail=1&order_id=' + orderId;
+            fetch(url)
                 .then(response => {
                     if (!response.ok) {
-                        throw new Error('HTTP error! status: ' + response.status);
+                        return response.text().then(text => {
+                            throw new Error('Ответ сервера: ' + (text.substring(0, 200) || response.status));
+                        });
                     }
                     return response.json();
                 })

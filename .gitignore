@@ -1,19 +1,24 @@
-```
+```php
 # Compiled and build artifacts
 *.pyc
-__pycache__/
+*.class
 *.o
 *.obj
+*.out
 dist/
 build/
 target/
 
 # Dependencies
-.venv/
-venv/
 node_modules/
-.julia/
-zig-cache/
+venv/
+.venv/
+__pycache__/
+.mypy_cache/
+.pytest_cache/
+.coverage
+coverage/
+htmlcov/
 
 # Logs and temp files
 *.log
@@ -24,7 +29,7 @@ zig-cache/
 # Environment
 .env
 .env.local
-*.env.*
+.env.*
 
 # Editors
 .vscode/
@@ -32,37 +37,9 @@ zig-cache/
 *.swp
 *.swo
 
-# System
+# System files
 .DS_Store
 Thumbs.db
-
-# Coverage
-coverage/
-htmlcov/
-.coverage
-
-# Python specific
-*.pyc
-__pycache__/
-*.pyo
-*.pyd
-.Python
-*.so
-.coverage
-.pytest_cache/
-.mypy_cache/
-
-# Node specific
-node_modules/
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
-# Build outputs
-dist/
-build/
-*.min.js
-*.min.css
 
 # Compressed files
 *.zip

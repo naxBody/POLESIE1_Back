@@ -19,7 +19,7 @@ $pageTitle = 'Продукция';
 $search = $_GET['search'] ?? '';
 $category = $_GET['category'] ?? '';
 
-$sql = "SELECT p.*, c.name as category_name, u.name as unit_name FROM products p 
+$sql = "SELECT p.*, c.name as category_name, u.symbol as unit_name FROM products p 
         LEFT JOIN product_categories c ON p.category_id = c.id 
         LEFT JOIN base_units u ON p.base_unit_id = u.id
         WHERE 1=1";

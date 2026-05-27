@@ -20,7 +20,7 @@ $status = $_GET['status'] ?? '';
 $orderId = $_GET['order'] ?? '';
 
 $sql = "SELECT pt.*, o.order_number, p.name as product_name, p.article as product_article, 
-               c.name as category_name, u.name as unit_name,
+               c.name as category_name, u.symbol as unit_name,
                u2.full_name as responsible_name, u3.full_name as worker_name
         FROM production_tasks pt
         JOIN orders o ON pt.order_id = o.id

@@ -345,7 +345,7 @@ if (!empty($orders)) {
     $resOrders = $stmtOrders->fetchAll();
     
     foreach ($resOrders as $row) {
-        $orderId = (int)$row['id'];
+        $orderId = (string)$row['id'];
         $ordersData[$orderId] = [
             'info' => $row,
             'items' => [],
@@ -365,7 +365,7 @@ if (!empty($orders)) {
     $stmtItems->execute($orderIds);
     $resItems = $stmtItems->fetchAll();
     foreach ($resItems as $row) {
-        $oid = (int)$row['order_id'];
+        $oid = (string)$row['order_id'];
         if (isset($ordersData[$oid])) {
             $ordersData[$oid]['items'][] = $row;
         }
@@ -382,7 +382,7 @@ if (!empty($orders)) {
     $stmtTasks->execute($orderIds);
     $resTasks = $stmtTasks->fetchAll();
     foreach ($resTasks as $row) {
-        $oid = (int)$row['order_id'];
+        $oid = (string)$row['order_id'];
         if (isset($ordersData[$oid])) {
             $row['materials'] = [];
             $row['stages'] = [];
@@ -809,7 +809,10 @@ if (!empty($orders)) {
     <script>
         // Данные из базы уже загружены в PHP массив ordersData
         // Преобразуем его в JS объект для использования
-        var ordersData = <?php echo json_encode($ordersData, JSON_UNESCAPED_UNICODE | JSON_FORCE_OBJECT); ?>;
+        var ordersData = <?php echo json_encode($ordersData, JSON_UNESCAPED_UNICODE); ?>;
+        
+        console.log('Orders data loaded:', ordersData);
+        console.log('Order IDs:', Object.keys(ordersData));
         
         // Открытие модального окна с деталями заказа (без AJAX, данные уже загружены)
         function openOrderDetailModal(orderId) {
@@ -820,6 +823,8 @@ if (!empty($orders)) {
             
             // Получаем данные из заранее загруженного массива
             var data = ordersData[String(orderId)];
+            
+            console.log('Opening order:', orderId, 'Data found:', !!data, 'Keys:', data ? Object.keys(data) : []);
             
             if (!data) {
                 body.innerHTML = '<div style="text-align: center; padding: 40px; color: #e74c3c;">Данные о заказе не найдены</div>';

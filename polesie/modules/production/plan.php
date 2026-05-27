@@ -326,7 +326,7 @@ if (count($orders) > 0) {
 $ordersData = [];
 if (!empty($orders)) {
     $orderIds = array_map(fn($o) => (int)$o['id'], $orders);
-    $orderIdsStr = implode(',', $orderIds);
+    $orderIdsPlaceholder = implode(',', array_fill(0, count($orderIds), '?'));
 
     // 1. Основная информация о заказах
     $sqlOrders = "SELECT o.id, o.order_number, o.status, 
@@ -336,10 +336,12 @@ if (!empty($orders)) {
                   FROM orders o 
                   LEFT JOIN contractors c ON o.customer_id = c.id
                   LEFT JOIN users u ON o.responsible_user_id = u.id
-                  WHERE o.id IN ($orderIdsStr)";
-    $resOrders = $db->query($sqlOrders);
+                  WHERE o.id IN ($orderIdsPlaceholder)";
+    $stmtOrders = $pdo->prepare($sqlOrders);
+    $stmtOrders->execute($orderIds);
+    $resOrders = $stmtOrders->fetchAll();
     
-    while ($row = $resOrders->fetch_assoc()) {
+    foreach ($resOrders as $row) {
         $orderId = (int)$row['id'];
         $ordersData[$orderId] = [
             'info' => $row,
@@ -349,11 +351,17 @@ if (!empty($orders)) {
     }
 
     // 2. Состав заказов (продукция)
-    $sqlItems = "SELECT oi.id, oi.order_id, oi.product_name, oi.article, oi.quantity, oi.price 
+    $sqlItems = "SELECT oi.id, oi.order_id, 
+                        COALESCE(oi.product_name, p.name, 'Без названия') as product_name, 
+                        COALESCE(oi.article, p.article, '') as article, 
+                        oi.quantity, oi.price 
                  FROM order_items oi 
-                 WHERE oi.order_id IN ($orderIdsStr)";
-    $resItems = $db->query($sqlItems);
-    while ($row = $resItems->fetch_assoc()) {
+                 LEFT JOIN products p ON oi.product_id = p.id
+                 WHERE oi.order_id IN ($orderIdsPlaceholder)";
+    $stmtItems = $pdo->prepare($sqlItems);
+    $stmtItems->execute($orderIds);
+    $resItems = $stmtItems->fetchAll();
+    foreach ($resItems as $row) {
         $oid = (int)$row['order_id'];
         if (isset($ordersData[$oid])) {
             $ordersData[$oid]['items'][] = $row;
@@ -361,11 +369,16 @@ if (!empty($orders)) {
     }
 
     // 3. Производственные задания для этих заказов
-    $sqlTasks = "SELECT pt.id, pt.order_id, pt.product_name, pt.plan_qty, pt.done_qty, pt.status as task_status, pt.start_date, pt.end_date 
+    $sqlTasks = "SELECT pt.id, pt.order_id, 
+                        COALESCE(pt.product_name, p.name, 'Без названия') as product_name, 
+                        pt.plan_qty, pt.done_qty, pt.status as task_status, pt.start_date, pt.end_date 
                  FROM production_tasks pt 
-                 WHERE pt.order_id IN ($orderIdsStr)";
-    $resTasks = $db->query($sqlTasks);
-    while ($row = $resTasks->fetch_assoc()) {
+                 LEFT JOIN products p ON pt.product_id = p.id
+                 WHERE pt.order_id IN ($orderIdsPlaceholder)";
+    $stmtTasks = $pdo->prepare($sqlTasks);
+    $stmtTasks->execute($orderIds);
+    $resTasks = $stmtTasks->fetchAll();
+    foreach ($resTasks as $row) {
         $oid = (int)$row['order_id'];
         if (isset($ordersData[$oid])) {
             $row['materials'] = [];
@@ -380,21 +393,25 @@ if (!empty($orders)) {
             $tid = (int)$task['id'];
             
             // Материалы
-            $sqlMat = "SELECT pm.material_name, pm.required_qty, pm.available_qty 
-                       FROM production_materials pm 
-                       WHERE pm.task_id = $tid";
-            $resMat = $db->query($sqlMat);
-            while ($row = $resMat->fetch_assoc()) {
+            $sqlMat = "SELECT ptm.material_name, ptm.quantity_required as required_qty, ptm.quantity_available as available_qty 
+                       FROM production_tasks_materials ptm 
+                       WHERE ptm.task_id = ?";
+            $stmtMat = $pdo->prepare($sqlMat);
+            $stmtMat->execute([$tid]);
+            $resMat = $stmtMat->fetchAll();
+            foreach ($resMat as $row) {
                 $task['materials'][] = $row;
             }
 
             // Этапы
-            $sqlStages = "SELECT ps.stage_name, ps.status, ps.date_completed 
-                          FROM production_stages ps 
-                          WHERE ps.task_id = $tid
-                          ORDER BY ps.sort_order ASC";
-            $resStages = $db->query($sqlStages);
-            while ($row = $resStages->fetch_assoc()) {
+            $sqlStages = "SELECT pts.stage_name, pts.status, pts.date_completed, pts.sort_order 
+                          FROM production_task_stages pts 
+                          WHERE pts.task_id = ?
+                          ORDER BY pts.sort_order ASC";
+            $stmtStages = $pdo->prepare($sqlStages);
+            $stmtStages->execute([$tid]);
+            $resStages = $stmtStages->fetchAll();
+            foreach ($resStages as $row) {
                 $task['stages'][] = $row;
             }
         }
@@ -897,7 +914,14 @@ if (!empty($orders)) {
                     html += '</div>';
                     html += '</div>';
                     html += '<div style="display: flex; align-items: center; gap: 8px;">';
-                    html += '<span class="badge">' + escapeHtml(task.task_status || '—') + '</span>';
+                    var taskStatusNames = {
+                        'planned': 'Запланировано',
+                        'in_progress': 'В работе',
+                        'completed': 'Завершено',
+                        'cancelled': 'Отменено'
+                    };
+                    var statusName = taskStatusNames[task.task_status] || task.task_status || '—';
+                    html += '<span class="badge">' + escapeHtml(statusName) + '</span>';
                     html += '<button class="toggle-details-btn" onclick="toggleTaskDetails(' + task.id + ', this)" data-task-id="' + task.id + '">';
                     html += '<span>📋</span><span class="btn-text">Подробнее</span>';
                     html += '</button>';
@@ -909,8 +933,8 @@ if (!empty($orders)) {
                     html += '<div style="display: flex; justify-content: space-between; font-size: 12px; color: #7f8c8d; margin-bottom: 6px;">';
                     html += '<span>План: <strong>' + (task.plan_qty || '—') + ' шт.</strong></span>';
                     html += '<span>Факт: <strong>' + (task.done_qty || '0') + ' шт.</strong></span>';
-                    if (task.planned_start) {
-                        html += '<span>' + formatDate(task.planned_start) + ' - ' + formatDate(task.planned_end) + '</span>';
+                    if (task.start_date) {
+                        html += '<span>' + formatDate(task.start_date) + ' - ' + formatDate(task.end_date) + '</span>';
                     }
                     html += '</div>';
                     
@@ -945,10 +969,6 @@ if (!empty($orders)) {
                                 : '<span class="badge badge-danger"><span class="material-status-indicator insufficient"></span>Не хватает (' + (mat.required_qty - mat.available_qty) + ')</span>';
                             html += '<tr style="' + (!isSufficient ? 'background: #fff5f5;' : '') + '">';
                             html += '<td><strong>' + escapeHtml(mat.material_name) + '</strong></td>';
-                            html += '<td><code style="background: #f8f9fa; padding: 2px 4px; border-radius: 3px; font-size: 10px;">' + escapeHtml('—' || '—') + '</code></td>';
-                            html += '';
-                            html += '';
-                            html += '<td>' + escapeHtml(mat.unit_name || '—') + '</td>';
                             html += '<td>' + statusHtml + '</td>';
                             html += '</tr>';
                         });
@@ -976,11 +996,12 @@ if (!empty($orders)) {
                         task.stages.forEach(function(stage) {
                             var stageClass = stage.status === 'completed' ? 'completed' : (stage.status === 'in_progress' ? 'in_progress' : 'pending');
                             var icon = stageIcons[stage.stage_name] || '📍';
+                            var statusName = stage.status === 'completed' ? 'Завершено' : (stage.status === 'in_progress' ? 'В работе' : 'Ожидает');
                             
                             html += '<div class="timeline-stage ' + stageClass + '">';
                             html += '<div class="timeline-stage-icon">' + icon + '</div>';
                             html += '<div class="timeline-stage-name">' + escapeHtml(stage.stage_name) + '</div>';
-                            html += '<div class="timeline-stage-status">' + escapeHtml(stage.status_name) + '</div>';
+                            html += '<div class="timeline-stage-status">' + statusName + '</div>';
                             html += '</div>';
                         });
                         

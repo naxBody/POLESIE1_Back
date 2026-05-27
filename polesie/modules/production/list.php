@@ -19,32 +19,30 @@ $pageTitle = 'Производство';
 $status = $_GET['status'] ?? '';
 $orderId = $_GET['order'] ?? '';
 
-$sql = "SELECT po.*, o.order_number, p.name as product_name, p.article as product_article, 
-               p.description as product_description, p.specifications as product_specifications,
-               p.base_price as product_price, p.is_active as product_is_active,
+$sql = "SELECT pt.*, o.order_number, p.name as product_name, p.article as product_article, 
                c.name as category_name, u.name as unit_name,
                u2.full_name as responsible_name, u3.full_name as worker_name
-        FROM production_orders po
-        JOIN orders o ON po.order_id = o.id
-        JOIN products p ON po.product_id = p.id
+        FROM production_tasks pt
+        JOIN orders o ON pt.order_id = o.id
+        JOIN products p ON pt.product_id = p.id
         LEFT JOIN product_categories c ON p.category_id = c.id
-        LEFT JOIN units u ON p.unit_id = u.id
-        LEFT JOIN users u2 ON po.responsible_user_id = u2.id
-        LEFT JOIN users u3 ON po.worker_id = u3.id
+        LEFT JOIN base_units u ON p.base_unit_id = u.id
+        LEFT JOIN users u2 ON pt.responsible_id = u2.id
+        LEFT JOIN users u3 ON pt.worker_id = u3.id
         WHERE 1=1";
 $params = [];
 
 if ($status) {
-    $sql .= " AND po.status_id = ?";
+    $sql .= " AND pt.status = ?";
     $params[] = $status;
 }
 
 if ($orderId) {
-    $sql .= " AND po.order_id = ?";
+    $sql .= " AND pt.order_id = ?";
     $params[] = $orderId;
 }
 
-$sql .= " ORDER BY po.created_at DESC";
+$sql .= " ORDER BY pt.created_at DESC";
 
 $stmt = $pdo->prepare($sql);
 $stmt->execute($params);

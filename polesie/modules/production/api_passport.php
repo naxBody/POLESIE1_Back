@@ -122,14 +122,14 @@ try {
                 SET warranty_start = ?, warranty_end = ?, warranty_months = ?,
                     manufacture_date = ?, company_name = ?, company_address = ?,
                     company_phone = ?, company_email = ?, product_name_custom = ?,
-                    product_description = ?, updated_at = NOW()
+                    product_description = ?, technical_specs_custom = ?, updated_at = NOW()
                 WHERE serial_number_id = ?
             ");
             $updateStmt->execute([
                 $warrantyStart, $warrantyEnd, $warrantyPeriod,
                 $manufactureDate, $orgName, $orgAddress,
                 $orgPhone, $orgEmail, $productName,
-                $productDescription, $serialId
+                $productDescription, $technicalSpecs ? json_encode($technicalSpecs, JSON_UNESCAPED_UNICODE) : null, $serialId
             ]);
         } else {
             // Создание новых данных
@@ -137,13 +137,13 @@ try {
                 INSERT INTO passport_dynamic_data 
                 (serial_number_id, warranty_start, warranty_end, warranty_months, manufacture_date,
                  company_name, company_address, company_phone, company_email, product_name_custom,
-                 product_description, created_by, created_at)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())
+                 product_description, technical_specs_custom, created_by, created_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())
             ");
             $insertStmt->execute([
                 $serialId, $warrantyStart, $warrantyEnd, $warrantyPeriod, $manufactureDate,
                 $orgName, $orgAddress, $orgPhone, $orgEmail, $productName,
-                $productDescription, $user['id']
+                $productDescription, $technicalSpecs ? json_encode($technicalSpecs, JSON_UNESCAPED_UNICODE) : null, $user['id']
             ]);
         }
         
@@ -252,14 +252,14 @@ try {
                 SET warranty_start = ?, warranty_end = ?, warranty_months = ?,
                     manufacture_date = ?, company_name = ?, company_address = ?,
                     company_phone = ?, company_email = ?, product_name_custom = ?,
-                    product_description = ?, updated_at = NOW()
+                    product_description = ?, technical_specs_custom = ?, updated_at = NOW()
                 WHERE serial_number_id = ?
             ");
             $updateDynamicStmt->execute([
                 $warrantyStart, $warrantyEnd, $warrantyMonths,
                 $manufactureDate, $companyName, $companyAddress,
                 $companyPhone, $companyEmail, $productNameCustom,
-                $productDescription, $serialId
+                $productDescription, $technicalSpecs ? json_encode($technicalSpecs, JSON_UNESCAPED_UNICODE) : null, $serialId
             ]);
         } else {
             // Создание новых данных
@@ -267,13 +267,13 @@ try {
                 INSERT INTO passport_dynamic_data 
                 (serial_number_id, warranty_start, warranty_end, warranty_months, manufacture_date,
                  company_name, company_address, company_phone, company_email, product_name_custom,
-                 product_description, created_by)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                 product_description, technical_specs_custom, created_by)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ");
             $insertDynamicStmt->execute([
                 $serialId, $warrantyStart, $warrantyEnd, $warrantyMonths, $manufactureDate,
                 $companyName, $companyAddress, $companyPhone, $companyEmail, $productNameCustom,
-                $productDescription, $user['id']
+                $productDescription, $technicalSpecs ? json_encode($technicalSpecs, JSON_UNESCAPED_UNICODE) : null, $user['id']
             ]);
         }
         

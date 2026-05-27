@@ -77,6 +77,16 @@ if ($dynamicPassportData) {
     if (!empty($dynamicPassportData['manufacture_date'])) {
         $serialData['manufacture_date'] = $dynamicPassportData['manufacture_date'];
     }
+    // Также переопределяем технические характеристики из динамического паспорта
+    if (!empty($dynamicPassportData['technical_specs_custom'])) {
+        $technicalSpecs = json_decode($dynamicPassportData['technical_specs_custom'], true) ?: $technicalSpecs;
+    }
+    if (!empty($dynamicPassportData['product_name_custom'])) {
+        $serialData['product_name'] = $dynamicPassportData['product_name_custom'];
+    }
+    if (!empty($dynamicPassportData['product_description'])) {
+        $serialData['product_description'] = $dynamicPassportData['product_description'];
+    }
 }
 
 // Режим печати

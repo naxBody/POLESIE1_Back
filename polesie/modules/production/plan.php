@@ -135,6 +135,33 @@ if (isset($_GET['api_order_detail'])) {
     header('Content-Type: application/json');
     $orderId = (int)$_GET['order_id'];
     
+    // Основная информация о заказе
+    $stmt = $pdo->prepare("
+        SELECT o.*, c.name as contractor_name, u.full_name as responsible_name,
+            CASE o.status
+                WHEN 'new' THEN 'Новый'
+                WHEN 'processing' THEN 'В работе'
+                WHEN 'ready' THEN 'Готов'
+                WHEN 'shipped' THEN 'Отгружен'
+                WHEN 'cancelled' THEN 'Отменен'
+                ELSE o.status
+            END as status_name,
+            CASE o.status
+                WHEN 'new' THEN '#3498db'
+                WHEN 'processing' THEN '#f39c12'
+                WHEN 'ready' THEN '#27ae60'
+                WHEN 'shipped' THEN '#9b59b6'
+                WHEN 'cancelled' THEN '#e74c3c'
+                ELSE '#95a5a6'
+            END as status_color
+        FROM orders o
+        LEFT JOIN contractors c ON o.customer_id = c.id
+        LEFT JOIN users u ON o.responsible_user_id = u.id
+        WHERE o.id = ?
+    ");
+    $stmt->execute([$orderId]);
+    $orderInfo = $stmt->fetch();
+    
     // Позиции заказа
     $stmt = $pdo->prepare("
         SELECT oi.*, p.name as product_name, p.article as product_article,
@@ -184,8 +211,23 @@ if (isset($_GET['api_order_detail'])) {
     $stmt->execute([$orderId]);
     $tasks = $stmt->fetchAll();
     
-    // Этапы выполнения для каждого задания
+    // Материалы по заданиям (что хватает/не хватает)
     foreach ($tasks as &$task) {
+        $stmt = $pdo->prepare("
+            SELECT ptm.*, m.name as material_name, m.article as material_article, mu.symbol as unit_name,
+                   CASE 
+                       WHEN ptm.quantity_available >= ptm.quantity_required THEN 'sufficient'
+                       ELSE 'insufficient'
+                   END as availability_status
+            FROM production_tasks_materials ptm
+            JOIN materials m ON ptm.material_id = m.id
+            LEFT JOIN base_units mu ON m.base_unit_id = mu.id
+            WHERE ptm.task_id = ?
+        ");
+        $stmt->execute([$task['id']]);
+        $task['materials'] = $stmt->fetchAll();
+        
+        // Этапы выполнения для каждого задания
         $stmt = $pdo->prepare("
             SELECT pts.*, ps.name as stage_name, ps.color as stage_color, ps.sort_order,
                 CASE pts.status
@@ -215,7 +257,11 @@ if (isset($_GET['api_order_detail'])) {
     }
     unset($task);
     
-    echo json_encode(['items' => $items, 'tasks' => $tasks], JSON_UNESCAPED_UNICODE);
+    echo json_encode([
+        'order' => $orderInfo,
+        'items' => $items, 
+        'tasks' => $tasks
+    ], JSON_UNESCAPED_UNICODE);
     exit;
 }
 
@@ -471,21 +517,26 @@ $stats['tasks_completed'] = $tasksStats['completed'] ?? 0;
         
         function renderOrderDetailModal(data, orderId) {
             const body = document.getElementById('modalOrderBody');
+            const order = data.order || {};
             let html = '';
             
             // Основная информация о заказе
             html += '<div class="passport-section">';
             html += '<div class="passport-section-title">📋 Информация о заказе</div>';
             html += '<div class="specs-list">';
-            html += '<div class="spec-item"><div class="spec-name">Позиций</div><div class="spec-value">' + (data.items ? data.items.length : 0) + ' шт.</div></div>';
-            html += '<div class="spec-item"><div class="spec-name">Производственных заданий</div><div class="spec-value">' + (data.tasks ? data.tasks.length : 0) + '</div></div>';
-            html += '</div>';
-            html += '</div>';
+            html += '<div class="spec-row"><div class="spec-label">№ заказа</div><div class="spec-value"><strong>' + escapeHtml(order.order_number || '—') + '</strong></div></div>';
+            html += '<div class="spec-row"><div class="spec-label">Статус</div><div class="spec-value"><span class="badge" style="background: ' + (order.status_color || '#95a5a6') + '20; color: ' + (order.status_color || '#95a5a6') + '">' + escapeHtml(order.status_name || '—') + '</span></div></div>';
+            html += '<div class="spec-row"><div class="spec-label">Заказчик</div><div class="spec-value">' + escapeHtml(order.contractor_name || '—') + '</div></div>';
+            html += '<div class="spec-row"><div class="spec-label">Ответственный</div><div class="spec-value">' + escapeHtml(order.responsible_name || '—') + '</div></div>';
+            if (order.delivery_date) {
+                html += '<div class="spec-row"><div class="spec-label">Дата доставки</div><div class="spec-value">' + formatDate(order.delivery_date) + '</div></div>';
+            }
+            html += '</div></div>';
             
             // Позиции заказа
             if (data.items && data.items.length > 0) {
                 html += '<div class="passport-section">';
-                html += '<div class="passport-section-title">📦 Позиции заказа</div>';
+                html += '<div class="passport-section-title">📦 Позиции заказа (' + data.items.length + ' шт.)</div>';
                 html += '<table class="materials-table">';
                 html += '<thead><tr><th>Продукция</th><th>Артикул</th><th>Кол-во</th><th>Цена</th><th>Сумма</th><th>Статус</th></tr></thead>';
                 html += '<tbody>';
@@ -499,54 +550,79 @@ $stats['tasks_completed'] = $tasksStats['completed'] ?? 0;
                     html += '<td><span class="badge" style="background: ' + item.production_status_color + '20; color: ' + item.production_status_color + '">' + escapeHtml(item.production_status_name) + '</span></td>';
                     html += '</tr>';
                 });
-                html += '</tbody></table>';
-                html += '</div>';
+                html += '</tbody></table></div>';
             }
             
             // Производственные задания
             if (data.tasks && data.tasks.length > 0) {
                 html += '<div class="passport-section">';
-                html += '<div class="passport-section-title">🏭 Производственные задания</div>';
+                html += '<div class="passport-section-title">🏭 Производственные задания (' + data.tasks.length + ')</div>';
+                
                 data.tasks.forEach(function(task, index) {
                     html += '<div class="task-card" style="background: #fafbfc; border: 1px solid #e9ecef; border-radius: 6px; padding: 16px; margin-bottom: 12px;">';
+                    
+                    // Заголовок задания
                     html += '<div class="task-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">';
                     html += '<div>';
-                    html += '<span class="task-title" style="font-weight: 600; color: #2c3e50;">' + escapeHtml(task.task_number) + '</span>';
-                    html += '<span style="margin-left: 12px; color: #7f8c8d;">' + escapeHtml(task.product_name) + '</span>';
+                    html += '<span class="task-title" style="font-weight: 600; color: #2c3e50;">#' + escapeHtml(task.id) + ' - ' + escapeHtml(task.product_name) + '</span>';
+                    html += '<span style="margin-left: 12px;" class="badge" style="background: ' + task.status_color + '20; color: ' + task.status_color + '">' + escapeHtml(task.status_name) + '</span>';
                     html += '</div>';
-                    html += '<div style="display: flex; gap: 8px; align-items: center;">';
-                    html += '<span class="badge" style="background: ' + task.status_color + '20; color: ' + task.status_color + '">' + escapeHtml(task.status_name) + '</span>';
                     html += '<button class="expand-btn" onclick="toggleTaskDetails(' + task.id + ')" style="background: none; border: none; cursor: pointer; font-size: 18px; color: #7f8c8d;">▼</button>';
                     html += '</div>';
-                    html += '</div>';
                     
-                    html += '<div style="display: flex; justify-content: space-between; font-size: 13px; color: #7f8c8d;">';
-                    html += '<span>План: ' + task.quantity_plan + ' шт.</span>';
-                    html += '<span>Факт: ' + task.quantity_fact + ' шт.</span>';
+                    // Прогресс
+                    html += '<div style="display: flex; justify-content: space-between; font-size: 13px; color: #7f8c8d; margin-bottom: 8px;">';
+                    html += '<span>План: ' + (task.quantity_plan || '—') + ' шт.</span>';
+                    html += '<span>Факт: ' + (task.quantity_fact || '0') + ' шт.</span>';
                     if (task.planned_start) {
                         html += '<span>' + formatDate(task.planned_start) + ' - ' + formatDate(task.planned_end) + '</span>';
                     }
                     html += '</div>';
                     
-                    html += '<div class="progress-bar" style="height: 8px; background: #e9ecef; border-radius: 4px; overflow: hidden; margin: 10px 0;">';
+                    html += '<div class="progress-bar" style="height: 8px; background: #e9ecef; border-radius: 4px; overflow: hidden; margin: 8px 0;">';
                     html += '<div class="progress-fill" style="height: 100%; background: linear-gradient(90deg, #3498db, #2ecc71); width: ' + task.progress_percent + '%;"></div>';
                     html += '</div>';
                     html += '<div style="font-size: 12px; color: #7f8c8d; text-align: right;">Выполнено: ' + task.progress_percent + '%</div>';
                     
-                    // Этапы
+                    // Детали (материалы и этапы)
+                    html += '<div class="task-details" id="task-details-' + task.id + '" style="display: none; margin-top: 16px; padding-top: 16px; border-top: 1px solid #e9ecef;">';
+                    
+                    // Материалы
+                    if (task.materials && task.materials.length > 0) {
+                        html += '<h5 style="margin-bottom: 8px; font-size: 13px; color: #2c3e50;">📦 Материалы:</h5>';
+                        html += '<table class="materials-table" style="font-size: 13px;">';
+                        html += '<thead><tr><th>Материал</th><th>Артикул</th><th>Требуется</th><th>Доступно</th><th>Ед.</th><th>Статус</th></tr></thead>';
+                        html += '<tbody>';
+                        task.materials.forEach(function(mat) {
+                            var statusBadge = mat.availability_status === 'sufficient' 
+                                ? '<span class="badge" style="background: #d4edda; color: #155724;">✓ Хватает</span>'
+                                : '<span class="badge" style="background: #f8d7da; color: #721c24;">⚠️ Не хватает</span>';
+                            html += '<tr>';
+                            html += '<td><strong>' + escapeHtml(mat.material_name) + '</strong></td>';
+                            html += '<td><code>' + escapeHtml(mat.material_article || '—') + '</code></td>';
+                            html += '<td>' + mat.quantity_required + '</td>';
+                            html += '<td>' + mat.quantity_available + '</td>';
+                            html += '<td>' + escapeHtml(mat.unit_name || '—') + '</td>';
+                            html += '<td>' + statusBadge + '</td>';
+                            html += '</tr>';
+                        });
+                        html += '</tbody></table>';
+                    }
+                    
+                    // Этапы производства
                     if (task.stages && task.stages.length > 0) {
-                        html += '<div class="task-details" id="task-details-' + task.id + '" style="display: none; margin-top: 16px; padding-top: 16px; border-top: 1px solid #e9ecef;">';
-                        html += '<h5 style="margin-bottom: 8px; font-size: 13px;">Этапы производства:</h5>';
+                        html += '<h5 style="margin: 16px 0 8px 0; font-size: 13px; color: #2c3e50;">🔄 Этапы производства:</h5>';
                         html += '<div class="stages-list" style="display: flex; flex-wrap: wrap; gap: 8px;">';
                         task.stages.forEach(function(stage) {
                             var badgeClass = stage.status === 'completed' ? 'completed' : (stage.status === 'in_progress' ? 'in_progress' : 'pending');
-                            var borderStyle = stage.status !== 'pending' ? 'border-color: ' + stage.stage_color + '; border: 1px solid;' : '';
-                            html += '<span class="stage-badge ' + badgeClass + '" style="padding: 4px 10px; border-radius: 12px; font-size: 12px; background: ' + (stage.status === 'completed' ? '#d4edda' : (stage.status === 'in_progress' ? '#fff3cd' : '#e9ecef')) + '; color: ' + (stage.status === 'completed' ? '#155724' : (stage.status === 'in_progress' ? '#856404' : '#495057')) + '; ' + borderStyle + '">' + escapeHtml(stage.stage_name) + ': ' + escapeHtml(stage.status_name) + '</span>';
+                            var stageBg = stage.status === 'completed' ? '#d4edda' : (stage.status === 'in_progress' ? '#fff3cd' : '#e9ecef');
+                            var stageColor = stage.status === 'completed' ? '#155724' : (stage.status === 'in_progress' ? '#856404' : '#495057');
+                            html += '<span class="stage-badge ' + badgeClass + '" style="padding: 6px 12px; border-radius: 12px; font-size: 12px; background: ' + stageBg + '; color: ' + stageColor + '; border: 1px solid ' + (stage.stage_color || '#ddd') + ';">' + escapeHtml(stage.stage_name) + ': ' + escapeHtml(stage.status_name) + '</span>';
                         });
-                        html += '</div></div>';
+                        html += '</div>';
                     }
                     
-                    html += '</div>';
+                    html += '</div></div>';
                 });
                 html += '</div>';
             }

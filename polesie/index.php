@@ -30,6 +30,10 @@ $stmt = $pdo->query("
 ");
 $stats['orders_in_progress'] = $stmt->fetchColumn();
 
+// Новые заказы
+$stmt = $pdo->query("SELECT COUNT(*) FROM orders WHERE status = 'new'");
+$stats['new_orders'] = $stmt->fetchColumn();
+
 // Производственные задания
 $stmt = $pdo->query("SELECT COUNT(*) FROM production_tasks");
 $stats['production_orders'] = $stmt->fetchColumn();
@@ -44,6 +48,31 @@ $stats['production_active'] = $stmt->fetchColumn();
 // Продукция на складе (сумма по всем продуктам)
 $stmt = $pdo->query("SELECT COUNT(*) FROM product_serial_numbers WHERE status = 'active'");
 $stats['warehouse_products'] = $stmt->fetchColumn() ?? 0;
+
+// Заказы с проблемами (просроченные или с нехваткой материалов)
+$problemOrders = $pdo->query("
+    SELECT o.id, o.order_number, o.delivery_date, o.status,
+        c.name as contractor_name,
+        DATEDIFF(o.delivery_date, CURDATE()) as days_until_delivery,
+        (SELECT COUNT(*) FROM production_tasks pt 
+         WHERE pt.order_id = o.id AND pt.status != 'completed') as pending_tasks,
+        (SELECT COUNT(*) FROM production_tasks_materials ptm
+         JOIN production_tasks pt ON ptm.task_id = pt.id
+         WHERE pt.order_id = o.id AND ptm.quantity_required > ptm.quantity_available) as material_shortages
+    FROM orders o
+    LEFT JOIN contractors c ON o.customer_id = c.id
+    WHERE o.status IN ('new', 'processing')
+    AND (o.delivery_date < CURDATE() + INTERVAL 7 DAY 
+         OR EXISTS (
+             SELECT 1 FROM production_tasks pt 
+             JOIN production_tasks_materials ptm ON ptm.task_id = pt.id
+             WHERE pt.order_id = o.id AND ptm.quantity_required > ptm.quantity_available
+         ))
+    ORDER BY 
+        CASE WHEN o.delivery_date < CURDATE() THEN 0 ELSE 1 END,
+        o.delivery_date ASC
+    LIMIT 10
+")->fetchAll();
 
 // Последние заказы
 $recentOrders = $pdo->query("
@@ -165,6 +194,73 @@ $pageTitle = 'Панель управления';
                         <div class="stat-card-change negative">↓ 5% за неделю</div>
                     </div>
                 </div>
+                
+                <!-- Важные уведомления / Проблемные заказы -->
+                <?php if (!empty($problemOrders)): ?>
+                <div class="card" style="margin-bottom: 24px; border-left: 4px solid #e74c3c;">
+                    <div class="card-header" style="background: #fdf2f2;">
+                        <h3 class="card-title" style="color: #c0392b;">⚠️ Требуют внимания</h3>
+                        <span class="badge" style="background: #e74c3c; color: white;"><?= count($problemOrders) ?> заказов</span>
+                    </div>
+                    <div class="card-body" style="padding: 0;">
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Заказ</th>
+                                        <th>Заказчик</th>
+                                        <th>Срок доставки</th>
+                                        <th>Дней осталось</th>
+                                        <th>Проблемы</th>
+                                        <th>Действия</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php foreach ($problemOrders as $po): 
+                                        $isOverdue = $po['days_until_delivery'] < 0;
+                                        $isUrgent = $po['days_until_delivery'] >= 0 && $po['days_until_delivery'] <= 3;
+                                    ?>
+                                    <tr style="<?= $isOverdue ? 'background: #fdf2f2;' : '' ?>">
+                                        <td><strong><?= e($po['order_number']) ?></strong></td>
+                                        <td><?= e($po['contractor_name'] ?? '—') ?></td>
+                                        <td>
+                                            <?= formatDate($po['delivery_date']) ?>
+                                            <?php if ($isOverdue): ?>
+                                                <span class="badge" style="background: #e74c3c; color: white; font-size: 11px;">ПРОСРОЧЕНО</span>
+                                            <?php elseif ($isUrgent): ?>
+                                                <span class="badge" style="background: #f39c12; color: white; font-size: 11px;">СРОЧНО</span>
+                                            <?php endif; ?>
+                                        </td>
+                                        <td>
+                                            <span style="color: <?= $isOverdue ? '#e74c3c' : ($isUrgent ? '#f39c12' : '#27ae60') ?>; font-weight: 600;">
+                                                <?= $po['days_until_delivery'] ?> дн.
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <?php if ($po['material_shortages'] > 0): ?>
+                                                <span class="badge" style="background: #e74c3c20; color: #e74c3c;">
+                                                    📦 Нехватка материалов (<?= $po['material_shortages'] ?>)
+                                                </span>
+                                            <?php endif; ?>
+                                            <?php if ($po['pending_tasks'] > 0): ?>
+                                                <span class="badge" style="background: #f39c1220; color: #f39c12;">
+                                                    ⏳ Заданий в работе (<?= $po['pending_tasks'] ?>)
+                                                </span>
+                                            <?php endif; ?>
+                                        </td>
+                                        <td>
+                                            <a href="<?= pageUrl('modules/orders/view.php?id=' . $po['id']) ?>" class="btn btn-sm btn-primary">
+                                                👁️ Просмотр
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    <?php endforeach; ?>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <?php endif; ?>
                 
                 <!-- Две колонки -->
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">

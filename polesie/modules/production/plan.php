@@ -17,8 +17,37 @@ $pdo = getDbConnection();
 
 $pageTitle = 'План выпуска';
 
+// Получение фильтров
+$search = $_GET['search'] ?? '';
+$statusFilter = $_GET['status'] ?? '';
+$priorityFilter = $_GET['priority'] ?? '';
+$materialIssueFilter = isset($_GET['material_issues']) ? true : false;
+$overdueFilter = isset($_GET['overdue']) ? true : false;
+
+// Построение WHERE clause
+$whereConditions = [];
+$params = [];
+
+if ($search) {
+    $whereConditions[] = "(o.order_number LIKE ? OR c.name LIKE ?)";
+    $params[] = "%$search%";
+    $params[] = "%$search%";
+}
+
+if ($statusFilter) {
+    $whereConditions[] = "o.status = ?";
+    $params[] = $statusFilter;
+}
+
+if ($priorityFilter) {
+    $whereConditions[] = "pt.priority = ?";
+    $params[] = $priorityFilter;
+}
+
+$whereClause = !empty($whereConditions) ? "WHERE " . implode(" AND ", $whereConditions) : "";
+
 // Получение всех заказов с информацией о производстве
-$orders = $pdo->query("
+$ordersQuery = "
     SELECT o.*, c.name as contractor_name, u.full_name as responsible_name,
         CASE o.status
             WHEN 'new' THEN 'Новый'
@@ -35,12 +64,51 @@ $orders = $pdo->query("
             WHEN 'shipped' THEN '#9b59b6'
             WHEN 'cancelled' THEN '#e74c3c'
             ELSE '#95a5a6'
-        END as status_color
+        END as status_color,
+        DATEDIFF(o.delivery_date, CURDATE()) as days_until_delivery
     FROM orders o
     LEFT JOIN contractors c ON o.customer_id = c.id
     LEFT JOIN users u ON o.responsible_user_id = u.id
-    ORDER BY o.order_date DESC, o.created_at DESC
-")->fetchAll();
+    $whereClause
+    ORDER BY 
+        CASE WHEN o.delivery_date < CURDATE() THEN 0 ELSE 1 END,
+        o.delivery_date ASC,
+        o.created_at DESC
+";
+
+$stmt = $pdo->prepare($ordersQuery);
+$stmt->execute($params);
+$allOrders = $stmt->fetchAll();
+
+// Фильтрация заказов с проблемами материалов и просроченных
+$orders = [];
+foreach ($allOrders as $order) {
+    // Если включен фильтр проблем с материалами
+    if ($materialIssueFilter) {
+        $hasMaterialIssues = false;
+        $stmt = $pdo->prepare("
+            SELECT COUNT(*) FROM production_tasks pt
+            JOIN production_tasks_materials ptm ON ptm.task_id = pt.id
+            WHERE pt.order_id = ? AND ptm.quantity_required > ptm.quantity_available
+        ");
+        $stmt->execute([$order['id']]);
+        $materialCount = $stmt->fetchColumn();
+        if ($materialCount == 0) continue; // Пропускаем заказы без проблем с материалами
+        $order['material_shortages'] = $materialCount;
+    }
+    
+    // Если включен фильтр просроченных
+    if ($overdueFilter && $order['days_until_delivery'] >= 0) {
+        continue; // Пропускаем заказы, которые не просрочены
+    }
+    
+    $orders[] = $order;
+}
+
+// Если нет специальных фильтров, берем все заказы
+if (!$materialIssueFilter && !$overdueFilter) {
+    $orders = $allOrders;
+}
 
 // Для каждого заказа получаем позиции и статус производства
 foreach ($orders as &$order) {
@@ -230,24 +298,77 @@ foreach ($orders as $order) {
                     </div>
                 </div>
                 
+                <!-- Фильтры -->
+                <div class="card" style="margin-bottom: 24px;">
+                    <div class="card-body">
+                        <form method="GET" action="" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; align-items: end;">
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <label class="form-label">Поиск</label>
+                                <input type="text" name="search" class="form-control" placeholder="№ заказа или заказчик" value="<?= e($search) ?>">
+                            </div>
+                            
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <label class="form-label">Статус</label>
+                                <select name="status" class="form-control">
+                                    <option value="">Все статусы</option>
+                                    <option value="new" <?= $statusFilter == 'new' ? 'selected' : '' ?>>Новый</option>
+                                    <option value="processing" <?= $statusFilter == 'processing' ? 'selected' : '' ?>>В работе</option>
+                                    <option value="ready" <?= $statusFilter == 'ready' ? 'selected' : '' ?>>Готов</option>
+                                    <option value="shipped" <?= $statusFilter == 'shipped' ? 'selected' : '' ?>>Отгружен</option>
+                                    <option value="cancelled" <?= $statusFilter == 'cancelled' ? 'selected' : '' ?>>Отменен</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <label class="form-label" title="Заказы с нехваткой материалов">📦 Проблемы с материалами</label>
+                                <input type="checkbox" name="material_issues" value="1" <?= $materialIssueFilter ? 'checked' : '' ?> style="width: 20px; height: 20px;">
+                            </div>
+                            
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <label class="form-label" title="Просроченные заказы">⏰ Просроченные</label>
+                                <input type="checkbox" name="overdue" value="1" <?= $overdueFilter ? 'checked' : '' ?> style="width: 20px; height: 20px;">
+                            </div>
+                            
+                            <div style="display: flex; gap: 8px;">
+                                <button type="submit" class="btn btn-primary">Фильтр</button>
+                                <a href="" class="btn btn-secondary">Сброс</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                
                 <!-- Заказы -->
-                <?php foreach ($orders as $order): ?>
-                <div class="order-card">
+                <?php foreach ($orders as $order): 
+                    $isOverdue = isset($order['days_until_delivery']) && $order['days_until_delivery'] < 0;
+                    $hasMaterialIssues = isset($order['material_shortages']) && $order['material_shortages'] > 0;
+                ?>
+                <div class="order-card" style="<?= $isOverdue ? 'border-left: 4px solid #e74c3c;' : '' ?><?= $hasMaterialIssues ? 'border-left: 4px solid #f39c12;' : '' ?>">
                     <div class="order-card-header">
                         <div>
                             <strong style="font-size: 16px;"><?= e($order['order_number']) ?></strong>
                             <span class="badge" style="background: <?= e($order['status_color']) ?>20; color: <?= e($order['status_color']) ?>; margin-left: 8px;">
                                 <?= e($order['status_name']) ?>
                             </span>
+                            <?php if ($isOverdue): ?>
+                                <span class="badge" style="background: #e74c3c; color: white; margin-left: 8px;">ПРОСРОЧЕНО</span>
+                            <?php endif; ?>
+                            <?php if ($hasMaterialIssues): ?>
+                                <span class="badge" style="background: #f39c12; color: white; margin-left: 8px;">НЕХВАТКА МАТЕРИАЛОВ</span>
+                            <?php endif; ?>
                         </div>
                         <div style="display: flex; gap: 12px; align-items: center;">
                             <span style="font-size: 14px; color: var(--text-secondary);">
                                 📅 <?= formatDate($order['order_date']) ?>
                                 <?php if ($order['delivery_date']): ?>
                                     → <?= formatDate($order['delivery_date']) ?>
+                                    <?php if (isset($order['days_until_delivery'])): ?>
+                                        <span style="color: <?= $order['days_until_delivery'] < 0 ? '#e74c3c' : ($order['days_until_delivery'] <= 3 ? '#f39c12' : '#27ae60') ?>; font-weight: 600;">
+                                            (<?= $order['days_until_delivery'] ?> дн.)
+                                        </span>
+                                    <?php endif; ?>
                                 <?php endif; ?>
                             </span>
-                            <a href="<?= pageUrl('modules/orders/list.php') ?>" class="btn btn-sm btn-secondary">Детали</a>
+                            <a href="<?= pageUrl('modules/orders/view.php?id=' . $order['id']) ?>" class="btn btn-sm btn-secondary">Детали</a>
                         </div>
                     </div>
                     

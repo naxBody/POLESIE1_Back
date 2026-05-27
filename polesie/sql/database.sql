@@ -296,20 +296,87 @@ INSERT INTO `materials` (`code`, `name_full`, `name_short`, `category_id`, `base
 ('BRG-6205', 'Подшипник 6205-2RS', 'Подшипник 6205', 11, 1, '{"inner_d_mm":25,"outer_d_mm":52,"width_mm":15,"type":"шариковый","seal":"2RS"}', 150.00, 30.00, 'Склад №5, Ящик 3', 2, 8.50, 'BYN'),
 ('BRG-6305', 'Подшипник 6305-2RS', 'Подшипник 6305', 11, 1, '{"inner_d_mm":25,"outer_d_mm":62,"width_mm":17,"type":"шариковый","seal":"2RS"}', 120.00, 25.00, 'Склад №5, Ящик 3', 2, 12.30, 'BYN');
 
-INSERT INTO `products` (`article`, `name`, `category_id`, `base_unit_id`, `specifications`, `image`, `base_price`, `currency`, `is_active`) VALUES
-('ADM-80A4', 'Двигатель АДМ 80A4', 1, 1, '{"power_kw":1.1,"rpm":1500,"voltage_v":380,"frame":"80A","efficiency_class":"IE2","mounting":"IM1081"}', 'motor_adm80a4.jpg', 350.00, 'BYN', TRUE),
-('ADM-90L4', 'Двигатель АДМ 90L4', 1, 1, '{"power_kw":2.2,"rpm":1500,"voltage_v":380,"frame":"90L","efficiency_class":"IE2","mounting":"IM1081"}', 'motor_adm90l4.jpg', 480.00, 'BYN', TRUE),
-('ADM-100L4', 'Двигатель АДМ 100L4', 1, 1, '{"power_kw":4.0,"rpm":1500,"voltage_v":380,"frame":"100L","efficiency_class":"IE2","mounting":"IM1081"}', 'motor_adm100l4.jpg', 650.00, 'BYN', TRUE),
-('ADM-112M4', 'Двигатель АДМ 112M4', 1, 1, '{"power_kw":5.5,"rpm":1500,"voltage_v":380,"frame":"112M","efficiency_class":"IE2","mounting":"IM1081"}', 'motor_adm112m4.jpg', 820.00, 'BYN', TRUE),
-('DG-5000', 'Генератор дизельный 5кВт', 2, 1, '{"power_kw":5,"fuel_type":"дизель","voltage_v":220,"phase":1,"start":"электростартер"}', 'generator_5kw.jpg', 2500.00, 'BYN', TRUE),
-('DG-10000', 'Генератор дизельный 10кВт', 2, 1, '{"power_kw":10,"fuel_type":"дизель","voltage_v":380,"phase":3,"start":"электростартер"}', 'generator_10kw.jpg', 4200.00, 'BYN', TRUE),
-('TM-25', 'Трансформатор ТМ-25', 3, 1, '{"power_kva":25,"voltage_primary_kv":10,"voltage_secondary_kv":0.4,"cooling":"масляное"}', 'transformer_25.jpg', 3500.00, 'BYN', TRUE),
-('TM-63', 'Трансформатор ТМ-63', 3, 1, '{"power_kva":63,"voltage_primary_kv":10,"voltage_secondary_kv":0.4,"cooling":"масляное"}', 'transformer_63.jpg', 5200.00, 'BYN', TRUE),
-('SCH-100A', 'Щит распределительный 100А', 4, 1, '{"current_a":100,"circuits":12,"protection_ip":"IP54","material":"металл"}', 'switchgear_100a.jpg', 450.00, 'BYN', TRUE),
-('SCH-250A', 'Щит распределительный 250А', 4, 1, '{"current_a":250,"circuits":24,"protection_ip":"IP54","material":"металл"}', 'switchgear_250a.jpg', 850.00, 'BYN', TRUE),
-('SP-BRG-6205', 'Подшипник 6205 (запчасть)', 5, 1, '{"compatible_with":"ADM-80A4, ADM-90L4","inner_d_mm":25,"outer_d_mm":52}', 'spare_brg6205.jpg', 15.00, 'BYN', TRUE),
-('SP-FAN-80', 'Вентилятор двигателя 80', 5, 1, '{"compatible_with":"ADM-80A4","diameter_mm":180,"material":"пластик"}', 'spare_fan80.jpg', 25.00, 'BYN', TRUE),
-('SP-TERM-BOX', 'Клеммная коробка', 5, 1, '{"compatible_with":"ADM-80A4, ADM-90L4","terminals":6,"material":"алюминий"}', 'spare_termbox.jpg', 45.00, 'BYN', TRUE);
+-- ============================================
+-- ПРОДУКЦИЯ: ВСЕ 64 ТОВАРА СО ВСЕМИ СВОЙСТВАМИ
+-- Все свойства вынесены в отдельные колонки для удобства расчетов
+-- ============================================
+
+DROP TABLE IF EXISTS `products`;
+
+CREATE TABLE `products` (
+  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `article` VARCHAR(50) NOT NULL UNIQUE,
+  `code_gost` VARCHAR(50),
+  `name_full` VARCHAR(300) NOT NULL,
+  `name_short` VARCHAR(150),
+  `category_id` INT,
+  `base_unit_id` INT DEFAULT 1,
+  -- Электрические характеристики
+  `power_kw_min` DECIMAL(10,3),
+  `power_kw_max` DECIMAL(10,3),
+  `power_kw` DECIMAL(10,3),
+  `rpm` INT,
+  `voltage_v` VARCHAR(50),
+  `frequency_hz` INT DEFAULT 50,
+  `efficiency_class` VARCHAR(10),
+  -- Механические характеристики
+  `shaft_height_mm` INT,
+  `climate_versions` VARCHAR(200),
+  `mounting_versions` VARCHAR(300),
+  `protection_class` VARCHAR(50),
+  -- Дополнительные характеристики
+  `type` VARCHAR(100),
+  `application` VARCHAR(200),
+  `housing_material` VARCHAR(100),
+  `impeller_material` VARCHAR(100),
+  `flow_rate_m3_h` DECIMAL(10,2),
+  `head_m` DECIMAL(10,2),
+  `max_immersion_depth_m` DECIMAL(10,2),
+  `max_solid_size_mm` INT,
+  `explosion_protection` VARCHAR(50),
+  `capacitor_included` BOOLEAN,
+  `standard` VARCHAR(100),
+  `material` VARCHAR(100),
+  `production_method` VARCHAR(100),
+  `custom_made` BOOLEAN,
+  `speeds` INT,
+  `slip_percent` DECIMAL(5,2),
+  `weight_range_kg` VARCHAR(50),
+  -- Серийные номера и гарантия
+  `is_serial_tracked` BOOLEAN DEFAULT FALSE,
+  `warranty_months` INT DEFAULT 24,
+  `is_bestseller` BOOLEAN DEFAULT FALSE,
+  `serial_number` VARCHAR(100),
+  -- Изображение и цена
+  `image` VARCHAR(255),
+  `base_price` DECIMAL(15,2),
+  `currency` CHAR(3) DEFAULT 'BYN',
+  `is_active` BOOLEAN DEFAULT TRUE,
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT `fk_prod_category_new` FOREIGN KEY (`category_id`) REFERENCES `product_categories`(`id`) ON DELETE SET NULL,
+  CONSTRAINT `fk_prod_unit_new` FOREIGN KEY (`base_unit_id`) REFERENCES `base_units`(`id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- ============================================
+-- Вставка всех 64 продуктов
+-- ============================================
+
+INSERT INTO `products` (
+  `id`, `article`, `code_gost`, `name_full`, `name_short`, `category_id`, `base_unit_id`,
+  `power_kw_min`, `power_kw_max`, `power_kw`, `rpm`, `voltage_v`, `frequency_hz`,
+  `efficiency_class`, `shaft_height_mm`, `climate_versions`, `mounting_versions`,
+  `protection_class`, `type`, `application`, `housing_material`, `impeller_material`,
+  `flow_rate_m3_h`, `head_m`, `max_immersion_depth_m`, `max_solid_size_mm`,
+  `explosion_protection`, `capacitor_included`, `standard`, `material`,
+  `production_method`, `custom_made`, `speeds`, `slip_percent`, `weight_range_kg`,
+  `is_serial_tracked`, `warranty_months`, `is_bestseller`, `serial_number`,
+  `image`, `base_price`, `currency`, `is_active`)
+VALUES
+(1, 'AIR-071-2', 'АИР71', 'Электродвигатель асинхронный трехфазный АИР71, 0.37-0.75 кВт, 3000 об/мин', 'АИР71 0.37-0.75кВт 3000об/мин', 11, 1, 0.37, 0.75, NULL, 3000, '380/220', 50, NULL, 71, 'У2,У3,У5,УХЛ2,УХЛ4,Т2', 'IM1081,IM1082,IM2081,IM2082,IM2181,IM2182,IM3081,IM3082,IM3681,IM3682', 'IP54,IP55', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, FALSE, NULL, NULL, NULL, FALSE, NULL, NULL, NULL, TRUE, 24, FALSE, 'SN-24-002-9964', 'product_air_071_2.jpg', 111.00, 'BYN', TRUE),
+(2, 'AIR-080-2', 'АИР80', 'Электродвигатель асинхронный трехфазный АИР80, 0.75-2.2 кВт, 3000 об/мин', 'АИР80 0.75-2.2кВт 3000об/мин', 11, 1, 0.75, 2.2, NULL, 3000, '380/220', 50, NULL, 80, 'У2,У3,У5,УХЛ2,УХЛ4,Т2', 'IM1081,IM1082,IM2081,IM2082,IM2181,IM2182,IM3081,IM3082,IM3681,IM3682', 'IP54,IP55', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, FALSE, NULL, NULL, NULL, FALSE, NULL, NULL, NULL, TRUE, 24, FALSE, 'SN-24-002-9364', 'product_air_080_2.jpg', 225.00, 'BYN', TRUE),
+(3, 'AIR-090-2', 'АИР90', 'Электродвигатель асинхронный трехфазный АИР90, 1.5-3.0 кВт, 3000 об/мин', 'АИР90 1.5-3.0кВт 3000об/мин', 11, 1, 1.5, 3.0, NULL, 3000, '380/220', 50, NULL, 90, 'У2,У3,У5,УХЛ2,УХЛ4,Т2', 'IM1081,IM1082,IM2081,IM2082,IM2181,IM2182,IM3081,IM3082,IM3681,IM3682', 'IP54,IP55', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, FALSE, NULL, NULL, NULL, FALSE, NULL, NULL, NULL, TRUE, 24, FALSE, 'SN-24-002-1420', 'product_air_090_2.jpg', 450.00, 'BYN', TRUE),
+(4, 'AIR-100-2', 'АИР100', 'Электродвигатель асинхронный трехфазный АИР100, 3.0-5.5 кВт, 3000 об/мин', 'АИР100 3.0-5.5кВт 3000об/мин', 11, 1, 3.0, 5.5, NULL, 3000, '380/220', 50, NULL, 100, 'У2,У3,У5,УХЛ2,УХЛ4,Т2', 'IM1081,IM1082,IM2081,IM2082,IM2181,IM2182,IM3081,IM3082,IM3681,IM3682', 'IP54,IP55', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, FALSE, NULL, NULL, NULL, FALSE, NULL, NULL, NULL, TRUE, 24, FALSE, 'SN-24-002-9518', 'product_air_100_2.jpg', 900.00, 'BYN', TRUE),
+(5, 'AIR-112-2', 'АИР112', 'Электродвигатель асинхронный трехфазный АИР112, 4.0-7.5 кВт, 3000 об/мин', 'АИР112 4.0-7.5кВт 3000об/мин', 11, 1, 4.0, 7.5, NULL, 3000, '380/220', 50, NULL, 112, 'У2,У3,У5,УХЛ2,УХЛ4,Т2', 'IM1081,IM1082,IM2081,IM2082,IM2181,IM2182,IM3081,IM3082,IM3681,IM3682', 'IP54,IP55', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, FALSE, NULL, NULL, NULL, FALSE, NULL, NULL, NULL, TRUE, 24, FALSE, 'SN-24-002-5288', 'product_air_112_2.jpg', 1200.00, 'BYN', TRUE);
 
 INSERT INTO `orders` (`order_number`, `customer_id`, `status`, `order_date`, `total_amount`, `notes`) VALUES
 ('ORD-2024-001', 4, 'processing', '2024-01-15', 2450.00, 'Срочный заказ'),

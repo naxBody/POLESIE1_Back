@@ -16,7 +16,7 @@ $pdo = getDbConnection();
 
 $pageTitle = 'Паспорта продуктов';
 
-// Получение паспортов из базы данных
+// Получение всех активных продуктов с паспортами (или без них)
 $search = $_GET['search'] ?? '';
 $categoryFilter = $_GET['category'] ?? '';
 
@@ -34,8 +34,8 @@ $query = "
         pp.production_notes,
         pp.quality_requirements,
         p.specifications
-    FROM product_passports pp
-    JOIN products p ON pp.product_id = p.id
+    FROM products p
+    LEFT JOIN product_passports pp ON pp.product_id = p.id
     LEFT JOIN product_categories pc ON p.category_id = pc.id
     WHERE p.is_active = TRUE
 ";
@@ -58,11 +58,31 @@ $stmt = $pdo->prepare($query);
 $stmt->execute($params);
 $passports = $stmt->fetchAll();
 
+// Для продуктов без паспорта создаем запись
+foreach ($passports as &$passport) {
+    if ($passport['passport_id'] === null) {
+        // Создаем паспорт для продукта
+        $insertStmt = $pdo->prepare("
+            INSERT INTO product_passports (product_id, total_weight_kg, warranty_months, is_serial_tracked)
+            VALUES (:product_id, 0, 12, FALSE)
+        ");
+        $insertStmt->execute([':product_id' => $passport['product_id']]);
+        
+        // Получаем ID созданного паспорта
+        $passport['passport_id'] = $pdo->lastInsertId();
+        $passport['total_weight_kg'] = 0;
+        $passport['warranty_months'] = 12;
+        $passport['is_serial_tracked'] = false;
+        $passport['production_notes'] = null;
+        $passport['quality_requirements'] = null;
+    }
+}
+unset($passport);
+
 // Получение уникальных категорий для фильтра
 $catQuery = "SELECT DISTINCT pc.code, pc.name 
              FROM product_categories pc
              JOIN products p ON p.category_id = pc.id
-             JOIN product_passports pp ON pp.product_id = p.id
              WHERE p.is_active = TRUE
              ORDER BY pc.name";
 $categories = $pdo->query($catQuery)->fetchAll();
@@ -296,6 +316,25 @@ $totalProducts = count($passports);
             border-radius: 20px;
             font-size: 14px;
             font-weight: 600;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            background: var(--bg-primary);
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow);
+        }
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+        .empty-state h3 {
+            font-size: 18px;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+        .empty-state p {
+            color: var(--text-secondary);
         }
     </style>
 </head>

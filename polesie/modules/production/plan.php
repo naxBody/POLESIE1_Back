@@ -119,9 +119,11 @@ if (isset($_GET['api_order_detail'])) {
     // Материалы по заданиям (что хватает/не хватает)
     foreach ($tasks as &$task) {
         $stmt = $pdo->prepare("
-            SELECT ptm.*, m.name as material_name, m.article as material_article, mu.symbol as unit_name,
+            SELECT ptm.id, ptm.task_id, ptm.material_id, ptm.quantity_required, ptm.quantity_used,
+                   m.name as material_name, m.article as material_article, mu.symbol as unit_name,
+                   (SELECT SUM(w.quantity) FROM warehouse_stock w WHERE w.material_id = m.id) as quantity_available,
                    CASE 
-                       WHEN ptm.quantity_available >= ptm.quantity_required THEN 'sufficient'
+                       WHEN (SELECT SUM(w.quantity) FROM warehouse_stock w WHERE w.material_id = m.id) >= ptm.quantity_required THEN 'sufficient'
                        ELSE 'insufficient'
                    END as availability_status
             FROM production_tasks_materials ptm
@@ -352,11 +354,11 @@ if (!empty($orders)) {
 
     // 2. Состав заказов (продукция)
     $sqlItems = "SELECT oi.id, oi.order_id, 
-                        COALESCE(oi.product_name, p.name, 'Без названия') as product_name, 
-                        COALESCE(oi.article, p.article, '') as article, 
+                        p.name as product_name, 
+                        p.article as article, 
                         oi.quantity, oi.price 
                  FROM order_items oi 
-                 LEFT JOIN products p ON oi.product_id = p.id
+                 JOIN products p ON oi.product_id = p.id
                  WHERE oi.order_id IN ($orderIdsPlaceholder)";
     $stmtItems = $pdo->prepare($sqlItems);
     $stmtItems->execute($orderIds);
@@ -370,10 +372,10 @@ if (!empty($orders)) {
 
     // 3. Производственные задания для этих заказов
     $sqlTasks = "SELECT pt.id, pt.order_id, 
-                        COALESCE(pt.product_name, p.name, 'Без названия') as product_name, 
-                        pt.plan_qty, pt.done_qty, pt.status as task_status, pt.start_date, pt.end_date 
+                        p.name as product_name, 
+                        pt.quantity_plan as plan_qty, pt.quantity_fact as done_qty, pt.status as task_status, pt.start_date, pt.end_date 
                  FROM production_tasks pt 
-                 LEFT JOIN products p ON pt.product_id = p.id
+                 JOIN products p ON pt.product_id = p.id
                  WHERE pt.order_id IN ($orderIdsPlaceholder)";
     $stmtTasks = $pdo->prepare($sqlTasks);
     $stmtTasks->execute($orderIds);
@@ -393,8 +395,10 @@ if (!empty($orders)) {
             $tid = (int)$task['id'];
             
             // Материалы
-            $sqlMat = "SELECT ptm.material_name, ptm.quantity_required as required_qty, ptm.quantity_available as available_qty 
-                       FROM production_tasks_materials ptm 
+            $sqlMat = "SELECT m.name as material_name, ptm.quantity_required as required_qty, 
+                              (SELECT COALESCE(SUM(w.quantity), 0) FROM warehouse_stock w WHERE w.material_id = m.id) as available_qty
+                       FROM production_tasks_materials ptm
+                       JOIN materials m ON ptm.material_id = m.id
                        WHERE ptm.task_id = ?";
             $stmtMat = $pdo->prepare($sqlMat);
             $stmtMat->execute([$tid]);
@@ -404,10 +408,11 @@ if (!empty($orders)) {
             }
 
             // Этапы
-            $sqlStages = "SELECT pts.stage_name, pts.status, pts.date_completed, pts.sort_order 
-                          FROM production_task_stages pts 
+            $sqlStages = "SELECT ps.name as stage_name, pts.status, pts.completed_at as date_completed, ps.sort_order 
+                          FROM production_task_stages pts
+                          JOIN production_stages ps ON pts.stage_id = ps.id
                           WHERE pts.task_id = ?
-                          ORDER BY pts.sort_order ASC";
+                          ORDER BY ps.sort_order ASC";
             $stmtStages = $pdo->prepare($sqlStages);
             $stmtStages->execute([$tid]);
             $resStages = $stmtStages->fetchAll();

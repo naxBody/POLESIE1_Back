@@ -502,3 +502,40 @@ INSERT INTO `product_serial_numbers` (`product_id`, `serial_number`, `production
 (1, 'SN-ADM80A4-2025-0003', '2025-01-23', 3, 'active', '2025-01-23', '2026-01-23');
 
 SET FOREIGN_KEY_CHECKS = 1;
+
+-- ============================================
+-- ТАБЛИЦА ДЛЯ ПАСПОРТОВ ПРОДУКТОВ
+-- ============================================
+
+-- 16. Паспорта продуктов (технологические спецификации)
+CREATE TABLE `product_passports` (
+  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `product_id` INT NOT NULL UNIQUE,
+  `total_weight_kg` DECIMAL(10,3) DEFAULT 0,
+  `warranty_months` INT DEFAULT 24,
+  `is_serial_tracked` BOOLEAN DEFAULT FALSE,
+  `production_notes` JSON COMMENT 'Примечания к производству',
+  `quality_requirements` JSON COMMENT 'Требования к качеству',
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  CONSTRAINT `fk_pp_product` FOREIGN KEY (`product_id`) REFERENCES `products`(`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- 17. Материалы паспорта продукта
+CREATE TABLE `product_passport_materials` (
+  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `passport_id` INT NOT NULL,
+  `material_id` INT NOT NULL,
+  `quantity` DECIMAL(15,3) NOT NULL,
+  `unit` VARCHAR(20) NOT NULL,
+  `sort_order` INT DEFAULT 0,
+  `notes` TEXT,
+  CONSTRAINT `fk_ppm_passport` FOREIGN KEY (`passport_id`) REFERENCES `product_passports`(`id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_ppm_material` FOREIGN KEY (`material_id`) REFERENCES `materials`(`id`) ON DELETE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Индексы для производительности
+CREATE INDEX idx_passport_product ON product_passports(product_id);
+CREATE INDEX idx_ppm_passport ON product_passport_materials(passport_id);
+CREATE INDEX idx_ppm_material ON product_passport_materials(material_id);
+

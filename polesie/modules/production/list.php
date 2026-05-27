@@ -151,8 +151,8 @@ $tasks = $stmt->fetchAll();
                                         <td><strong>#<?= $t['id'] ?></strong></td>
                                         <td><strong><?= e($t['product_name']) ?></strong></td>
                                         <td><?= e($t['order_number']) ?></td>
-                                        <td><?= $t['quantity'] ?></td>
-                                        <td><?= date('d.m.Y', strtotime($t['planned_date'])) ?></td>
+                                        <td><?= e($t['quantity'] ?? '—') ?></td>
+                                        <td><?= $t['planned_date'] ? date('d.m.Y', strtotime($t['planned_date'])) : '—' ?></td>
                                         <td>
                                             <?php if ($t['status'] === 'planned'): ?>
                                                 <span class="badge badge-warning">Планируется</span>

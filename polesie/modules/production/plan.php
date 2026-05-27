@@ -223,8 +223,8 @@ if (isset($_GET['api_order_detail'])) {
 $stmt = $pdo->prepare("
     SELECT 
         COUNT(*) as total,
-        SUM(CASE WHEN status = 'in_progress' THEN 1 ELSE 0 END) as in_progress,
-        SUM(CASE WHEN status = 'completed' THEN 1 ELSE 0 END) as completed
+        SUM(CASE WHEN pt.status = 'in_progress' THEN 1 ELSE 0 END) as in_progress,
+        SUM(CASE WHEN pt.status = 'completed' THEN 1 ELSE 0 END) as completed
     FROM production_tasks pt
     JOIN orders o ON pt.order_id = o.id
     WHERE o.id IN (" . implode(',', array_fill(0, count($orders), '?')) . ")

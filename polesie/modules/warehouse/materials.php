@@ -47,6 +47,7 @@ try {
     // Получение всех материалов с категориями и единицами измерения
     try {
         $sql = "SELECT m.*, 
+                       m.current_stock as warehouse_quantity,
                        mc.name as category_name, 
                        mc.parent_id as category_parent_id,
                        parent_cat.name as parent_category_name,

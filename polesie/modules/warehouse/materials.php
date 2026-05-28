@@ -221,6 +221,13 @@ try {
     }
     
     // Сбор уникальных значений для фильтров
+    $strengthClasses = [];
+    $coatings = [];
+    $threads = [];
+    $insulations = [];
+    $crossSections = [];
+    $diameters = [];
+    
     foreach ($allMaterials as $mat) {
         if (!empty($mat['grade']) && !in_array($mat['grade'], $materialGrades)) {
             $materialGrades[] = $mat['grade'];
@@ -231,11 +238,39 @@ try {
         if (!empty($mat['unit_name']) && !in_array($mat['unit_name'], $units)) {
             $units[] = $mat['unit_name'];
         }
+        if (!empty($mat['standard']) && !in_array($mat['standard'], $standards)) {
+            $standards[] = $mat['standard'];
+        }
+        if (!empty($mat['strength_class']) && !in_array($mat['strength_class'], $strengthClasses)) {
+            $strengthClasses[] = $mat['strength_class'];
+        }
+        if (!empty($mat['coating']) && !in_array($mat['coating'], $coatings)) {
+            $coatings[] = $mat['coating'];
+        }
+        if (!empty($mat['thread']) && !in_array($mat['thread'], $threads)) {
+            $threads[] = $mat['thread'];
+        }
+        if (!empty($mat['insulation']) && !in_array($mat['insulation'], $insulations)) {
+            $insulations[] = $mat['insulation'];
+        }
+        if (!empty($mat['cross_section_mm2']) && !in_array($mat['cross_section_mm2'], $crossSections)) {
+            $crossSections[] = $mat['cross_section_mm2'];
+        }
+        if (!empty($mat['diameter_mm']) && !in_array($mat['diameter_mm'], $diameters)) {
+            $diameters[] = $mat['diameter_mm'];
+        }
     }
     
     sort($materialGrades);
     sort($productForms);
     sort($units);
+    sort($standards);
+    sort($strengthClasses);
+    sort($coatings);
+    sort($threads);
+    sort($insulations);
+    sort($crossSections);
+    sort($diameters);
     
 } catch (Exception $e) {
     // Если ошибка - продолжаем с пустыми данными

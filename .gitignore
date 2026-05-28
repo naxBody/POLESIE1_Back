@@ -1,1 +1,1 @@
-Nothing should be ignored based on the provided file changes. The modified file 'polesie/modules/products/passports.php' is a PHP source code file that should be tracked in version control. No build artifacts, dependencies, or temporary files are present in the changes.
+Nothing should be ignored based on the provided file changes. The only modified file is a PHP source code file (`polesie/modules/warehouse/production.php`), which should not be added to .gitignore.

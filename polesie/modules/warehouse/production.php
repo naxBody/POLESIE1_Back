@@ -1009,9 +1009,10 @@ if ($filterCategory !== '') {
                         $displaySpecs = [];
                         
                         // Мощность - проверяем все возможные ключи
-                        $powerKw = $specs['power_kw'] ?? $specs['мощность_квт'] ?? null;
+                        $powerKw = $specs['power_kw'] ?? $specs['мощность_квт'] ?? $specs['мощность_основная_квт'] ?? null;
                         $powerKwMin = $specs['power_kw_min'] ?? $specs['мощность_квт_min'] ?? null;
                         $powerKwMax = $specs['power_kw_max'] ?? $specs['мощность_квт_max'] ?? null;
+                        $powerReserve = $specs['мощность_резервная_квт'] ?? $specs['мощность_максимальная_квт'] ?? null;
                         
                         if (!empty($powerKw)) {
                             $displaySpecs[] = ['label' => 'Мощность', 'value' => $powerKw . ' кВт'];
@@ -1027,6 +1028,15 @@ if ($filterCategory !== '') {
                             if ($powerRange) {
                                 $displaySpecs[] = ['label' => 'Мощность', 'value' => $powerRange];
                             }
+                        }
+                        if (!empty($powerReserve)) {
+                            $displaySpecs[] = ['label' => 'Резервная мощность', 'value' => $powerReserve . ' кВт'];
+                        }
+                        
+                        // Мощность для трансформаторов (кВА)
+                        $powerKva = $specs['мощность_ква'] ?? $specs['power_kva'] ?? null;
+                        if (!empty($powerKva)) {
+                            $displaySpecs[] = ['label' => 'Номинальная мощность', 'value' => $powerKva . ' кВА'];
                         }
                         
                         // Обороты - проверяем все возможные ключи
@@ -1081,7 +1091,7 @@ if ($filterCategory !== '') {
                         }
                         
                         // Вес
-                        $weightKg = $specs['weight_kg'] ?? $specs['вес_кг'] ?? null;
+                        $weightKg = $specs['weight_kg'] ?? $specs['вес_кг'] ?? $specs['масса_кг'] ?? null;
                         if (!empty($weightKg)) {
                             $displaySpecs[] = ['label' => 'Вес', 'value' => $weightKg . ' кг'];
                         }
@@ -1096,6 +1106,114 @@ if ($filterCategory !== '') {
                         $motorType = $specs['motor_type'] ?? $specs['тип_двигателя'] ?? null;
                         if (!empty($motorType)) {
                             $displaySpecs[] = ['label' => 'Тип двигателя', 'value' => $motorType];
+                        }
+                        
+                        // Напряжение ВН (для трансформаторов)
+                        $voltageHv = $specs['напряжение_вн_кв'] ?? $specs['напряжение_первичное_кв'] ?? null;
+                        if (!empty($voltageHv)) {
+                            $displaySpecs[] = ['label' => 'Напряжение ВН', 'value' => $voltageHv . ' кВ'];
+                        }
+                        
+                        // Напряжение НН (для трансформаторов)
+                        $voltageLv = $specs['напряжение_нн_в'] ?? $specs['напряжение_вторичное_в'] ?? null;
+                        if (!empty($voltageLv)) {
+                            $displaySpecs[] = ['label' => 'Напряжение НН', 'value' => $voltageLv . ' В'];
+                        }
+                        
+                        // Схема соединения (для трансформаторов)
+                        $connectionScheme = $specs['схема_соединения'] ?? $specs['соединение'] ?? null;
+                        if (!empty($connectionScheme)) {
+                            $displaySpecs[] = ['label' => 'Схема соединения', 'value' => $connectionScheme];
+                        }
+                        
+                        // Номинальный ток (для щитового оборудования)
+                        $ratedCurrent = $specs['ток_номинальный_а'] ?? $specs['макс_ток_а'] ?? null;
+                        if (!empty($ratedCurrent)) {
+                            $displaySpecs[] = ['label' => 'Номинальный ток', 'value' => $ratedCurrent . ' А'];
+                        }
+                        
+                        // Количество групп/двигателей/панелей
+                        $numGroups = $specs['количество_групп'] ?? $specs['группы'] ?? null;
+                        if (!empty($numGroups)) {
+                            $displaySpecs[] = ['label' => 'Количество групп', 'value' => $numGroups . ' шт'];
+                        }
+                        $numMotors = $specs['количество_двигателей'] ?? $specs['motors'] ?? null;
+                        if (!empty($numMotors)) {
+                            $displaySpecs[] = ['label' => 'Количество двигателей', 'value' => $numMotors . ' шт'];
+                        }
+                        $numPanels = $specs['количество_панелей'] ?? $specs['панели'] ?? null;
+                        if (!empty($numPanels)) {
+                            $displaySpecs[] = ['label' => 'Количество панелей', 'value' => $numPanels . ' шт'];
+                        }
+                        
+                        // Тип топлива (для генераторов)
+                        $fuelType = $specs['тип_топлива'] ?? null;
+                        if (!empty($fuelType)) {
+                            $displaySpecs[] = ['label' => 'Тип топлива', 'value' => $fuelType];
+                        }
+                        
+                        // Тип запуска (для генераторов)
+                        $startType = $specs['тип_запуска'] ?? null;
+                        if (!empty($startType)) {
+                            $displaySpecs[] = ['label' => 'Тип запуска', 'value' => $startType];
+                        }
+                        
+                        // Объем бака (для генераторов)
+                        $tankVolume = $specs['объем_бака_л'] ?? null;
+                        if (!empty($tankVolume)) {
+                            $displaySpecs[] = ['label' => 'Объем бака', 'value' => $tankVolume . ' л'];
+                        }
+                        
+                        // Расход топлива (для генераторов)
+                        $fuelConsumption = $specs['расход_топлива_л_ч'] ?? null;
+                        if (!empty($fuelConsumption)) {
+                            $displaySpecs[] = ['label' => 'Расход топлива', 'value' => $fuelConsumption . ' л/ч'];
+                        }
+                        
+                        // Уровень шума (для генераторов)
+                        $noiseLevel = $specs['шум_дб'] ?? $specs['уровень_шума_дб'] ?? null;
+                        if (!empty($noiseLevel)) {
+                            $displaySpecs[] = ['label' => 'Уровень шума', 'value' => $noiseLevel . ' дБ'];
+                        }
+                        
+                        // Потери (для трансформаторов)
+                        $lossNoLoad = $specs['потери_хх_вт'] ?? null;
+                        if (!empty($lossNoLoad)) {
+                            $displaySpecs[] = ['label' => 'Потери холостого хода', 'value' => $lossNoLoad . ' Вт'];
+                        }
+                        $lossShortCircuit = $specs['потери_кз_вт'] ?? null;
+                        if (!empty($lossShortCircuit)) {
+                            $displaySpecs[] = ['label' => 'Потери короткого замыкания', 'value' => $lossShortCircuit . ' Вт'];
+                        }
+                        
+                        // Масса масла (для масляных трансформаторов)
+                        $oilMass = $specs['масса_масла_кг'] ?? null;
+                        if (!empty($oilMass)) {
+                            $displaySpecs[] = ['label' => 'Масса масла', 'value' => $oilMass . ' кг'];
+                        }
+                        
+                        // Класс нагревостойкости (для трансформаторов)
+                        $insulationClass = $specs['класс_нагревостойкости'] ?? null;
+                        if (!empty($insulationClass)) {
+                            $displaySpecs[] = ['label' => 'Класс нагревостойкости', 'value' => $insulationClass];
+                        }
+                        
+                        // Для роторов и статоров
+                        $rotorDiameter = $specs['диаметр_мм'] ?? null;
+                        if (!empty($rotorDiameter)) {
+                            $displaySpecs[] = ['label' => 'Диаметр', 'value' => $rotorDiameter . ' мм'];
+                        }
+                        $rotorLength = $specs['длина_мм'] ?? null;
+                        if (!empty($rotorLength)) {
+                            $displaySpecs[] = ['label' => 'Длина', 'value' => $rotorLength . ' мм'];
+                        }
+                        $shaftDiameter = $specs['диаметр_вала_мм'] ?? null;
+                        if (!empty($shaftDiameter)) {
+                            $displaySpecs[] = ['label' => 'Диаметр вала', 'value' => $shaftDiameter . ' мм'];
+                        }
+                        $grooves = $specs['пазы'] ?? null;
+                        if (!empty($grooves)) {
+                            $displaySpecs[] = ['label' => 'Количество пазов', 'value' => $grooves . ' шт'];
                         }
                         
                         foreach ($displaySpecs as $spec):

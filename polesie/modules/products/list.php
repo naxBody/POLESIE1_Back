@@ -27,8 +27,8 @@ $sql = "SELECT p.*, c.name as category_name, u.symbol as unit_name
 $params = [];
 
 if ($search) {
-    $sql .= " AND (p.name_full LIKE ? OR p.name_short LIKE ? OR p.article LIKE ?)";
-    $params = ["%$search%", "%$search%", "%$search%"];
+    $sql .= " AND (p.name LIKE ? OR p.article LIKE ?)";
+    $params = ["%$search%", "%$search%"];
 }
 
 if ($category) {
@@ -36,7 +36,7 @@ if ($category) {
     $params[] = $category;
 }
 
-$sql .= " ORDER BY p.name_full ASC";
+$sql .= " ORDER BY p.name ASC";
 
 try {
     $stmt = $pdo->prepare($sql);
@@ -179,7 +179,7 @@ error_log("Всего категорий продукции: " . count($categori
                     
                     $productData = [
                         'id' => $p['id'],
-                        'name' => $p['name_full'] ?? '',
+                        'name' => $p['name'] ?? '',
                         'name_short' => $p['name_short'] ?? '',
                         'article' => $p['article'] ?? '',
                         'code_gost' => $p['code_gost'] ?? '',
@@ -222,7 +222,7 @@ error_log("Всего категорий продукции: " . count($categori
                     ?>
                     <tr class="table-row-clickable" onclick="openProductModal(<?= json_encode($productData, JSON_UNESCAPED_UNICODE) ?>)">
                         <td><code><?= e($p['article']) ?></code></td>
-                        <td><strong><?= e($p['name_full']) ?></strong></td>
+                        <td><strong><?= e($p['name']) ?></strong></td>
                         <td><?= e($p['category_name'] ?? '—') ?></td>
                         <td><?= e($p['unit_name'] ?? $p['unit'] ?? '—') ?></td>
                         <td><?= number_format($p['base_price'] ?? $p['price'], 2, ',', ' ') ?></td>

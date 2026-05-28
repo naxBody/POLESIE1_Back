@@ -54,7 +54,26 @@ try {
                        u.symbol as unit_symbol,
                        c.name as supplier_name,
                        m.current_stock as warehouse_quantity,
-                       COALESCE(m.base_unit, u.name, 'шт') as base_unit
+                       COALESCE(m.base_unit, u.name, 'шт') as base_unit,
+                       -- Извлекаем данные из JSON specifications
+                       JSON_EXTRACT(m.specifications, '\$.steel_grade') as grade,
+                       JSON_EXTRACT(m.specifications, '\$.surface') as material_type,
+                       JSON_EXTRACT(m.specifications, '\$.gost') as standard,
+                       JSON_EXTRACT(m.specifications, '\$.diameter_mm') as diameter_mm,
+                       JSON_EXTRACT(m.specifications, '\$.length_m') as length_m,
+                       JSON_EXTRACT(m.specifications, '\$.length_mm') as length_mm,
+                       JSON_EXTRACT(m.specifications, '\$.width_mm') as width_mm,
+                       JSON_EXTRACT(m.specifications, '\$.thickness_mm') as thickness_mm,
+                       JSON_EXTRACT(m.specifications, '\$.strength_class') as strength_class,
+                       JSON_EXTRACT(m.specifications, '\$.coating') as coating,
+                       JSON_EXTRACT(m.specifications, '\$.cross_section_mm2') as cross_section_mm2,
+                       JSON_EXTRACT(m.specifications, '\$.material') as material_property,
+                       JSON_EXTRACT(m.specifications, '\$.insulation') as insulation,
+                       JSON_EXTRACT(m.specifications, '\$.thread') as thread,
+                       JSON_EXTRACT(m.specifications, '\$.inner_d_mm') as inner_d_mm,
+                       JSON_EXTRACT(m.specifications, '\$.outer_d_mm') as outer_d_mm,
+                       0 as is_critical,
+                       0 as requires_cert
                 FROM materials m
                 LEFT JOIN material_categories mc ON m.category_id = mc.id
                 LEFT JOIN material_categories parent_cat ON mc.parent_id = parent_cat.id
@@ -64,6 +83,41 @@ try {
         
         $stmt = $pdo->query($sql);
         $allMaterials = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        // Преобразуем JSON значения в обычные строки/числа
+        foreach ($allMaterials as &$mat) {
+            if (isset($mat['grade']) && is_string($mat['grade'])) {
+                $mat['grade'] = trim($mat['grade'], '"');
+            }
+            if (isset($mat['material_type']) && is_string($mat['material_type'])) {
+                $mat['material_type'] = trim($mat['material_type'], '"');
+            }
+            if (isset($mat['standard']) && is_string($mat['standard'])) {
+                $mat['standard'] = trim($mat['standard'], '"');
+            }
+            if (isset($mat['diameter_mm']) && is_string($mat['diameter_mm'])) {
+                $mat['diameter_mm'] = floatval(trim($mat['diameter_mm'], '"'));
+            }
+            if (isset($mat['length_m']) && is_string($mat['length_m'])) {
+                $mat['length_m'] = floatval(trim($mat['length_m'], '"'));
+            }
+            if (isset($mat['length_mm']) && is_string($mat['length_mm'])) {
+                $mat['length_mm'] = floatval(trim($mat['length_mm'], '"'));
+            }
+            if (isset($mat['width_mm']) && is_string($mat['width_mm'])) {
+                $mat['width_mm'] = floatval(trim($mat['width_mm'], '"'));
+            }
+            if (isset($mat['thickness_mm']) && is_string($mat['thickness_mm'])) {
+                $mat['thickness_mm'] = floatval(trim($mat['thickness_mm'], '"'));
+            }
+            if (isset($mat['strength_class']) && is_string($mat['strength_class'])) {
+                $mat['strength_class'] = trim($mat['strength_class'], '"');
+            }
+            if (isset($mat['coating']) && is_string($mat['coating'])) {
+                $mat['coating'] = trim($mat['coating'], '"');
+            }
+        }
+        unset($mat);
         
         error_log("Загружено материалов: " . count($allMaterials));
     } catch (Exception $e) {

@@ -58,7 +58,8 @@ $problemOrders = $pdo->query("
          WHERE pt.order_id = o.id AND pt.status != 'completed') as pending_tasks,
         (SELECT COUNT(*) FROM production_tasks_materials ptm
          JOIN production_tasks pt ON ptm.task_id = pt.id
-         WHERE pt.order_id = o.id AND ptm.quantity_required > ptm.quantity_available) as material_shortages
+         JOIN materials m ON ptm.material_id = m.id
+         WHERE pt.order_id = o.id AND ptm.quantity_required > m.current_stock) as material_shortages
     FROM orders o
     LEFT JOIN contractors c ON o.customer_id = c.id
     WHERE o.status IN ('new', 'processing')
@@ -66,7 +67,8 @@ $problemOrders = $pdo->query("
          OR EXISTS (
              SELECT 1 FROM production_tasks pt 
              JOIN production_tasks_materials ptm ON ptm.task_id = pt.id
-             WHERE pt.order_id = o.id AND ptm.quantity_required > ptm.quantity_available
+             JOIN materials m ON ptm.material_id = m.id
+             WHERE pt.order_id = o.id AND ptm.quantity_required > m.current_stock
          ))
     ORDER BY 
         CASE WHEN o.delivery_date < CURDATE() THEN 0 ELSE 1 END,

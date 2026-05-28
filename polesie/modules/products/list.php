@@ -27,8 +27,8 @@ $sql = "SELECT p.*, c.name as category_name, u.symbol as unit_name
 $params = [];
 
 if ($search) {
-    $sql .= " AND (p.name LIKE ? OR p.article LIKE ?)";
-    $params = ["%$search%", "%$search%"];
+    $sql .= " AND (p.name_full LIKE ? OR p.name_short LIKE ? OR p.article LIKE ?)";
+    $params = ["%$search%", "%$search%", "%$search%"];
 }
 
 if ($category) {
@@ -36,7 +36,7 @@ if ($category) {
     $params[] = $category;
 }
 
-$sql .= " ORDER BY p.name ASC";
+$sql .= " ORDER BY p.name_full ASC";
 
 try {
     $stmt = $pdo->prepare($sql);
@@ -179,8 +179,9 @@ error_log("Всего категорий продукции: " . count($categori
                     
                     $productData = [
                         'id' => $p['id'],
-                        'name' => $p['name'] ?? '',
+                        'name' => $p['name_full'] ?? $p['name_short'] ?? '',
                         'name_short' => $p['name_short'] ?? '',
+                        'name_full' => $p['name_full'] ?? '',
                         'article' => $p['article'] ?? '',
                         'code_gost' => $p['code_gost'] ?? '',
                         'category_name' => $p['category_name'] ?? '',
@@ -222,7 +223,7 @@ error_log("Всего категорий продукции: " . count($categori
                     ?>
                     <tr class="table-row-clickable" onclick="openProductModal(<?= json_encode($productData, JSON_UNESCAPED_UNICODE) ?>)">
                         <td><code><?= e($p['article']) ?></code></td>
-                        <td><strong><?= e($p['name']) ?></strong></td>
+                        <td><strong><?= e($p['name_full'] ?? $p['name_short'] ?? '—') ?></strong></td>
                         <td><?= e($p['category_name'] ?? '—') ?></td>
                         <td><?= e($p['unit_name'] ?? $p['unit'] ?? '—') ?></td>
                         <td><?= number_format($p['base_price'] ?? $p['price'], 2, ',', ' ') ?></td>
@@ -247,7 +248,7 @@ error_log("Всего категорий продукции: " . count($categori
                 <div class="empty-state">
                     <div class="empty-state-icon">📦</div>
                     <h3>Продукция не найдена</h3>
-                    <p>Добавьте первую позицию продукции</p>
+                    <p>Измените параметры фильтрации или добавьте первую позицию продукции</p>
                 </div>
             <?php endif; ?>
         </div>

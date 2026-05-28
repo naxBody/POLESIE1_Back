@@ -1,5 +1,48 @@
-Nothing should be ignored in this case, as the only modified file is a SQL script file (`polesie/sql/database_updated.sql`) which is source code and should be tracked by git. No build artifacts, dependencies, or temporary files are present in the changes.
+# Examples 1:
+(empty)
 
-Therefore, the output is empty:
+# Example 2 (Project with artifacts):
+# Compiled and build artifacts
+*.pyc
+__pycache__/
+*.o
+*.obj
+dist/
+build/
+target/
 
-```(empty)```
+# Dependencies
+.venv/
+venv/
+node_modules/
+.mypy_cache/
+.pytest_cache/
+.gradle/
+
+# Logs and temp files
+*.log
+*.tmp
+*.swp
+
+# Environment
+.env
+.env.local
+.env.*
+
+# Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Coverage
+coverage/
+htmlcov/
+.coverage
+
+# Original rules preserved
+*.log

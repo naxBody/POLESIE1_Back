@@ -866,13 +866,13 @@ CREATE INDEX idx_ppt_code ON product_property_templates(code);
 -- Общепромышленные электродвигатели (категория 2)
 INSERT INTO `product_property_templates` (`category_id`, `name`, `code`, `property_type`, `unit`, `min_value`, `max_value`, `is_required`, `sort_order`, `description`, `possible_values`) VALUES
 (2, 'Мощность', 'мощность_квт', 'number', 'кВт', 0.06, 500, TRUE, 1, 'Номинальная мощность двигателя', NULL),
-(2, 'Синхронная скорость', 'обороты_мин', 'select', NULL, NULL, NULL, TRUE, 2, 'Частота вращения ротора', '{"values": [750, 1000, 1500, 3000]}'),
-(2, 'Напряжение питания', 'напряжение_в', 'select', 'В', NULL, NULL, TRUE, 3, 'Номинальное напряжение', '{"values": [220, 380, 660, "380/660"]}'),
+(2, 'Синхронная скорость', 'обороты_мин', 'select', NULL, NULL, NULL, TRUE, 2, 'Частота вращения ротора', JSON_OBJECT('values', JSON_ARRAY(750, 1000, 1500, 3000))),
+(2, 'Напряжение питания', 'напряжение_в', 'select', 'В', NULL, NULL, TRUE, 3, 'Номинальное напряжение', JSON_OBJECT('values', JSON_ARRAY(220, 380, 660, '380/660'))),
 (2, 'Габарит', 'габарит', 'string', NULL, NULL, NULL, TRUE, 4, 'Типоразмер двигателя', NULL),
-(2, 'Класс энергоэффективности', 'класс_эффективности', 'select', NULL, NULL, NULL, TRUE, 5, 'Класс IE по ГОСТ', '{"values": ["IE1", "IE2", "IE3", "IE4"]}'),
-(2, 'Исполнение по монтажу', 'монтаж', 'select', NULL, NULL, NULL, FALSE, 6, 'Конструктивное исполнение', '{"values": ["IM1001", "IM1011", "IM1031", "IM1081", "IM2001", "IM2031", "IM3001", "IM3011"]}'),
-(2, 'Степень защиты', 'степень_защиты', 'select', NULL, NULL, NULL, FALSE, 7, 'Класс IP', '{"values": ["IP23", "IP44", "IP54", "IP55", "IP65"]}'),
-(2, 'Класс изоляции', 'класс_изоляции', 'select', NULL, NULL, NULL, FALSE, 8, 'Термический класс', '{"values": ["A", "E", "B", "F", "H"]}'),
+(2, 'Класс энергоэффективности', 'класс_эффективности', 'select', NULL, NULL, NULL, TRUE, 5, 'Класс IE по ГОСТ', JSON_OBJECT('values', JSON_ARRAY('IE1', 'IE2', 'IE3', 'IE4'))),
+(2, 'Исполнение по монтажу', 'монтаж', 'select', NULL, NULL, NULL, FALSE, 6, 'Конструктивное исполнение', JSON_OBJECT('values', JSON_ARRAY('IM1001', 'IM1011', 'IM1031', 'IM1081', 'IM2001', 'IM2031', 'IM3001', 'IM3011'))),
+(2, 'Степень защиты', 'степень_защиты', 'select', NULL, NULL, NULL, FALSE, 7, 'Класс IP', JSON_OBJECT('values', JSON_ARRAY('IP23', 'IP44', 'IP54', 'IP55', 'IP65'))),
+(2, 'Класс изоляции', 'класс_изоляции', 'select', NULL, NULL, NULL, FALSE, 8, 'Термический класс', JSON_OBJECT('values', JSON_ARRAY('A', 'E', 'B', 'F', 'H'))),
 (2, 'Масса', 'масса_кг', 'number', 'кг', 5, 5000, FALSE, 9, 'Масса двигателя без упаковки', NULL),
 (2, 'КПД', 'кпд_проц', 'number', '%', 50, 98, FALSE, 10, 'Коэффициент полезного действия', NULL),
 (2, 'Коэффициент мощности', 'косинус_фи', 'number', NULL, 0.5, 1.0, FALSE, 11, 'cos φ', NULL);
@@ -880,27 +880,27 @@ INSERT INTO `product_property_templates` (`category_id`, `name`, `code`, `proper
 -- Взрывозащищенные электродвигатели (категория 3)
 INSERT INTO `product_property_templates` (`category_id`, `name`, `code`, `property_type`, `unit`, `min_value`, `max_value`, `is_required`, `sort_order`, `description`, `possible_values`) VALUES
 (3, 'Мощность', 'мощность_квт', 'number', 'кВт', 0.12, 400, TRUE, 1, 'Номинальная мощность двигателя', NULL),
-(3, 'Синхронная скорость', 'обороты_мин', 'select', NULL, NULL, NULL, TRUE, 2, 'Частота вращения ротора', '{"values": [750, 1000, 1500, 3000]}'),
-(3, 'Напряжение питания', 'напряжение_в', 'select', 'В', NULL, NULL, TRUE, 3, 'Номинальное напряжение', '{"values": [220, 380, 660, "380/660"]}'),
+(3, 'Синхронная скорость', 'обороты_мин', 'select', NULL, NULL, NULL, TRUE, 2, 'Частота вращения ротора', JSON_OBJECT('values', JSON_ARRAY(750, 1000, 1500, 3000))),
+(3, 'Напряжение питания', 'напряжение_в', 'select', 'В', NULL, NULL, TRUE, 3, 'Номинальное напряжение', JSON_OBJECT('values', JSON_ARRAY(220, 380, 660, '380/660'))),
 (3, 'Габарит', 'габарит', 'string', NULL, NULL, NULL, TRUE, 4, 'Типоразмер двигателя', NULL),
 (3, 'Маркировка взрывозащиты', 'маркировка_взрывозащиты', 'string', NULL, NULL, NULL, TRUE, 5, 'Знак взрывозащиты', NULL),
-(3, 'Уровень взрывозащиты', 'уровень_взрывозащиты', 'select', NULL, NULL, NULL, TRUE, 6, 'Уровень по ГОСТ', '{"values": ["Взрывобезопасное", "Взрывозащищенное", "Особовзрывобезопасное"]}'),
-(3, 'Класс энергоэффективности', 'класс_эффективности', 'select', NULL, NULL, NULL, FALSE, 7, 'Класс IE', '{"values": ["IE1", "IE2", "IE3", "IE4"]}'),
-(3, 'Степень защиты', 'степень_защиты', 'select', NULL, NULL, NULL, FALSE, 8, 'Класс IP', '{"values": ["IP54", "IP55", "IP65", "IP66"]}'),
-(3, 'Класс изоляции', 'класс_изоляции', 'select', NULL, NULL, NULL, FALSE, 9, 'Термический класс', '{"values": ["F", "H"]}'),
+(3, 'Уровень взрывозащиты', 'уровень_взрывозащиты', 'select', NULL, NULL, NULL, TRUE, 6, 'Уровень по ГОСТ', JSON_OBJECT('values', JSON_ARRAY('Взрывобезопасное', 'Взрывозащищенное', 'Особовзрывобезопасное'))),
+(3, 'Класс энергоэффективности', 'класс_эффективности', 'select', NULL, NULL, NULL, FALSE, 7, 'Класс IE', JSON_OBJECT('values', JSON_ARRAY('IE1', 'IE2', 'IE3', 'IE4'))),
+(3, 'Степень защиты', 'степень_защиты', 'select', NULL, NULL, NULL, FALSE, 8, 'Класс IP', JSON_OBJECT('values', JSON_ARRAY('IP54', 'IP55', 'IP65', 'IP66'))),
+(3, 'Класс изоляции', 'класс_изоляции', 'select', NULL, NULL, NULL, FALSE, 9, 'Термический класс', JSON_OBJECT('values', JSON_ARRAY('F', 'H'))),
 (3, 'Масса', 'масса_кг', 'number', 'кг', 10, 3000, FALSE, 10, 'Масса двигателя', NULL),
-(3, 'Температура поверхности', 'температура_поверхности', 'select', '°C', NULL, NULL, FALSE, 11, 'Предельная температура', '{"values": ["T1", "T2", "T3", "T4", "T5", "T6"]}');
+(3, 'Температура поверхности', 'температура_поверхности', 'select', '°C', NULL, NULL, FALSE, 11, 'Предельная температура', JSON_OBJECT('values', JSON_ARRAY('T1', 'T2', 'T3', 'T4', 'T5', 'T6')));
 
 -- Крановые электродвигатели (категория 4)
 INSERT INTO `product_property_templates` (`category_id`, `name`, `code`, `property_type`, `unit`, `min_value`, `max_value`, `is_required`, `sort_order`, `description`, `possible_values`) VALUES
 (4, 'Мощность', 'мощность_квт', 'number', 'кВт', 1.5, 160, TRUE, 1, 'Номинальная мощность при ПВ 40%', NULL),
-(4, 'Синхронная скорость', 'обороты_мин', 'select', NULL, NULL, NULL, TRUE, 2, 'Частота вращения ротора', '{"values": [600, 750, 900, 1000, 1500]}'),
-(4, 'Напряжение питания', 'напряжение_в', 'select', 'В', NULL, NULL, TRUE, 3, 'Номинальное напряжение', '{"values": [220, 380, 660, "380/660"]}'),
+(4, 'Синхронная скорость', 'обороты_мин', 'select', NULL, NULL, NULL, TRUE, 2, 'Частота вращения ротора', JSON_OBJECT('values', JSON_ARRAY(600, 750, 900, 1000, 1500))),
+(4, 'Напряжение питания', 'напряжение_в', 'select', 'В', NULL, NULL, TRUE, 3, 'Номинальное напряжение', JSON_OBJECT('values', JSON_ARRAY(220, 380, 660, '380/660'))),
 (4, 'Габарит', 'габарит', 'string', NULL, NULL, NULL, TRUE, 4, 'Типоразмер двигателя', NULL),
-(4, 'Режим работы', 'режим_работы', 'select', NULL, NULL, NULL, TRUE, 5, 'Категория режима', '{"values": ["S3", "S4", "S5"]}'),
+(4, 'Режим работы', 'режим_работы', 'select', NULL, NULL, NULL, TRUE, 5, 'Категория режима', JSON_OBJECT('values', JSON_ARRAY('S3', 'S4', 'S5'))),
 (4, 'ПВ рабочий', 'пв_проц', 'number', '%', 15, 100, FALSE, 6, 'Продолжительность включения', NULL),
-(4, 'Класс изоляции', 'класс_изоляции', 'select', NULL, NULL, NULL, TRUE, 7, 'Термический класс', '{"values": ["F", "H"]}'),
-(4, 'Степень защиты', 'степень_защиты', 'select', NULL, NULL, NULL, FALSE, 8, 'Класс IP', '{"values": ["IP44", "IP54", "IP55"]}'),
+(4, 'Класс изоляции', 'класс_изоляции', 'select', NULL, NULL, NULL, TRUE, 7, 'Термический класс', JSON_OBJECT('values', JSON_ARRAY('F', 'H'))),
+(4, 'Степень защиты', 'степень_защиты', 'select', NULL, NULL, NULL, FALSE, 8, 'Класс IP', JSON_OBJECT('values', JSON_ARRAY('IP44', 'IP54', 'IP55'))),
 (4, 'Масса', 'масса_кг', 'number', 'кг', 20, 2000, FALSE, 9, 'Масса двигателя', NULL),
 (4, 'Момент инерции', 'момент_инерции', 'number', 'кг·м²', 0.01, 500, FALSE, 10, 'Момент инерции ротора', NULL),
 (4, 'Передаточное число редуктора', 'передаточное_число', 'number', NULL, 1, 100, FALSE, 11, 'Для мотор-редукторов', NULL);
@@ -909,25 +909,25 @@ INSERT INTO `product_property_templates` (`category_id`, `name`, `code`, `proper
 INSERT INTO `product_property_templates` (`category_id`, `name`, `code`, `property_type`, `unit`, `min_value`, `max_value`, `is_required`, `sort_order`, `description`, `possible_values`) VALUES
 (6, 'Основная мощность', 'мощность_основная_квт', 'number', 'кВт', 1, 3000, TRUE, 1, 'Основная мощность COP', NULL),
 (6, 'Резервная мощность', 'мощность_резервная_квт', 'number', 'кВт', 1, 3300, FALSE, 2, 'Резервная мощность LTP', NULL),
-(6, 'Тип топлива', 'тип_топлива', 'select', NULL, NULL, NULL, TRUE, 3, 'Вид используемого топлива', '{"values": ["дизель", "бензин", "газ"]}'),
-(6, 'Тип запуска', 'тип_запуска', 'select', NULL, NULL, NULL, TRUE, 4, 'Способ запуска', '{"values": ["ручной", "электростартер", "ATS"]}'),
-(6, 'Количество фаз', 'фазы', 'select', NULL, NULL, NULL, TRUE, 5, 'Однофазный/трехфазный', '{"values": [1, 3]}'),
-(6, 'Напряжение', 'напряжение_в', 'select', 'В', NULL, NULL, TRUE, 6, 'Выходное напряжение', '{"values": [220, 380, "220/380"]}'),
-(6, 'Частота тока', 'частота_гц', 'select', 'Гц', NULL, NULL, TRUE, 7, 'Частота переменного тока', '{"values": [50, 60]}'),
+(6, 'Тип топлива', 'тип_топлива', 'select', NULL, NULL, NULL, TRUE, 3, 'Вид используемого топлива', JSON_OBJECT('values', JSON_ARRAY('дизель', 'бензин', 'газ'))),
+(6, 'Тип запуска', 'тип_запуска', 'select', NULL, NULL, NULL, TRUE, 4, 'Способ запуска', JSON_OBJECT('values', JSON_ARRAY('ручной', 'электростартер', 'ATS'))),
+(6, 'Количество фаз', 'фазы', 'select', NULL, NULL, NULL, TRUE, 5, 'Однофазный/трехфазный', JSON_OBJECT('values', JSON_ARRAY(1, 3))),
+(6, 'Напряжение', 'напряжение_в', 'select', 'В', NULL, NULL, TRUE, 6, 'Выходное напряжение', JSON_OBJECT('values', JSON_ARRAY(220, 380, '220/380'))),
+(6, 'Частота тока', 'частота_гц', 'select', 'Гц', NULL, NULL, TRUE, 7, 'Частота переменного тока', JSON_OBJECT('values', JSON_ARRAY(50, 60))),
 (6, 'Расход топлива', 'расход_л_ч', 'number', 'л/ч', 0.5, 500, FALSE, 8, 'При нагрузке 75%', NULL),
 (6, 'Уровень шума', 'шум_дб', 'number', 'дБ', 40, 100, FALSE, 9, 'На расстоянии 7м', NULL),
 (6, 'Объем топливного бака', 'бак_л', 'number', 'л', 5, 5000, FALSE, 10, 'Вместимость бака', NULL),
 (6, 'Масса', 'масса_кг', 'number', 'кг', 20, 10000, FALSE, 11, 'Масса генератора', NULL),
-(6, 'Исполнение', 'исполнение', 'select', NULL, NULL, NULL, FALSE, 12, 'Тип исполнения', '{"values": ["открытое", "в кожухе", "контейнер", "автомобильное"]}');
+(6, 'Исполнение', 'исполнение', 'select', NULL, NULL, NULL, FALSE, 12, 'Тип исполнения', JSON_OBJECT('values', JSON_ARRAY('открытое', 'в кожухе', 'контейнер', 'автомобильное')));
 
 -- Бензиновые генераторы (категория 7)
 INSERT INTO `product_property_templates` (`category_id`, `name`, `code`, `property_type`, `unit`, `min_value`, `max_value`, `is_required`, `sort_order`, `description`, `possible_values`) VALUES
 (7, 'Основная мощность', 'мощность_основная_квт', 'number', 'кВт', 0.7, 20, TRUE, 1, 'Основная мощность', NULL),
 (7, 'Резервная мощность', 'мощность_резервная_квт', 'number', 'кВт', 1, 22, FALSE, 2, 'Максимальная мощность', NULL),
-(7, 'Тип топлива', 'тип_топлива', 'select', NULL, NULL, NULL, TRUE, 3, 'Вид топлива', '{"values": ["бензин АИ-92", "бензин АИ-95"]}'),
-(7, 'Тип запуска', 'тип_запуска', 'select', NULL, NULL, NULL, TRUE, 4, 'Способ запуска', '{"values": ["ручной", "электростартер"]}'),
-(7, 'Количество фаз', 'фазы', 'select', NULL, NULL, NULL, TRUE, 5, 'Однофазный/трехфазный', '{"values": [1, 3]}'),
-(7, 'Напряжение', 'напряжение_в', 'select', 'В', NULL, NULL, TRUE, 6, 'Выходное напряжение', '{"values": [220, 380, "220/380"]}'),
+(7, 'Тип топлива', 'тип_топлива', 'select', NULL, NULL, NULL, TRUE, 3, 'Вид топлива', JSON_OBJECT('values', JSON_ARRAY('бензин АИ-92', 'бензин АИ-95'))),
+(7, 'Тип запуска', 'тип_запуска', 'select', NULL, NULL, NULL, TRUE, 4, 'Способ запуска', JSON_OBJECT('values', JSON_ARRAY('ручной', 'электростартер'))),
+(7, 'Количество фаз', 'фазы', 'select', NULL, NULL, NULL, TRUE, 5, 'Однофазный/трехфазный', JSON_OBJECT('values', JSON_ARRAY(1, 3))),
+(7, 'Напряжение', 'напряжение_в', 'select', 'В', NULL, NULL, TRUE, 6, 'Выходное напряжение', JSON_OBJECT('values', JSON_ARRAY(220, 380, '220/380'))),
 (7, 'Двигатель', 'двигатель', 'string', NULL, NULL, NULL, FALSE, 7, 'Производитель двигателя', NULL),
 (7, 'Расход топлива', 'расход_л_ч', 'number', 'л/ч', 0.3, 10, FALSE, 8, 'При нагрузке 75%', NULL),
 (7, 'Уровень шума', 'шум_дб', 'number', 'дБ', 50, 85, FALSE, 9, 'На расстоянии 7м', NULL),
@@ -939,24 +939,24 @@ INSERT INTO `product_property_templates` (`category_id`, `name`, `code`, `proper
 INSERT INTO `product_property_templates` (`category_id`, `name`, `code`, `property_type`, `unit`, `min_value`, `max_value`, `is_required`, `sort_order`, `description`, `possible_values`) VALUES
 (9, 'Мощность', 'мощность_ква', 'number', 'кВА', 16, 63000, TRUE, 1, 'Номинальная мощность', NULL),
 (9, 'Напряжение ВН', 'напряжение_вн_кв', 'number', 'кВ', 6, 750, TRUE, 2, 'Высокое напряжение', NULL),
-(9, 'Напряжение НН', 'напряжение_нн_в', 'select', 'В', NULL, NULL, TRUE, 3, 'Низкое напряжение', '{"values": [230, 400, "230/400", 690]}'),
-(9, 'Схема соединения', 'схема_соединения', 'select', NULL, NULL, NULL, TRUE, 4, 'Группа соединений', '{"values": ["Y/Yн-0", "Δ/Yн-11", "Y/Δ-11", "Yн/Δ-11"]}'),
+(9, 'Напряжение НН', 'напряжение_нн_в', 'select', 'В', NULL, NULL, TRUE, 3, 'Низкое напряжение', JSON_OBJECT('values', JSON_ARRAY(230, 400, '230/400', 690))),
+(9, 'Схема соединения', 'схема_соединения', 'select', NULL, NULL, NULL, TRUE, 4, 'Группа соединений', JSON_OBJECT('values', JSON_ARRAY('Y/Yн-0', 'Δ/Yн-11', 'Y/Δ-11', 'Yн/Δ-11'))),
 (9, 'Напряжение КЗ', 'напряжение_кз_проц', 'number', '%', 3, 15, FALSE, 5, 'Напряжение короткого замыкания', NULL),
 (9, 'Потери холостого хода', 'потери_хх_вт', 'number', 'Вт', 100, 50000, FALSE, 6, 'Мощность потерь ХХ', NULL),
 (9, 'Потери КЗ', 'потери_кз_вт', 'number', 'Вт', 500, 200000, FALSE, 7, 'Мощность потерь КЗ', NULL),
 (9, 'Ток холостого хода', 'ток_хх_проц', 'number', '%', 0.5, 5, FALSE, 8, 'Процент тока ХХ', NULL),
 (9, 'Масса масла', 'масса_масла_кг', 'number', 'кг', 50, 50000, FALSE, 9, 'Масса трансформаторного масла', NULL),
 (9, 'Полная масса', 'масса_кг', 'number', 'кг', 200, 100000, FALSE, 10, 'Масса трансформатора', NULL),
-(9, 'Климатическое исполнение', 'климат', 'select', NULL, NULL, NULL, FALSE, 11, 'По ГОСТ', '{"values": ["У1", "УХЛ1", "Т1", "У2", "УХЛ2"]}');
+(9, 'Климатическое исполнение', 'климат', 'select', NULL, NULL, NULL, FALSE, 11, 'По ГОСТ', JSON_OBJECT('values', JSON_ARRAY('У1', 'УХЛ1', 'Т1', 'У2', 'УХЛ2')));
 
 -- Сухие трансформаторы (категория 10)
 INSERT INTO `product_property_templates` (`category_id`, `name`, `code`, `property_type`, `unit`, `min_value`, `max_value`, `is_required`, `sort_order`, `description`, `possible_values`) VALUES
 (10, 'Мощность', 'мощность_ква', 'number', 'кВА', 16, 10000, TRUE, 1, 'Номинальная мощность', NULL),
 (10, 'Напряжение ВН', 'напряжение_вн_кв', 'number', 'кВ', 6, 35, TRUE, 2, 'Высокое напряжение', NULL),
-(10, 'Напряжение НН', 'напряжение_нн_в', 'select', 'В', NULL, NULL, TRUE, 3, 'Низкое напряжение', '{"values": [230, 400, "230/400", 690]}'),
-(10, 'Схема соединения', 'схема_соединения', 'select', NULL, NULL, NULL, TRUE, 4, 'Группа соединений', '{"values": ["Dyn11", "Yyn0", "Yzn5"]}'),
-(10, 'Класс нагревостойкости', 'класс_нагревостойкости', 'select', NULL, NULL, NULL, TRUE, 5, 'Термический класс', '{"values": ["F", "H", "C"]}'),
-(10, 'Степень защиты', 'степень_защиты', 'select', NULL, NULL, NULL, FALSE, 6, 'Класс IP', '{"values": ["IP00", "IP20", "IP23", "IP54"]}'),
+(10, 'Напряжение НН', 'напряжение_нн_в', 'select', 'В', NULL, NULL, TRUE, 3, 'Низкое напряжение', JSON_OBJECT('values', JSON_ARRAY(230, 400, '230/400', 690))),
+(10, 'Схема соединения', 'схема_соединения', 'select', NULL, NULL, NULL, TRUE, 4, 'Группа соединений', JSON_OBJECT('values', JSON_ARRAY('Dyn11', 'Yyn0', 'Yzn5'))),
+(10, 'Класс нагревостойкости', 'класс_нагревостойкости', 'select', NULL, NULL, NULL, TRUE, 5, 'Термический класс', JSON_OBJECT('values', JSON_ARRAY('F', 'H', 'C'))),
+(10, 'Степень защиты', 'степень_защиты', 'select', NULL, NULL, NULL, FALSE, 6, 'Класс IP', JSON_OBJECT('values', JSON_ARRAY('IP00', 'IP20', 'IP23', 'IP54'))),
 (10, 'Напряжение КЗ', 'напряжение_кз_проц', 'number', '%', 4, 10, FALSE, 7, 'Напряжение короткого замыкания', NULL),
 (10, 'Уровень шума', 'шум_дб', 'number', 'дБ', 35, 70, FALSE, 8, 'На расстоянии 1м', NULL),
 (10, 'Масса', 'масса_кг', 'number', 'кг', 100, 20000, FALSE, 9, 'Масса трансформатора', NULL),
@@ -965,10 +965,10 @@ INSERT INTO `product_property_templates` (`category_id`, `name`, `code`, `proper
 -- Вводно-распределительные устройства (категория 11)
 INSERT INTO `product_property_templates` (`category_id`, `name`, `code`, `property_type`, `unit`, `min_value`, `max_value`, `is_required`, `sort_order`, `description`, `possible_values`) VALUES
 (11, 'Номинальный ток', 'ток_номинальный_а', 'number', 'А', 100, 6300, TRUE, 1, 'Рабочий ток вводного автомата', NULL),
-(11, 'Напряжение', 'напряжение_в', 'select', 'В', NULL, NULL, TRUE, 2, 'Номинальное напряжение', '{"values": [220, 380, "220/380"]}'),
-(11, 'Количество вводов', 'количество_вводов', 'select', NULL, NULL, NULL, TRUE, 3, 'Число независимых вводов', '{"values": [1, 2, 3, 4]}'),
-(11, 'Степень защиты', 'степень_защиты', 'select', NULL, NULL, NULL, TRUE, 4, 'Класс IP', '{"values": ["IP31", "IP54", "IP55", "IP65"]}'),
-(11, 'Тип установки', 'тип_установки', 'select', NULL, NULL, NULL, FALSE, 5, 'Способ монтажа', '{"values": ["напольное", "настенное", "подвесное"]}'),
+(11, 'Напряжение', 'напряжение_в', 'select', 'В', NULL, NULL, TRUE, 2, 'Номинальное напряжение', JSON_OBJECT('values', JSON_ARRAY(220, 380, '220/380'))),
+(11, 'Количество вводов', 'количество_вводов', 'select', NULL, NULL, NULL, TRUE, 3, 'Число независимых вводов', JSON_OBJECT('values', JSON_ARRAY(1, 2, 3, 4))),
+(11, 'Степень защиты', 'степень_защиты', 'select', NULL, NULL, NULL, TRUE, 4, 'Класс IP', JSON_OBJECT('values', JSON_ARRAY('IP31', 'IP54', 'IP55', 'IP65'))),
+(11, 'Тип установки', 'тип_установки', 'select', NULL, NULL, NULL, FALSE, 5, 'Способ монтажа', JSON_OBJECT('values', JSON_ARRAY('напольное', 'настенное', 'подвесное'))),
 (11, 'Количество отходящих линий', 'линии_отходящие', 'number', NULL, 1, 100, FALSE, 6, 'Число выходных линий', NULL),
 (11, 'АВР', 'авр', 'boolean', NULL, NULL, NULL, FALSE, 7, 'Автоматический ввод резерва', NULL),
 (11, 'Учет электроэнергии', 'учет', 'boolean', NULL, NULL, NULL, FALSE, 8, 'Наличие счетчика', NULL),
@@ -978,26 +978,26 @@ INSERT INTO `product_property_templates` (`category_id`, `name`, `code`, `proper
 -- Щиты управления (категория 12)
 INSERT INTO `product_property_templates` (`category_id`, `name`, `code`, `property_type`, `unit`, `min_value`, `max_value`, `is_required`, `sort_order`, `description`, `possible_values`) VALUES
 (12, 'Номинальный ток', 'ток_номональный_а', 'number', 'А', 1, 1000, TRUE, 1, 'Рабочий ток', NULL),
-(12, 'Напряжение', 'напряжение_в', 'select', 'В', NULL, NULL, TRUE, 2, 'Номинальное напряжение', '{"values": [24, 220, 380]}'),
+(12, 'Напряжение', 'напряжение_в', 'select', 'В', NULL, NULL, TRUE, 2, 'Номинальное напряжение', JSON_OBJECT('values', JSON_ARRAY(24, 220, 380))),
 (12, 'Количество двигателей', 'количество_двигателей', 'number', NULL, 1, 50, TRUE, 3, 'Число управляемых двигателей', NULL),
-(12, 'Степень защиты', 'степень_защиты', 'select', NULL, NULL, NULL, TRUE, 4, 'Класс IP', '{"values": ["IP31", "IP54", "IP55", "IP65"]}'),
-(12, 'Тип управления', 'тип_управления', 'select', NULL, NULL, NULL, FALSE, 5, 'Способ управления', '{"values": ["прямой пуск", "звезда-треугольник", "частотный преобразователь", "устройство плавного пуска"]}'),
+(12, 'Степень защиты', 'степень_защиты', 'select', NULL, NULL, NULL, TRUE, 4, 'Класс IP', JSON_OBJECT('values', JSON_ARRAY('IP31', 'IP54', 'IP55', 'IP65'))),
+(12, 'Тип управления', 'тип_управления', 'select', NULL, NULL, NULL, FALSE, 5, 'Способ управления', JSON_OBJECT('values', JSON_ARRAY('прямой пуск', 'звезда-треугольник', 'частотный преобразователь', 'устройство плавного пуска'))),
 (12, 'Контроллер', 'контроллер', 'boolean', NULL, NULL, NULL, FALSE, 6, 'Наличие программируемого контроллера', NULL),
 (12, 'Сенсорная панель', 'сенсорная_панель', 'boolean', NULL, NULL, NULL, FALSE, 7, 'Наличие HMI панели', NULL),
-(12, 'Тип установки', 'тип_установки', 'select', NULL, NULL, NULL, FALSE, 8, 'Способ монтажа', '{"values": ["напольное", "настенное", "шкаф"]}'),
+(12, 'Тип установки', 'тип_установки', 'select', NULL, NULL, NULL, FALSE, 8, 'Способ монтажа', JSON_OBJECT('values', JSON_ARRAY('напольное', 'настенное', 'шкаф'))),
 (12, 'Габариты', 'габариты', 'text', NULL, NULL, NULL, FALSE, 9, 'В×Ш×Г в мм', NULL),
 (12, 'Масса', 'масса_кг', 'number', 'кг', 10, 2000, FALSE, 10, 'Масса щита', NULL);
 
 -- Щиты освещения (категория 13)
 INSERT INTO `product_property_templates` (`category_id`, `name`, `code`, `property_type`, `unit`, `min_value`, `max_value`, `is_required`, `sort_order`, `description`, `possible_values`) VALUES
 (13, 'Номинальный ток', 'ток_номональный_а', 'number', 'А', 16, 630, TRUE, 1, 'Рабочий ток вводного автомата', NULL),
-(13, 'Напряжение', 'напряжение_в', 'select', 'В', NULL, NULL, TRUE, 2, 'Номинальное напряжение', '{"values": [220, 380]}'),
+(13, 'Напряжение', 'напряжение_в', 'select', 'В', NULL, NULL, TRUE, 2, 'Номинальное напряжение', JSON_OBJECT('values', JSON_ARRAY(220, 380))),
 (13, 'Количество групп', 'количество_групп', 'number', NULL, 1, 100, TRUE, 3, 'Число групп освещения', NULL),
-(13, 'Степень защиты', 'степень_защиты', 'select', NULL, NULL, NULL, TRUE, 4, 'Класс IP', '{"values": ["IP31", "IP54", "IP55", "IP65"]}'),
+(13, 'Степень защиты', 'степень_защиты', 'select', NULL, NULL, NULL, TRUE, 4, 'Класс IP', JSON_OBJECT('values', JSON_ARRAY('IP31', 'IP54', 'IP55', 'IP65'))),
 (13, 'Фотореле', 'фотореле', 'boolean', NULL, NULL, NULL, FALSE, 5, 'Автоматическое управление по освещенности', NULL),
 (13, 'Таймер', 'таймер', 'boolean', NULL, NULL, NULL, FALSE, 6, 'Управление по расписанию', NULL),
 (13, 'Датчик движения', 'датчик_движения', 'boolean', NULL, NULL, NULL, FALSE, 7, 'Управление по движению', NULL),
-(13, 'Тип установки', 'тип_установки', 'select', NULL, NULL, NULL, FALSE, 8, 'Способ монтажа', '{"values": ["настенное", "навесное", "встраиваемое"]}'),
+(13, 'Тип установки', 'тип_установки', 'select', NULL, NULL, NULL, FALSE, 8, 'Способ монтажа', JSON_OBJECT('values', JSON_ARRAY('настенное', 'навесное', 'встраиваемое'))),
 (13, 'Габариты', 'габариты', 'text', NULL, NULL, NULL, FALSE, 9, 'В×Ш×Г в мм', NULL),
 (13, 'Масса', 'масса_кг', 'number', 'кг', 5, 500, FALSE, 10, 'Масса щита', NULL);
 
@@ -1006,9 +1006,9 @@ INSERT INTO `product_property_templates` (`category_id`, `name`, `code`, `proper
 (15, 'Диаметр', 'диаметр_мм', 'number', 'мм', 50, 1000, TRUE, 1, 'Наружный диаметр ротора', NULL),
 (15, 'Длина', 'длина_мм', 'number', 'мм', 100, 2000, TRUE, 2, 'Длина активной части', NULL),
 (15, 'Масса', 'масса_кг', 'number', 'кг', 1, 5000, FALSE, 3, 'Масса ротора', NULL),
-(15, 'Тип вала', 'тип_вала', 'select', NULL, NULL, NULL, FALSE, 4, 'Конструкция вала', '{"values": ["цельный", "сборный", "полый"]}'),
-(15, 'Материал сердечника', 'материал_сердечника', 'select', NULL, NULL, NULL, FALSE, 5, 'Марка стали', '{"values": ["2212", "2312", "2412", "2512"]}'),
-(15, 'Тип обмотки', 'тип_обмотки', 'select', NULL, NULL, NULL, FALSE, 6, 'Конструкция обмотки', '{"values": ["беличья клетка", "фазная", "короткозамкнутая"]}'),
+(15, 'Тип вала', 'тип_вала', 'select', NULL, NULL, NULL, FALSE, 4, 'Конструкция вала', JSON_OBJECT('values', JSON_ARRAY('цельный', 'сборный', 'полый'))),
+(15, 'Материал сердечника', 'материал_сердечника', 'select', NULL, NULL, NULL, FALSE, 5, 'Марка стали', JSON_OBJECT('values', JSON_ARRAY('2212', '2312', '2412', '2512'))),
+(15, 'Тип обмотки', 'тип_обмотки', 'select', NULL, NULL, NULL, FALSE, 6, 'Конструкция обмотки', JSON_OBJECT('values', JSON_ARRAY('беличья клетка', 'фазная', 'короткозамкнутая'))),
 (15, 'Для двигателя', 'для_двигателя', 'string', NULL, NULL, NULL, TRUE, 7, 'Типоразмер совместимого двигателя', NULL);
 
 -- Статоры (категория 16)
@@ -1017,9 +1017,9 @@ INSERT INTO `product_property_templates` (`category_id`, `name`, `code`, `proper
 (16, 'Внутренний диаметр', 'диаметр_внутренний_мм', 'number', 'мм', 50, 1000, TRUE, 2, 'Диаметр расточки', NULL),
 (16, 'Длина', 'длина_мм', 'number', 'мм', 100, 2000, TRUE, 3, 'Длина пакета статора', NULL),
 (16, 'Масса', 'масса_кг', 'number', 'кг', 2, 3000, FALSE, 4, 'Масса статора', NULL),
-(16, 'Материал корпуса', 'материал_корпуса', 'select', NULL, NULL, NULL, FALSE, 5, 'Материал корпуса', '{"values": ["алюминий", "чугун", "сталь"]}'),
-(16, 'Материал сердечника', 'материал_сердечника', 'select', NULL, NULL, NULL, FALSE, 6, 'Марка стали', '{"values": ["2212", "2312", "2412", "2512"]}'),
-(16, 'Количество полюсов', 'количество_полюсов', 'select', NULL, NULL, NULL, TRUE, 7, 'Число полюсов', '{"values": [2, 4, 6, 8, 10, 12]}'),
+(16, 'Материал корпуса', 'материал_корпуса', 'select', NULL, NULL, NULL, FALSE, 5, 'Материал корпуса', JSON_OBJECT('values', JSON_ARRAY('алюминий', 'чугун', 'сталь'))),
+(16, 'Материал сердечника', 'материал_сердечника', 'select', NULL, NULL, NULL, FALSE, 6, 'Марка стали', JSON_OBJECT('values', JSON_ARRAY('2212', '2312', '2412', '2512'))),
+(16, 'Количество полюсов', 'количество_полюсов', 'select', NULL, NULL, NULL, TRUE, 7, 'Число полюсов', JSON_OBJECT('values', JSON_ARRAY(2, 4, 6, 8, 10, 12))),
 (16, 'Для двигателя', 'для_двигателя', 'string', NULL, NULL, NULL, TRUE, 8, 'Типоразмер совместимого двигателя', NULL);
 
 -- Подшипниковые щиты (категория 17)
@@ -1027,18 +1027,18 @@ INSERT INTO `product_property_templates` (`category_id`, `name`, `code`, `proper
 (17, 'Наружный диаметр', 'диаметр_наружный_мм', 'number', 'мм', 100, 800, TRUE, 1, 'Диаметр щита', NULL),
 (17, 'Высота', 'высота_мм', 'number', 'мм', 50, 500, TRUE, 2, 'Высота щита', NULL),
 (17, 'Масса', 'масса_кг', 'number', 'кг', 1, 500, FALSE, 3, 'Масса щита', NULL),
-(17, 'Материал', 'материал', 'select', NULL, NULL, NULL, FALSE, 4, 'Материал изготовления', '{"values": ["алюминий", "чугун", "сталь"]}'),
+(17, 'Материал', 'материал', 'select', NULL, NULL, NULL, FALSE, 4, 'Материал изготовления', JSON_OBJECT('values', JSON_ARRAY('алюминий', 'чугун', 'сталь'))),
 (17, 'Тип подшипника', 'тип_подшипника', 'string', NULL, NULL, NULL, FALSE, 5, 'Марка устанавливаемого подшипника', NULL),
 (17, 'Для двигателя', 'для_двигателя', 'string', NULL, NULL, NULL, TRUE, 6, 'Типоразмер совместимого двигателя', NULL),
-(17, 'Сторона', 'сторона', 'select', NULL, NULL, NULL, FALSE, 7, 'Сторона установки', '{"values": ["передний", "задний", "универсальный"]}');
+(17, 'Сторона', 'сторона', 'select', NULL, NULL, NULL, FALSE, 7, 'Сторона установки', JSON_OBJECT('values', JSON_ARRAY('передний', 'задний', 'универсальный')));
 
 -- Клеммные коробки (категория 18)
 INSERT INTO `product_property_templates` (`category_id`, `name`, `code`, `property_type`, `unit`, `min_value`, `max_value`, `is_required`, `sort_order`, `description`, `possible_values`) VALUES
 (18, 'Номинальный ток', 'ток_номональный_а', 'number', 'А', 10, 1000, TRUE, 1, 'Рабочий ток клемм', NULL),
 (18, 'Напряжение', 'напряжение_в', 'number', 'В', 220, 6000, TRUE, 2, 'Рабочее напряжение', NULL),
-(18, 'Количество выводов', 'количество_выводов', 'select', NULL, NULL, NULL, TRUE, 3, 'Число клемм', '{"values": [3, 6, 9, 12]}'),
-(18, 'Степень защиты', 'степень_защиты', 'select', NULL, NULL, NULL, TRUE, 4, 'Класс IP', '{"values": ["IP44", "IP54", "IP55", "IP65"]}'),
-(18, 'Материал корпуса', 'материал_корпуса', 'select', NULL, NULL, NULL, FALSE, 5, 'Материал корпуса', '{"values": ["алюминий", "чугун", "пластик"]}'),
+(18, 'Количество выводов', 'количество_выводов', 'select', NULL, NULL, NULL, TRUE, 3, 'Число клемм', JSON_OBJECT('values', JSON_ARRAY(3, 6, 9, 12))),
+(18, 'Степень защиты', 'степень_защиты', 'select', NULL, NULL, NULL, TRUE, 4, 'Класс IP', JSON_OBJECT('values', JSON_ARRAY('IP44', 'IP54', 'IP55', 'IP65'))),
+(18, 'Материал корпуса', 'материал_корпуса', 'select', NULL, NULL, NULL, FALSE, 5, 'Материал корпуса', JSON_OBJECT('values', JSON_ARRAY('алюминий', 'чугун', 'пластик'))),
 (18, 'Масса', 'масса_кг', 'number', 'кг', 0.5, 50, FALSE, 6, 'Масса коробки', NULL),
 (18, 'Для двигателя', 'для_двигателя', 'string', NULL, NULL, NULL, TRUE, 7, 'Типоразмер совместимого двигателя', NULL);
 

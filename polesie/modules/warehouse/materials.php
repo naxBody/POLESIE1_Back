@@ -2,6 +2,7 @@
 /**
  * Справочник материалов - полный каталог с фильтрацией и выбором свойств
  * ОАО "Полесьеэлектромаш"
+ * Все данные берутся из базы данных
  */
 
 require_once __DIR__ . '/../../config/config.php';
@@ -16,82 +17,74 @@ $user = getCurrentUser();
 $pdo = getDbConnection();
 $pageTitle = 'Материалы';
 
-// Получение данных из JSON
-$jsonPath = BASE_PATH . '/list_materials.json';
-if (!file_exists($jsonPath)) {
-    $jsonPath = dirname(BASE_PATH) . '/list_materials.json';
-}
-$materialsData = [];
-$categories = [];
+// Получение всех материалов из базы данных
 $allMaterials = [];
-$availableCombinations = []; // Доступные комбинации свойств по подкатегориям
-
-// Получение остатков из базы данных
-$warehouseQuantities = [];
-try {
-    $stmt = $pdo->query("SELECT code, current_stock FROM materials");
-    while ($row = $stmt->fetch()) {
-        $warehouseQuantities[$row['code']] = floatval($row['current_stock']);
-    }
-} catch (Exception $e) {
-    // Если таблица не существует или ошибка - продолжаем без количеств
-}
-
-if (file_exists($jsonPath)) {
-    $jsonData = file_get_contents($jsonPath);
-    $materialsData = json_decode($jsonData, true);
-    $categories = $materialsData['categories'] ?? [];
-    
-    // Сбор всех материалов в плоский список
-    foreach ($categories as $category) {
-        if (isset($category['subcategories'])) {
-            foreach ($category['subcategories'] as $subcategory) {
-                if (isset($subcategory['materials'])) {
-                    foreach ($subcategory['materials'] as $material) {
-                        $material['parent_category'] = $category;
-                        $material['subcategory'] = $subcategory;
-                        // Добавляем количество из склада: сначала из JSON, если нет - из БД
-                        $material['warehouse_quantity'] = $material['warehouse_quantity'] ?? ($warehouseQuantities[$material['code_internal']] ?? null);
-                        $allMaterials[] = $material;
-                    }
-                }
-                // Сохраняем доступные комбинации свойств
-                if (isset($subcategory['available_combinations'])) {
-                    $availableCombinations[$subcategory['id']] = $subcategory['available_combinations'];
-                }
-            }
-        }
-    }
-}
-
-// Получение уникальных значений для фильтров
+$categories = [];
 $materialGrades = [];
 $standards = [];
 $productForms = [];
 $units = [];
-$criticalLevels = ['Все', 'Обычные', 'Ответственные'];
 
-foreach ($allMaterials as $mat) {
-    $specs = $mat['specifications'] ?? [];
+try {
+    // Получение категорий материалов
+    $catStmt = $pdo->query("SELECT * FROM material_categories ORDER BY name");
+    $categories = $catStmt->fetchAll(PDO::FETCH_ASSOC);
     
-    if (!empty($specs['material_grade']) && !in_array($specs['material_grade'], $materialGrades)) {
-        $materialGrades[] = $specs['material_grade'];
+    // Построение иерархии категорий
+    $categoryTree = [];
+    foreach ($categories as $cat) {
+        if ($cat['parent_id'] === null) {
+            $categoryTree[$cat['id']] = $cat;
+            $categoryTree[$cat['id']]['subcategories'] = [];
+        }
     }
-    if (!empty($specs['standard_doc']) && !in_array($specs['standard_doc'], $standards)) {
-        $standards[] = $specs['standard_doc'];
+    foreach ($categories as $cat) {
+        if ($cat['parent_id'] !== null && isset($categoryTree[$cat['parent_id']])) {
+            $categoryTree[$cat['parent_id']]['subcategories'][] = $cat;
+        }
     }
-    if (!empty($specs['product_form']) && !in_array($specs['product_form'], $productForms)) {
-        $productForms[] = $specs['product_form'];
+    
+    // Получение всех материалов с категориями и единицами измерения
+    $sql = "SELECT m.*, 
+                   mc.name as category_name, 
+                   mc.parent_id as category_parent_id,
+                   parent_cat.name as parent_category_name,
+                   u.name as unit_name, 
+                   u.symbol as unit_symbol,
+                   c.name as supplier_name
+            FROM materials m
+            LEFT JOIN material_categories mc ON m.category_id = mc.id
+            LEFT JOIN material_categories parent_cat ON mc.parent_id = parent_cat.id
+            LEFT JOIN base_units u ON m.base_unit_id = u.id
+            LEFT JOIN contractors c ON m.supplier_id = c.id
+            ORDER BY m.name_full ASC";
+    
+    $stmt = $pdo->query($sql);
+    $allMaterials = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    
+    // Сбор уникальных значений для фильтров
+    foreach ($allMaterials as $mat) {
+        if (!empty($mat['grade']) && !in_array($mat['grade'], $materialGrades)) {
+            $materialGrades[] = $mat['grade'];
+        }
+        if (!empty($mat['material_type']) && !in_array($mat['material_type'], $productForms)) {
+            $productForms[] = $mat['material_type'];
+        }
+        if (!empty($mat['unit_name']) && !in_array($mat['unit_name'], $units)) {
+            $units[] = $mat['unit_name'];
+        }
     }
-    if (!empty($mat['base_unit']) && !in_array($mat['base_unit'], $units)) {
-        $units[] = $mat['base_unit'];
-    }
+    
+    sort($materialGrades);
+    sort($productForms);
+    sort($units);
+    
+} catch (Exception $e) {
+    // Если ошибка - продолжаем с пустыми данными
+    error_log("Ошибка при загрузке материалов: " . $e->getMessage());
 }
 
-sort($materialGrades);
-sort($standards);
-sort($productForms);
-sort($units);
+$criticalLevels = ['Все', 'Обычные', 'Ответственные'];
 
 // Применение фильтров
 $filteredMaterials = $allMaterials;
@@ -110,27 +103,24 @@ if ($filterSearch !== '') {
     $filteredMaterials = array_filter($filteredMaterials, function($m) use ($filterSearch) {
         // Поиск по названию (полному и краткому)
         $searchInName = stripos($m['name_full'], $filterSearch) !== false || 
-                        stripos($m['name_short'], $filterSearch) !== false;
+                        stripos($m['name_short'] ?? '', $filterSearch) !== false;
         
-        // Поиск по внутреннему коду
-        $searchInCode = stripos($m['code_internal'], $filterSearch) !== false;
+        // Поиск по коду материала
+        $searchInCode = stripos($m['code'], $filterSearch) !== false;
         
-        // Поиск по категории (родительской и подкатегории)
+        // Поиск по категории
         $searchInCategory = false;
-        if (!empty($m['parent_category']['name_ru'])) {
-            $searchInCategory = stripos($m['parent_category']['name_ru'], $filterSearch) !== false;
+        if (!empty($m['parent_category_name'])) {
+            $searchInCategory = stripos($m['parent_category_name'], $filterSearch) !== false;
         }
-        if (!$searchInCategory && !empty($m['subcategory']['name_ru'])) {
-            $searchInCategory = stripos($m['subcategory']['name_ru'], $filterSearch) !== false;
-        }
-        
-        // Поиск по описанию ГОСТ/стандарта
-        $searchInGost = false;
-        if (!empty($m['specifications']['standard_doc'])) {
-            $searchInGost = stripos($m['specifications']['standard_doc'], $filterSearch) !== false;
+        if (!$searchInCategory && !empty($m['category_name'])) {
+            $searchInCategory = stripos($m['category_name'], $filterSearch) !== false;
         }
         
-        return $searchInName || $searchInCode || $searchInCategory || $searchInGost;
+        // Поиск по марке материала
+        $searchInGrade = !empty($m['grade']) && stripos($m['grade'], $filterSearch) !== false;
+        
+        return $searchInName || $searchInCode || $searchInCategory || $searchInGrade;
     });
 }
 
@@ -138,103 +128,15 @@ if ($filterSearch !== '') {
 $filterGrade = $_GET['grade'] ?? '';
 if ($filterGrade !== '') {
     $filteredMaterials = array_filter($filteredMaterials, function($m) use ($filterGrade) {
-        return isset($m['specifications']['material_grade']) && 
-               $m['specifications']['material_grade'] === $filterGrade;
+        return isset($m['grade']) && $m['grade'] === $filterGrade;
     });
 }
 
-// Фильтр по стандарту
-$filterStandard = $_GET['standard'] ?? '';
-if ($filterStandard !== '') {
-    $filteredMaterials = array_filter($filteredMaterials, function($m) use ($filterStandard) {
-        return isset($m['specifications']['standard_doc']) && 
-               $m['specifications']['standard_doc'] === $filterStandard;
-    });
-}
-
-// Фильтр по форме изделия
-$filterForm = $_GET['form'] ?? '';
-if ($filterForm !== '') {
-    $filteredMaterials = array_filter($filteredMaterials, function($m) use ($filterForm) {
-        return isset($m['specifications']['product_form']) && 
-               $m['specifications']['product_form'] === $filterForm;
-    });
-}
-
-// Фильтр по ответственности
-$filterCritical = $_GET['critical'] ?? '';
-if ($filterCritical !== '') {
-    $filteredMaterials = array_filter($filteredMaterials, function($m) use ($filterCritical) {
-        if ($filterCritical === 'critical') {
-            return !empty($m['is_critical']);
-        } elseif ($filterCritical === 'non_critical') {
-            return empty($m['is_critical']);
-        }
-        return true;
-    });
-}
-
-// Фильтр по требованию сертификата
-$filterCert = $_GET['cert'] ?? '';
-if ($filterCert !== '') {
-    $filteredMaterials = array_filter($filteredMaterials, function($m) use ($filterCert) {
-        if ($filterCert === 'required') {
-            return !empty($m['requires_cert']);
-        } elseif ($filterCert === 'not_required') {
-            return empty($m['requires_cert']);
-        }
-        return true;
-    });
-}
-
-// Фильтр по диаметру (для болтов, прутков и т.д.)
-$filterDiameter = $_GET['diameter'] ?? '';
-if ($filterDiameter !== '') {
-    $filteredMaterials = array_filter($filteredMaterials, function($m) use ($filterDiameter) {
-        $specs = $m['specifications'] ?? [];
-        $diameter = $specs['thread_diameter_mm'] ?? $specs['diameter_mm'] ?? $specs['conductor_diameter_mm'] ?? $specs['nominal_diameter_mm'] ?? null;
-        if ($diameter === null) return false;
-        // Для числовых значений сравниваем как числа
-        if (is_numeric($filterDiameter) && is_numeric($diameter)) {
-            return floatval($diameter) == floatval($filterDiameter);
-        }
-        return $diameter == $filterDiameter;
-    });
-}
-
-// Фильтр по длине
-$filterLength = $_GET['length'] ?? '';
-if ($filterLength !== '') {
-    $filteredMaterials = array_filter($filteredMaterials, function($m) use ($filterLength) {
-        $specs = $m['specifications'] ?? [];
-        $length = $specs['length_mm'] ?? $specs['length_m'] ?? null;
-        if ($length === null) return false;
-        // length_mm может быть массивом или单个 значением
-        if (is_array($length)) {
-            return in_array($filterLength, $length);
-        }
-        if (is_numeric($filterLength) && is_numeric($length)) {
-            return floatval($length) == floatval($filterLength);
-        }
-        return $length == $filterLength;
-    });
-}
-
-// Фильтр по классу прочности
-$filterStrengthClass = $_GET['strength_class'] ?? '';
-if ($filterStrengthClass !== '') {
-    $filteredMaterials = array_filter($filteredMaterials, function($m) use ($filterStrengthClass) {
-        $specs = $m['specifications'] ?? [];
-        return isset($specs['strength_class']) && $specs['strength_class'] === $filterStrengthClass;
-    });
-}
-
-// Фильтр по покрытию
-$filterCoating = $_GET['coating'] ?? '';
-if ($filterCoating !== '') {
-    $filteredMaterials = array_filter($filteredMaterials, function($m) use ($filterCoating) {
-        $specs = $m['specifications'] ?? [];
-        return isset($specs['coating']) && $specs['coating'] === $filterCoating;
+// Фильтр по типу материала
+$filterType = $_GET['type'] ?? '';
+if ($filterType !== '') {
+    $filteredMaterials = array_filter($filteredMaterials, function($m) use ($filterType) {
+        return isset($m['material_type']) && $m['material_type'] === $filterType;
     });
 }
 
@@ -249,14 +151,14 @@ usort($filteredMaterials, function($a, $b) use ($sortBy, $sortOrder) {
             $result = strcmp($a['name_full'], $b['name_full']);
             break;
         case 'code':
-            $result = strcmp($a['code_internal'], $b['code_internal']);
+            $result = strcmp($a['code'], $b['code']);
             break;
         case 'category':
-            $result = strcmp($a['parent_category']['name_ru'] ?? '', $b['parent_category']['name_ru'] ?? '');
+            $result = strcmp($a['parent_category_name'] ?? $a['category_name'] ?? '', $b['parent_category_name'] ?? $b['category_name'] ?? '');
             break;
         case 'grade':
-            $gradeA = $a['specifications']['material_grade'] ?? '';
-            $gradeB = $b['specifications']['material_grade'] ?? '';
+            $gradeA = $a['grade'] ?? '';
+            $gradeB = $b['grade'] ?? '';
             $result = strcmp($gradeA, $gradeB);
             break;
     }
@@ -934,18 +836,18 @@ $availableCombinationsJson = json_encode($availableCombinations, JSON_UNESCAPED_
                     <div class="material-card-header">
                         <div>
                             <div class="material-category">
-                                <?= e($material['parent_category']['name_ru'] ?? '') ?> → 
-                                <?= e($material['subcategory']['name_ru'] ?? '') ?>
+                                <?= e($material['parent_category_name'] ?? $material['category_name'] ?? '') ?> → 
+                                <?= e($material['category_name'] ?? '') ?>
                             </div>
                             <div class="material-name"><?= e($material['name_full']) ?></div>
                         </div>
                     </div>
                     
-                    <div class="material-code"><?= e($material['code_internal']) ?></div>
+                    <div class="material-code"><?= e($material['code']) ?></div>
                     
                     <div class="material-specs">
                         <?php 
-                        $specs = $material['specifications'] ?? [];
+                        $specs = $material ?? [];
                         $displaySpecs = array_slice($specs, 0, 3, true);
                         foreach ($displaySpecs as $key => $value): 
                             if (is_array($value)) {
@@ -953,9 +855,9 @@ $availableCombinationsJson = json_encode($availableCombinations, JSON_UNESCAPED_
                             }
                             // Перевод ключей спецификаций на русский язык
                             $specLabels = [
-                                'material_grade' => 'Марка',
-                                'standard_doc' => 'Стандарт',
-                                'product_form' => 'Форма',
+                                'grade' => 'Марка',
+                                'type' => 'Стандарт',
+                                'material_type' => 'Форма',
                                 'diameter_mm' => 'Диаметр',
                                 'length_m' => 'Длина',
                                 'length_mm' => 'Длина',
@@ -1050,17 +952,17 @@ $availableCombinationsJson = json_encode($availableCombinations, JSON_UNESCAPED_
                     }
                     ?>
                     <tr onclick="openMaterialModal(<?= htmlspecialchars(json_encode($material), ENT_QUOTES, 'UTF-8') ?>)" style="cursor: pointer;">
-                        <td><code><?= e($material['code_internal']) ?></code></td>
+                        <td><code><?= e($material['code']) ?></code></td>
                         <td>
                             <strong><?= e($material['name_full']) ?></strong><br>
                             <small style="color: var(--text-muted);"><?= e($material['name_short']) ?></small>
                         </td>
                         <td>
-                            <small><?= e($material['parent_category']['name_ru'] ?? '') ?></small><br>
-                            <strong><?= e($material['subcategory']['name_ru'] ?? '') ?></strong>
+                            <small><?= e($material['parent_category_name'] ?? $material['category_name'] ?? '') ?></small><br>
+                            <strong><?= e($material['category_name'] ?? '') ?></strong>
                         </td>
-                        <td><?= e($material['specifications']['material_grade'] ?? '—') ?></td>
-                        <td><small><?= e($material['specifications']['standard_doc'] ?? '—') ?></small></td>
+                        <td><?= e($material['grade'] ?? '—') ?></td>
+                        <td><small><?= e($material['material_type'] ?? '—') ?></small></td>
                         <td><?= e($material['base_unit']) ?></td>
                         <td>
                             <span class="quantity-badge <?= $qtyClass ?>" style="font-size: 13px;"><?= $qtyText ?></span>
@@ -1296,9 +1198,9 @@ function openMaterialModal(material) {
     
     // Словарь перевода ключей характеристик на русский язык
     const specLabels = {
-        'material_grade': 'Марка материала',
-        'standard_doc': 'Нормативный документ',
-        'product_form': 'Форма изделия',
+        'grade': 'Марка материала',
+        'type': 'Нормативный документ',
+        'material_type': 'Форма изделия',
         'diameter_mm': 'Диаметр (мм)',
         'length_m': 'Длина (м)',
         'thickness_mm': 'Толщина (мм)',
@@ -1531,7 +1433,7 @@ function openMaterialModal(material) {
         'clearance': 'Зазор',
         'coating': 'Покрытие',
         'coating_thickness_mkm': 'Толщина покрытия (мкм)',
-        'code_internal': 'Внутренний код',
+        'code': 'Артикул',
         'coil_weight_kg': 'Вес бухты (кг)',
         'colors': 'Цвета',
         'conversion_factor': 'Коэффициент пересчёта',
@@ -1681,7 +1583,7 @@ function openMaterialModal(material) {
         const label = specLabels[key] || key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
         
         // Если это standard_doc, делаем его кликабельным
-        if (key === 'standard_doc' && typeof value === 'string' && value.includes('ГОСТ')) {
+        if (key === 'type' && typeof value === 'string' && value.includes('ГОСТ')) {
             const gostNumber = extractGostNumber(value);
             const gostLink = generateGostLink(value);
             specsHtml += `
@@ -1710,7 +1612,7 @@ function openMaterialModal(material) {
             <div class="specs-list">
                 <div class="spec-item">
                     <span class="spec-item-label">Внутренний код</span>
-                    <span class="spec-item-value"><code>${escapeHtml(material.code_internal)}</code></span>
+                    <span class="spec-item-value"><code>${escapeHtml(material.code)}</code></span>
                 </div>
                 <div class="spec-item">
                     <span class="spec-item-label">Краткое название</span>
@@ -1777,9 +1679,9 @@ function printMaterial() {
     
     // Словарь перевода ключей характеристик на русский язык (для печати)
     const specLabels = {
-        'material_grade': 'Марка материала',
-        'standard_doc': 'Нормативный документ',
-        'product_form': 'Форма изделия',
+        'grade': 'Марка материала',
+        'type': 'Нормативный документ',
+        'material_type': 'Форма изделия',
         'diameter_mm': 'Диаметр (мм)',
         'length_m': 'Длина (м)',
         'thickness_mm': 'Толщина (мм)',
@@ -1859,7 +1761,7 @@ function printMaterial() {
         </head>
         <body>
             <h1>${currentMaterial.name_full}</h1>
-            <p><strong>Код:</strong> <code>${currentMaterial.code_internal}</code></p>
+            <p><strong>Код:</strong> <code>${currentMaterial.code}</code></p>
             <p><strong>Краткое название:</strong> ${currentMaterial.name_short}</p>
             
             <div class="section">

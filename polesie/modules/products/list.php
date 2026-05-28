@@ -315,7 +315,8 @@ error_log("Всего категорий продукции: " . count($categori
                         <th>Артикул</th>
                         <th>Наименование</th>
                         <th>Категория</th>
-                        <th>Ед. изм.</th>
+                        <th>Мощность, кВт</th>
+                        <th>Обороты, об/мин</th>
                         <th>Цена (BYN)</th>
                         <th>Статус</th>
                         <th>Действия</th>
@@ -325,58 +326,25 @@ error_log("Всего категорий продукции: " . count($categori
                     <?php foreach ($products as $p): ?>
                     <?php 
                     // Подготовка данных для безопасной передачи в JS
-                    // specs_decoded больше не используется, характеристики берутся из отдельных полей
+                    $specs = !empty($p['specifications']) && is_array($p['specifications']) ? $p['specifications'] : [];
                     
                     $productData = [
                         'id' => $p['id'],
-                        'name' => ($p['name_full'] ?? $p['name_short'] ?? $p['name'] ?? ''),
-                        'name_short' => $p['name_short'] ?? $p['name'] ?? '',
-                        'name_full' => $p['name_full'] ?? $p['name'] ?? '',
+                        'name' => $p['name'] ?? '',
                         'article' => $p['article'] ?? '',
-                        'code_gost' => $p['code_gost'] ?? '',
                         'category_name' => $p['category_name'] ?? '',
-                        'unit_name' => $p['unit_name'] ?? $p['unit'] ?? '',
-                        'base_price' => $p['base_price'] ?? $p['price'] ?? 0,
+                        'base_price' => $p['base_price'] ?? 0,
                         'is_active' => (int)($p['is_active'] ?? 0),
-                        
-                        // Характеристики электродвигателя из отдельных полей
-                        'power_kw' => $p['power_kw'] ?? null,
-                        'rpm' => $p['rpm'] ?? null,
-                        'voltage_v' => $p['voltage_v'] ?? null,
-                        'frequency_hz' => $p['frequency_hz'] ?? 50,
-                        'efficiency_class' => $p['efficiency_class'] ?? null,
-                        'shaft_height_mm' => $p['shaft_height_mm'] ?? null,
-                        'frame_size' => $p['frame_size'] ?? null,
-                        'climate_versions' => $p['climate_versions'] ?? null,
-                        'mounting_versions' => $p['mounting_versions'] ?? null,
-                        'protection_class' => $p['protection_class'] ?? null,
-                        'motor_type' => $p['motor_type'] ?? null,
-                        'application' => $p['application'] ?? null,
-                        'housing_material' => $p['housing_material'] ?? null,
-                        'shaft_material' => $p['shaft_material'] ?? null,
-                        'explosion_protection' => $p['explosion_protection'] ?? null,
-                        'capacitor_included' => (bool)($p['capacitor_included'] ?? false),
-                        'standard' => $p['standard'] ?? 'ГОСТ',
-                        'weight_range_kg' => $p['weight_range_kg'] ?? null,
-                        'warranty_months' => $p['warranty_months'] ?? 24,
-                        'is_serial_tracked' => (bool)($p['is_serial_tracked'] ?? false),
-                        
-                        'serial_number' => $p['serial_number'] ?? null,
-                        'manufacture_date' => $p['manufacture_date'] ?? null,
-                        'warranty_start' => $p['warranty_start'] ?? null,
-                        'warranty_end' => $p['warranty_end'] ?? null,
-                        'documents' => $p['documents'] ?? [],
-                        'manual_url' => $p['manual_url'] ?? null,
-                        'created_at' => $p['created_at'] ?? '',
-                        'updated_at' => $p['updated_at'] ?? ''
+                        'specifications' => $specs
                     ];
                     ?>
                     <tr class="table-row-clickable" onclick="openProductModal(<?= json_encode($productData, JSON_UNESCAPED_UNICODE) ?>)">
                         <td><code><?= e($p['article']) ?></code></td>
-                        <td><strong><?= e($p['name_full'] ?? $p['name_short'] ?? $p['name'] ?? '—') ?></strong></td>
+                        <td><strong><?= e($p['name'] ?? '—') ?></strong></td>
                         <td><?= e($p['category_name'] ?? '—') ?></td>
-                        <td><?= e($p['unit_name'] ?? $p['unit'] ?? '—') ?></td>
-                        <td><?= number_format((float)($p['base_price'] ?? $p['price'] ?? 0), 2, ',', ' ') ?></td>
+                        <td><?= isset($specs['мощность_квт']) ? e($specs['мощность_квт']) : '-' ?></td>
+                        <td><?= isset($specs['частота_вращения_об_мин']) ? e($specs['частота_вращения_об_мин']) : '-' ?></td>
+                        <td><?= number_format((float)($p['base_price'] ?? 0), 2, ',', ' ') ?></td>
                         <td>
                             <?php if (isset($p['is_active']) && ($p['is_active'] == 1 || $p['is_active'] === true)): ?>
                                 <span class="badge badge-success">✓ Активно</span>

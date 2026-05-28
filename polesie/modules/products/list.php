@@ -27,8 +27,22 @@ $sql = "SELECT p.*, c.name as category_name, u.symbol as unit_name
 $params = [];
 
 if ($search) {
-    $sql .= " AND (p.name_full LIKE ? OR p.name_short LIKE ? OR p.article LIKE ?)";
-    $params = ["%$search%", "%$search%", "%$search%"];
+    // Поддержка как старой структуры (поле name), так и новой (name_full, name_short)
+    $sql .= " AND (p.article LIKE ?";
+    $params[] = "%$search%";
+    
+    // Проверяем наличие полей name_full и name_short
+    try {
+        $testStmt = $pdo->query("SELECT name_full FROM products LIMIT 1");
+        $sql .= " OR p.name_full LIKE ? OR p.name_short LIKE ?";
+        $params[] = "%$search%";
+        $params[] = "%$search%";
+    } catch (Exception $e) {
+        // Если поля name_full нет, используем старое поле name
+        $sql .= " OR p.name LIKE ?";
+        $params[] = "%$search%";
+    }
+    $sql .= ")";
 }
 
 if ($category) {
@@ -36,28 +50,48 @@ if ($category) {
     $params[] = $category;
 }
 
-$sql .= " ORDER BY p.name_full ASC";
+// Определяем поле для сортировки (name_full или name)
+$sortField = 'name';
+try {
+    $testStmt = $pdo->query("SELECT name_full FROM products LIMIT 1");
+    $sortField = 'name_full';
+} catch (Exception $e) {
+    $sortField = 'name';
+}
+
+$sql .= " ORDER BY p.$sortField ASC";
 
 try {
     $stmt = $pdo->prepare($sql);
     $stmt->execute($params);
     $products = $stmt->fetchAll();
     error_log("Загружено продукции: " . count($products));
+    error_log("SQL запрос: " . $sql);
+    error_log("Параметры: " . json_encode($params));
 } catch (Exception $e) {
     error_log("Ошибка при загрузке продукции: " . $e->getMessage());
     error_log("SQL: " . $sql);
+    error_log("Trace: " . $e->getTraceAsString());
     $products = [];
 }
 
 // Получение серийных номеров и документов для каждого продукта
+error_log("Начинаем обработку " . count($products) . " продуктов");
 foreach ($products as &$product) {
+    error_log("Обработка продукта ID=" . $product['id'] . ", name=" . ($product['name_full'] ?? $product['name_short'] ?? $product['name'] ?? 'N/A'));
+    
     // Получение последнего серийного номера для продукта
-    $serialStmt = $pdo->prepare("SELECT id, serial_number, production_date, warranty_start, warranty_end, notes 
-                                  FROM product_serial_numbers 
-                                  WHERE product_id = ? 
-                                  ORDER BY created_at DESC LIMIT 1");
-    $serialStmt->execute([$product['id']]);
-    $serialData = $serialStmt->fetch();
+    try {
+        $serialStmt = $pdo->prepare("SELECT id, serial_number, production_date, warranty_start, warranty_end, notes 
+                                      FROM product_serial_numbers 
+                                      WHERE product_id = ? 
+                                      ORDER BY created_at DESC LIMIT 1");
+        $serialStmt->execute([$product['id']]);
+        $serialData = $serialStmt->fetch();
+    } catch (Exception $e) {
+        error_log("Ошибка получения серийного номера для продукта ID=" . $product['id'] . ": " . $e->getMessage());
+        $serialData = false;
+    }
     
     if ($serialData) {
         $product['serial_number'] = $serialData['serial_number'];
@@ -179,9 +213,9 @@ error_log("Всего категорий продукции: " . count($categori
                     
                     $productData = [
                         'id' => $p['id'],
-                        'name' => $p['name_full'] ?? $p['name_short'] ?? '',
-                        'name_short' => $p['name_short'] ?? '',
-                        'name_full' => $p['name_full'] ?? '',
+                        'name' => ($p['name_full'] ?? $p['name_short'] ?? $p['name'] ?? ''),
+                        'name_short' => $p['name_short'] ?? $p['name'] ?? '',
+                        'name_full' => $p['name_full'] ?? $p['name'] ?? '',
                         'article' => $p['article'] ?? '',
                         'code_gost' => $p['code_gost'] ?? '',
                         'category_name' => $p['category_name'] ?? '',
@@ -223,12 +257,12 @@ error_log("Всего категорий продукции: " . count($categori
                     ?>
                     <tr class="table-row-clickable" onclick="openProductModal(<?= json_encode($productData, JSON_UNESCAPED_UNICODE) ?>)">
                         <td><code><?= e($p['article']) ?></code></td>
-                        <td><strong><?= e($p['name_full'] ?? $p['name_short'] ?? '—') ?></strong></td>
+                        <td><strong><?= e($p['name_full'] ?? $p['name_short'] ?? $p['name'] ?? '—') ?></strong></td>
                         <td><?= e($p['category_name'] ?? '—') ?></td>
                         <td><?= e($p['unit_name'] ?? $p['unit'] ?? '—') ?></td>
-                        <td><?= number_format($p['base_price'] ?? $p['price'], 2, ',', ' ') ?></td>
+                        <td><?= number_format((float)($p['base_price'] ?? $p['price'] ?? 0), 2, ',', ' ') ?></td>
                         <td>
-                            <?php if ($p['is_active']): ?>
+                            <?php if (isset($p['is_active']) && ($p['is_active'] == 1 || $p['is_active'] === true)): ?>
                                 <span class="badge badge-success">✓ Активно</span>
                             <?php else: ?>
                                 <span class="badge badge-secondary">○ Не активно</span>
@@ -282,6 +316,9 @@ error_log("Всего категорий продукции: " . count($categori
     <script>
         function openProductModal(product) {
             console.log('Opening product:', product);
+            console.log('Product name:', product.name);
+            console.log('Product name_full:', product.name_full);
+            console.log('Product name_short:', product.name_short);
             
             // Сохраняем текущий продукт для использования в функции печати
             window.currentProduct = product;

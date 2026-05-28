@@ -1,48 +1,44 @@
-```markdown
-# Compiled and binary files
-*.pyc
-*.class
-*.o
-*.exe
-*.dll
-*.so
-*.a
-*.obj
-*.out
+```
+# Environment and config files
+.env
+.env.local
+.env.*
 
-# Dependencies
-node_modules/
-venv/
-.venv/
-__pycache__/
-dist/
-build/
-.mypy_cache/
-.pytest_cache/
-target/
-.gradle/
+# Logs and temporary files
+*.log
+*.tmp
 
 # Editor/IDE files
 .vscode/
 .idea/
 *.swp
 *.swo
-*.tmp
 
-# System/Environment files
+# Dependencies and build artifacts
+node_modules/
+vendor/
+composer.lock
+
+# OS generated files
 .DS_Store
 Thumbs.db
-.env
-.env.local
-*.env.*
 
-# Logs and coverage
-*.log
-coverage/
-htmlcov/
-.coverage
+# Database related
+*.sql.bak
+*.db-journal
 
-# Compressed files
+# Cache directories
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Backup files
+*~
+*.bak
+*.backup
+
+# Compression archives
 *.zip
 *.gz
 *.tar

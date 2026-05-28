@@ -539,3 +539,29 @@ CREATE INDEX idx_passport_product ON product_passports(product_id);
 CREATE INDEX idx_ppm_passport ON product_passport_materials(passport_id);
 CREATE INDEX idx_ppm_material ON product_passport_materials(material_id);
 
+-- ============================================
+-- ТАБЛИЦА СИСТЕМНЫХ НАСТРОЕК
+-- ============================================
+
+CREATE TABLE `system_settings` (
+  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `setting_key` VARCHAR(100) NOT NULL UNIQUE,
+  `setting_value` TEXT,
+  `setting_type` ENUM('string', 'number', 'boolean', 'json') DEFAULT 'string',
+  `description` TEXT,
+  `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Системные настройки по умолчанию
+INSERT INTO `system_settings` (`setting_key`, `setting_value`, `setting_type`, `description`) VALUES
+('company_name', 'ОАО \"Полесьеэлектромаш\"', 'string', 'Название компании'),
+('company_inn', '', 'string', 'УНН компании'),
+('company_address', 'Республика Беларусь, Гомельская область', 'string', 'Юридический адрес'),
+('company_phone', '+375 (232) XX-XX-XX', 'string', 'Телефон'),
+('company_email', 'info@polesie.by', 'string', 'Email'),
+('currency_default', 'BYN', 'string', 'Валюта по умолчанию'),
+('timezone', 'Europe/Minsk', 'string', 'Часовой пояс'),
+('language', 'ru', 'string', 'Язык интерфейса');
+
+SET FOREIGN_KEY_CHECKS = 1;
+

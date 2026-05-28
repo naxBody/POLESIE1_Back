@@ -138,21 +138,8 @@ foreach ($materialsData as $material) {
     }
 }
 
-// Примеры расшифровок для常见ных аббревиатур
-$abbreviationDecodings = [
-    ['code' => 'Б', 'full_name' => 'Болт', 'category' => 'Крепеж', 'description' => 'Болт крепежный'],
-    ['code' => 'Г', 'full_name' => 'Гайка', 'category' => 'Крепеж', 'description' => 'Гайка шестигранная'],
-    ['code' => 'Ш', 'full_name' => 'Шайба', 'category' => 'Крепеж', 'description' => 'Шайба плоская'],
-    ['code' => 'П', 'full_name' => 'Провод', 'category' => 'Электротехника', 'description' => 'Провод медный'],
-    ['code' => 'А', 'full_name' => 'Алюминий', 'category' => 'Металлы', 'description' => 'Алюминиевый сплав'],
-    ['code' => 'Ст', 'full_name' => 'Сталь', 'category' => 'Металлы', 'description' => 'Сталь конструкционная'],
-    ['code' => 'Ч', 'full_name' => 'Чугун', 'category' => 'Металлы', 'description' => 'Чугун литейный'],
-    ['code' => 'М', 'full_name' => 'Медь', 'category' => 'Металлы', 'description' => 'Медь электротехническая'],
-    ['code' => 'ПШ', 'full_name' => 'Пруток шлифованный', 'category' => 'Металлы', 'description' => 'Пруток стальной шлифованный'],
-    ['code' => 'кп', 'full_name' => 'класс прочности', 'category' => 'Крепеж', 'description' => 'Характеристика прочности'],
-    ['code' => 'ц', 'full_name' => 'оцинкованный', 'category' => 'Крепеж', 'description' => 'Покрытие цинком'],
-    ['code' => 'мм', 'full_name' => 'миллиметр', 'category' => 'Общее', 'description' => 'Единица измерения'],
-];
+// Примеры расшифровок для常见ных аббревиатур удалены - используется только международный формат кодов
+$abbreviationDecodings = [];
 
 // Стандарты ГОСТ
 $gostStandards = [
@@ -179,12 +166,12 @@ foreach ($materialCategories as $category) {
         'category_ru' => $catName,
         'subcategory_ru' => $catName,
         'pattern' => $catCode . '-XXX-XX',
-        'description_ru' => 'Формат: ' . $catCode . '-[номер]-[параметры]',
+        'description_ru' => 'Format: ' . $catCode . '-[number]-[parameters]',
         'examples' => [$catCode . '-001-10', $catCode . '-002-15'],
         'example_detailed_decoding' => [
-            $catCode . ' - категория материала',
-            '001 - порядковый номер в категории',
-            '10 - основной параметр (диаметр/сечение)'
+            $catCode . ' - material category',
+            '001 - serial number in category',
+            '10 - main parameter (diameter/cross-section)'
         ]
     ];
     
@@ -199,35 +186,42 @@ foreach ($materialCategories as $category) {
         if (strpos($subCode, 'BOLT') !== false) {
             $example = 'BOLT-M10x50';
             $decoding = [
-                'BOLT - болт (bolt)',
-                'M10 - метрическая резьба диаметром 10мм',
-                'x50 - длина болта 50мм'
+                'BOLT - bolt type',
+                'M10 - metric thread 10mm diameter',
+                'x50 - bolt length 50mm'
             ];
         } elseif (strpos($subCode, 'NUT') !== false) {
             $example = 'NUT-M10';
             $decoding = [
-                'NUT - гайка (nut)',
-                'M10 - метрическая резьба диаметром 10мм'
+                'NUT - nut type',
+                'M10 - metric thread 10mm diameter'
+            ];
+        } elseif (strpos($subCode, 'WASHER') !== false) {
+            $example = 'WASHER-10';
+            $decoding = [
+                'WASHER - washer type',
+                '10 - inner diameter 10mm'
             ];
         } elseif (strpos($subCode, 'WIRE') !== false) {
-            $example = 'П-2.5-М';
+            $example = 'WIRE-CU-2.5';
             $decoding = [
-                'П - провод',
-                '2.5 - сечение 2.5 мм²',
-                'М - медный'
+                'WIRE - wire type',
+                'CU - copper material',
+                '2.5 - cross section 2.5 mm²'
             ];
         } elseif (strpos($subCode, 'BAR') !== false) {
-            $example = 'ПШ-020-Ст45';
+            $example = 'ST-BAR-45-20';
             $decoding = [
-                'ПШ - пруток шлифованный',
-                '020 - диаметр 20мм',
-                'Ст45 - сталь марки 45'
+                'ST - steel',
+                'BAR - bar type',
+                '45 - steel grade 45',
+                '20 - diameter 20mm'
             ];
         } else {
             $example = $subCode . '-001';
             $decoding = [
-                $subCode . ' - код подкатегории',
-                '001 - порядковый номер'
+                $subCode . ' - category code',
+                '001 - serial number'
             ];
         }
         
@@ -235,7 +229,7 @@ foreach ($materialCategories as $category) {
             'category_ru' => $catName,
             'subcategory_ru' => $subName,
             'pattern' => $subCode . '-XXX-XX',
-            'description_ru' => 'Формат: ' . $subCode . '-[параметры]',
+            'description_ru' => 'Format: ' . $subCode . '-[parameters]',
             'examples' => [$example],
             'example_detailed_decoding' => $decoding
         ];

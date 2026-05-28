@@ -27,7 +27,7 @@ $units = [];
 
 try {
     // Получение категорий материалов
-    $catStmt = $pdo->query("SELECT * FROM material_categories ORDER BY name");
+    $catStmt = $pdo->query("SELECT * FROM material_categories ORDER BY name_ru");
     $categories = $catStmt->fetchAll(PDO::FETCH_ASSOC);
     
     // Построение иерархии категорий

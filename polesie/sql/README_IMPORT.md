@@ -10,6 +10,19 @@
 - `/workspace/polesie/generate_passports_sql.py` - Python скрипт для генерации SQL
 - `/workspace/polesie/sql/import_passports.sql` - сгенерированный SQL файл для импорта
 
+## Исправление проблемы с collation
+
+**Ошибка:** `#1267 - Illegal mix of collations (utf8mb4_general_ci,IMPLICIT) and (utf8mb4_unicode_ci,IMPLICIT) for operation '='`
+
+**Решение:** В SQL файле все сравнения строк теперь используют явное приведение к collation:
+```sql
+WHERE code COLLATE utf8mb4_general_ci = 'VALUE'
+WHERE article COLLATE utf8mb4_general_ci = 'ARTICLE-123'
+WHERE sku COLLATE utf8mb4_general_ci = 'SKU-456'
+```
+
+Это обеспечивает совместимость между таблицами с разной кодировкой.
+
 ## Структура данных в БД
 
 ### Таблицы

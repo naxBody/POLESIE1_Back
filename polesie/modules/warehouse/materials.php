@@ -1077,7 +1077,7 @@ $availableCombinationsJson = json_encode($availableCombinations, JSON_UNESCAPED_
                     // Определение цвета бейджа количества
                     $qtyClass = 'quantity-badge-medium';
                     $qtyText = 'Нет данных';
-                    if ($material['warehouse_quantity'] !== null) {
+                    if (isset($material['warehouse_quantity']) && $material['warehouse_quantity'] !== null) {
                         $qty = floatval($material['warehouse_quantity']);
                         $qtyText = number_format($qty, 2, ',', ' ');
                         if ($qty <= 10) {
@@ -1123,7 +1123,7 @@ $availableCombinationsJson = json_encode($availableCombinations, JSON_UNESCAPED_
                     // Определение цвета бейджа количества для таблицы
                     $qtyClass = 'quantity-badge-medium';
                     $qtyText = 'Нет данных';
-                    if ($material['warehouse_quantity'] !== null) {
+                    if (isset($material['warehouse_quantity']) && $material['warehouse_quantity'] !== null) {
                         $qty = floatval($material['warehouse_quantity']);
                         $qtyText = number_format($qty, 2, ',', ' ');
                         if ($qty <= 10) {

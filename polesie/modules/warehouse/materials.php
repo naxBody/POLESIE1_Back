@@ -538,13 +538,13 @@ foreach ($allMaterials as $mat) {
 
 // Добавляем формат кода для каждой категории
 $categoryCodeFormats = [
-    2 => ['ST-BAR-XX-NNN', 'Пруток: СТАЛЬ-МАРКА-ДИАМЕТР'],
-    3 => ['ST-SHEET-TT-NN', 'Лист: СТАЛЬ-ТОЛЩИНА-НОМЕР'],
-    4 => ['CAST-IRON-XXX', 'Чугун: CAST-IRON-МАРКА'],
-    6 => ['WIRE-CU-SSS-VV', 'Провод: WIRE-МАТЕРИАЛ-СЕЧЕНИЕ-ИЗОЛЯЦИЯ'],
-    9 => ['BOLT-MDxL', 'Болт: BOLT-МЕТРИЧЕСКАЯ РЕЗЬБА x ДЛИНА'],
-    10 => ['NUT-MD', 'Гайка: NUT-МЕТРИЧЕСКАЯ РЕЗЬБА'],
-    11 => ['BRG-DDD-OOO', 'Подшипник: BRG-ВНУТР_ДИАМЕТР-ТИП'],
+    2 => ['ST-BAR-XX-NNN', 'Bar: STEEL-GRADE-DIAMETER'],
+    3 => ['ST-SHEET-TT-NN', 'Sheet: STEEL-THICKNESS-NUMBER'],
+    4 => ['CAST-IRON-XXX', 'Cast Iron: CAST-IRON-GRADE'],
+    6 => ['WIRE-CU-SSS-VV', 'Wire: WIRE-MATERIAL-CROSSSECTION-INSULATION'],
+    9 => ['BOLT-MDxL', 'Bolt: BOLT-METRIC_THREAD x LENGTH'],
+    10 => ['NUT-MD', 'Nut: NUT-METRIC_THREAD'],
+    11 => ['BRG-DDD-OOO', 'Bearing: BRG-INNER_DIAMETER-TYPE'],
 ];
 
 foreach ($categoryCodeFormats as $catId => $format) {

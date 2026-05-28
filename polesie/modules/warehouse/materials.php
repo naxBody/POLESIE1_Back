@@ -52,7 +52,8 @@ try {
                    u.name as unit_name, 
                    u.symbol as unit_symbol,
                    c.name as supplier_name,
-                   m.current_stock as warehouse_quantity
+                   m.current_stock as warehouse_quantity,
+                   COALESCE(m.base_unit, u.name, 'шт') as base_unit
             FROM materials m
             LEFT JOIN material_categories mc ON m.category_id = mc.id
             LEFT JOIN material_categories parent_cat ON mc.parent_id = parent_cat.id
@@ -194,6 +195,38 @@ $filterCoating = $_GET['coating'] ?? '';
 if ($filterCoating !== '') {
     $filteredMaterials = array_filter($filteredMaterials, function($m) use ($filterCoating) {
         return isset($m['coating']) && $m['coating'] === $filterCoating;
+    });
+}
+
+// Фильтр по диаметру
+$filterDiameter = $_GET['diameter'] ?? '';
+if ($filterDiameter !== '') {
+    $filteredMaterials = array_filter($filteredMaterials, function($m) use ($filterDiameter) {
+        return isset($m['diameter']) && $m['diameter'] == $filterDiameter;
+    });
+}
+
+// Фильтр по длине
+$filterLength = $_GET['length'] ?? '';
+if ($filterLength !== '') {
+    $filteredMaterials = array_filter($filteredMaterials, function($m) use ($filterLength) {
+        return isset($m['length']) && $m['length'] == $filterLength;
+    });
+}
+
+// Фильтр по ширине
+$filterWidth = $_GET['width'] ?? '';
+if ($filterWidth !== '') {
+    $filteredMaterials = array_filter($filteredMaterials, function($m) use ($filterWidth) {
+        return isset($m['width']) && $m['width'] == $filterWidth;
+    });
+}
+
+// Фильтр по толщине
+$filterThickness = $_GET['thickness'] ?? '';
+if ($filterThickness !== '') {
+    $filteredMaterials = array_filter($filteredMaterials, function($m) use ($filterThickness) {
+        return isset($m['thickness']) && $m['thickness'] == $filterThickness;
     });
 }
 
@@ -1021,7 +1054,7 @@ $availableCombinationsJson = json_encode($availableCombinations, JSON_UNESCAPED_
                         </td>
                         <td><?= e($material['grade'] ?? '—') ?></td>
                         <td><small><?= e($material['material_type'] ?? '—') ?></small></td>
-                        <td><?= e($material['base_unit'] ?? $material['unit_name'] ?? 'шт') ?></td>
+                        <td><?= e($material['unit_name'] ?? 'шт') ?></td>
                         <td>
                             <span class="quantity-badge <?= $qtyClass ?>" style="font-size: 13px;"><?= $qtyText ?></span>
                         </td>
@@ -1682,7 +1715,7 @@ function openMaterialModal(material) {
                 </div>
                 <div class="spec-item">
                     <span class="spec-item-label">Единица измерения</span>
-                    <span class="spec-item-value">${escapeHtml(material.base_unit)}</span>
+                    <span class="spec-item-value">${escapeHtml(material.unit_name || 'шт')}</span>
                 </div>
                 ${material.alt_unit ? `
                 <div class="spec-item">

@@ -52,20 +52,33 @@ try {
                 LEFT JOIN product_categories parent_cat ON pc.parent_id = parent_cat.id
                 LEFT JOIN base_units bu ON p.base_unit_id = bu.id
                 LEFT JOIN contractors c ON p.supplier_id = c.id
-                WHERE p.is_active = TRUE
-                ORDER BY p.name_full ASC";
+                WHERE (p.is_active = TRUE OR p.is_active IS NULL OR p.is_active = 1)
+                ORDER BY p.name ASC";
         
         $stmt = $pdo->query($sql);
         $dbProducts = $stmt->fetchAll(PDO::FETCH_ASSOC);
         
         // Преобразование данных для совместимости с существующим кодом
         foreach ($dbProducts as $prod) {
+            // specifications может быть JSON или текстом
+            $specs = [];
+            if (!empty($prod['specifications'])) {
+                $specsData = json_decode($prod['specifications'], true);
+                if (is_array($specsData)) {
+                    $specs = $specsData;
+                }
+            }
+            
+            // Защита от null значений
+            $protectionClass = !empty($prod['protection_class']) ? $prod['protection_class'] : (isset($specs['protection_class']) ? $specs['protection_class'] : '');
+            $mountingVersions = isset($specs['mounting_versions']) ? $specs['mounting_versions'] : '';
+            
             $product = [
                 'id' => $prod['id'],
                 'sku' => $prod['article'],
-                'code_gost' => $prod['code_gost'] ?? '',
-                'name_full' => $prod['name_full'],
-                'name_short' => $prod['name_short'] ?? '',
+                'code_gost' => !empty($prod['code_gost']) ? $prod['code_gost'] : '',
+                'name_full' => !empty($prod['name']) ? $prod['name'] : ($prod['name_short'] ?? ''),
+                'name_short' => !empty($prod['name_short']) ? $prod['name_short'] : ($prod['name'] ?? ''),
                 'category_id' => $prod['category_id'],
                 'category_parent_id' => $prod['category_parent_id'],
                 'parent_category' => [
@@ -77,21 +90,22 @@ try {
                     'name_ru' => $prod['category_name'] ?? ''
                 ],
                 'specs' => [
-                    'power_kw' => $prod['power_kw'] ?? null,
-                    'power_kw_min' => $prod['power_kw_min'] ?? null,
-                    'power_kw_max' => $prod['power_kw_max'] ?? null,
-                    'rpm' => $prod['rpm'] ?? null,
-                    'voltage_v' => $prod['voltage_v'] ?? null,
-                    'efficiency_class' => $prod['efficiency_class'] ?? null,
-                    'shaft_height_mm' => $prod['shaft_height_mm'] ?? null,
-                    'protection_class' => $prod['protection_class'] ? explode(',', $prod['protection_class']) : [],
-                    'mounting_versions' => $prod['mounting_versions'] ? explode(',', $prod['mounting_versions']) : []
+                    'power_kw' => !empty($prod['power_kw']) ? $prod['power_kw'] : ($specs['power_kw'] ?? null),
+                    'power_kw_min' => $specs['power_kw_min'] ?? null,
+                    'power_kw_max' => $specs['power_kw_max'] ?? null,
+                    'rpm' => !empty($prod['rpm']) ? $prod['rpm'] : ($specs['rpm'] ?? null),
+                    'voltage_v' => $specs['voltage_v'] ?? null,
+                    'efficiency_class' => !empty($prod['efficiency_class']) ? $prod['efficiency_class'] : ($specs['efficiency_class'] ?? null),
+                    'shaft_height_mm' => $specs['shaft_height_mm'] ?? null,
+                    'protection_class' => $protectionClass ? (is_array($protectionClass) ? $protectionClass : explode(',', $protectionClass)) : [],
+                    'mounting_versions' => $mountingVersions ? (is_array($mountingVersions) ? $mountingVersions : explode(',', $mountingVersions)) : []
                 ],
-                'is_bestseller' => $prod['is_bestseller'] ?? false,
-                'is_serial_tracked' => $prod['is_serial_tracked'] ?? false,
+                'is_bestseller' => !empty($prod['is_bestseller']),
+                'is_serial_tracked' => !empty($prod['is_serial_tracked']),
                 'image' => $prod['image'] ?? null,
                 'base_price' => $prod['base_price'] ?? 0,
-                'currency' => $prod['currency'] ?? 'BYN'
+                'currency' => $prod['currency'] ?? 'BYN',
+                'is_active' => !empty($prod['is_active'])
             ];
             $allProducts[] = $product;
         }

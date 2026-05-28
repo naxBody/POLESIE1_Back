@@ -45,18 +45,18 @@ try {
                        pc.name as category_name, 
                        pc.parent_id as category_parent_id,
                        parent_cat.name as parent_category_name,
-                       bu.name as unit_name,
-                       c.name as supplier_name
+                       bu.name as unit_name
                 FROM products p
                 LEFT JOIN product_categories pc ON p.category_id = pc.id
                 LEFT JOIN product_categories parent_cat ON pc.parent_id = parent_cat.id
                 LEFT JOIN base_units bu ON p.base_unit_id = bu.id
-                LEFT JOIN contractors c ON p.supplier_id = c.id
                 WHERE (p.is_active = TRUE OR p.is_active IS NULL OR p.is_active = 1)
                 ORDER BY p.name ASC";
         
         $stmt = $pdo->query($sql);
         $dbProducts = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        error_log("Загружено записей из БД: " . count($dbProducts));
         
         // Преобразование данных для совместимости с существующим кодом
         foreach ($dbProducts as $prod) {
@@ -83,7 +83,7 @@ try {
                 'category_parent_id' => $prod['category_parent_id'],
                 'parent_category' => [
                     'id' => $prod['category_parent_id'],
-                    'name_ru' => $prod['parent_category_name'] ?? ''
+                    'name_ru' => $prod['parent_category_name'] ?? ($prod['category_name'] ?? '')
                 ],
                 'subcategory' => [
                     'id' => $prod['category_id'],
@@ -110,10 +110,11 @@ try {
             $allProducts[] = $product;
         }
         
-        error_log("Загружено продукции: " . count($allProducts));
+        error_log("Преобразовано продукции: " . count($allProducts));
     } catch (Exception $e) {
         error_log("Ошибка при загрузке продукции: " . $e->getMessage());
         error_log("SQL: " . $sql);
+        error_log("Trace: " . $e->getTraceAsString());
         $allProducts = [];
     }
     

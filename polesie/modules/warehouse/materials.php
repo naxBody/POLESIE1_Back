@@ -52,8 +52,6 @@ try {
                        parent_cat.name as parent_category_name,
                        u.name as unit_name, 
                        u.symbol as unit_symbol,
-                       c.name as supplier_name,
-                       m.current_stock as warehouse_quantity,
                        COALESCE(u.name, 'шт') as base_unit,
                        -- Извлекаем данные из JSON specifications
                        JSON_EXTRACT(m.specifications, '$.steel_grade') as grade,
@@ -78,14 +76,26 @@ try {
                 LEFT JOIN material_categories mc ON m.category_id = mc.id
                 LEFT JOIN material_categories parent_cat ON mc.parent_id = parent_cat.id
                 LEFT JOIN base_units u ON m.base_unit_id = u.id
-                LEFT JOIN contractors c ON m.supplier_id = c.id
                 ORDER BY m.name_full ASC";
         
         $stmt = $pdo->query($sql);
         $allMaterials = $stmt->fetchAll(PDO::FETCH_ASSOC);
         
-        // Преобразуем JSON значения в обычные строки/числа
+        error_log("Загружено материалов из БД: " . count($allMaterials));
+        
+        // Преобразуем JSON значения в обычные строки/числа И добавляем specifications как массив
         foreach ($allMaterials as &$mat) {
+            // Декодируем specifications JSON в массив для использования в JS
+            $specsArray = [];
+            if (!empty($mat['specifications'])) {
+                $decodedSpecs = json_decode($mat['specifications'], true);
+                if (is_array($decodedSpecs)) {
+                    $specsArray = $decodedSpecs;
+                }
+            }
+            // Добавляем decoded specifications как отдельное поле
+            $mat['specifications'] = $specsArray;
+            
             if (isset($mat['grade']) && is_string($mat['grade'])) {
                 $mat['grade'] = trim($mat['grade'], '"');
             }
@@ -119,10 +129,11 @@ try {
         }
         unset($mat);
         
-        error_log("Загружено материалов: " . count($allMaterials));
+        error_log("Преобразовано материалов: " . count($allMaterials));
     } catch (Exception $e) {
         error_log("Ошибка при загрузке материалов: " . $e->getMessage());
         error_log("SQL: " . $sql);
+        error_log("Trace: " . $e->getTraceAsString());
         $allMaterials = [];
     }
     

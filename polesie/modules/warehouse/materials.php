@@ -26,18 +26,18 @@ $productForms = [];
 $units = [];
 
 try {
-    // Получение категорий материалов
-    $catStmt = $pdo->query("SELECT * FROM material_categories ORDER BY name_ru");
+    // Получение категорий материалов - сначала родительские, потом дочерние
+    $catStmt = $pdo->query("SELECT * FROM material_categories ORDER BY parent_id IS NOT NULL, id ASC");
     $categories = $catStmt->fetchAll(PDO::FETCH_ASSOC);
     
-    // Построение иерархии категорий
+    // Построение иерархии категорий (двухпроходный алгоритм)
     $categoryTree = [];
+    // Первый проход: создаем все категории в дереве
     foreach ($categories as $cat) {
-        if ($cat['parent_id'] === null) {
-            $categoryTree[$cat['id']] = $cat;
-            $categoryTree[$cat['id']]['subcategories'] = [];
-        }
+        $categoryTree[$cat['id']] = $cat;
+        $categoryTree[$cat['id']]['subcategories'] = [];
     }
+    // Второй проход: добавляем подкатегории к родителям
     foreach ($categories as $cat) {
         if ($cat['parent_id'] !== null && isset($categoryTree[$cat['parent_id']])) {
             $categoryTree[$cat['parent_id']]['subcategories'][] = $cat;
@@ -532,6 +532,25 @@ foreach ($allMaterials as $mat) {
         $availableCombinations[$catId]['threads'][] = $mat['thread'];
     }
 }
+
+// Добавляем формат кода для каждой категории
+$categoryCodeFormats = [
+    2 => ['ST-BAR-XX-NNN', 'Пруток: СТАЛЬ-МАРКА-ДИАМЕТР'],
+    3 => ['ST-SHEET-TT-NN', 'Лист: СТАЛЬ-ТОЛЩИНА-НОМЕР'],
+    4 => ['CAST-IRON-XXX', 'Чугун: CAST-IRON-МАРКА'],
+    6 => ['WIRE-CU-SSS-VV', 'Провод: WIRE-МАТЕРИАЛ-СЕЧЕНИЕ-ИЗОЛЯЦИЯ'],
+    9 => ['BOLT-MDD-LLL-CC', 'Болт: BOLT-РЕЗЬБА-ДЛИНА-КЛАСС'],
+    10 => ['NUT-MDD-CC', 'Гайка: NUT-РЕЗЬБА-КЛАСС'],
+    11 => ['BRG-DDD-OOO', 'Подшипник: BRG-ВНУТР_ДИАМЕТР-ТИП'],
+];
+
+foreach ($categoryCodeFormats as $catId => $format) {
+    if (isset($availableCombinations[$catId])) {
+        $availableCombinations[$catId]['_code_format'] = $format[0];
+        $availableCombinations[$catId]['_code_format_ru'] = $format[1];
+    }
+}
+
 $availableCombinationsJson = json_encode($availableCombinations, JSON_UNESCAPED_UNICODE);
 ?>
 <!DOCTYPE html>
@@ -996,14 +1015,21 @@ $availableCombinationsJson = json_encode($availableCombinations, JSON_UNESCAPED_
                     <label class="filter-label">Категория</label>
                     <select name="category" class="filter-select" id="categorySelect" onchange="updatePropertyFilters()">
                         <option value="">Все категории</option>
-                        <?php foreach ($categories as $cat): ?>
-                            <?php if (isset($cat['subcategories'])): ?>
-                                <?php foreach ($cat['subcategories'] as $subcat): ?>
-                                    <option value="<?= $subcat['id'] ?>" 
-                                            <?= $filterCategory == $subcat['id'] ? 'selected' : '' ?>>
-                                        <?= e($cat['name_ru']) ?> → <?= e($subcat['name_ru']) ?>
-                                    </option>
-                                <?php endforeach; ?>
+                        <?php foreach ($categoryTree as $cat): ?>
+                            <?php if (!empty($cat['subcategories'])): ?>
+                                <optgroup label="<?= e($cat['name_ru']) ?>">
+                                    <?php foreach ($cat['subcategories'] as $subcat): ?>
+                                        <option value="<?= $subcat['id'] ?>" 
+                                                <?= $filterCategory == $subcat['id'] ? 'selected' : '' ?>>
+                                            <?= e($subcat['name_ru']) ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </optgroup>
+                            <?php else: ?>
+                                <option value="<?= $cat['id'] ?>" 
+                                        <?= $filterCategory == $cat['id'] ? 'selected' : '' ?>>
+                                    <?= e($cat['name_ru']) ?>
+                                </option>
                             <?php endif; ?>
                         <?php endforeach; ?>
                     </select>
@@ -1147,13 +1173,17 @@ $availableCombinationsJson = json_encode($availableCombinations, JSON_UNESCAPED_
                         <?php if ($filterCategory): ?>
                             <?php 
                             $catName = '';
-                            foreach ($categories as $cat) {
-                                if (isset($cat['subcategories'])) {
+                            foreach ($categoryTree as $cat) {
+                                if (!empty($cat['subcategories'])) {
                                     foreach ($cat['subcategories'] as $subcat) {
                                         if ($subcat['id'] == $filterCategory) {
-                                            $catName = $cat['name_ru'] . ' → ' . $subcat['name_ru'];
+                                            $catName = $subcat['name_ru'];
+                                            break 2;
                                         }
                                     }
+                                } elseif ($cat['id'] == $filterCategory) {
+                                    $catName = $cat['name_ru'];
+                                    break;
                                 }
                             }
                             ?>

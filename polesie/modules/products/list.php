@@ -19,15 +19,16 @@ $pageTitle = 'Продукция';
 $search = $_GET['search'] ?? '';
 $category = $_GET['category'] ?? '';
 
-$sql = "SELECT p.*, c.name as category_name, u.symbol as unit_name FROM products p 
+$sql = "SELECT p.*, c.name as category_name, u.symbol as unit_name 
+        FROM products p 
         LEFT JOIN product_categories c ON p.category_id = c.id 
         LEFT JOIN base_units u ON p.base_unit_id = u.id
         WHERE 1=1";
 $params = [];
 
 if ($search) {
-    $sql .= " AND (p.name LIKE ? OR p.article LIKE ?)";
-    $params = ["%$search%", "%$search%"];
+    $sql .= " AND (p.name_full LIKE ? OR p.name_short LIKE ? OR p.article LIKE ?)";
+    $params = ["%$search%", "%$search%", "%$search%"];
 }
 
 if ($category) {
@@ -35,7 +36,7 @@ if ($category) {
     $params[] = $category;
 }
 
-$sql .= " ORDER BY p.name ASC";
+$sql .= " ORDER BY p.name_full ASC";
 
 $stmt = $pdo->prepare($sql);
 $stmt->execute($params);
@@ -44,7 +45,7 @@ $products = $stmt->fetchAll();
 // Получение серийных номеров и документов для каждого продукта
 foreach ($products as &$product) {
     // Получение последнего серийного номера для продукта
-    $serialStmt = $pdo->prepare("SELECT id, serial_number, manufacture_date, warranty_start, warranty_end, notes 
+    $serialStmt = $pdo->prepare("SELECT id, serial_number, production_date, warranty_start, warranty_end, notes 
                                   FROM product_serial_numbers 
                                   WHERE product_id = ? 
                                   ORDER BY created_at DESC LIMIT 1");
@@ -53,7 +54,7 @@ foreach ($products as &$product) {
     
     if ($serialData) {
         $product['serial_number'] = $serialData['serial_number'];
-        $product['manufacture_date'] = $serialData['manufacture_date'];
+        $product['manufacture_date'] = $serialData['production_date'];
         $product['warranty_start'] = $serialData['warranty_start'];
         $product['warranty_end'] = $serialData['warranty_end'];
         $product['notes'] = $serialData['notes'];
@@ -77,7 +78,7 @@ foreach ($products as &$product) {
         }
         
         // Получение пути к руководству
-        $product['manual_url'] = $serialData['manual_file_path'] ?? null;
+        $product['manual_url'] = null;
     } else {
         $product['serial_number'] = null;
         $product['manufacture_date'] = null;
@@ -86,18 +87,6 @@ foreach ($products as &$product) {
         $product['notes'] = null;
         $product['documents'] = [];
         $product['manual_url'] = null;
-    }
-    
-    // Декодирование JSON спецификаций
-    if (!empty($product['specifications'])) {
-        $decoded = json_decode($product['specifications'], true);
-        if (is_array($decoded)) {
-            $product['specs_decoded'] = $decoded;
-        } else {
-            $product['specs_decoded'] = null;
-        }
-    } else {
-        $product['specs_decoded'] = null;
     }
 }
 
@@ -172,23 +161,41 @@ $categories = $catStmt->fetchAll();
                     <?php foreach ($products as $p): ?>
                     <?php 
                     // Подготовка данных для безопасной передачи в JS
-                    // specs_decoded уже декодирован из JSON в PHP, поэтому передаём как объект
-                    $specsDecoded = null;
-                    if (!empty($p['specs_decoded']) && is_array($p['specs_decoded'])) {
-                        $specsDecoded = $p['specs_decoded'];
-                    }
+                    // specs_decoded больше не используется, характеристики берутся из отдельных полей
                     
                     $productData = [
                         'id' => $p['id'],
-                        'name' => $p['name'] ?? '',
+                        'name' => $p['name_full'] ?? '',
+                        'name_short' => $p['name_short'] ?? '',
                         'article' => $p['article'] ?? '',
+                        'code_gost' => $p['code_gost'] ?? '',
                         'category_name' => $p['category_name'] ?? '',
                         'unit_name' => $p['unit_name'] ?? $p['unit'] ?? '',
                         'base_price' => $p['base_price'] ?? $p['price'] ?? 0,
                         'is_active' => (int)($p['is_active'] ?? 0),
-                        'description' => $p['description'] ?? '',
-                        'specifications' => $p['specifications'] ?? '',
-                        'specs_decoded' => $specsDecoded,
+                        
+                        // Характеристики электродвигателя из отдельных полей
+                        'power_kw' => $p['power_kw'] ?? null,
+                        'rpm' => $p['rpm'] ?? null,
+                        'voltage_v' => $p['voltage_v'] ?? null,
+                        'frequency_hz' => $p['frequency_hz'] ?? 50,
+                        'efficiency_class' => $p['efficiency_class'] ?? null,
+                        'shaft_height_mm' => $p['shaft_height_mm'] ?? null,
+                        'frame_size' => $p['frame_size'] ?? null,
+                        'climate_versions' => $p['climate_versions'] ?? null,
+                        'mounting_versions' => $p['mounting_versions'] ?? null,
+                        'protection_class' => $p['protection_class'] ?? null,
+                        'motor_type' => $p['motor_type'] ?? null,
+                        'application' => $p['application'] ?? null,
+                        'housing_material' => $p['housing_material'] ?? null,
+                        'shaft_material' => $p['shaft_material'] ?? null,
+                        'explosion_protection' => $p['explosion_protection'] ?? null,
+                        'capacitor_included' => (bool)($p['capacitor_included'] ?? false),
+                        'standard' => $p['standard'] ?? 'ГОСТ',
+                        'weight_range_kg' => $p['weight_range_kg'] ?? null,
+                        'warranty_months' => $p['warranty_months'] ?? 24,
+                        'is_serial_tracked' => (bool)($p['is_serial_tracked'] ?? false),
+                        
                         'serial_number' => $p['serial_number'] ?? null,
                         'manufacture_date' => $p['manufacture_date'] ?? null,
                         'warranty_start' => $p['warranty_start'] ?? null,
@@ -201,7 +208,7 @@ $categories = $catStmt->fetchAll();
                     ?>
                     <tr class="table-row-clickable" onclick="openProductModal(<?= json_encode($productData, JSON_UNESCAPED_UNICODE) ?>)">
                         <td><code><?= e($p['article']) ?></code></td>
-                        <td><strong><?= e($p['name']) ?></strong></td>
+                        <td><strong><?= e($p['name_full']) ?></strong></td>
                         <td><?= e($p['category_name'] ?? '—') ?></td>
                         <td><?= e($p['unit_name'] ?? $p['unit'] ?? '—') ?></td>
                         <td><?= number_format($p['base_price'] ?? $p['price'], 2, ',', ' ') ?></td>
@@ -294,6 +301,9 @@ $categories = $catStmt->fetchAll();
             }
             html += '<div class="spec-row"><div class="spec-label">Серийный номер</div><div class="spec-value">' + escapeHtml(serialNumber) + '</div></div>';
             
+            if (product.code_gost) {
+                html += '<div class="spec-row"><div class="spec-label">ГОСТ</div><div class="spec-value">' + escapeHtml(product.code_gost) + '</div></div>';
+            }
             html += '<div class="spec-row"><div class="spec-label">Категория</div><div class="spec-value">' + (product.category_name || '—') + '</div></div>';
             html += '<div class="spec-row"><div class="spec-label">Ед. измерения</div><div class="spec-value">' + (product.unit_name || '—') + '</div></div>';
             html += '<div class="spec-row"><div class="spec-label">Цена</div><div class="spec-value">' + (product.base_price ? Number(product.base_price).toFixed(2).replace('.', ',') + ' BYN' : '—') + '</div></div>';
@@ -301,28 +311,69 @@ $categories = $catStmt->fetchAll();
             html += '</div>';
             html += '</div>';
             
-            // Технические характеристики из JSON (если есть декодированные данные)
-            if (product.specs_decoded && typeof product.specs_decoded === 'object') {
-                var specsObj = product.specs_decoded;
-                if (specsObj && typeof specsObj === 'object' && Object.keys(specsObj).length > 0) {
-                    html += '<div class="passport-section">';
-                    html += '<div class="passport-section-title">⚙️ Технические характеристики</div>';
-                    html += '<div class="specs-list">';
-                    for (var key in specsObj) {
-                        if (specsObj.hasOwnProperty(key)) {
-                            html += '<div class="spec-row">';
-                            html += '<div class="spec-label">' + escapeHtml(formatSpecName(key)) + '</div>';
-                            html += '<div class="spec-value">' + escapeHtml(String(specsObj[key])) + '</div>';
-                            html += '</div>';
-                        }
-                    }
-                    html += '</div>';
-                    html += '</div>';
-                }
-            } else if (product.specifications && product.specifications.trim() !== '') {
+            // Технические характеристики электродвигателя из отдельных полей
+            var hasSpecs = product.power_kw || product.rpm || product.voltage_v || product.shaft_height_mm || product.frame_size;
+            if (hasSpecs) {
                 html += '<div class="passport-section">';
-                html += '<div class="passport-section-title">⚙️ Характеристики</div>';
-                html += '<div class="spec-row"><div class="spec-value" style="white-space: pre-wrap;">' + escapeHtml(product.specifications) + '</div></div>';
+                html += '<div class="passport-section-title">⚙️ Технические характеристики</div>';
+                html += '<div class="specs-list">';
+                
+                if (product.power_kw) {
+                    html += '<div class="spec-row"><div class="spec-label">Мощность, кВт</div><div class="spec-value">' + escapeHtml(String(product.power_kw)) + '</div></div>';
+                }
+                if (product.rpm) {
+                    html += '<div class="spec-row"><div class="spec-label">Частота вращения, об/мин</div><div class="spec-value">' + escapeHtml(String(product.rpm)) + '</div></div>';
+                }
+                if (product.voltage_v) {
+                    html += '<div class="spec-row"><div class="spec-label">Напряжение, В</div><div class="spec-value">' + escapeHtml(product.voltage_v) + '</div></div>';
+                }
+                if (product.frequency_hz) {
+                    html += '<div class="spec-row"><div class="spec-label">Частота тока, Гц</div><div class="spec-value">' + escapeHtml(String(product.frequency_hz)) + '</div></div>';
+                }
+                if (product.efficiency_class) {
+                    html += '<div class="spec-row"><div class="spec-label">Класс энергоэффективности</div><div class="spec-value">' + escapeHtml(product.efficiency_class) + '</div></div>';
+                }
+                if (product.shaft_height_mm) {
+                    html += '<div class="spec-row"><div class="spec-label">Высота оси вращения, мм</div><div class="spec-value">' + escapeHtml(String(product.shaft_height_mm)) + '</div></div>';
+                }
+                if (product.frame_size) {
+                    html += '<div class="spec-row"><div class="spec-label">Типоразмер корпуса</div><div class="spec-value">' + escapeHtml(product.frame_size) + '</div></div>';
+                }
+                if (product.climate_versions) {
+                    html += '<div class="spec-row"><div class="spec-label">Климатическое исполнение</div><div class="spec-value">' + escapeHtml(product.climate_versions) + '</div></div>';
+                }
+                if (product.mounting_versions) {
+                    html += '<div class="spec-row"><div class="spec-label">Исполнение по монтажу</div><div class="spec-value">' + escapeHtml(product.mounting_versions) + '</div></div>';
+                }
+                if (product.protection_class) {
+                    html += '<div class="spec-row"><div class="spec-label">Класс защиты</div><div class="spec-value">' + escapeHtml(product.protection_class) + '</div></div>';
+                }
+                if (product.motor_type) {
+                    html += '<div class="spec-row"><div class="spec-label">Тип двигателя</div><div class="spec-value">' + escapeHtml(product.motor_type) + '</div></div>';
+                }
+                if (product.application) {
+                    html += '<div class="spec-row"><div class="spec-label">Область применения</div><div class="spec-value">' + escapeHtml(product.application) + '</div></div>';
+                }
+                if (product.housing_material) {
+                    html += '<div class="spec-row"><div class="spec-label">Материал корпуса</div><div class="spec-value">' + escapeHtml(product.housing_material) + '</div></div>';
+                }
+                if (product.shaft_material) {
+                    html += '<div class="spec-row"><div class="spec-label">Материал вала</div><div class="spec-value">' + escapeHtml(product.shaft_material) + '</div></div>';
+                }
+                if (product.explosion_protection) {
+                    html += '<div class="spec-row"><div class="spec-label">Взрывозащита</div><div class="spec-value">' + escapeHtml(product.explosion_protection) + '</div></div>';
+                }
+                if (product.capacitor_included) {
+                    html += '<div class="spec-row"><div class="spec-label">Конденсатор в комплекте</div><div class="spec-value">✓ Да</div></div>';
+                }
+                if (product.standard) {
+                    html += '<div class="spec-row"><div class="spec-label">Стандарт</div><div class="spec-value">' + escapeHtml(product.standard) + '</div></div>';
+                }
+                if (product.weight_range_kg) {
+                    html += '<div class="spec-row"><div class="spec-label">Вес, кг</div><div class="spec-value">' + escapeHtml(product.weight_range_kg) + '</div></div>';
+                }
+                
+                html += '</div>';
                 html += '</div>';
             }
             

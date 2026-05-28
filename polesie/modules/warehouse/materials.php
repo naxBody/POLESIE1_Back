@@ -51,7 +51,8 @@ try {
                    parent_cat.name as parent_category_name,
                    u.name as unit_name, 
                    u.symbol as unit_symbol,
-                   c.name as supplier_name
+                   c.name as supplier_name,
+                   m.current_stock as warehouse_quantity
             FROM materials m
             LEFT JOIN material_categories mc ON m.category_id = mc.id
             LEFT JOIN material_categories parent_cat ON mc.parent_id = parent_cat.id
@@ -140,6 +141,46 @@ if ($filterType !== '') {
     });
 }
 
+// Фильтр по стандарту
+$filterStandard = $_GET['standard'] ?? '';
+if ($filterStandard !== '') {
+    $filteredMaterials = array_filter($filteredMaterials, function($m) use ($filterStandard) {
+        return isset($m['standard']) && $m['standard'] === $filterStandard;
+    });
+}
+
+// Фильтр по форме
+$filterForm = $_GET['form'] ?? '';
+if ($filterForm !== '') {
+    $filteredMaterials = array_filter($filteredMaterials, function($m) use ($filterForm) {
+        return isset($m['material_type']) && $m['material_type'] === $filterForm;
+    });
+}
+
+// Фильтр по критичности
+$filterCritical = $_GET['critical'] ?? '';
+if ($filterCritical !== '') {
+    $filteredMaterials = array_filter($filteredMaterials, function($m) use ($filterCritical) {
+        if ($filterCritical === '1') {
+            return !empty($m['is_critical']);
+        } else {
+            return empty($m['is_critical']);
+        }
+    });
+}
+
+// Фильтр по сертификату
+$filterCert = $_GET['cert'] ?? '';
+if ($filterCert !== '') {
+    $filteredMaterials = array_filter($filteredMaterials, function($m) use ($filterCert) {
+        if ($filterCert === '1') {
+            return !empty($m['requires_cert']);
+        } else {
+            return empty($m['requires_cert']);
+        }
+    });
+}
+
 // Сортировка
 $sortBy = $_GET['sort'] ?? 'name';
 $sortOrder = $_GET['order'] ?? 'asc';
@@ -165,7 +206,8 @@ usort($filteredMaterials, function($a, $b) use ($sortBy, $sortOrder) {
     return $sortOrder === 'desc' ? -$result : $result;
 });
 
-// Подготовка данных о комбинациях свойств для JS
+// Подготовка данных о комбинациях свойств для JS (пустой массив, т.к. данные берутся из БД)
+$availableCombinations = [];
 $availableCombinationsJson = json_encode($availableCombinations, JSON_UNESCAPED_UNICODE);
 ?>
 <!DOCTYPE html>

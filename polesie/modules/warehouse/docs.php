@@ -166,12 +166,12 @@ foreach ($materialCategories as $category) {
         'category_ru' => $catName,
         'subcategory_ru' => $catName,
         'pattern' => $catCode . '-XXX-XX',
-        'description_ru' => 'Format: ' . $catCode . '-[number]-[parameters]',
+        'description_ru' => 'Формат: ' . $catCode . '-[номер]-[параметры]',
         'examples' => [$catCode . '-001-10', $catCode . '-002-15'],
         'example_detailed_decoding' => [
-            $catCode . ' - material category',
-            '001 - serial number in category',
-            '10 - main parameter (diameter/cross-section)'
+            $catCode . ' — категория материала',
+            '001 — порядковый номер в категории',
+            '10 — основной параметр (диаметр/сечение)'
         ]
     ];
     
@@ -186,42 +186,42 @@ foreach ($materialCategories as $category) {
         if (strpos($subCode, 'BOLT') !== false) {
             $example = 'BOLT-M10x50';
             $decoding = [
-                'BOLT - bolt type',
-                'M10 - metric thread 10mm diameter',
-                'x50 - bolt length 50mm'
+                'BOLT — болт крепежный',
+                'M10 — метрическая резьба диаметром 10 мм',
+                'x50 — длина болта 50 мм'
             ];
         } elseif (strpos($subCode, 'NUT') !== false) {
             $example = 'NUT-M10';
             $decoding = [
-                'NUT - nut type',
-                'M10 - metric thread 10mm diameter'
+                'NUT — гайка шестигранная',
+                'M10 — метрическая резьба диаметром 10 мм'
             ];
         } elseif (strpos($subCode, 'WASHER') !== false) {
             $example = 'WASHER-10';
             $decoding = [
-                'WASHER - washer type',
-                '10 - inner diameter 10mm'
+                'WASHER — шайба плоская',
+                '10 — внутренний диаметр 10 мм'
             ];
         } elseif (strpos($subCode, 'WIRE') !== false) {
             $example = 'WIRE-CU-2.5';
             $decoding = [
-                'WIRE - wire type',
-                'CU - copper material',
-                '2.5 - cross section 2.5 mm²'
+                'WIRE — провод медный',
+                'CU — медь электротехническая',
+                '2.5 — сечение провода 2.5 мм²'
             ];
         } elseif (strpos($subCode, 'BAR') !== false) {
             $example = 'ST-BAR-45-20';
             $decoding = [
-                'ST - steel',
-                'BAR - bar type',
-                '45 - steel grade 45',
-                '20 - diameter 20mm'
+                'ST — сталь конструкционная',
+                'BAR — пруток шлифованный',
+                '45 — сталь марки 45',
+                '20 — диаметр прутка 20 мм'
             ];
         } else {
             $example = $subCode . '-001';
             $decoding = [
-                $subCode . ' - category code',
-                '001 - serial number'
+                $subCode . ' — код категории',
+                '001 — порядковый номер'
             ];
         }
         
@@ -229,7 +229,7 @@ foreach ($materialCategories as $category) {
             'category_ru' => $catName,
             'subcategory_ru' => $subName,
             'pattern' => $subCode . '-XXX-XX',
-            'description_ru' => 'Format: ' . $subCode . '-[parameters]',
+            'description_ru' => 'Формат: ' . $subCode . '-[параметры]',
             'examples' => [$example],
             'example_detailed_decoding' => $decoding
         ];

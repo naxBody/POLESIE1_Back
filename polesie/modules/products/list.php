@@ -222,6 +222,24 @@ try {
     $categories = [];
 }
 
+// Получение шаблонов свойств для всех категорий
+try {
+    $templatesStmt = $pdo->query("SELECT category_id, code, name, property_type, unit, sort_order FROM product_property_templates ORDER BY category_id, sort_order");
+    $propertyTemplates = $templatesStmt->fetchAll();
+    
+    // Группируем шаблоны по category_id
+    $templatesByCategory = [];
+    foreach ($templatesStmt->fetchAll() as $tmpl) {
+        if (!isset($templatesByCategory[$tmpl['category_id']])) {
+            $templatesByCategory[$tmpl['category_id']] = [];
+        }
+        $templatesByCategory[$tmpl['category_id']][] = $tmpl;
+    }
+} catch (Exception $e) {
+    error_log("Ошибка при загрузке шаблонов свойств: " . $e->getMessage());
+    $templatesByCategory = [];
+}
+
 error_log("Всего категорий продукции: " . count($categories));
 ?>
 <!DOCTYPE html>

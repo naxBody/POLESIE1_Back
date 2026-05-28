@@ -69,17 +69,51 @@ try {
                 }
             }
             
+            // Полная обработка русскоязычных ключей БД (как в products/list.php)
+            // Мощность
+            if (isset($specs['мощность_квт'])) {
+                $prod['power_kw'] = is_numeric($specs['мощность_квт']) ? floatval($specs['мощность_квт']) : $specs['мощность_квт'];
+            }
+            // Обороты
+            if (isset($specs['обороты_мин'])) {
+                $prod['rpm'] = is_numeric($specs['обороты_мин']) ? intval($specs['обороты_мин']) : $specs['обороты_мин'];
+            }
+            // Напряжение
+            if (isset($specs['напряжение_в'])) {
+                $prod['voltage_v'] = is_numeric($specs['напряжение_в']) ? intval($specs['напряжение_в']) : $specs['напряжение_в'];
+            }
+            // Класс эффективности
+            if (isset($specs['класс_эффективности'])) {
+                $prod['efficiency_class'] = strval($specs['класс_эффективности']);
+            }
+            // Высота оси
+            if (isset($specs['высота_оси_мм'])) {
+                $prod['shaft_height_mm'] = is_numeric($specs['высота_оси_мм']) ? floatval($specs['высота_оси_мм']) : $specs['высота_оси_мм'];
+            }
+            // Габарит
+            if (isset($specs['габарит'])) {
+                $prod['frame_size'] = strval($specs['габарит']);
+            }
+            // Монтаж
+            if (isset($specs['монтаж'])) {
+                $prod['mounting_versions'] = strval($specs['монтаж']);
+            }
+            // Степень защиты
+            if (isset($specs['степень_защиты'])) {
+                $prod['protection_class'] = strval($specs['степень_защиты']);
+            }
+            
             // Маппинг русскоязычных ключей БД в английские для отображения
             // мощность_квт -> power_kw, обороты_мин -> rpm, и т.д.
             $powerKw = !empty($prod['power_kw']) ? $prod['power_kw'] : ($specs['power_kw'] ?? $specs['мощность_квт'] ?? null);
             $rpm = !empty($prod['rpm']) ? $prod['rpm'] : ($specs['rpm'] ?? $specs['обороты_мин'] ?? null);
-            $voltageV = $specs['voltage_v'] ?? $specs['напряжение_в'] ?? null;
+            $voltageV = !empty($prod['voltage_v']) ? $prod['voltage_v'] : ($specs['voltage_v'] ?? $specs['напряжение_в'] ?? null);
             $efficiencyClass = !empty($prod['efficiency_class']) ? $prod['efficiency_class'] : ($specs['efficiency_class'] ?? $specs['класс_эффективности'] ?? null);
-            $shaftHeightMm = $specs['shaft_height_mm'] ?? $specs['высота_оси_мм'] ?? $specs['габарит'] ?? null;
+            $shaftHeightMm = !empty($prod['shaft_height_mm']) ? $prod['shaft_height_mm'] : ($specs['shaft_height_mm'] ?? $specs['высота_оси_мм'] ?? $specs['габарит'] ?? null);
             
             // Защита от null значений
             $protectionClassInput = !empty($prod['protection_class']) ? $prod['protection_class'] : ($specs['protection_class'] ?? $specs['степень_защиты'] ?? '');
-            $mountingVersionsInput = isset($specs['mounting_versions']) ? $specs['mounting_versions'] : (isset($specs['монтаж']) ? $specs['монтаж'] : '');
+            $mountingVersionsInput = !empty($prod['mounting_versions']) ? $prod['mounting_versions'] : (isset($specs['mounting_versions']) ? $specs['mounting_versions'] : (isset($specs['монтаж']) ? $specs['монтаж'] : ''));
             
             $protectionClass = !empty($protectionClassInput) ? $protectionClassInput : '';
             $mountingVersions = !empty($mountingVersionsInput) ? $mountingVersionsInput : '';
@@ -153,15 +187,15 @@ foreach ($allProducts as $prod) {
         $rpmValues[] = $specs['rpm'];
     }
     if (!empty($specs['protection_class'])) {
-        foreach ($specs['protection_class'] as $pc) {
-            if (!in_array($pc, $protectionClasses)) {
+        foreach ((is_array($specs['protection_class']) ? $specs['protection_class'] : [$specs['protection_class']]) as $pc) {
+            if (!empty($pc) && !in_array($pc, $protectionClasses)) {
                 $protectionClasses[] = $pc;
             }
         }
     }
     if (!empty($specs['mounting_versions'])) {
-        foreach ($specs['mounting_versions'] as $mv) {
-            if (!in_array($mv, $mountingVersions)) {
+        foreach ((is_array($specs['mounting_versions']) ? $specs['mounting_versions'] : [$specs['mounting_versions']]) as $mv) {
+            if (!empty($mv) && !in_array($mv, $mountingVersions)) {
                 $mountingVersions[] = $mv;
             }
         }
@@ -974,7 +1008,7 @@ if ($filterCategory !== '') {
                         $specs = $product['specs'] ?? [];
                         $displaySpecs = [];
                         
-                        // Мощность
+                        // Мощность - проверяем все возможные ключи
                         $powerKw = $specs['power_kw'] ?? $specs['мощность_квт'] ?? null;
                         $powerKwMin = $specs['power_kw_min'] ?? $specs['мощность_квт_min'] ?? null;
                         $powerKwMax = $specs['power_kw_max'] ?? $specs['мощность_квт_max'] ?? null;
@@ -987,41 +1021,81 @@ if ($filterCategory !== '') {
                                 $powerRange = $powerKwMin . '-' . $powerKwMax . ' кВт';
                             } elseif (!empty($powerKwMin)) {
                                 $powerRange = $powerKwMin . ' кВт';
+                            } elseif (!empty($powerKwMax)) {
+                                $powerRange = $powerKwMax . ' кВт';
                             }
                             if ($powerRange) {
                                 $displaySpecs[] = ['label' => 'Мощность', 'value' => $powerRange];
                             }
                         }
                         
-                        // Обороты
+                        // Обороты - проверяем все возможные ключи
                         $rpm = $specs['rpm'] ?? $specs['обороты_мин'] ?? null;
                         if (!empty($rpm)) {
                             $displaySpecs[] = ['label' => 'Обороты', 'value' => $rpm . ' об/мин'];
                         }
                         
-                        // Высота оси
+                        // Высота оси - проверяем все возможные ключи
                         $shaftHeight = $specs['shaft_height_mm'] ?? $specs['высота_оси_мм'] ?? $specs['габарит'] ?? null;
                         if (!empty($shaftHeight)) {
                             $displaySpecs[] = ['label' => 'Высота оси', 'value' => $shaftHeight . ' мм'];
                         }
                         
-                        // Класс энергоэффективности
+                        // Класс энергоэффективности - проверяем все возможные ключи
                         $efficiencyClass = $specs['efficiency_class'] ?? $specs['класс_эффективности'] ?? null;
                         if (!empty($efficiencyClass)) {
                             $displaySpecs[] = ['label' => 'Класс энергоэффективности', 'value' => $efficiencyClass];
                         }
                         
-                        // Напряжение
+                        // Напряжение - проверяем все возможные ключи
                         $voltageV = $specs['voltage_v'] ?? $specs['напряжение_в'] ?? null;
                         if (!empty($voltageV)) {
                             $displaySpecs[] = ['label' => 'Напряжение', 'value' => $voltageV . ' В'];
                         }
                         
-                        // Класс защиты
+                        // Класс защиты - проверяем все возможные ключи и форматы
                         $protectionClass = $specs['protection_class'] ?? $specs['степень_защиты'] ?? null;
                         if (!empty($protectionClass)) {
                             $protectionValue = is_array($protectionClass) ? implode(', ', $protectionClass) : $protectionClass;
                             $displaySpecs[] = ['label' => 'Класс защиты', 'value' => $protectionValue];
+                        }
+                        
+                        // Варианты монтажа - проверяем все возможные ключи
+                        $mountingVersions = $specs['mounting_versions'] ?? $specs['монтаж'] ?? null;
+                        if (!empty($mountingVersions)) {
+                            $mountingValue = is_array($mountingVersions) ? implode(', ', $mountingVersions) : $mountingVersions;
+                            $displaySpecs[] = ['label' => 'Варианты монтажа', 'value' => $mountingValue];
+                        }
+                        
+                        // Частота
+                        $frequencyHz = $specs['frequency_hz'] ?? $specs['частота_гц'] ?? null;
+                        if (!empty($frequencyHz)) {
+                            $displaySpecs[] = ['label' => 'Частота', 'value' => $frequencyHz . ' Гц'];
+                        }
+                        
+                        // Климатическое исполнение
+                        $climateVersions = $specs['climate_versions'] ?? $specs['климатическое_исполнение'] ?? null;
+                        if (!empty($climateVersions)) {
+                            $climateValue = is_array($climateVersions) ? implode(', ', $climateVersions) : $climateVersions;
+                            $displaySpecs[] = ['label' => 'Климатическое исполнение', 'value' => $climateValue];
+                        }
+                        
+                        // Вес
+                        $weightKg = $specs['weight_kg'] ?? $specs['вес_кг'] ?? null;
+                        if (!empty($weightKg)) {
+                            $displaySpecs[] = ['label' => 'Вес', 'value' => $weightKg . ' кг'];
+                        }
+                        
+                        // Материал корпуса
+                        $housingMaterial = $specs['housing_material'] ?? $specs['материал_корпуса'] ?? null;
+                        if (!empty($housingMaterial)) {
+                            $displaySpecs[] = ['label' => 'Материал корпуса', 'value' => $housingMaterial];
+                        }
+                        
+                        // Тип двигателя
+                        $motorType = $specs['motor_type'] ?? $specs['тип_двигателя'] ?? null;
+                        if (!empty($motorType)) {
+                            $displaySpecs[] = ['label' => 'Тип двигателя', 'value' => $motorType];
                         }
                         
                         foreach ($displaySpecs as $spec):
@@ -1169,66 +1243,114 @@ if ($filterCategory !== '') {
                 
                 var specs = product.specs;
                 
-                if (specs.power_kw !== undefined) {
-                    html += '<div class="spec-row"><span class="spec-label">Мощность:</span><span class="spec-value">' + specs.power_kw + ' кВт</span></div>';
-                } else if (specs.power_kw_min !== undefined || specs.power_kw_max !== undefined) {
+                // Мощность с поддержкой русских ключей
+                if (specs.power_kw !== undefined || specs['мощность_квт'] !== undefined) {
+                    var powerVal = specs.power_kw !== undefined ? specs.power_kw : specs['мощность_квт'];
+                    html += '<div class="spec-row"><span class="spec-label">Мощность:</span><span class="spec-value">' + powerVal + ' кВт</span></div>';
+                } else if (specs.power_kw_min !== undefined || specs.power_kw_max !== undefined || specs['мощность_квт_min'] !== undefined || specs['мощность_квт_max'] !== undefined) {
+                    var powerMin = specs.power_kw_min !== undefined ? specs.power_kw_min : (specs['мощность_квт_min'] !== undefined ? specs['мощность_квт_min'] : null);
+                    var powerMax = specs.power_kw_max !== undefined ? specs.power_kw_max : (specs['мощность_квт_max'] !== undefined ? specs['мощность_квт_max'] : null);
                     var powerRange = '';
-                    if (specs.power_kw_min !== undefined && specs.power_kw_max !== undefined) {
-                        powerRange = specs.power_kw_min + ' - ' + specs.power_kw_max + ' кВт';
-                    } else if (specs.power_kw_min !== undefined) {
-                        powerRange = specs.power_kw_min + ' кВт';
+                    if (powerMin !== null && powerMax !== null) {
+                        powerRange = powerMin + ' - ' + powerMax + ' кВт';
+                    } else if (powerMin !== null) {
+                        powerRange = powerMin + ' кВт';
+                    } else if (powerMax !== null) {
+                        powerRange = powerMax + ' кВт';
                     }
                     if (powerRange) {
                         html += '<div class="spec-row"><span class="spec-label">Мощность:</span><span class="spec-value">' + powerRange + '</span></div>';
                     }
                 }
                 
-                if (specs.rpm !== undefined) {
-                    html += '<div class="spec-row"><span class="spec-label">Обороты:</span><span class="spec-value">' + specs.rpm + ' об/мин</span></div>';
+                // Обороты с поддержкой русских ключей
+                if (specs.rpm !== undefined || specs['обороты_мин'] !== undefined) {
+                    var rpmVal = specs.rpm !== undefined ? specs.rpm : specs['обороты_мин'];
+                    html += '<div class="spec-row"><span class="spec-label">Обороты:</span><span class="spec-value">' + rpmVal + ' об/мин</span></div>';
                 }
-                if (specs.shaft_height_mm !== undefined) {
-                    html += '<div class="spec-row"><span class="spec-label">Высота оси:</span><span class="spec-value">' + specs.shaft_height_mm + ' мм</span></div>';
+                
+                // Высота оси с поддержкой русских ключей
+                if (specs.shaft_height_mm !== undefined || specs['высота_оси_мм'] !== undefined || specs['габарит'] !== undefined) {
+                    var shaftVal = specs.shaft_height_mm !== undefined ? specs.shaft_height_mm : (specs['высота_оси_мм'] !== undefined ? specs['высота_оси_мм'] : specs['габарит']);
+                    html += '<div class="spec-row"><span class="spec-label">Высота оси:</span><span class="spec-value">' + shaftVal + ' мм</span></div>';
                 }
-                if (specs.efficiency_class !== undefined) {
-                    html += '<div class="spec-row"><span class="spec-label">Класс энергоэффективности:</span><span class="spec-value">' + specs.efficiency_class + '</span></div>';
+                
+                // Класс энергоэффективности с поддержкой русских ключей
+                if (specs.efficiency_class !== undefined || specs['класс_эффективности'] !== undefined) {
+                    var effVal = specs.efficiency_class !== undefined ? specs.efficiency_class : specs['класс_эффективности'];
+                    html += '<div class="spec-row"><span class="spec-label">Класс энергоэффективности:</span><span class="spec-value">' + escapeHtml(String(effVal)) + '</span></div>';
                 }
-                if (specs.voltage_v !== undefined) {
-                    html += '<div class="spec-row"><span class="spec-label">Напряжение:</span><span class="spec-value">' + specs.voltage_v + ' В</span></div>';
+                
+                // Напряжение с поддержкой русских ключей
+                if (specs.voltage_v !== undefined || specs['напряжение_в'] !== undefined) {
+                    var voltVal = specs.voltage_v !== undefined ? specs.voltage_v : specs['напряжение_в'];
+                    html += '<div class="spec-row"><span class="spec-label">Напряжение:</span><span class="spec-value">' + voltVal + ' В</span></div>';
                 }
-                if (specs.frequency_hz !== undefined) {
-                    html += '<div class="spec-row"><span class="spec-label">Частота:</span><span class="spec-value">' + specs.frequency_hz + ' Гц</span></div>';
+                
+                // Частота с поддержкой русских ключей
+                if (specs.frequency_hz !== undefined || specs['частота_гц'] !== undefined) {
+                    var freqVal = specs.frequency_hz !== undefined ? specs.frequency_hz : specs['частота_гц'];
+                    html += '<div class="spec-row"><span class="spec-label">Частота:</span><span class="spec-value">' + freqVal + ' Гц</span></div>';
                 }
-                if (specs.protection_class !== undefined) {
-                    var protectionValue = Array.isArray(specs.protection_class) ? specs.protection_class.join(', ') : specs.protection_class;
+                
+                // Класс защиты с поддержкой русских ключей
+                if (specs.protection_class !== undefined || specs['степень_защиты'] !== undefined) {
+                    var protVal = specs.protection_class !== undefined ? specs.protection_class : specs['степень_защиты'];
+                    var protectionValue = Array.isArray(protVal) ? protVal.join(', ') : protVal;
                     html += '<div class="spec-row"><span class="spec-label">Класс защиты:</span><span class="spec-value">' + escapeHtml(protectionValue) + '</span></div>';
                 }
-                if (specs.mounting_versions !== undefined) {
-                    var mountingValue = Array.isArray(specs.mounting_versions) ? specs.mounting_versions.join(', ') : specs.mounting_versions;
+                
+                // Варианты монтажа с поддержкой русских ключей
+                if (specs.mounting_versions !== undefined || specs['монтаж'] !== undefined) {
+                    var mountVal = specs.mounting_versions !== undefined ? specs.mounting_versions : specs['монтаж'];
+                    var mountingValue = Array.isArray(mountVal) ? mountVal.join(', ') : mountVal;
                     html += '<div class="spec-row"><span class="spec-label">Варианты монтажа:</span><span class="spec-value">' + escapeHtml(mountingValue) + '</span></div>';
                 }
-                if (specs.climate_versions !== undefined) {
-                    var climateValue = Array.isArray(specs.climate_versions) ? specs.climate_versions.join(', ') : specs.climate_versions;
-                    html += '<div class="spec-row"><span class="spec-label">Климатические исполнения:</span><span class="spec-value">' + escapeHtml(climateValue) + '</span></div>';
+                
+                // Климатическое исполнение с поддержкой русских ключей
+                if (specs.climate_versions !== undefined || specs['климатическое_исполнение'] !== undefined) {
+                    var climateVal = specs.climate_versions !== undefined ? specs.climate_versions : specs['климатическое_исполнение'];
+                    var climateValue = Array.isArray(climateVal) ? climateVal.join(', ') : climateVal;
+                    html += '<div class="spec-row"><span class="spec-label">Климатическое исполнение:</span><span class="spec-value">' + escapeHtml(climateValue) + '</span></div>';
                 }
-                if (specs.application !== undefined) {
-                    html += '<div class="spec-row"><span class="spec-label">Назначение:</span><span class="spec-value">' + escapeHtml(specs.application) + '</span></div>';
+                
+                // Вес с поддержкой русских ключей
+                if (specs.weight_kg !== undefined || specs['вес_кг'] !== undefined) {
+                    var weightVal = specs.weight_kg !== undefined ? specs.weight_kg : specs['вес_кг'];
+                    html += '<div class="spec-row"><span class="spec-label">Вес:</span><span class="spec-value">' + weightVal + ' кг</span></div>';
                 }
-                if (specs.flow_rate_m3_h !== undefined) {
-                    html += '<div class="spec-row"><span class="spec-label">Производительность:</span><span class="spec-value">' + specs.flow_rate_m3_h + ' м³/ч</span></div>';
+                
+                // Материал корпуса с поддержкой русских ключей
+                if (specs.housing_material !== undefined || specs['материал_корпуса'] !== undefined) {
+                    var housingVal = specs.housing_material !== undefined ? specs.housing_material : specs['материал_корпуса'];
+                    html += '<div class="spec-row"><span class="spec-label">Материал корпуса:</span><span class="spec-value">' + escapeHtml(housingVal) + '</span></div>';
                 }
-                if (specs.head_m !== undefined) {
-                    html += '<div class="spec-row"><span class="spec-label">Напор:</span><span class="spec-value">' + specs.head_m + ' м</span></div>';
+                
+                // Тип двигателя с поддержкой русских ключей
+                if (specs.motor_type !== undefined || specs['тип_двигателя'] !== undefined) {
+                    var motorVal = specs.motor_type !== undefined ? specs.motor_type : specs['тип_двигателя'];
+                    html += '<div class="spec-row"><span class="spec-label">Тип двигателя:</span><span class="spec-value">' + escapeHtml(motorVal) + '</span></div>';
                 }
-                if (specs.housing_material !== undefined) {
-                    html += '<div class="spec-row"><span class="spec-label">Материал корпуса:</span><span class="spec-value">' + escapeHtml(specs.housing_material) + '</span></div>';
+                if (specs.flow_rate_m3_h !== undefined || specs['производительность_м3ч'] !== undefined) {
+                    var flowVal = specs.flow_rate_m3_h !== undefined ? specs.flow_rate_m3_h : specs['производительность_м3ч'];
+                    html += '<div class="spec-row"><span class="spec-label">Производительность:</span><span class="spec-value">' + flowVal + ' м³/ч</span></div>';
                 }
-                if (specs.explosion_protection !== undefined) {
-                    html += '<div class="spec-row"><span class="spec-label">Вид взрывозащиты:</span><span class="spec-value">' + escapeHtml(specs.explosion_protection) + '</span></div>';
+                if (specs.head_m !== undefined || specs['напор_м'] !== undefined) {
+                    var headVal = specs.head_m !== undefined ? specs.head_m : specs['напор_м'];
+                    html += '<div class="spec-row"><span class="spec-label">Напор:</span><span class="spec-value">' + headVal + ' м</span></div>';
+                }
+                if (specs.explosion_protection !== undefined || specs['взрывозащита'] !== undefined) {
+                    var explVal = specs.explosion_protection !== undefined ? specs.explosion_protection : specs['взрывозащита'];
+                    html += '<div class="spec-row"><span class="spec-label">Вид взрывозащиты:</span><span class="spec-value">' + escapeHtml(explVal) + '</span></div>';
+                }
+                if (specs.application !== undefined || specs['область_применения'] !== undefined) {
+                    var appVal = specs.application !== undefined ? specs.application : specs['область_применения'];
+                    html += '<div class="spec-row"><span class="spec-label">Назначение:</span><span class="spec-value">' + escapeHtml(appVal) + '</span></div>';
                 }
                 
                 // Другие спецификации
                 for (var key in specs) {
-                    if (!['power_kw', 'power_kw_min', 'power_kw_max', 'rpm', 'shaft_height_mm', 'efficiency_class', 'voltage_v', 'frequency_hz', 'protection_class', 'mounting_versions', 'climate_versions', 'application', 'flow_rate_m3_h', 'head_m', 'housing_material', 'explosion_protection'].includes(key)) {
+                    if (!['power_kw', 'power_kw_min', 'power_kw_max', 'мощность_квт', 'мощность_квт_min', 'мощность_квт_max', 'rpm', 'обороты_мин', 'shaft_height_mm', 'высота_оси_мм', 'габарит', 'efficiency_class', 'класс_эффективности', 'voltage_v', 'напряжение_в', 'frequency_hz', 'частота_гц', 'protection_class', 'степень_защиты', 'mounting_versions', 'монтаж', 'climate_versions', 'климатическое_исполнение', 'application', 'область_применения', 'flow_rate_m3_h', 'производительность_м3ч', 'head_m', 'напор_м', 'housing_material', 'материал_корпуса', 'explosion_protection', 'взрывозащита', 'weight_kg', 'вес_кг', 'motor_type', 'тип_двигателя'].includes(key)) {
                         var value = specs[key];
                         if (Array.isArray(value)) {
                             value = value.join(', ');

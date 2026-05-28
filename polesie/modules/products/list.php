@@ -19,7 +19,27 @@ $pageTitle = 'Продукция';
 $search = $_GET['search'] ?? '';
 $category = $_GET['category'] ?? '';
 
-$sql = "SELECT p.*, c.name as category_name, u.symbol as unit_name 
+$sql = "SELECT p.*, c.name as category_name, u.symbol as unit_name,
+               -- Извлекаем данные из JSON specifications (поддержка русских ключей)
+               JSON_EXTRACT(p.specifications, '$.мощность_квт') as power_kw,
+               JSON_EXTRACT(p.specifications, '$.обороты_мин') as rpm,
+               JSON_EXTRACT(p.specifications, '$.напряжение_в') as voltage_v,
+               JSON_EXTRACT(p.specifications, '$.частота_гц') as frequency_hz,
+               JSON_EXTRACT(p.specifications, '$.класс_эффективности') as efficiency_class,
+               JSON_EXTRACT(p.specifications, '$.высота_оси_мм') as shaft_height_mm,
+               JSON_EXTRACT(p.specifications, '$.габарит') as frame_size,
+               JSON_EXTRACT(p.specifications, '$.климатическое_исполнение') as climate_versions,
+               JSON_EXTRACT(p.specifications, '$.монтаж') as mounting_versions,
+               JSON_EXTRACT(p.specifications, '$.степень_защиты') as protection_class,
+               JSON_EXTRACT(p.specifications, '$.тип_двигателя') as motor_type,
+               JSON_EXTRACT(p.specifications, '$.область_применения') as application,
+               JSON_EXTRACT(p.specifications, '$.материал_корпуса') as housing_material,
+               JSON_EXTRACT(p.specifications, '$.материал_вала') as shaft_material,
+               JSON_EXTRACT(p.specifications, '$.взрывозащита') as explosion_protection,
+               JSON_EXTRACT(p.specifications, '$.конденсатор_в_комплекте') as capacitor_included,
+               JSON_EXTRACT(p.specifications, '$.стандарт') as standard,
+               JSON_EXTRACT(p.specifications, '$.вес_кг') as weight_range_kg,
+               JSON_EXTRACT(p.specifications, '$.гарантия_мес') as warranty_months
         FROM products p 
         LEFT JOIN product_categories c ON p.category_id = c.id 
         LEFT JOIN base_units u ON p.base_unit_id = u.id
@@ -79,6 +99,68 @@ try {
 error_log("Начинаем обработку " . count($products) . " продуктов");
 foreach ($products as &$product) {
     error_log("Обработка продукта ID=" . $product['id'] . ", name=" . ($product['name_full'] ?? $product['name_short'] ?? $product['name'] ?? 'N/A'));
+    
+    // Преобразуем JSON значения в обычные строки/числа (аналогично materials.php)
+    // Извлеченные из JSON specifications значения могут быть в формате JSON строк
+    
+    // Обработка числовых и строковых характеристик
+    if (isset($product['power_kw']) && is_string($product['power_kw'])) {
+        $product['power_kw'] = floatval(trim($product['power_kw'], '"'));
+    }
+    if (isset($product['rpm']) && is_string($product['rpm'])) {
+        $product['rpm'] = intval(trim($product['rpm'], '"'));
+    }
+    if (isset($product['voltage_v']) && is_string($product['voltage_v'])) {
+        $product['voltage_v'] = intval(trim($product['voltage_v'], '"'));
+    }
+    if (isset($product['frequency_hz']) && is_string($product['frequency_hz'])) {
+        $product['frequency_hz'] = intval(trim($product['frequency_hz'], '"'));
+    }
+    if (isset($product['efficiency_class']) && is_string($product['efficiency_class'])) {
+        $product['efficiency_class'] = trim($product['efficiency_class'], '"');
+    }
+    if (isset($product['shaft_height_mm']) && is_string($product['shaft_height_mm'])) {
+        $product['shaft_height_mm'] = floatval(trim($product['shaft_height_mm'], '"'));
+    }
+    if (isset($product['frame_size']) && is_string($product['frame_size'])) {
+        $product['frame_size'] = trim($product['frame_size'], '"');
+    }
+    if (isset($product['climate_versions']) && is_string($product['climate_versions'])) {
+        $product['climate_versions'] = trim($product['climate_versions'], '"');
+    }
+    if (isset($product['mounting_versions']) && is_string($product['mounting_versions'])) {
+        $product['mounting_versions'] = trim($product['mounting_versions'], '"');
+    }
+    if (isset($product['protection_class']) && is_string($product['protection_class'])) {
+        $product['protection_class'] = trim($product['protection_class'], '"');
+    }
+    if (isset($product['motor_type']) && is_string($product['motor_type'])) {
+        $product['motor_type'] = trim($product['motor_type'], '"');
+    }
+    if (isset($product['application']) && is_string($product['application'])) {
+        $product['application'] = trim($product['application'], '"');
+    }
+    if (isset($product['housing_material']) && is_string($product['housing_material'])) {
+        $product['housing_material'] = trim($product['housing_material'], '"');
+    }
+    if (isset($product['shaft_material']) && is_string($product['shaft_material'])) {
+        $product['shaft_material'] = trim($product['shaft_material'], '"');
+    }
+    if (isset($product['explosion_protection']) && is_string($product['explosion_protection'])) {
+        $product['explosion_protection'] = trim($product['explosion_protection'], '"');
+    }
+    if (isset($product['capacitor_included']) && is_string($product['capacitor_included'])) {
+        $product['capacitor_included'] = trim($product['capacitor_included'], '"') === 'true' || trim($product['capacitor_included'], '"') === '1';
+    }
+    if (isset($product['standard']) && is_string($product['standard'])) {
+        $product['standard'] = trim($product['standard'], '"');
+    }
+    if (isset($product['weight_range_kg']) && is_string($product['weight_range_kg'])) {
+        $product['weight_range_kg'] = floatval(trim($product['weight_range_kg'], '"'));
+    }
+    if (isset($product['warranty_months']) && is_string($product['warranty_months'])) {
+        $product['warranty_months'] = intval(trim($product['warranty_months'], '"'));
+    }
     
     // Получение последнего серийного номера для продукта
     try {

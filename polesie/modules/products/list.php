@@ -159,7 +159,7 @@ error_log("Всего категорий продукции: " . count($categori
                 </div>
             </form>
 
-            <table class="data-table">
+            <table class="table">
                 <thead>
                     <tr>
                         <th>Артикул</th>

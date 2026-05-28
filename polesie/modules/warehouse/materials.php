@@ -49,8 +49,10 @@ try {
         $sql = "SELECT m.*, 
                        m.current_stock as warehouse_quantity,
                        mc.name as category_name, 
+                       mc.name_ru as category_name_ru,
                        mc.parent_id as category_parent_id,
                        parent_cat.name as parent_category_name,
+                       parent_cat.name_ru as parent_category_name_ru,
                        u.name as unit_name, 
                        u.symbol as unit_symbol,
                        COALESCE(u.name, 'шт') as base_unit,
@@ -304,13 +306,13 @@ if ($filterSearch !== '') {
         // Поиск по коду материала
         $searchInCode = stripos($m['code'], $filterSearch) !== false;
         
-        // Поиск по категории
+        // Поиск по категории (используем русские названия)
         $searchInCategory = false;
-        if (!empty($m['parent_category_name'])) {
-            $searchInCategory = stripos($m['parent_category_name'], $filterSearch) !== false;
+        if (!empty($m['parent_category_name_ru'])) {
+            $searchInCategory = stripos($m['parent_category_name_ru'], $filterSearch) !== false;
         }
-        if (!$searchInCategory && !empty($m['category_name'])) {
-            $searchInCategory = stripos($m['category_name'], $filterSearch) !== false;
+        if (!$searchInCategory && !empty($m['category_name_ru'])) {
+            $searchInCategory = stripos($m['category_name_ru'], $filterSearch) !== false;
         }
         
         // Поиск по марке материала
@@ -470,7 +472,8 @@ usort($filteredMaterials, function($a, $b) use ($sortBy, $sortOrder) {
             $result = strcmp($a['code'], $b['code']);
             break;
         case 'category':
-            $result = strcmp($a['parent_category_name'] ?? $a['category_name'] ?? '', $b['parent_category_name'] ?? $b['category_name'] ?? '');
+            // Сортировка по категории (русские названия)
+            $result = strcmp($a['parent_category_name_ru'] ?? $a['category_name_ru'] ?? '', $b['parent_category_name_ru'] ?? $b['category_name_ru'] ?? '');
             break;
         case 'grade':
             $gradeA = $a['grade'] ?? '';
@@ -1284,8 +1287,8 @@ $availableCombinationsJson = json_encode($availableCombinations, JSON_UNESCAPED_
                     <div class="material-card-header">
                         <div>
                             <div class="material-category">
-                                <?= e($material['parent_category_name'] ?? $material['category_name'] ?? '') ?> → 
-                                <?= e($material['category_name'] ?? '') ?>
+                                <?= e($material['parent_category_name_ru'] ?? $material['category_name_ru'] ?? '') ?> → 
+                                <?= e($material['category_name_ru'] ?? '') ?>
                             </div>
                             <div class="material-name"><?= e($material['name_full']) ?></div>
                         </div>
@@ -1406,8 +1409,8 @@ $availableCombinationsJson = json_encode($availableCombinations, JSON_UNESCAPED_
                             <small style="color: var(--text-muted);"><?= e($material['name_short']) ?></small>
                         </td>
                         <td>
-                            <small><?= e($material['parent_category_name'] ?? $material['category_name'] ?? '') ?></small><br>
-                            <strong><?= e($material['category_name'] ?? '') ?></strong>
+                            <small><?= e($material['parent_category_name_ru'] ?? $material['category_name_ru'] ?? '') ?></small><br>
+                            <strong><?= e($material['category_name_ru'] ?? '') ?></strong>
                         </td>
                         <td><?= e($material['grade'] ?? '—') ?></td>
                         <td><small><?= e($material['material_type'] ?? '—') ?></small></td>

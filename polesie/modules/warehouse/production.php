@@ -974,38 +974,54 @@ if ($filterCategory !== '') {
                         $specs = $product['specs'] ?? [];
                         $displaySpecs = [];
                         
-                        if (!empty($specs['power_kw'])) {
-                            $displaySpecs[] = ['label' => 'Мощность', 'value' => $specs['power_kw'] . ' кВт'];
-                        } elseif (!empty($specs['power_kw_min']) || !empty($specs['power_kw_max'])) {
+                        // Мощность
+                        $powerKw = $specs['power_kw'] ?? $specs['мощность_квт'] ?? null;
+                        $powerKwMin = $specs['power_kw_min'] ?? $specs['мощность_квт_min'] ?? null;
+                        $powerKwMax = $specs['power_kw_max'] ?? $specs['мощность_квт_max'] ?? null;
+                        
+                        if (!empty($powerKw)) {
+                            $displaySpecs[] = ['label' => 'Мощность', 'value' => $powerKw . ' кВт'];
+                        } elseif (!empty($powerKwMin) || !empty($powerKwMax)) {
                             $powerRange = '';
-                            if (!empty($specs['power_kw_min']) && !empty($specs['power_kw_max'])) {
-                                $powerRange = $specs['power_kw_min'] . '-' . $specs['power_kw_max'] . ' кВт';
-                            } elseif (!empty($specs['power_kw_min'])) {
-                                $powerRange = $specs['power_kw_min'] . ' кВт';
+                            if (!empty($powerKwMin) && !empty($powerKwMax)) {
+                                $powerRange = $powerKwMin . '-' . $powerKwMax . ' кВт';
+                            } elseif (!empty($powerKwMin)) {
+                                $powerRange = $powerKwMin . ' кВт';
                             }
                             if ($powerRange) {
                                 $displaySpecs[] = ['label' => 'Мощность', 'value' => $powerRange];
                             }
                         }
                         
-                        if (!empty($specs['rpm'])) {
-                            $displaySpecs[] = ['label' => 'Обороты', 'value' => $specs['rpm'] . ' об/мин'];
+                        // Обороты
+                        $rpm = $specs['rpm'] ?? $specs['обороты_мин'] ?? null;
+                        if (!empty($rpm)) {
+                            $displaySpecs[] = ['label' => 'Обороты', 'value' => $rpm . ' об/мин'];
                         }
                         
-                        if (!empty($specs['shaft_height_mm'])) {
-                            $displaySpecs[] = ['label' => 'Высота оси', 'value' => $specs['shaft_height_mm'] . ' мм'];
+                        // Высота оси
+                        $shaftHeight = $specs['shaft_height_mm'] ?? $specs['высота_оси_мм'] ?? $specs['габарит'] ?? null;
+                        if (!empty($shaftHeight)) {
+                            $displaySpecs[] = ['label' => 'Высота оси', 'value' => $shaftHeight . ' мм'];
                         }
                         
-                        if (!empty($specs['efficiency_class'])) {
-                            $displaySpecs[] = ['label' => 'Эффективность', 'value' => $specs['efficiency_class']];
+                        // Класс энергоэффективности
+                        $efficiencyClass = $specs['efficiency_class'] ?? $specs['класс_эффективности'] ?? null;
+                        if (!empty($efficiencyClass)) {
+                            $displaySpecs[] = ['label' => 'Класс энергоэффективности', 'value' => $efficiencyClass];
                         }
                         
-                        if (!empty($specs['voltage_v'])) {
-                            $displaySpecs[] = ['label' => 'Напряжение', 'value' => $specs['voltage_v'] . ' В'];
+                        // Напряжение
+                        $voltageV = $specs['voltage_v'] ?? $specs['напряжение_в'] ?? null;
+                        if (!empty($voltageV)) {
+                            $displaySpecs[] = ['label' => 'Напряжение', 'value' => $voltageV . ' В'];
                         }
                         
-                        if (!empty($specs['protection_class']) && is_array($specs['protection_class'])) {
-                            $displaySpecs[] = ['label' => 'Защита', 'value' => implode(', ', $specs['protection_class'])];
+                        // Класс защиты
+                        $protectionClass = $specs['protection_class'] ?? $specs['степень_защиты'] ?? null;
+                        if (!empty($protectionClass)) {
+                            $protectionValue = is_array($protectionClass) ? implode(', ', $protectionClass) : $protectionClass;
+                            $displaySpecs[] = ['label' => 'Класс защиты', 'value' => $protectionValue];
                         }
                         
                         foreach ($displaySpecs as $spec):

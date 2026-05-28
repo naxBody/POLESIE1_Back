@@ -69,54 +69,78 @@ try {
                 }
             }
             
-            // Полная обработка русскоязычных ключей БД (как в products/list.php)
-            // Мощность
-            if (isset($specs['мощность_квт'])) {
-                $prod['power_kw'] = is_numeric($specs['мощность_квт']) ? floatval($specs['мощность_квт']) : $specs['мощность_квт'];
-            }
-            // Обороты
-            if (isset($specs['обороты_мин'])) {
-                $prod['rpm'] = is_numeric($specs['обороты_мин']) ? intval($specs['обороты_мин']) : $specs['обороты_мин'];
-            }
-            // Напряжение
-            if (isset($specs['напряжение_в'])) {
-                $prod['voltage_v'] = is_numeric($specs['напряжение_в']) ? intval($specs['напряжение_в']) : $specs['напряжение_в'];
-            }
-            // Класс эффективности
-            if (isset($specs['класс_эффективности'])) {
-                $prod['efficiency_class'] = strval($specs['класс_эффективности']);
-            }
-            // Высота оси
-            if (isset($specs['высота_оси_мм'])) {
-                $prod['shaft_height_mm'] = is_numeric($specs['высота_оси_мм']) ? floatval($specs['высота_оси_мм']) : $specs['высота_оси_мм'];
-            }
-            // Габарит
-            if (isset($specs['габарит'])) {
-                $prod['frame_size'] = strval($specs['габарит']);
-            }
-            // Монтаж
-            if (isset($specs['монтаж'])) {
-                $prod['mounting_versions'] = strval($specs['монтаж']);
-            }
-            // Степень защиты
-            if (isset($specs['степень_защиты'])) {
-                $prod['protection_class'] = strval($specs['степень_защиты']);
+            // Определяем категорию продукта для выбора нужных характеристик
+            $categoryId = intval($prod['category_id']);
+            $parentCategoryId = intval($prod['category_parent_id']);
+            
+            // Полный маппинг всех возможных русскоязычных ключей БД
+            $allSpecsMap = [
+                // Основные характеристики двигателей
+                'мощность_квт' => 'power_kw',
+                'обороты_мин' => 'rpm',
+                'напряжение_в' => 'voltage_v',
+                'габарит' => 'frame_size',
+                'высота_оси_мм' => 'shaft_height_mm',
+                'класс_эффективности' => 'efficiency_class',
+                'монтаж' => 'mounting_versions',
+                'степень_защиты' => 'protection_class',
+                'климатическое_исполнение' => 'climate_versions',
+                'класс_изоляции' => 'insulation_class',
+                'коэффициент_мощности' => 'power_factor',
+                'кпд_проц' => 'efficiency_percent',
+                'вес_кг' => 'weight_kg',
+                // Взрывозащищенные
+                'маркировка_взрывозащиты' => 'explosion_marking',
+                'уровень_взрывозащиты' => 'explosion_level',
+                // Крановые
+                'режим_работы' => 'duty_cycle',
+                'пв_проц' => 'duty_percent',
+                // Генераторы
+                'мощность_основная_квт' => 'power_main_kw',
+                'мощность_резервная_квт' => 'power_reserve_kw',
+                'мощность_максимальная_квт' => 'power_max_kw',
+                'тип_топлива' => 'fuel_type',
+                'тип_запуска' => 'start_type',
+                'шум_дб' => 'noise_db',
+                'фазы' => 'phases',
+                'частота_гц' => 'frequency_hz',
+                'расход_топлива_л_ч' => 'fuel_consumption_l_h',
+                'объем_бака_л' => 'tank_capacity_l',
+                'исполнение' => 'execution_type',
+                'двигатель' => 'engine_model',
+                // Трансформаторы
+                'мощность_кВа' => 'power_kva',
+                'напряжение_вн_кВ' => 'voltage_hv_kv',
+                'напряжение_нн_кВ' => 'voltage_lv_kv',
+                'ток_хх_А' => 'no_load_current_a',
+                'потери_кВт' => 'losses_kw',
+                // Насосы
+                'производительность_м3ч' => 'flow_rate_m3_h',
+                'напор_м' => 'head_m',
+                'частота_гц' => 'frequency_hz',
+                'взрывозащита' => 'explosion_protection',
+                'область_применения' => 'application',
+                'материал_корпуса' => 'housing_material',
+                'тип_двигателя' => 'motor_type'
+            ];
+            
+            // Создаем массив specs со всеми возможными значениями
+            $fullSpecs = [];
+            foreach ($allSpecsMap as $ruKey => $enKey) {
+                if (isset($specs[$ruKey])) {
+                    $fullSpecs[$enKey] = $specs[$ruKey];
+                }
+                // Также проверяем английские ключи (для обратной совместимости)
+                if (isset($specs[$enKey]) && !isset($fullSpecs[$enKey])) {
+                    $fullSpecs[$enKey] = $specs[$enKey];
+                }
             }
             
-            // Маппинг русскоязычных ключей БД в английские для отображения
-            // мощность_квт -> power_kw, обороты_мин -> rpm, и т.д.
-            $powerKw = !empty($prod['power_kw']) ? $prod['power_kw'] : ($specs['power_kw'] ?? $specs['мощность_квт'] ?? null);
-            $rpm = !empty($prod['rpm']) ? $prod['rpm'] : ($specs['rpm'] ?? $specs['обороты_мин'] ?? null);
-            $voltageV = !empty($prod['voltage_v']) ? $prod['voltage_v'] : ($specs['voltage_v'] ?? $specs['напряжение_в'] ?? null);
-            $efficiencyClass = !empty($prod['efficiency_class']) ? $prod['efficiency_class'] : ($specs['efficiency_class'] ?? $specs['класс_эффективности'] ?? null);
-            $shaftHeightMm = !empty($prod['shaft_height_mm']) ? $prod['shaft_height_mm'] : ($specs['shaft_height_mm'] ?? $specs['высота_оси_мм'] ?? $specs['габарит'] ?? null);
-            
-            // Защита от null значений
-            $protectionClassInput = !empty($prod['protection_class']) ? $prod['protection_class'] : ($specs['protection_class'] ?? $specs['степень_защиты'] ?? '');
-            $mountingVersionsInput = !empty($prod['mounting_versions']) ? $prod['mounting_versions'] : (isset($specs['mounting_versions']) ? $specs['mounting_versions'] : (isset($specs['монтаж']) ? $specs['монтаж'] : ''));
-            
-            $protectionClass = !empty($protectionClassInput) ? $protectionClassInput : '';
-            $mountingVersions = !empty($mountingVersionsInput) ? $mountingVersionsInput : '';
+            // Добавляем специальные поля для диапазонов мощности
+            if (isset($specs['мощность_квт_min'])) $fullSpecs['power_kw_min'] = $specs['мощность_квт_min'];
+            if (isset($specs['мощность_квт_max'])) $fullSpecs['power_kw_max'] = $specs['мощность_квт_max'];
+            if (isset($specs['power_kw_min'])) $fullSpecs['power_kw_min'] = $fullSpecs['power_kw_min'] ?? $specs['power_kw_min'];
+            if (isset($specs['power_kw_max'])) $fullSpecs['power_kw_max'] = $fullSpecs['power_kw_max'] ?? $specs['power_kw_max'];
             
             $product = [
                 'id' => $prod['id'],
@@ -134,17 +158,7 @@ try {
                     'id' => $prod['category_id'],
                     'name_ru' => $prod['category_name'] ?? ''
                 ],
-                'specs' => [
-                    'power_kw' => $powerKw,
-                    'power_kw_min' => $specs['power_kw_min'] ?? $specs['мощность_квт_min'] ?? null,
-                    'power_kw_max' => $specs['power_kw_max'] ?? $specs['мощность_квт_max'] ?? null,
-                    'rpm' => $rpm,
-                    'voltage_v' => $voltageV,
-                    'efficiency_class' => $efficiencyClass,
-                    'shaft_height_mm' => $shaftHeightMm,
-                    'protection_class' => $protectionClass ? (is_array($protectionClass) ? $protectionClass : explode(',', $protectionClass)) : [],
-                    'mounting_versions' => $mountingVersions ? (is_array($mountingVersions) ? $mountingVersions : explode(',', $mountingVersions)) : []
-                ],
+                'specs' => $fullSpecs,
                 'is_bestseller' => !empty($prod['is_bestseller']),
                 'is_serial_tracked' => !empty($prod['is_serial_tracked']),
                 'image' => $prod['image'] ?? null,
@@ -1007,95 +1021,266 @@ if ($filterCategory !== '') {
                         <?php
                         $specs = $product['specs'] ?? [];
                         $displaySpecs = [];
+                        $categoryId = intval($product['category_id']);
                         
-                        // Мощность - проверяем все возможные ключи
-                        $powerKw = $specs['power_kw'] ?? $specs['мощность_квт'] ?? null;
-                        $powerKwMin = $specs['power_kw_min'] ?? $specs['мощность_квт_min'] ?? null;
-                        $powerKwMax = $specs['power_kw_max'] ?? $specs['мощность_квт_max'] ?? null;
+                        // Функция проверки значения (не null, не пустая строка, не 0)
+                        function hasValue($val) {
+                            return $val !== null && $val !== '' && $val !== 'null';
+                        }
                         
-                        if (!empty($powerKw)) {
-                            $displaySpecs[] = ['label' => 'Мощность', 'value' => $powerKw . ' кВт'];
-                        } elseif (!empty($powerKwMin) || !empty($powerKwMax)) {
-                            $powerRange = '';
-                            if (!empty($powerKwMin) && !empty($powerKwMax)) {
-                                $powerRange = $powerKwMin . '-' . $powerKwMax . ' кВт';
-                            } elseif (!empty($powerKwMin)) {
-                                $powerRange = $powerKwMin . ' кВт';
-                            } elseif (!empty($powerKwMax)) {
-                                $powerRange = $powerKwMax . ' кВт';
+                        // === ОБЩЕПРОМЫШЛЕННЫЕ ЭЛЕКТРОДВИГАТЕЛИ (категория 2) ===
+                        if ($categoryId == 2) {
+                            if (hasValue($specs['power_kw'] ?? null)) {
+                                $displaySpecs[] = ['label' => 'Мощность', 'value' => $specs['power_kw'] . ' кВт'];
                             }
-                            if ($powerRange) {
-                                $displaySpecs[] = ['label' => 'Мощность', 'value' => $powerRange];
+                            if (hasValue($specs['rpm'] ?? null)) {
+                                $displaySpecs[] = ['label' => 'Частота вращения', 'value' => $specs['rpm'] . ' об/мин'];
+                            }
+                            if (hasValue($specs['voltage_v'] ?? null)) {
+                                $displaySpecs[] = ['label' => 'Напряжение питания', 'value' => $specs['voltage_v'] . ' В'];
+                            }
+                            if (hasValue($specs['frame_size'] ?? null)) {
+                                $displaySpecs[] = ['label' => 'Габарит двигателя', 'value' => $specs['frame_size']];
+                            }
+                            if (hasValue($specs['efficiency_class'] ?? null)) {
+                                $displaySpecs[] = ['label' => 'Класс энергоэффективности', 'value' => $specs['efficiency_class']];
+                            }
+                            if (hasValue($specs['mounting_versions'] ?? null)) {
+                                $val = is_array($specs['mounting_versions']) ? implode(', ', $specs['mounting_versions']) : $specs['mounting_versions'];
+                                $displaySpecs[] = ['label' => 'Исполнение по монтажу', 'value' => $val];
+                            }
+                            if (hasValue($specs['protection_class'] ?? null)) {
+                                $val = is_array($specs['protection_class']) ? implode(', ', $specs['protection_class']) : $specs['protection_class'];
+                                $displaySpecs[] = ['label' => 'Степень защиты', 'value' => $val];
+                            }
+                            if (hasValue($specs['climate_versions'] ?? null)) {
+                                $val = is_array($specs['climate_versions']) ? implode(', ', $specs['climate_versions']) : $specs['climate_versions'];
+                                $displaySpecs[] = ['label' => 'Климатическое исполнение', 'value' => $val];
+                            }
+                            if (hasValue($specs['insulation_class'] ?? null)) {
+                                $displaySpecs[] = ['label' => 'Класс изоляции', 'value' => $specs['insulation_class']];
+                            }
+                            if (hasValue($specs['power_factor'] ?? null)) {
+                                $displaySpecs[] = ['label' => 'Коэффициент мощности (cos φ)', 'value' => $specs['power_factor']];
+                            }
+                            if (hasValue($specs['efficiency_percent'] ?? null)) {
+                                $displaySpecs[] = ['label' => 'КПД', 'value' => $specs['efficiency_percent'] . '%'];
+                            }
+                            if (hasValue($specs['weight_kg'] ?? null)) {
+                                $displaySpecs[] = ['label' => 'Масса', 'value' => $specs['weight_kg'] . ' кг'];
                             }
                         }
-                        
-                        // Обороты - проверяем все возможные ключи
-                        $rpm = $specs['rpm'] ?? $specs['обороты_мин'] ?? null;
-                        if (!empty($rpm)) {
-                            $displaySpecs[] = ['label' => 'Обороты', 'value' => $rpm . ' об/мин'];
+                        // === ВЗРЫВОЗАЩИЩЕННЫЕ ДВИГАТЕЛИ (категория 3) ===
+                        elseif ($categoryId == 3) {
+                            if (hasValue($specs['power_kw'] ?? null)) {
+                                $displaySpecs[] = ['label' => 'Мощность', 'value' => $specs['power_kw'] . ' кВт'];
+                            }
+                            if (hasValue($specs['rpm'] ?? null)) {
+                                $displaySpecs[] = ['label' => 'Частота вращения', 'value' => $specs['rpm'] . ' об/мин'];
+                            }
+                            if (hasValue($specs['voltage_v'] ?? null)) {
+                                $displaySpecs[] = ['label' => 'Напряжение питания', 'value' => $specs['voltage_v'] . ' В'];
+                            }
+                            if (hasValue($specs['frame_size'] ?? null)) {
+                                $displaySpecs[] = ['label' => 'Габарит двигателя', 'value' => $specs['frame_size']];
+                            }
+                            if (hasValue($specs['explosion_marking'] ?? null)) {
+                                $displaySpecs[] = ['label' => 'Маркировка взрывозащиты', 'value' => $specs['explosion_marking']];
+                            }
+                            if (hasValue($specs['efficiency_class'] ?? null)) {
+                                $displaySpecs[] = ['label' => 'Класс энергоэффективности', 'value' => $specs['efficiency_class']];
+                            }
+                            if (hasValue($specs['explosion_level'] ?? null)) {
+                                $displaySpecs[] = ['label' => 'Уровень взрывозащиты', 'value' => $specs['explosion_level']];
+                            }
+                            if (hasValue($specs['mounting_versions'] ?? null)) {
+                                $val = is_array($specs['mounting_versions']) ? implode(', ', $specs['mounting_versions']) : $specs['mounting_versions'];
+                                $displaySpecs[] = ['label' => 'Исполнение по монтажу', 'value' => $val];
+                            }
+                            if (hasValue($specs['protection_class'] ?? null)) {
+                                $val = is_array($specs['protection_class']) ? implode(', ', $specs['protection_class']) : $specs['protection_class'];
+                                $displaySpecs[] = ['label' => 'Степень защиты', 'value' => $val];
+                            }
+                            if (hasValue($specs['weight_kg'] ?? null)) {
+                                $displaySpecs[] = ['label' => 'Масса', 'value' => $specs['weight_kg'] . ' кг'];
+                            }
                         }
-                        
-                        // Высота оси - проверяем все возможные ключи
-                        $shaftHeight = $specs['shaft_height_mm'] ?? $specs['высота_оси_мм'] ?? $specs['габарит'] ?? null;
-                        if (!empty($shaftHeight)) {
-                            $displaySpecs[] = ['label' => 'Высота оси', 'value' => $shaftHeight . ' мм'];
+                        // === КРАНОВЫЕ ДВИГАТЕЛИ (категория 4) ===
+                        elseif ($categoryId == 4) {
+                            if (hasValue($specs['power_kw'] ?? null)) {
+                                $displaySpecs[] = ['label' => 'Мощность', 'value' => $specs['power_kw'] . ' кВт'];
+                            }
+                            if (hasValue($specs['rpm'] ?? null)) {
+                                $displaySpecs[] = ['label' => 'Частота вращения', 'value' => $specs['rpm'] . ' об/мин'];
+                            }
+                            if (hasValue($specs['voltage_v'] ?? null)) {
+                                $displaySpecs[] = ['label' => 'Напряжение питания', 'value' => $specs['voltage_v'] . ' В'];
+                            }
+                            if (hasValue($specs['frame_size'] ?? null)) {
+                                $displaySpecs[] = ['label' => 'Габарит двигателя', 'value' => $specs['frame_size']];
+                            }
+                            if (hasValue($specs['duty_cycle'] ?? null)) {
+                                $displaySpecs[] = ['label' => 'Режим работы', 'value' => $specs['duty_cycle']];
+                            }
+                            if (hasValue($specs['insulation_class'] ?? null)) {
+                                $displaySpecs[] = ['label' => 'Класс изоляции', 'value' => $specs['insulation_class']];
+                            }
+                            if (hasValue($specs['protection_class'] ?? null)) {
+                                $val = is_array($specs['protection_class']) ? implode(', ', $specs['protection_class']) : $specs['protection_class'];
+                                $displaySpecs[] = ['label' => 'Степень защиты', 'value' => $val];
+                            }
+                            if (hasValue($specs['duty_percent'] ?? null)) {
+                                $displaySpecs[] = ['label' => 'ПВ (продолжительность включения)', 'value' => $specs['duty_percent'] . '%'];
+                            }
+                            if (hasValue($specs['weight_kg'] ?? null)) {
+                                $displaySpecs[] = ['label' => 'Масса', 'value' => $specs['weight_kg'] . ' кг'];
+                            }
                         }
-                        
-                        // Класс энергоэффективности - проверяем все возможные ключи
-                        $efficiencyClass = $specs['efficiency_class'] ?? $specs['класс_эффективности'] ?? null;
-                        if (!empty($efficiencyClass)) {
-                            $displaySpecs[] = ['label' => 'Класс энергоэффективности', 'value' => $efficiencyClass];
+                        // === ДИЗЕЛЬНЫЕ ГЕНЕРАТОРЫ (категория 6) ===
+                        elseif ($categoryId == 6) {
+                            if (hasValue($specs['power_main_kw'] ?? null)) {
+                                $displaySpecs[] = ['label' => 'Основная мощность', 'value' => $specs['power_main_kw'] . ' кВт'];
+                            }
+                            if (hasValue($specs['power_reserve_kw'] ?? null)) {
+                                $displaySpecs[] = ['label' => 'Резервная мощность', 'value' => $specs['power_reserve_kw'] . ' кВт'];
+                            }
+                            if (hasValue($specs['fuel_type'] ?? null)) {
+                                $displaySpecs[] = ['label' => 'Тип топлива', 'value' => $specs['fuel_type']];
+                            }
+                            if (hasValue($specs['start_type'] ?? null)) {
+                                $displaySpecs[] = ['label' => 'Тип запуска', 'value' => $specs['start_type']];
+                            }
+                            if (hasValue($specs['noise_db'] ?? null)) {
+                                $displaySpecs[] = ['label' => 'Уровень шума', 'value' => $specs['noise_db'] . ' дБ'];
+                            }
+                            if (hasValue($specs['phases'] ?? null)) {
+                                $displaySpecs[] = ['label' => 'Количество фаз', 'value' => $specs['phases']];
+                            }
+                            if (hasValue($specs['voltage_v'] ?? null)) {
+                                $displaySpecs[] = ['label' => 'Напряжение', 'value' => $specs['voltage_v'] . ' В'];
+                            }
+                            if (hasValue($specs['frequency_hz'] ?? null)) {
+                                $displaySpecs[] = ['label' => 'Частота', 'value' => $specs['frequency_hz'] . ' Гц'];
+                            }
+                            if (hasValue($specs['fuel_consumption_l_h'] ?? null)) {
+                                $displaySpecs[] = ['label' => 'Расход топлива', 'value' => $specs['fuel_consumption_l_h'] . ' л/ч'];
+                            }
+                            if (hasValue($specs['tank_capacity_l'] ?? null)) {
+                                $displaySpecs[] = ['label' => 'Объем топливного бака', 'value' => $specs['tank_capacity_l'] . ' л'];
+                            }
+                            if (hasValue($specs['weight_kg'] ?? null)) {
+                                $displaySpecs[] = ['label' => 'Масса', 'value' => $specs['weight_kg'] . ' кг'];
+                            }
+                            if (hasValue($specs['execution_type'] ?? null)) {
+                                $displaySpecs[] = ['label' => 'Исполнение', 'value' => $specs['execution_type']];
+                            }
                         }
-                        
-                        // Напряжение - проверяем все возможные ключи
-                        $voltageV = $specs['voltage_v'] ?? $specs['напряжение_в'] ?? null;
-                        if (!empty($voltageV)) {
-                            $displaySpecs[] = ['label' => 'Напряжение', 'value' => $voltageV . ' В'];
+                        // === БЕНЗИНОВЫЕ ГЕНЕРАТОРЫ (категория 7) ===
+                        elseif ($categoryId == 7) {
+                            if (hasValue($specs['power_main_kw'] ?? null)) {
+                                $displaySpecs[] = ['label' => 'Основная мощность', 'value' => $specs['power_main_kw'] . ' кВт'];
+                            }
+                            if (hasValue($specs['power_max_kw'] ?? null)) {
+                                $displaySpecs[] = ['label' => 'Максимальная мощность', 'value' => $specs['power_max_kw'] . ' кВт'];
+                            }
+                            if (hasValue($specs['fuel_type'] ?? null)) {
+                                $displaySpecs[] = ['label' => 'Тип топлива', 'value' => $specs['fuel_type']];
+                            }
+                            if (hasValue($specs['start_type'] ?? null)) {
+                                $displaySpecs[] = ['label' => 'Тип запуска', 'value' => $specs['start_type']];
+                            }
+                            if (hasValue($specs['noise_db'] ?? null)) {
+                                $displaySpecs[] = ['label' => 'Уровень шума', 'value' => $specs['noise_db'] . ' дБ'];
+                            }
+                            if (hasValue($specs['phases'] ?? null)) {
+                                $displaySpecs[] = ['label' => 'Количество фаз', 'value' => $specs['phases']];
+                            }
+                            if (hasValue($specs['voltage_v'] ?? null)) {
+                                $displaySpecs[] = ['label' => 'Напряжение', 'value' => $specs['voltage_v'] . ' В'];
+                            }
+                            if (hasValue($specs['engine_model'] ?? null)) {
+                                $displaySpecs[] = ['label' => 'Модель двигателя', 'value' => $specs['engine_model']];
+                            }
+                            if (hasValue($specs['tank_capacity_l'] ?? null)) {
+                                $displaySpecs[] = ['label' => 'Объем топливного бака', 'value' => $specs['tank_capacity_l'] . ' л'];
+                            }
+                            if (hasValue($specs['weight_kg'] ?? null)) {
+                                $displaySpecs[] = ['label' => 'Масса', 'value' => $specs['weight_kg'] . ' кг'];
+                            }
                         }
-                        
-                        // Класс защиты - проверяем все возможные ключи и форматы
-                        $protectionClass = $specs['protection_class'] ?? $specs['степень_защиты'] ?? null;
-                        if (!empty($protectionClass)) {
-                            $protectionValue = is_array($protectionClass) ? implode(', ', $protectionClass) : $protectionClass;
-                            $displaySpecs[] = ['label' => 'Класс защиты', 'value' => $protectionValue];
-                        }
-                        
-                        // Варианты монтажа - проверяем все возможные ключи
-                        $mountingVersions = $specs['mounting_versions'] ?? $specs['монтаж'] ?? null;
-                        if (!empty($mountingVersions)) {
-                            $mountingValue = is_array($mountingVersions) ? implode(', ', $mountingVersions) : $mountingVersions;
-                            $displaySpecs[] = ['label' => 'Варианты монтажа', 'value' => $mountingValue];
-                        }
-                        
-                        // Частота
-                        $frequencyHz = $specs['frequency_hz'] ?? $specs['частота_гц'] ?? null;
-                        if (!empty($frequencyHz)) {
-                            $displaySpecs[] = ['label' => 'Частота', 'value' => $frequencyHz . ' Гц'];
-                        }
-                        
-                        // Климатическое исполнение
-                        $climateVersions = $specs['climate_versions'] ?? $specs['климатическое_исполнение'] ?? null;
-                        if (!empty($climateVersions)) {
-                            $climateValue = is_array($climateVersions) ? implode(', ', $climateVersions) : $climateVersions;
-                            $displaySpecs[] = ['label' => 'Климатическое исполнение', 'value' => $climateValue];
-                        }
-                        
-                        // Вес
-                        $weightKg = $specs['weight_kg'] ?? $specs['вес_кг'] ?? null;
-                        if (!empty($weightKg)) {
-                            $displaySpecs[] = ['label' => 'Вес', 'value' => $weightKg . ' кг'];
-                        }
-                        
-                        // Материал корпуса
-                        $housingMaterial = $specs['housing_material'] ?? $specs['материал_корпуса'] ?? null;
-                        if (!empty($housingMaterial)) {
-                            $displaySpecs[] = ['label' => 'Материал корпуса', 'value' => $housingMaterial];
-                        }
-                        
-                        // Тип двигателя
-                        $motorType = $specs['motor_type'] ?? $specs['тип_двигателя'] ?? null;
-                        if (!empty($motorType)) {
-                            $displaySpecs[] = ['label' => 'Тип двигателя', 'value' => $motorType];
+                        // === ДЛЯ ВСЕХ ОСТАЛЬНЫХ КАТЕГОРИЙ - универсальный вывод ===
+                        else {
+                            // Мощность
+                            if (hasValue($specs['power_kw'] ?? null)) {
+                                $displaySpecs[] = ['label' => 'Мощность', 'value' => $specs['power_kw'] . ' кВт'];
+                            } elseif (hasValue($specs['power_main_kw'] ?? null)) {
+                                $displaySpecs[] = ['label' => 'Мощность', 'value' => $specs['power_main_kw'] . ' кВт'];
+                            }
+                            // Обороты
+                            if (hasValue($specs['rpm'] ?? null)) {
+                                $displaySpecs[] = ['label' => 'Обороты', 'value' => $specs['rpm'] . ' об/мин'];
+                            }
+                            // Напряжение
+                            if (hasValue($specs['voltage_v'] ?? null)) {
+                                $displaySpecs[] = ['label' => 'Напряжение', 'value' => $specs['voltage_v'] . ' В'];
+                            }
+                            // Высота оси / габарит
+                            if (hasValue($specs['shaft_height_mm'] ?? null)) {
+                                $displaySpecs[] = ['label' => 'Высота оси', 'value' => $specs['shaft_height_mm'] . ' мм'];
+                            } elseif (hasValue($specs['frame_size'] ?? null)) {
+                                $displaySpecs[] = ['label' => 'Габарит', 'value' => $specs['frame_size']];
+                            }
+                            // Класс энергоэффективности
+                            if (hasValue($specs['efficiency_class'] ?? null)) {
+                                $displaySpecs[] = ['label' => 'Класс энергоэффективности', 'value' => $specs['efficiency_class']];
+                            }
+                            // Класс защиты
+                            if (hasValue($specs['protection_class'] ?? null)) {
+                                $val = is_array($specs['protection_class']) ? implode(', ', $specs['protection_class']) : $specs['protection_class'];
+                                $displaySpecs[] = ['label' => 'Класс защиты', 'value' => $val];
+                            }
+                            // Монтаж
+                            if (hasValue($specs['mounting_versions'] ?? null)) {
+                                $val = is_array($specs['mounting_versions']) ? implode(', ', $specs['mounting_versions']) : $specs['mounting_versions'];
+                                $displaySpecs[] = ['label' => 'Варианты монтажа', 'value' => $val];
+                            }
+                            // Частота
+                            if (hasValue($specs['frequency_hz'] ?? null)) {
+                                $displaySpecs[] = ['label' => 'Частота', 'value' => $specs['frequency_hz'] . ' Гц'];
+                            }
+                            // Климатическое исполнение
+                            if (hasValue($specs['climate_versions'] ?? null)) {
+                                $val = is_array($specs['climate_versions']) ? implode(', ', $specs['climate_versions']) : $specs['climate_versions'];
+                                $displaySpecs[] = ['label' => 'Климатическое исполнение', 'value' => $val];
+                            }
+                            // Вес
+                            if (hasValue($specs['weight_kg'] ?? null)) {
+                                $displaySpecs[] = ['label' => 'Вес', 'value' => $specs['weight_kg'] . ' кг'];
+                            }
+                            // Материал корпуса
+                            if (hasValue($specs['housing_material'] ?? null)) {
+                                $displaySpecs[] = ['label' => 'Материал корпуса', 'value' => $specs['housing_material']];
+                            }
+                            // Тип двигателя
+                            if (hasValue($specs['motor_type'] ?? null)) {
+                                $displaySpecs[] = ['label' => 'Тип двигателя', 'value' => $specs['motor_type']];
+                            }
+                            // Производительность (для насосов)
+                            if (hasValue($specs['flow_rate_m3_h'] ?? null)) {
+                                $displaySpecs[] = ['label' => 'Производительность', 'value' => $specs['flow_rate_m3_h'] . ' м³/ч'];
+                            }
+                            // Напор (для насосов)
+                            if (hasValue($specs['head_m'] ?? null)) {
+                                $displaySpecs[] = ['label' => 'Напор', 'value' => $specs['head_m'] . ' м'];
+                            }
+                            // Взрывозащита
+                            if (hasValue($specs['explosion_protection'] ?? null)) {
+                                $displaySpecs[] = ['label' => 'Вид взрывозащиты', 'value' => $specs['explosion_protection']];
+                            }
+                            // Назначение
+                            if (hasValue($specs['application'] ?? null)) {
+                                $displaySpecs[] = ['label' => 'Назначение', 'value' => $specs['application']];
+                            }
                         }
                         
                         foreach ($displaySpecs as $spec):

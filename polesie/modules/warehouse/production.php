@@ -133,7 +133,7 @@ $filteredProducts = $allProducts;
 $filterCategory = $_GET['category'] ?? '';
 if ($filterCategory !== '') {
     $filteredProducts = array_filter($filteredProducts, function($p) use ($filterCategory) {
-        return $p['parent_category']['id'] == $filterCategory;
+        return isset($p['category_id']) && ($p['category_id'] == $filterCategory || (isset($p['category_parent_id']) && $p['category_parent_id'] == $filterCategory));
     });
 }
 
@@ -141,7 +141,7 @@ if ($filterCategory !== '') {
 $filterSubcategory = $_GET['subcategory'] ?? '';
 if ($filterSubcategory !== '') {
     $filteredProducts = array_filter($filteredProducts, function($p) use ($filterSubcategory) {
-        return $p['subcategory']['id'] == $filterSubcategory;
+        return isset($p['category_id']) && $p['category_id'] == $filterSubcategory;
     });
 }
 
@@ -181,8 +181,7 @@ if ($filterRpm !== '') {
 $filterProtection = $_GET['protection'] ?? '';
 if ($filterProtection !== '') {
     $filteredProducts = array_filter($filteredProducts, function($p) use ($filterProtection) {
-        if (empty($p['specs']['protection_class'])) return false;
-        return in_array($filterProtection, $p['specs']['protection_class']);
+        return isset($p['protection_class']) && $p['protection_class'] === $filterProtection;
     });
 }
 

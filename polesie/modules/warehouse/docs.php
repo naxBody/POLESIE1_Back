@@ -19,49 +19,229 @@ $user = getCurrentUser();
 $pdo = getDbConnection();
 $pageTitle = 'Документы и справочники';
 
-// Получение данных из JSON
-$docsPath = BASE_PATH . '/list_materials_docs.json';
-$docsData = [];
-
-if (file_exists($docsPath)) {
-    $jsonData = file_get_contents($docsPath);
-    $docsData = json_decode($jsonData, true);
-}
-
-$abbreviations = $docsData['abbreviation_decodings'] ?? [];
-$gostStandards = $docsData['gost_standards'] ?? [];
-
-// Фильтруем зарезервированные категории (начинаются с _CATEGORY_)
-$gostStandards = array_filter($gostStandards, function($gost) {
-    return !isset($gost['gost_number']) || strpos($gost['gost_number'], '_CATEGORY_') !== 0;
-});
-$gostStandards = array_values($gostStandards); // Переиндексируем массив
-
-$allAbbreviations = $materialsData['all_abbreviations'] ?? [];
-
-// Загружаем полную структуру кодов из list_materials.json
-$materialsPath = BASE_PATH . '/list_materials.json';
-$codeStructures = [];
-if (file_exists($materialsPath)) {
-    $materialsData = json_decode(file_get_contents($materialsPath), true);
-    $categories = $materialsData['categories'] ?? [];
+// Получаем категории материалов с их свойствами из БД
+$materialCategories = [];
+try {
+    $stmt = $pdo->query("
+        SELECT 
+            mc.id,
+            mc.parent_id,
+            mc.name_ru,
+            mc.code,
+            mc.description
+        FROM material_categories mc
+        ORDER BY mc.parent_id, mc.name_ru
+    ");
+    $allCategories = $stmt->fetchAll(PDO::FETCH_ASSOC);
     
-    foreach ($categories as $category) {
-        if (isset($category['subcategories'])) {
-            foreach ($category['subcategories'] as $subcategory) {
-                $combos = $subcategory['available_combinations'] ?? [];
-                if (isset($combos['_code_format']) && isset($combos['_code_format_ru'])) {
-                    $codeStructures[$subcategory['id']] = [
-                        'category_ru' => $category['name_ru'],
-                        'subcategory_ru' => $subcategory['name_ru'],
-                        'pattern' => $combos['_code_format_ru'],
-                        'description_ru' => $combos['_code_format_ru'],
-                        'examples' => $combos['examples'] ?? [],
-                        'example_detailed_decoding' => $combos['example_detailed_decoding'] ?? []
-                    ];
-                }
+    // Строим древовидную структуру
+    foreach ($allCategories as $cat) {
+        if ($cat['parent_id'] === null) {
+            $materialCategories[$cat['id']] = [
+                'id' => $cat['id'],
+                'name_ru' => $cat['name_ru'],
+                'code' => $cat['code'],
+                'description' => $cat['description'],
+                'children' => []
+            ];
+        } else {
+            if (isset($materialCategories[$cat['parent_id']])) {
+                $materialCategories[$cat['parent_id']]['children'][] = [
+                    'id' => $cat['id'],
+                    'name_ru' => $cat['name_ru'],
+                    'code' => $cat['code'],
+                    'description' => $cat['description']
+                ];
             }
         }
+    }
+} catch (PDOException $e) {
+    $materialCategories = [];
+}
+
+// Получаем все материалы с их свойствами для расшифровки аббревиатур
+$materialsData = [];
+try {
+    $stmt = $pdo->query("
+        SELECT 
+            m.id,
+            m.code,
+            m.name_full,
+            m.name_short,
+            mc.name_ru as category_name,
+            m.specifications
+        FROM materials m
+        LEFT JOIN material_categories mc ON m.category_id = mc.id
+        ORDER BY mc.name_ru, m.code
+    ");
+    $materialsData = $stmt->fetchAll(PDO::FETCH_ASSOC);
+} catch (PDOException $e) {
+    $materialsData = [];
+}
+
+// Получаем категории продукции
+$productCategories = [];
+try {
+    $stmt = $pdo->query("
+        SELECT 
+            pc.id,
+            pc.parent_id,
+            pc.name_ru,
+            pc.code,
+            pc.description
+        FROM product_categories pc
+        ORDER BY pc.parent_id, pc.name_ru
+    ");
+    $allProductCategories = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    
+    foreach ($allProductCategories as $cat) {
+        if ($cat['parent_id'] === null) {
+            $productCategories[$cat['id']] = [
+                'id' => $cat['id'],
+                'name_ru' => $cat['name_ru'],
+                'code' => $cat['code'],
+                'description' => $cat['description'],
+                'children' => []
+            ];
+        } else {
+            if (isset($productCategories[$cat['parent_id']])) {
+                $productCategories[$cat['parent_id']]['children'][] = [
+                    'id' => $cat['id'],
+                    'name_ru' => $cat['name_ru'],
+                    'code' => $cat['code'],
+                    'description' => $cat['description']
+                ];
+            }
+        }
+    }
+} catch (PDOException $e) {
+    $productCategories = [];
+}
+
+// Формируем список всех аббревиатур из кодов материалов
+$allAbbreviations = [];
+foreach ($materialsData as $material) {
+    $code = $material['code'];
+    $category = $material['category_name'] ?? 'Неизвестно';
+    
+    // Разбиваем код на части для расшифровки
+    $parts = explode('-', $code);
+    foreach ($parts as $part) {
+        if (!isset($allAbbreviations[$part])) {
+            $allAbbreviations[$part] = [
+                'code' => $part,
+                'full_name' => $material['name_short'],
+                'category' => $category,
+                'description' => 'Элемент кода материала'
+            ];
+        }
+    }
+}
+
+// Примеры расшифровок для常见ных аббревиатур
+$abbreviationDecodings = [
+    ['code' => 'Б', 'full_name' => 'Болт', 'category' => 'Крепеж', 'description' => 'Болт крепежный'],
+    ['code' => 'Г', 'full_name' => 'Гайка', 'category' => 'Крепеж', 'description' => 'Гайка шестигранная'],
+    ['code' => 'Ш', 'full_name' => 'Шайба', 'category' => 'Крепеж', 'description' => 'Шайба плоская'],
+    ['code' => 'П', 'full_name' => 'Провод', 'category' => 'Электротехника', 'description' => 'Провод медный'],
+    ['code' => 'А', 'full_name' => 'Алюминий', 'category' => 'Металлы', 'description' => 'Алюминиевый сплав'],
+    ['code' => 'Ст', 'full_name' => 'Сталь', 'category' => 'Металлы', 'description' => 'Сталь конструкционная'],
+    ['code' => 'Ч', 'full_name' => 'Чугун', 'category' => 'Металлы', 'description' => 'Чугун литейный'],
+    ['code' => 'М', 'full_name' => 'Медь', 'category' => 'Металлы', 'description' => 'Медь электротехническая'],
+    ['code' => 'ПШ', 'full_name' => 'Пруток шлифованный', 'category' => 'Металлы', 'description' => 'Пруток стальной шлифованный'],
+    ['code' => 'кп', 'full_name' => 'класс прочности', 'category' => 'Крепеж', 'description' => 'Характеристика прочности'],
+    ['code' => 'ц', 'full_name' => 'оцинкованный', 'category' => 'Крепеж', 'description' => 'Покрытие цинком'],
+    ['code' => 'мм', 'full_name' => 'миллиметр', 'category' => 'Общее', 'description' => 'Единица измерения'],
+];
+
+// Стандарты ГОСТ
+$gostStandards = [
+    ['gost_number' => 'ГОСТ 7798-70', 'title' => 'Болты с шестигранной головкой', 'category' => 'Крепеж', 'status' => 'active'],
+    ['gost_number' => 'ГОСТ 5915-70', 'title' => 'Гайки шестигранные', 'category' => 'Крепеж', 'status' => 'active'],
+    ['gost_number' => 'ГОСТ 11402-75', 'title' => 'Шайбы пружинные', 'category' => 'Крепеж', 'status' => 'active'],
+    ['gost_number' => 'ГОСТ 8736-2014', 'title' => 'Песок для строительных работ', 'category' => 'Материалы', 'status' => 'active'],
+    ['gost_number' => 'ГОСТ 1050-88', 'title' => 'Сталь сортовая калиброванная', 'category' => 'Металлы', 'status' => 'active'],
+    ['gost_number' => 'ГОСТ 2284-79', 'title' => 'Круги шлифовальные', 'category' => 'Инструмент', 'status' => 'active'],
+    ['gost_number' => 'ГОСТ 6311-2014', 'title' => 'Кабели силовые', 'category' => 'Электротехника', 'status' => 'active'],
+    ['gost_number' => 'ГОСТ 18599-2014', 'title' => 'Провода обмоточные', 'category' => 'Электротехника', 'status' => 'active'],
+    ['gost_number' => 'ГОСТ 8822-2014', 'title' => 'Подшипники качения', 'category' => 'Подшипники', 'status' => 'active'],
+    ['gost_number' => 'ГОСТ 5950-2000', 'title' => 'Стали инструментальные', 'category' => 'Металлы', 'status' => 'active'],
+];
+
+// Структуры кодов по категориям
+$codeStructures = [];
+foreach ($materialCategories as $category) {
+    $catCode = $category['code'];
+    $catName = $category['name_ru'];
+    
+    // Основная категория
+    $codeStructures[] = [
+        'category_ru' => $catName,
+        'subcategory_ru' => $catName,
+        'pattern' => $catCode . '-XXX-XX',
+        'description_ru' => 'Формат: ' . $catCode . '-[номер]-[параметры]',
+        'examples' => [$catCode . '-001-10', $catCode . '-002-15'],
+        'example_detailed_decoding' => [
+            $catCode . ' - категория материала',
+            '001 - порядковый номер в категории',
+            '10 - основной параметр (диаметр/сечение)'
+        ]
+    ];
+    
+    // Подкатегории
+    foreach ($category['children'] as $subcat) {
+        $subCode = $subcat['code'];
+        $subName = $subcat['name_ru'];
+        
+        $example = '';
+        $decoding = [];
+        
+        if (strpos($subCode, 'BOLT') !== false) {
+            $example = 'Б-010-8.8-ц';
+            $decoding = [
+                'Б - болт',
+                '010 - диаметр 10мм',
+                '8.8 - класс прочности',
+                'ц - оцинкованный'
+            ];
+        } elseif (strpos($subCode, 'NUT') !== false) {
+            $example = 'Г-010-8-ц';
+            $decoding = [
+                'Г - гайка',
+                '010 - диаметр 10мм',
+                '8 - класс прочности',
+                'ц - оцинкованная'
+            ];
+        } elseif (strpos($subCode, 'WIRE') !== false) {
+            $example = 'П-2.5-М';
+            $decoding = [
+                'П - провод',
+                '2.5 - сечение 2.5 мм²',
+                'М - медный'
+            ];
+        } elseif (strpos($subCode, 'BAR') !== false) {
+            $example = 'ПШ-020-Ст45';
+            $decoding = [
+                'ПШ - пруток шлифованный',
+                '020 - диаметр 20мм',
+                'Ст45 - сталь марки 45'
+            ];
+        } else {
+            $example = $subCode . '-001';
+            $decoding = [
+                $subCode . ' - код подкатегории',
+                '001 - порядковый номер'
+            ];
+        }
+        
+        $codeStructures[] = [
+            'category_ru' => $catName,
+            'subcategory_ru' => $subName,
+            'pattern' => $subCode . '-XXX-XX',
+            'description_ru' => 'Формат: ' . $subCode . '-[параметры]',
+            'examples' => [$example],
+            'example_detailed_decoding' => $decoding
+        ];
     }
 }
 
@@ -658,7 +838,18 @@ if (file_exists($materialsPath)) {
                         </div>
                         
                         <div class="abbreviations-grid" id="abbreviationsGrid">
-                            <?php foreach ($abbreviations as $code => $info): ?>
+                            <?php foreach ($abbreviationDecodings as $info): ?>
+                            <div class="abbreviation-card" data-code="<?= e(mb_strtolower($info['code'], 'UTF-8')) ?>" data-name="<?= e(mb_strtolower($info['full_name'], 'UTF-8')) ?>">
+                                <div class="abbr-header">
+                                    <span class="abbr-code"><?= e($info['code']) ?></span>
+                                    <span class="abbr-full-name"><?= e($info['full_name']) ?></span>
+                                </div>
+                                <div class="abbr-description"><?= e($info['description']) ?></div>
+                                <div class="abbr-category">📁 <?= e($info['category']) ?></div>
+                            </div>
+                            <?php endforeach; ?>
+                            
+                            <?php foreach ($allAbbreviations as $code => $info): ?>
                             <div class="abbreviation-card" data-code="<?= e(mb_strtolower($code, 'UTF-8')) ?>" data-name="<?= e(mb_strtolower($info['full_name'], 'UTF-8')) ?>">
                                 <div class="abbr-header">
                                     <span class="abbr-code"><?= e($code) ?></span>
@@ -678,16 +869,16 @@ if (file_exists($materialsPath)) {
                         </div>
                         
                         <!-- Справочник всех аббревиатур -->
-                        <?php if (!empty($allAbbreviations)): ?>
+                        <?php if (!empty($abbreviationDecodings)): ?>
                         <div style="margin-bottom: 32px; background: var(--bg-primary); border-radius: var(--border-radius-lg); padding: 20px; box-shadow: var(--shadow);">
                             <h3 style="margin-bottom: 16px; font-size: 16px; font-weight: 600;">
                                 📖 Полный справочник аббревиатур
                             </h3>
                             <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px;">
-                                <?php foreach ($allAbbreviations as $abbrCode => $abbrInfo): ?>
+                                <?php foreach ($abbreviationDecodings as $abbrInfo): ?>
                                 <div style="display: flex; align-items: center; gap: 10px; padding: 10px; background: var(--gray-50); border-radius: 8px; border: 1px solid var(--border-color);">
-                                    <span style="font-family: 'Courier New', monospace; font-weight: 700; color: var(--primary-color); font-size: 14px; min-width: 70px;"><?= e($abbrCode) ?></span>
-                                    <span style="font-size: 13px; color: var(--text-secondary);"><?= e($abbrInfo['desc']) ?></span>
+                                    <span style="font-family: 'Courier New', monospace; font-weight: 700; color: var(--primary-color); font-size: 14px; min-width: 70px;"><?= e($abbrInfo['code']) ?></span>
+                                    <span style="font-size: 13px; color: var(--text-secondary);"><?= e($abbrInfo['full_name']) ?> - <?= e($abbrInfo['description']) ?></span>
                                 </div>
                                 <?php endforeach; ?>
                             </div>
@@ -721,8 +912,7 @@ if (file_exists($materialsPath)) {
                                         <table class="explanation-table" style="width: 100%; margin-left: 12px;">
                                             <?php foreach ($structure['example_detailed_decoding'] as $item): ?>
                                             <tr>
-                                                <td><?= e($item['code']) ?></td>
-                                                <td><?= e($item['desc']) ?></td>
+                                                <td colspan="2"><?= e($item) ?></td>
                                             </tr>
                                             <?php endforeach; ?>
                                         </table>

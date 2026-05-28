@@ -16,42 +16,100 @@ $user = getCurrentUser();
 $pdo = getDbConnection();
 $pageTitle = 'Продукция';
 
-// Получение данных из JSON
-$jsonPath = dirname(BASE_PATH) . '/production.json';
-if (!file_exists($jsonPath)) {
-    $jsonPath = BASE_PATH . '/production.json';
-}
-
-$productionData = [];
-$categories = [];
+// Получение всех продуктов из базы данных
 $allProducts = [];
+$categories = [];
 
-if (file_exists($jsonPath)) {
-    $jsonData = file_get_contents($jsonPath);
-    $productionData = json_decode($jsonData, true);
-    $categories = $productionData['categories'] ?? [];
+try {
+    // Получение категорий продукции
+    $catStmt = $pdo->query("SELECT * FROM product_categories ORDER BY name");
+    $categories = $catStmt->fetchAll(PDO::FETCH_ASSOC);
     
-    // Сбор всей продукции в плоский список
-    $productIndex = 0;
-    foreach ($categories as $category) {
-        if (isset($category['subcategories'])) {
-            foreach ($category['subcategories'] as $subcategory) {
-                if (isset($subcategory['products'])) {
-                    foreach ($subcategory['products'] as $product) {
-                        $product['parent_category'] = $category;
-                        $product['subcategory'] = $subcategory;
-                        // Генерируем уникальный ID на основе SKU или индекса
-                        if (!isset($product['id'])) {
-                            $product['id'] = 'PROD_' . $productIndex . '_' . md5($product['sku']);
-                        }
-                        $allProducts[] = $product;
-                        $productIndex++;
-                    }
-                }
-            }
+    // Построение иерархии категорий
+    $categoryTree = [];
+    foreach ($categories as $cat) {
+        if ($cat['parent_id'] === null) {
+            $categoryTree[$cat['id']] = $cat;
+            $categoryTree[$cat['id']]['subcategories'] = [];
         }
     }
+    foreach ($categories as $cat) {
+        if ($cat['parent_id'] !== null && isset($categoryTree[$cat['parent_id']])) {
+            $categoryTree[$cat['parent_id']]['subcategories'][] = $cat;
+        }
+    }
+    
+    // Получение всей продукции с категориями
+    try {
+        $sql = "SELECT p.*, 
+                       pc.name as category_name, 
+                       pc.parent_id as category_parent_id,
+                       parent_cat.name as parent_category_name,
+                       bu.name as unit_name,
+                       c.name as supplier_name
+                FROM products p
+                LEFT JOIN product_categories pc ON p.category_id = pc.id
+                LEFT JOIN product_categories parent_cat ON pc.parent_id = parent_cat.id
+                LEFT JOIN base_units bu ON p.base_unit_id = bu.id
+                LEFT JOIN contractors c ON p.supplier_id = c.id
+                WHERE p.is_active = TRUE
+                ORDER BY p.name_full ASC";
+        
+        $stmt = $pdo->query($sql);
+        $dbProducts = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        // Преобразование данных для совместимости с существующим кодом
+        foreach ($dbProducts as $prod) {
+            $product = [
+                'id' => $prod['id'],
+                'sku' => $prod['article'],
+                'code_gost' => $prod['code_gost'] ?? '',
+                'name_full' => $prod['name_full'],
+                'name_short' => $prod['name_short'] ?? '',
+                'category_id' => $prod['category_id'],
+                'category_parent_id' => $prod['category_parent_id'],
+                'parent_category' => [
+                    'id' => $prod['category_parent_id'],
+                    'name_ru' => $prod['parent_category_name'] ?? ''
+                ],
+                'subcategory' => [
+                    'id' => $prod['category_id'],
+                    'name_ru' => $prod['category_name'] ?? ''
+                ],
+                'specs' => [
+                    'power_kw' => $prod['power_kw'] ?? null,
+                    'power_kw_min' => $prod['power_kw_min'] ?? null,
+                    'power_kw_max' => $prod['power_kw_max'] ?? null,
+                    'rpm' => $prod['rpm'] ?? null,
+                    'voltage_v' => $prod['voltage_v'] ?? null,
+                    'efficiency_class' => $prod['efficiency_class'] ?? null,
+                    'shaft_height_mm' => $prod['shaft_height_mm'] ?? null,
+                    'protection_class' => $prod['protection_class'] ? explode(',', $prod['protection_class']) : [],
+                    'mounting_versions' => $prod['mounting_versions'] ? explode(',', $prod['mounting_versions']) : []
+                ],
+                'is_bestseller' => $prod['is_bestseller'] ?? false,
+                'is_serial_tracked' => $prod['is_serial_tracked'] ?? false,
+                'image' => $prod['image'] ?? null,
+                'base_price' => $prod['base_price'] ?? 0,
+                'currency' => $prod['currency'] ?? 'BYN'
+            ];
+            $allProducts[] = $product;
+        }
+        
+        error_log("Загружено продукции: " . count($allProducts));
+    } catch (Exception $e) {
+        error_log("Ошибка при загрузке продукции: " . $e->getMessage());
+        error_log("SQL: " . $sql);
+        $allProducts = [];
+    }
+    
+} catch (Exception $e) {
+    // Если ошибка - продолжаем с пустыми данными
+    error_log("Ошибка при загрузке справочников: " . $e->getMessage());
 }
+
+error_log("Всего продукции в базе: " . count($allProducts));
+error_log("Категорий продукции: " . count($categories));
 
 // Получение уникальных значений для фильтров
 $efficiencyClasses = [];
@@ -181,7 +239,7 @@ if ($filterRpm !== '') {
 $filterProtection = $_GET['protection'] ?? '';
 if ($filterProtection !== '') {
     $filteredProducts = array_filter($filteredProducts, function($p) use ($filterProtection) {
-        return isset($p['protection_class']) && $p['protection_class'] === $filterProtection;
+        return isset($p['specs']['protection_class']) && is_array($p['specs']['protection_class']) && in_array($filterProtection, $p['specs']['protection_class']);
     });
 }
 

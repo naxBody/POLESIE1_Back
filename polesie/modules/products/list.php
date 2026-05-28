@@ -38,9 +38,16 @@ if ($category) {
 
 $sql .= " ORDER BY p.name_full ASC";
 
-$stmt = $pdo->prepare($sql);
-$stmt->execute($params);
-$products = $stmt->fetchAll();
+try {
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute($params);
+    $products = $stmt->fetchAll();
+    error_log("Загружено продукции: " . count($products));
+} catch (Exception $e) {
+    error_log("Ошибка при загрузке продукции: " . $e->getMessage());
+    error_log("SQL: " . $sql);
+    $products = [];
+}
 
 // Получение серийных номеров и документов для каждого продукта
 foreach ($products as &$product) {
@@ -91,8 +98,15 @@ foreach ($products as &$product) {
 }
 
 // Получение категорий
-$catStmt = $pdo->query("SELECT * FROM product_categories ORDER BY name");
-$categories = $catStmt->fetchAll();
+try {
+    $catStmt = $pdo->query("SELECT * FROM product_categories ORDER BY name");
+    $categories = $catStmt->fetchAll();
+} catch (Exception $e) {
+    error_log("Ошибка при загрузке категорий: " . $e->getMessage());
+    $categories = [];
+}
+
+error_log("Всего категорий продукции: " . count($categories));
 ?>
 <!DOCTYPE html>
 <html lang="ru">

@@ -45,24 +45,32 @@ try {
     }
     
     // Получение всех материалов с категориями и единицами измерения
-    $sql = "SELECT m.*, 
-                   mc.name as category_name, 
-                   mc.parent_id as category_parent_id,
-                   parent_cat.name as parent_category_name,
-                   u.name as unit_name, 
-                   u.symbol as unit_symbol,
-                   c.name as supplier_name,
-                   m.current_stock as warehouse_quantity,
-                   COALESCE(m.base_unit, u.name, 'шт') as base_unit
-            FROM materials m
-            LEFT JOIN material_categories mc ON m.category_id = mc.id
-            LEFT JOIN material_categories parent_cat ON mc.parent_id = parent_cat.id
-            LEFT JOIN base_units u ON m.base_unit_id = u.id
-            LEFT JOIN contractors c ON m.supplier_id = c.id
-            ORDER BY m.name_full ASC";
-    
-    $stmt = $pdo->query($sql);
-    $allMaterials = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    try {
+        $sql = "SELECT m.*, 
+                       mc.name as category_name, 
+                       mc.parent_id as category_parent_id,
+                       parent_cat.name as parent_category_name,
+                       u.name as unit_name, 
+                       u.symbol as unit_symbol,
+                       c.name as supplier_name,
+                       m.current_stock as warehouse_quantity,
+                       COALESCE(m.base_unit, u.name, 'шт') as base_unit
+                FROM materials m
+                LEFT JOIN material_categories mc ON m.category_id = mc.id
+                LEFT JOIN material_categories parent_cat ON mc.parent_id = parent_cat.id
+                LEFT JOIN base_units u ON m.base_unit_id = u.id
+                LEFT JOIN contractors c ON m.supplier_id = c.id
+                ORDER BY m.name_full ASC";
+        
+        $stmt = $pdo->query($sql);
+        $allMaterials = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        error_log("Загружено материалов: " . count($allMaterials));
+    } catch (Exception $e) {
+        error_log("Ошибка при загрузке материалов: " . $e->getMessage());
+        error_log("SQL: " . $sql);
+        $allMaterials = [];
+    }
     
     // Сбор уникальных значений для фильтров
     foreach ($allMaterials as $mat) {
@@ -83,8 +91,11 @@ try {
     
 } catch (Exception $e) {
     // Если ошибка - продолжаем с пустыми данными
-    error_log("Ошибка при загрузке материалов: " . $e->getMessage());
+    error_log("Ошибка при загрузке справочников: " . $e->getMessage());
 }
+
+error_log("Всего материалов в базе: " . count($allMaterials));
+error_log("Категорий: " . count($categories));
 
 $criticalLevels = ['Все', 'Обычные', 'Ответственные'];
 

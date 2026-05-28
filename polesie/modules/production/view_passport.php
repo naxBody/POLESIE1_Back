@@ -83,6 +83,51 @@ $dynStmt = $pdo->prepare("SELECT * FROM passport_dynamic_data WHERE serial_numbe
 $dynStmt->execute([$id]);
 $dynamicPassportData = $dynStmt->fetch();
 
+// Получение материалов для продукта из паспорта продукта
+$materialsStmt = $pdo->prepare("
+    SELECT 
+        ppm.quantity,
+        ppm.unit,
+        ppm.sort_order,
+        m.code as material_code,
+        m.name_full as material_name,
+        m.name_short as material_short,
+        mc.name as material_category,
+        m.material_type
+    FROM product_passport_materials ppm
+    JOIN materials m ON ppm.material_id = m.id
+    LEFT JOIN material_categories mc ON m.category_id = mc.id
+    WHERE ppm.passport_id = (
+        SELECT id FROM product_passports WHERE product_id = ?
+    )
+    ORDER BY ppm.sort_order, m.name_full
+");
+$materialsStmt->execute([$serialData['product_id']]);
+$materials = $materialsStmt->fetchAll();
+
+// Получение этапов производства из маршрутной карты продукта
+$stagesStmt = $pdo->prepare("
+    SELECT 
+        rco.operation_number,
+        rco.name as operation_name,
+        rco.description,
+        rco.time_norm_hours,
+        rco.sort_order,
+        ps.name as stage_name,
+        ps.color as stage_color,
+        rco.work_center,
+        rco.equipment,
+        rco.required_skills
+    FROM route_card_operations rco
+    LEFT JOIN production_stages ps ON rco.stage_id = ps.id
+    WHERE rco.route_card_id IN (
+        SELECT id FROM route_cards WHERE product_id = ? AND is_active = TRUE
+    )
+    ORDER BY rco.sort_order, rco.operation_number
+");
+$stagesStmt->execute([$serialData['product_id']]);
+$stages = $stagesStmt->fetchAll();
+
 // Если есть динамические данные, используем их
 if ($dynamicPassportData) {
     // Переопределяем данные если заданы в динамическом паспорте
@@ -257,6 +302,92 @@ $isPrint = isset($_GET['print']);
             margin-bottom: 20px;
         }
         
+        /* Стили для этапов производства */
+        .stages-timeline {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .stage-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            padding: 16px;
+            background: var(--bg-tertiary);
+            border-radius: var(--border-radius);
+            border-left: 4px solid var(--primary-color);
+        }
+        .stage-number {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+        .stage-content {
+            flex: 1;
+        }
+        .stage-name {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+        .stage-description {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+        .stage-meta {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+        .stage-meta-item {
+            font-size: 12px;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        /* Стили для материалов */
+        .materials-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 8px;
+        }
+        .materials-table th {
+            text-align: left;
+            padding: 12px;
+            background: var(--bg-secondary);
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            border-bottom: 2px solid var(--border-color);
+        }
+        .materials-table td {
+            padding: 12px;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 14px;
+        }
+        .materials-table tr:hover {
+            background: var(--bg-tertiary);
+        }
+        .material-code {
+            font-family: 'Courier New', monospace;
+            background: var(--bg-secondary);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+        
         @media print {
             body * {
                 visibility: hidden;
@@ -314,6 +445,41 @@ $isPrint = isset($_GET['print']);
             }
             .actions-bar {
                 display: none;
+            }
+            .stage-item {
+                background: white;
+                border: 1px solid #ddd;
+                padding: 12px;
+            }
+            .stage-number {
+                background: #333 !important;
+                color: white;
+            }
+            .stage-name {
+                color: #000;
+                font-weight: 600;
+            }
+            .stage-description {
+                color: #333;
+            }
+            .stage-meta-item {
+                color: #333;
+            }
+            .materials-table {
+                background: white;
+            }
+            .materials-table th {
+                background: #f5f5f5;
+                color: #000;
+                border-bottom: 1px solid #333;
+            }
+            .materials-table td {
+                border-bottom: 1px solid #eee;
+                color: #000;
+            }
+            .material-code {
+                background: #f5f5f5;
+                color: #000;
             }
         }
     </style>
@@ -472,6 +638,80 @@ $isPrint = isset($_GET['print']);
         <div class="passport-section">
             <div class="passport-section-title">📝 Описание</div>
             <div style="line-height: 1.6;"><?= nl2br(e($serialData['product_description'])) ?></div>
+        </div>
+        <?php endif; ?>
+        
+        <!-- Этапы производства -->
+        <?php if (!empty($stages)): ?>
+        <div class="passport-section">
+            <div class="passport-section-title">🏭 Этапы производства</div>
+            <div class="stages-timeline">
+                <?php foreach ($stages as $index => $stage): ?>
+                <div class="stage-item" style="<?= !empty($stage['stage_color']) ? 'border-left-color: ' . e($stage['stage_color']) : '' ?>">
+                    <div class="stage-number" style="<?= !empty($stage['stage_color']) ? 'background: ' . e($stage['stage_color']) : '' ?>">
+                        <?= $index + 1 ?>
+                    </div>
+                    <div class="stage-content">
+                        <div class="stage-name"><?= e($stage['operation_name']) ?></div>
+                        <?php if (!empty($stage['description'])): ?>
+                        <div class="stage-description"><?= nl2br(e($stage['description'])) ?></div>
+                        <?php endif; ?>
+                        <div class="stage-meta">
+                            <?php if (!empty($stage['stage_name'])): ?>
+                            <span class="stage-meta-item">📍 <?= e($stage['stage_name']) ?></span>
+                            <?php endif; ?>
+                            <?php if (!empty($stage['work_center'])): ?>
+                            <span class="stage-meta-item">🏢 <?= e($stage['work_center']) ?></span>
+                            <?php endif; ?>
+                            <?php if (!empty($stage['equipment'])): ?>
+                            <span class="stage-meta-item">🔧 <?= e($stage['equipment']) ?></span>
+                            <?php endif; ?>
+                            <?php if (!empty($stage['time_norm_hours'])): ?>
+                            <span class="stage-meta-item">⏱️ <?= number_format($stage['time_norm_hours'], 1) ?> ч</span>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                </div>
+                <?php endforeach; ?>
+            </div>
+        </div>
+        <?php endif; ?>
+        
+        <!-- Материалы для производства -->
+        <?php if (!empty($materials)): ?>
+        <div class="passport-section">
+            <div class="passport-section-title">📦 Материалы для производства (<?= count($materials) ?> поз.)</div>
+            <table class="materials-table">
+                <thead>
+                    <tr>
+                        <th style="width: 50px;">№</th>
+                        <th>Материал</th>
+                        <th>Код</th>
+                        <th style="width: 100px;">Количество</th>
+                        <th style="width: 80px;">Ед.</th>
+                        <th>Категория</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($materials as $index => $material): ?>
+                    <tr>
+                        <td><?= $index + 1 ?></td>
+                        <td><strong><?= e($material['material_name']) ?></strong></td>
+                        <td><span class="material-code"><?= e($material['material_code']) ?></span></td>
+                        <td><?= number_format($material['quantity'], 3, ',', ' ') ?></td>
+                        <td><?= e($material['unit']) ?></td>
+                        <td><?= e($material['material_category'] ?? '—') ?></td>
+                    </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+        <?php else: ?>
+        <div class="passport-section">
+            <div class="passport-section-title">📦 Материалы для производства</div>
+            <p style="color: var(--text-secondary); padding: 20px; text-align: center; background: var(--bg-tertiary); border-radius: var(--border-radius);">
+                ℹ️ Материалы не указаны в паспорте продукта
+            </p>
         </div>
         <?php endif; ?>
         

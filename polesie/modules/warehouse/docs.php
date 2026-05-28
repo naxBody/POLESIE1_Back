@@ -197,20 +197,17 @@ foreach ($materialCategories as $category) {
         $decoding = [];
         
         if (strpos($subCode, 'BOLT') !== false) {
-            $example = 'Б-010-8.8-ц';
+            $example = 'BOLT-M10x50';
             $decoding = [
-                'Б - болт',
-                '010 - диаметр 10мм',
-                '8.8 - класс прочности',
-                'ц - оцинкованный'
+                'BOLT - болт (bolt)',
+                'M10 - метрическая резьба диаметром 10мм',
+                'x50 - длина болта 50мм'
             ];
         } elseif (strpos($subCode, 'NUT') !== false) {
-            $example = 'Г-010-8-ц';
+            $example = 'NUT-M10';
             $decoding = [
-                'Г - гайка',
-                '010 - диаметр 10мм',
-                '8 - класс прочности',
-                'ц - оцинкованная'
+                'NUT - гайка (nut)',
+                'M10 - метрическая резьба диаметром 10мм'
             ];
         } elseif (strpos($subCode, 'WIRE') !== false) {
             $example = 'П-2.5-М';

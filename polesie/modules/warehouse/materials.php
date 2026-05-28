@@ -181,6 +181,22 @@ if ($filterCert !== '') {
     });
 }
 
+// Фильтр по классу прочности
+$filterStrengthClass = $_GET['strength_class'] ?? '';
+if ($filterStrengthClass !== '') {
+    $filteredMaterials = array_filter($filteredMaterials, function($m) use ($filterStrengthClass) {
+        return isset($m['strength_class']) && $m['strength_class'] === $filterStrengthClass;
+    });
+}
+
+// Фильтр по покрытию
+$filterCoating = $_GET['coating'] ?? '';
+if ($filterCoating !== '') {
+    $filteredMaterials = array_filter($filteredMaterials, function($m) use ($filterCoating) {
+        return isset($m['coating']) && $m['coating'] === $filterCoating;
+    });
+}
+
 // Сортировка
 $sortBy = $_GET['sort'] ?? 'name';
 $sortOrder = $_GET['order'] ?? 'asc';
@@ -1005,7 +1021,7 @@ $availableCombinationsJson = json_encode($availableCombinations, JSON_UNESCAPED_
                         </td>
                         <td><?= e($material['grade'] ?? '—') ?></td>
                         <td><small><?= e($material['material_type'] ?? '—') ?></small></td>
-                        <td><?= e($material['base_unit']) ?></td>
+                        <td><?= e($material['base_unit'] ?? $material['unit_name'] ?? 'шт') ?></td>
                         <td>
                             <span class="quantity-badge <?= $qtyClass ?>" style="font-size: 13px;"><?= $qtyText ?></span>
                         </td>

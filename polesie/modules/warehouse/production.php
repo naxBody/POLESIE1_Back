@@ -69,9 +69,20 @@ try {
                 }
             }
             
+            // Маппинг русскоязычных ключей БД в английские для отображения
+            // мощность_квт -> power_kw, обороты_мин -> rpm, и т.д.
+            $powerKw = !empty($prod['power_kw']) ? $prod['power_kw'] : ($specs['power_kw'] ?? $specs['мощность_квт'] ?? null);
+            $rpm = !empty($prod['rpm']) ? $prod['rpm'] : ($specs['rpm'] ?? $specs['обороты_мин'] ?? null);
+            $voltageV = $specs['voltage_v'] ?? $specs['напряжение_в'] ?? null;
+            $efficiencyClass = !empty($prod['efficiency_class']) ? $prod['efficiency_class'] : ($specs['efficiency_class'] ?? $specs['класс_эффективности'] ?? null);
+            $shaftHeightMm = $specs['shaft_height_mm'] ?? $specs['высота_оси_мм'] ?? $specs['габарит'] ?? null;
+            
             // Защита от null значений
-            $protectionClass = !empty($prod['protection_class']) ? $prod['protection_class'] : (isset($specs['protection_class']) ? $specs['protection_class'] : '');
-            $mountingVersions = isset($specs['mounting_versions']) ? $specs['mounting_versions'] : '';
+            $protectionClassInput = !empty($prod['protection_class']) ? $prod['protection_class'] : ($specs['protection_class'] ?? $specs['степень_защиты'] ?? '');
+            $mountingVersionsInput = isset($specs['mounting_versions']) ? $specs['mounting_versions'] : (isset($specs['монтаж']) ? $specs['монтаж'] : '');
+            
+            $protectionClass = !empty($protectionClassInput) ? $protectionClassInput : '';
+            $mountingVersions = !empty($mountingVersionsInput) ? $mountingVersionsInput : '';
             
             $product = [
                 'id' => $prod['id'],
@@ -90,13 +101,13 @@ try {
                     'name_ru' => $prod['category_name'] ?? ''
                 ],
                 'specs' => [
-                    'power_kw' => !empty($prod['power_kw']) ? $prod['power_kw'] : ($specs['power_kw'] ?? null),
-                    'power_kw_min' => $specs['power_kw_min'] ?? null,
-                    'power_kw_max' => $specs['power_kw_max'] ?? null,
-                    'rpm' => !empty($prod['rpm']) ? $prod['rpm'] : ($specs['rpm'] ?? null),
-                    'voltage_v' => $specs['voltage_v'] ?? null,
-                    'efficiency_class' => !empty($prod['efficiency_class']) ? $prod['efficiency_class'] : ($specs['efficiency_class'] ?? null),
-                    'shaft_height_mm' => $specs['shaft_height_mm'] ?? null,
+                    'power_kw' => $powerKw,
+                    'power_kw_min' => $specs['power_kw_min'] ?? $specs['мощность_квт_min'] ?? null,
+                    'power_kw_max' => $specs['power_kw_max'] ?? $specs['мощность_квт_max'] ?? null,
+                    'rpm' => $rpm,
+                    'voltage_v' => $voltageV,
+                    'efficiency_class' => $efficiencyClass,
+                    'shaft_height_mm' => $shaftHeightMm,
                     'protection_class' => $protectionClass ? (is_array($protectionClass) ? $protectionClass : explode(',', $protectionClass)) : [],
                     'mounting_versions' => $mountingVersions ? (is_array($mountingVersions) ? $mountingVersions : explode(',', $mountingVersions)) : []
                 ],

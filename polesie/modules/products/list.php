@@ -85,82 +85,95 @@ try {
         $product['specifications'] = $specsArray;
         
         // Берем значения напрямую из specsArray (как в materials.php)
-        // Мощность
+        // Для продукции Полесьеэлектромаш
+        
+        // Мощность (кВт)
         if (isset($specsArray['мощность_квт'])) {
             $product['power_kw'] = is_numeric($specsArray['мощность_квт']) ? floatval($specsArray['мощность_квт']) : $specsArray['мощность_квт'];
         }
-        // Обороты
-        if (isset($specsArray['обороты_мин'])) {
-            $product['rpm'] = is_numeric($specsArray['обороты_мин']) ? intval($specsArray['обороты_мин']) : $specsArray['обороты_мин'];
+        // Частота вращения (об/мин)
+        if (isset($specsArray['частота_вращения_об_мин'])) {
+            $product['rpm'] = is_numeric($specsArray['частота_вращения_об_мин']) ? intval($specsArray['частота_вращения_об_мин']) : $specsArray['частота_вращения_об_мин'];
         }
-        // Напряжение
-        if (isset($specsArray['напряжение_в'])) {
-            $product['voltage_v'] = is_numeric($specsArray['напряжение_в']) ? intval($specsArray['напряжение_в']) : $specsArray['напряжение_в'];
+        // КПД (%)
+        if (isset($specsArray['кпд_проц'])) {
+            $product['efficiency_percent'] = is_numeric($specsArray['кпд_проц']) ? floatval($specsArray['кпд_проц']) : $specsArray['кпд_проц'];
         }
-        // Частота
-        if (isset($specsArray['частота_гц'])) {
-            $product['frequency_hz'] = is_numeric($specsArray['частота_гц']) ? intval($specsArray['частота_гц']) : $specsArray['частота_гц'];
+        // Косинус фи
+        if (isset($specsArray['косинус_фи'])) {
+            $product['cos_phi'] = is_numeric($specsArray['косинус_фи']) ? floatval($specsArray['косинус_фи']) : $specsArray['косинус_фи'];
         }
-        // Класс эффективности
-        if (isset($specsArray['класс_эффективности'])) {
-            $product['efficiency_class'] = strval($specsArray['класс_эффективности']);
+        // Пусковой ток к номинальному
+        if (isset($specsArray['пусковой_ток_к_номинальному'])) {
+            $product['start_current_ratio'] = is_numeric($specsArray['пусковой_ток_к_номинальному']) ? floatval($specsArray['пусковой_ток_к_номинальному']) : $specsArray['пусковой_ток_к_номинальному'];
         }
-        // Высота оси
-        if (isset($specsArray['высота_оси_мм'])) {
-            $product['shaft_height_mm'] = is_numeric($specsArray['высота_оси_мм']) ? floatval($specsArray['высота_оси_мм']) : $specsArray['высота_оси_мм'];
+        // Пусковой момент к номинальному
+        if (isset($specsArray['пусковой_момент_к_номинальному'])) {
+            $product['start_torque_ratio'] = is_numeric($specsArray['пусковой_момент_к_номинальному']) ? floatval($specsArray['пусковой_момент_к_номинальному']) : $specsArray['пусковой_момент_к_номинальному'];
+        }
+        // Макс момент к номинальному
+        if (isset($specsArray['макс_момент_к_номинальному'])) {
+            $product['max_torque_ratio'] = is_numeric($specsArray['макс_момент_к_номинальному']) ? floatval($specsArray['макс_момент_к_номинальному']) : $specsArray['макс_момент_к_номинальному'];
+        }
+        // Мин момент к номинальному
+        if (isset($specsArray['мин_момент_к_номинальному'])) {
+            $product['min_torque_ratio'] = is_numeric($specsArray['мин_момент_к_номинальному']) ? floatval($specsArray['мин_момент_к_номинальному']) : $specsArray['мин_момент_к_номинальному'];
+        }
+        // Масса (кг)
+        if (isset($specsArray['масса_кг'])) {
+            $product['weight_kg'] = is_numeric($specsArray['масса_кг']) ? floatval($specsArray['масса_кг']) : $specsArray['масса_кг'];
         }
         // Габарит
         if (isset($specsArray['габарит'])) {
-            $product['frame_size'] = strval($specsArray['габарит']);
+            $product['frame_size'] = is_numeric($specsArray['габарит']) ? intval($specsArray['габарит']) : $specsArray['габарит'];
         }
-        // Климатическое исполнение
-        if (isset($specsArray['климатическое_исполнение'])) {
-            $product['climate_versions'] = strval($specsArray['климатическое_исполнение']);
+        // Число полюсов
+        if (isset($specsArray['число_полюсов'])) {
+            $product['poles'] = is_numeric($specsArray['число_полюсов']) ? intval($specsArray['число_полюсов']) : $specsArray['число_полюсов'];
         }
-        // Монтаж
-        if (isset($specsArray['монтаж'])) {
-            $product['mounting_versions'] = strval($specsArray['монтаж']);
+        // Класс энергоэффективности
+        if (isset($specsArray['класс_энергоэффективности'])) {
+            $product['energy_class'] = strval($specsArray['класс_энергоэффективности']);
         }
-        // Степень защиты
-        if (isset($specsArray['степень_защиты'])) {
-            $product['protection_class'] = strval($specsArray['степень_защиты']);
+        // Напряжение (В)
+        if (isset($specsArray['напряжение_в'])) {
+            $product['voltage_v'] = is_numeric($specsArray['напряжение_в']) ? intval($specsArray['напряжение_в']) : $specsArray['напряжение_в'];
         }
-        // Тип двигателя
-        if (isset($specsArray['тип_двигателя'])) {
-            $product['motor_type'] = strval($specsArray['тип_двигателя']);
+        // Многоскоростные: мощность на 1500 об/мин
+        if (isset($specsArray['мощность_квт_1500'])) {
+            $product['power_kw_1500'] = is_numeric($specsArray['мощность_квт_1500']) ? floatval($specsArray['мощность_квт_1500']) : $specsArray['мощность_квт_1500'];
         }
-        // Область применения
-        if (isset($specsArray['область_применения'])) {
-            $product['application'] = strval($specsArray['область_применения']);
+        // Многоскоростные: мощность на 3000 об/мин
+        if (isset($specsArray['мощность_квт_3000'])) {
+            $product['power_kw_3000'] = is_numeric($specsArray['мощность_квт_3000']) ? floatval($specsArray['мощность_квт_3000']) : $specsArray['мощность_квт_3000'];
         }
-        // Материал корпуса
-        if (isset($specsArray['материал_корпуса'])) {
-            $product['housing_material'] = strval($specsArray['материал_корпуса']);
+        // Многоскоростные: мощность на 1000 об/мин
+        if (isset($specsArray['мощность_квт_1000'])) {
+            $product['power_kw_1000'] = is_numeric($specsArray['мощность_квт_1000']) ? floatval($specsArray['мощность_квт_1000']) : $specsArray['мощность_квт_1000'];
         }
-        // Материал вала
-        if (isset($specsArray['материал_вала'])) {
-            $product['shaft_material'] = strval($specsArray['материал_вала']);
+        // Многоскоростные: мощность на 750 об/мин
+        if (isset($specsArray['мощность_квт_750'])) {
+            $product['power_kw_750'] = is_numeric($specsArray['мощность_квт_750']) ? floatval($specsArray['мощность_квт_750']) : $specsArray['мощность_квт_750'];
         }
-        // Взрывозащита
-        if (isset($specsArray['взрывозащита'])) {
-            $product['explosion_protection'] = strval($specsArray['взрывозащита']);
+        // Степень взрывозащиты
+        if (isset($specsArray['степень_взрывозащиты'])) {
+            $product['explosion_protection'] = strval($specsArray['степень_взрывозащиты']);
         }
-        // Конденсатор в комплекте
-        if (isset($specsArray['конденсатор_в_комплекте'])) {
-            $val = $specsArray['конденсатор_в_комплекте'];
-            $product['capacitor_included'] = ($val === true || $val === 'true' || $val === '1' || $val === 1);
+        // Материал станины
+        if (isset($specsArray['материал_станины'])) {
+            $product['stator_material'] = strval($specsArray['материал_станины']);
         }
-        // Стандарт
-        if (isset($specsArray['стандарт'])) {
-            $product['standard'] = strval($specsArray['стандарт']);
+        // Потребляемая мощность (Вт) - для насосов
+        if (isset($specsArray['потребляемая_мощность_вт'])) {
+            $product['power_consumed_w'] = is_numeric($specsArray['потребляемая_мощность_вт']) ? intval($specsArray['потребляемая_мощность_вт']) : $specsArray['потребляемая_мощность_вт'];
         }
-        // Вес
-        if (isset($specsArray['вес_кг'])) {
-            $product['weight_range_kg'] = is_numeric($specsArray['вес_кг']) ? floatval($specsArray['вес_кг']) : $specsArray['вес_кг'];
+        // Производительность (л/мин) - для насосов
+        if (isset($specsArray['производительность_л_мин'])) {
+            $product['flow_rate_l_min'] = is_numeric($specsArray['производительность_л_мин']) ? intval($specsArray['производительность_л_мин']) : $specsArray['производительность_л_мин'];
         }
-        // Гарантия
-        if (isset($specsArray['гарантия_мес'])) {
-            $product['warranty_months'] = is_numeric($specsArray['гарантия_мес']) ? intval($specsArray['гарантия_мес']) : $specsArray['гарантия_мес'];
+        // Номинальный напор (м) - для насосов
+        if (isset($specsArray['номинальный_напор_м'])) {
+            $product['head_m'] = is_numeric($specsArray['номинальный_напор_м']) ? intval($specsArray['номинальный_напор_м']) : $specsArray['номинальный_напор_м'];
         }
     }
     unset($product);

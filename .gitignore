@@ -4,12 +4,13 @@
 __pycache__/
 
 # Dependencies
-vendor/
-composer.lock
+venv/
+.venv/
 
 # Logs and temp files
 *.log
 *.tmp
+*.swp
 
 # Environment
 .env
@@ -20,11 +21,16 @@ composer.lock
 .vscode/
 .idea/
 
+# Database related
+*.sql.bak
+*.db-journal
+
+# Coverage reports
+coverage/
+htmlcov/
+.coverage
+
 # OS generated files
 .DS_Store
 Thumbs.db
-
-# Backup files
-*.bak
-*.backup
 ```

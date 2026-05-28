@@ -247,10 +247,119 @@ $totalProducts = count($passports);
             margin-bottom: 12px;
             padding-bottom: 8px;
             border-bottom: 2px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .production-flow {
+            position: relative;
+            padding-left: 20px;
+        }
+        .production-flow::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: linear-gradient(to bottom, var(--primary-color), var(--success-color));
+            border-radius: 3px;
+        }
+        .stage-item {
+            position: relative;
+            padding: 16px;
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .stage-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+        }
+        .stage-item::before {
+            content: attr(data-step);
+            position: absolute;
+            left: -34px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 28px;
+            height: 28px;
+            background: var(--primary-color);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 700;
+            border: 3px solid white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+        .stage-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        .stage-name {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        .stage-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .stage-description {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+            line-height: 1.5;
+        }
+        .stage-details {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            padding-top: 12px;
+            border-top: 1px dashed var(--border-color);
+        }
+        .stage-detail-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+        .materials-grouped {
+            margin-bottom: 20px;
+        }
+        .material-category-header {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            padding: 10px 12px;
+            background: var(--bg-secondary);
+            border-radius: 8px 8px 0 0;
+            margin-top: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .material-category-header:first-child {
+            margin-top: 0;
         }
         .materials-table {
             width: 100%;
             border-collapse: collapse;
+            background: white;
+            border-radius: 0 0 8px 8px;
+            overflow: hidden;
         }
         .materials-table th {
             text-align: left;
@@ -568,29 +677,40 @@ $totalProducts = count($passports);
                 html += '</div>';
             }
             
-            // Этапы производства из БД
+            // Этапы производства из БД - красивый поток производства
             html += '<div class="passport-section">';
-            html += '<div class="passport-section-title">🏭 Этапы производства</div>';
+            html += '<div class="passport-section-title">🏭 Карта производства</div>';
             if (passport.stages && passport.stages.length > 0) {
-                html += '<div style="display: flex; flex-direction: column; gap: 10px;">';
+                html += '<div class="production-flow">';
                 for (var i = 0; i < passport.stages.length; i++) {
                     var stage = passport.stages[i];
-                    html += '<div style="display: flex; align-items: center; gap: 12px; padding: 12px; background: var(--bg-tertiary); border-radius: 8px;">';
-                    html += '<div style="width: 32px; height: 32px; background: ' + (stage.stage_color || '#3498db') + '; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700;">' + (i + 1) + '</div>';
-                    html += '<div style="flex: 1;">';
-                    html += '<div style="font-weight: 600; color: var(--text-primary);">' + escapeHtml(stage.operation_name) + '</div>';
-                    if (stage.description) {
-                        html += '<div style="font-size: 12px; color: var(--text-secondary);">' + escapeHtml(stage.description) + '</div>';
+                    var stepNum = i + 1;
+                    html += '<div class="stage-item" data-step="' + stepNum + '">';
+                    html += '<div class="stage-header">';
+                    html += '<div class="stage-name">' + escapeHtml(stage.operation_name || 'Операция ' + stepNum) + '</div>';
+                    if (stage.stage_color) {
+                        html += '<span class="stage-badge" style="background: ' + stage.stage_color + '; color: white;">' + escapeHtml(stage.stage_name || 'Этап') + '</span>';
+                    } else if (stage.stage_name) {
+                        html += '<span class="stage-badge" style="background: #3498db; color: white;">' + escapeHtml(stage.stage_name) + '</span>';
                     }
                     html += '</div>';
-                    if (stage.work_center || stage.equipment) {
-                        html += '<div style="text-align: right; font-size: 12px; color: var(--text-secondary);">';
-                        if (stage.work_center) html += '<div>📍 ' + escapeHtml(stage.work_center) + '</div>';
-                        if (stage.equipment) html += '<div>🔧 ' + escapeHtml(stage.equipment) + '</div>';
-                        if (stage.time_norm_hours) html += '<div>⏱️ ' + parseFloat(stage.time_norm_hours).toFixed(1) + ' ч</div>';
-                    } else if (stage.time_norm_hours) {
-                        html += '<div style="font-size: 13px; color: var(--text-secondary);">⏱️ ' + parseFloat(stage.time_norm_hours).toFixed(1) + ' ч</div>';
+                    if (stage.description) {
+                        html += '<div class="stage-description">' + escapeHtml(stage.description) + '</div>';
                     }
+                    html += '<div class="stage-details">';
+                    if (stage.work_center) {
+                        html += '<div class="stage-detail-item">📍 ' + escapeHtml(stage.work_center) + '</div>';
+                    }
+                    if (stage.equipment) {
+                        html += '<div class="stage-detail-item">🔧 ' + escapeHtml(stage.equipment) + '</div>';
+                    }
+                    if (stage.time_norm_hours) {
+                        html += '<div class="stage-detail-item">⏱️ ' + parseFloat(stage.time_norm_hours).toFixed(1) + ' ч</div>';
+                    }
+                    if (stage.operation_number) {
+                        html += '<div class="stage-detail-item">№ ' + escapeHtml(stage.operation_number) + '</div>';
+                    }
+                    html += '</div>';
                     html += '</div>';
                 }
                 html += '</div>';
@@ -601,26 +721,55 @@ $totalProducts = count($passports);
             }
             html += '</div>';
             
-            // Материалы из БД
+            // Материалы из БД - сгруппированные по категориям
             html += '<div class="passport-section">';
-            html += '<div class="passport-section-title">📦 Материалы для производства (' + (passport.materials ? passport.materials.length : 0) + ' поз.)</div>';
+            html += '<div class="passport-section-title">📦 Материалы для производства</div>';
             if (passport.materials && passport.materials.length > 0) {
-                html += '<table class="materials-table">';
-                html += '<thead><tr><th>№</th><th>Материал</th><th>Код</th><th>Количество</th><th>Ед.</th><th>Категория</th></tr></thead>';
-                html += '<tbody>';
+                // Группируем материалы по категориям
+                var materialsByCategory = {};
                 for (var i = 0; i < passport.materials.length; i++) {
                     var mat = passport.materials[i];
-                    html += '<tr>';
-                    html += '<td>' + (i + 1) + '</td>';
-                    html += '<td><strong>' + escapeHtml(mat.material_name) + '</strong></td>';
-                    html += '<td><code>' + escapeHtml(mat.material_code) + '</code></td>';
-                    html += '<td>' + Number(mat.quantity).toFixed(2).replace('.', ',') + '</td>';
-                    html += '<td>' + escapeHtml(mat.unit) + '</td>';
-                    html += '<td>' + escapeHtml(mat.material_category || '—') + '</td>';
-                    html += '</tr>';
+                    var catName = mat.material_category || 'Прочее';
+                    if (!materialsByCategory[catName]) {
+                        materialsByCategory[catName] = [];
+                    }
+                    materialsByCategory[catName].push(mat);
                 }
-                html += '</tbody>';
-                html += '</table>';
+                
+                var categoryIcons = {
+                    'Металлы': '🔩',
+                    'Крепеж': '🔧',
+                    'Электроника': '⚡',
+                    'Пластик': '🧪',
+                    'Резина': '⭕',
+                    'Упаковка': '📦',
+                    'Прочее': '📋'
+                };
+                
+                for (var catName in materialsByCategory) {
+                    if (materialsByCategory.hasOwnProperty(catName)) {
+                        var icon = categoryIcons[catName] || '📋';
+                        html += '<div class="materials-grouped">';
+                        html += '<div class="material-category-header">' + icon + ' ' + escapeHtml(catName) + ' (' + materialsByCategory[catName].length + ' поз.)</div>';
+                        html += '<table class="materials-table">';
+                        html += '<thead><tr><th>№</th><th>Материал</th><th>Код</th><th>Количество</th><th>Ед.</th></tr></thead>';
+                        html += '<tbody>';
+                        for (var j = 0; j < materialsByCategory[catName].length; j++) {
+                            var mat = materialsByCategory[catName][j];
+                            var globalIdx = i + j + 1;
+                            html += '<tr>';
+                            html += '<td>' + (j + 1) + '</td>';
+                            html += '<td><strong>' + escapeHtml(mat.material_name) + '</strong></td>';
+                            html += '<td><code>' + escapeHtml(mat.material_code) + '</code></td>';
+                            html += '<td>' + Number(mat.quantity).toFixed(2).replace('.', ',') + '</td>';
+                            html += '<td>' + escapeHtml(mat.unit) + '</td>';
+                            html += '</tr>';
+                        }
+                        html += '</tbody>';
+                        html += '</table>';
+                        html += '</div>';
+                    }
+                }
             } else {
                 html += '<div style="padding: 20px; text-align: center; color: var(--text-secondary); background: var(--bg-tertiary); border-radius: 8px;">';
                 html += 'ℹ️ Материалы не указаны в паспорте';

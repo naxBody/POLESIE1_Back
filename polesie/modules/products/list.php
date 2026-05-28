@@ -20,26 +20,26 @@ $search = $_GET['search'] ?? '';
 $category = $_GET['category'] ?? '';
 
 $sql = "SELECT p.*, c.name as category_name, u.symbol as unit_name,
-               -- Извлекаем данные из JSON specifications (поддержка русских ключей)
-               JSON_EXTRACT(p.specifications, '$.мощность_квт') as power_kw,
-               JSON_EXTRACT(p.specifications, '$.обороты_мин') as rpm,
-               JSON_EXTRACT(p.specifications, '$.напряжение_в') as voltage_v,
-               JSON_EXTRACT(p.specifications, '$.частота_гц') as frequency_hz,
-               JSON_EXTRACT(p.specifications, '$.класс_эффективности') as efficiency_class,
-               JSON_EXTRACT(p.specifications, '$.высота_оси_мм') as shaft_height_mm,
-               JSON_EXTRACT(p.specifications, '$.габарит') as frame_size,
-               JSON_EXTRACT(p.specifications, '$.климатическое_исполнение') as climate_versions,
-               JSON_EXTRACT(p.specifications, '$.монтаж') as mounting_versions,
-               JSON_EXTRACT(p.specifications, '$.степень_защиты') as protection_class,
-               JSON_EXTRACT(p.specifications, '$.тип_двигателя') as motor_type,
-               JSON_EXTRACT(p.specifications, '$.область_применения') as application,
-               JSON_EXTRACT(p.specifications, '$.материал_корпуса') as housing_material,
-               JSON_EXTRACT(p.specifications, '$.материал_вала') as shaft_material,
-               JSON_EXTRACT(p.specifications, '$.взрывозащита') as explosion_protection,
-               JSON_EXTRACT(p.specifications, '$.конденсатор_в_комплекте') as capacitor_included,
-               JSON_EXTRACT(p.specifications, '$.стандарт') as standard,
-               JSON_EXTRACT(p.specifications, '$.вес_кг') as weight_range_kg,
-               JSON_EXTRACT(p.specifications, '$.гарантия_мес') as warranty_months
+               -- Извлекаем данные из JSON specifications с JSON_UNQUOTE для корректных значений
+               JSON_UNQUOTE(JSON_EXTRACT(p.specifications, '$.мощность_квт')) as power_kw,
+               JSON_UNQUOTE(JSON_EXTRACT(p.specifications, '$.обороты_мин')) as rpm,
+               JSON_UNQUOTE(JSON_EXTRACT(p.specifications, '$.напряжение_в')) as voltage_v,
+               JSON_UNQUOTE(JSON_EXTRACT(p.specifications, '$.частота_гц')) as frequency_hz,
+               JSON_UNQUOTE(JSON_EXTRACT(p.specifications, '$.класс_эффективности')) as efficiency_class,
+               JSON_UNQUOTE(JSON_EXTRACT(p.specifications, '$.высота_оси_мм')) as shaft_height_mm,
+               JSON_UNQUOTE(JSON_EXTRACT(p.specifications, '$.габарит')) as frame_size,
+               JSON_UNQUOTE(JSON_EXTRACT(p.specifications, '$.климатическое_исполнение')) as climate_versions,
+               JSON_UNQUOTE(JSON_EXTRACT(p.specifications, '$.монтаж')) as mounting_versions,
+               JSON_UNQUOTE(JSON_EXTRACT(p.specifications, '$.степень_защиты')) as protection_class,
+               JSON_UNQUOTE(JSON_EXTRACT(p.specifications, '$.тип_двигателя')) as motor_type,
+               JSON_UNQUOTE(JSON_EXTRACT(p.specifications, '$.область_применения')) as application,
+               JSON_UNQUOTE(JSON_EXTRACT(p.specifications, '$.материал_корпуса')) as housing_material,
+               JSON_UNQUOTE(JSON_EXTRACT(p.specifications, '$.материал_вала')) as shaft_material,
+               JSON_UNQUOTE(JSON_EXTRACT(p.specifications, '$.взрывозащита')) as explosion_protection,
+               JSON_UNQUOTE(JSON_EXTRACT(p.specifications, '$.конденсатор_в_комплекте')) as capacitor_included,
+               JSON_UNQUOTE(JSON_EXTRACT(p.specifications, '$.стандарт')) as standard,
+               JSON_UNQUOTE(JSON_EXTRACT(p.specifications, '$.вес_кг')) as weight_range_kg,
+               JSON_UNQUOTE(JSON_EXTRACT(p.specifications, '$.гарантия_мес')) as warranty_months
         FROM products p 
         LEFT JOIN product_categories c ON p.category_id = c.id 
         LEFT JOIN base_units u ON p.base_unit_id = u.id

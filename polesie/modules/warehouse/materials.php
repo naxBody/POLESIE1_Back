@@ -54,23 +54,39 @@ try {
                        u.name as unit_name, 
                        u.symbol as unit_symbol,
                        COALESCE(u.name, 'шт') as base_unit,
-                       -- Извлекаем данные из JSON specifications
+                       -- Извлекаем данные из JSON specifications (поддержка русских и английских ключей)
                        JSON_EXTRACT(m.specifications, '$.steel_grade') as grade,
+                       JSON_EXTRACT(m.specifications, '$.марка_стали') as grade_ru,
                        JSON_EXTRACT(m.specifications, '$.surface') as material_type,
+                       JSON_EXTRACT(m.specifications, '$.поверхность') as material_type_ru,
                        JSON_EXTRACT(m.specifications, '$.gost') as standard,
+                       JSON_EXTRACT(m.specifications, '$.гост') as standard_ru,
                        JSON_EXTRACT(m.specifications, '$.diameter_mm') as diameter_mm,
+                       JSON_EXTRACT(m.specifications, '$.диаметр_мм') as diameter_mm_ru,
                        JSON_EXTRACT(m.specifications, '$.length_m') as length_m,
+                       JSON_EXTRACT(m.specifications, '$.длина_м') as length_m_ru,
                        JSON_EXTRACT(m.specifications, '$.length_mm') as length_mm,
+                       JSON_EXTRACT(m.specifications, '$.длина_мм') as length_mm_ru,
                        JSON_EXTRACT(m.specifications, '$.width_mm') as width_mm,
+                       JSON_EXTRACT(m.specifications, '$.ширина_мм') as width_mm_ru,
                        JSON_EXTRACT(m.specifications, '$.thickness_mm') as thickness_mm,
+                       JSON_EXTRACT(m.specifications, '$.толщина_мм') as thickness_mm_ru,
                        JSON_EXTRACT(m.specifications, '$.strength_class') as strength_class,
+                       JSON_EXTRACT(m.specifications, '$.класс_прочности') as strength_class_ru,
                        JSON_EXTRACT(m.specifications, '$.coating') as coating,
+                       JSON_EXTRACT(m.specifications, '$.покрытие') as coating_ru,
                        JSON_EXTRACT(m.specifications, '$.cross_section_mm2') as cross_section_mm2,
+                       JSON_EXTRACT(m.specifications, '$.сечение_мм2') as cross_section_mm2_ru,
                        JSON_EXTRACT(m.specifications, '$.material') as material_property,
+                       JSON_EXTRACT(m.specifications, '$.материал') as material_property_ru,
                        JSON_EXTRACT(m.specifications, '$.insulation') as insulation,
+                       JSON_EXTRACT(m.specifications, '$.изоляция') as insulation_ru,
                        JSON_EXTRACT(m.specifications, '$.thread') as thread,
+                       JSON_EXTRACT(m.specifications, '$.резьба') as thread_ru,
                        JSON_EXTRACT(m.specifications, '$.inner_d_mm') as inner_d_mm,
+                       JSON_EXTRACT(m.specifications, '$.внутренний_диаметр_мм') as inner_d_mm_ru,
                        JSON_EXTRACT(m.specifications, '$.outer_d_mm') as outer_d_mm,
+                       JSON_EXTRACT(m.specifications, '$.внешний_диаметр_мм') as outer_d_mm_ru,
                        0 as is_critical,
                        0 as requires_cert
                 FROM materials m
@@ -97,35 +113,101 @@ try {
             // Добавляем decoded specifications как отдельное поле
             $mat['specifications'] = $specsArray;
             
-            if (isset($mat['grade']) && is_string($mat['grade'])) {
+            // Обработка английских и русских ключей (приоритет русским если есть)
+            if (isset($mat['grade_ru']) && is_string($mat['grade_ru'])) {
+                $mat['grade'] = trim($mat['grade_ru'], '"');
+            } elseif (isset($mat['grade']) && is_string($mat['grade'])) {
                 $mat['grade'] = trim($mat['grade'], '"');
             }
-            if (isset($mat['material_type']) && is_string($mat['material_type'])) {
+            
+            if (isset($mat['material_type_ru']) && is_string($mat['material_type_ru'])) {
+                $mat['material_type'] = trim($mat['material_type_ru'], '"');
+            } elseif (isset($mat['material_type']) && is_string($mat['material_type'])) {
                 $mat['material_type'] = trim($mat['material_type'], '"');
             }
-            if (isset($mat['standard']) && is_string($mat['standard'])) {
+            
+            if (isset($mat['standard_ru']) && is_string($mat['standard_ru'])) {
+                $mat['standard'] = trim($mat['standard_ru'], '"');
+            } elseif (isset($mat['standard']) && is_string($mat['standard'])) {
                 $mat['standard'] = trim($mat['standard'], '"');
             }
-            if (isset($mat['diameter_mm']) && is_string($mat['diameter_mm'])) {
+            
+            if (isset($mat['diameter_mm_ru']) && is_string($mat['diameter_mm_ru'])) {
+                $mat['diameter_mm'] = floatval(trim($mat['diameter_mm_ru'], '"'));
+            } elseif (isset($mat['diameter_mm']) && is_string($mat['diameter_mm'])) {
                 $mat['diameter_mm'] = floatval(trim($mat['diameter_mm'], '"'));
             }
-            if (isset($mat['length_m']) && is_string($mat['length_m'])) {
+            
+            if (isset($mat['length_m_ru']) && is_string($mat['length_m_ru'])) {
+                $mat['length_m'] = floatval(trim($mat['length_m_ru'], '"'));
+            } elseif (isset($mat['length_m']) && is_string($mat['length_m'])) {
                 $mat['length_m'] = floatval(trim($mat['length_m'], '"'));
             }
-            if (isset($mat['length_mm']) && is_string($mat['length_mm'])) {
+            
+            if (isset($mat['length_mm_ru']) && is_string($mat['length_mm_ru'])) {
+                $mat['length_mm'] = floatval(trim($mat['length_mm_ru'], '"'));
+            } elseif (isset($mat['length_mm']) && is_string($mat['length_mm'])) {
                 $mat['length_mm'] = floatval(trim($mat['length_mm'], '"'));
             }
-            if (isset($mat['width_mm']) && is_string($mat['width_mm'])) {
+            
+            if (isset($mat['width_mm_ru']) && is_string($mat['width_mm_ru'])) {
+                $mat['width_mm'] = floatval(trim($mat['width_mm_ru'], '"'));
+            } elseif (isset($mat['width_mm']) && is_string($mat['width_mm'])) {
                 $mat['width_mm'] = floatval(trim($mat['width_mm'], '"'));
             }
-            if (isset($mat['thickness_mm']) && is_string($mat['thickness_mm'])) {
+            
+            if (isset($mat['thickness_mm_ru']) && is_string($mat['thickness_mm_ru'])) {
+                $mat['thickness_mm'] = floatval(trim($mat['thickness_mm_ru'], '"'));
+            } elseif (isset($mat['thickness_mm']) && is_string($mat['thickness_mm'])) {
                 $mat['thickness_mm'] = floatval(trim($mat['thickness_mm'], '"'));
             }
-            if (isset($mat['strength_class']) && is_string($mat['strength_class'])) {
+            
+            if (isset($mat['strength_class_ru']) && is_string($mat['strength_class_ru'])) {
+                $mat['strength_class'] = trim($mat['strength_class_ru'], '"');
+            } elseif (isset($mat['strength_class']) && is_string($mat['strength_class'])) {
                 $mat['strength_class'] = trim($mat['strength_class'], '"');
             }
-            if (isset($mat['coating']) && is_string($mat['coating'])) {
+            
+            if (isset($mat['coating_ru']) && is_string($mat['coating_ru'])) {
+                $mat['coating'] = trim($mat['coating_ru'], '"');
+            } elseif (isset($mat['coating']) && is_string($mat['coating'])) {
                 $mat['coating'] = trim($mat['coating'], '"');
+            }
+            
+            if (isset($mat['cross_section_mm2_ru']) && is_string($mat['cross_section_mm2_ru'])) {
+                $mat['cross_section_mm2'] = floatval(trim($mat['cross_section_mm2_ru'], '"'));
+            } elseif (isset($mat['cross_section_mm2']) && is_string($mat['cross_section_mm2'])) {
+                $mat['cross_section_mm2'] = floatval(trim($mat['cross_section_mm2'], '"'));
+            }
+            
+            if (isset($mat['material_property_ru']) && is_string($mat['material_property_ru'])) {
+                $mat['material_property'] = trim($mat['material_property_ru'], '"');
+            } elseif (isset($mat['material_property']) && is_string($mat['material_property'])) {
+                $mat['material_property'] = trim($mat['material_property'], '"');
+            }
+            
+            if (isset($mat['insulation_ru']) && is_string($mat['insulation_ru'])) {
+                $mat['insulation'] = trim($mat['insulation_ru'], '"');
+            } elseif (isset($mat['insulation']) && is_string($mat['insulation'])) {
+                $mat['insulation'] = trim($mat['insulation'], '"');
+            }
+            
+            if (isset($mat['thread_ru']) && is_string($mat['thread_ru'])) {
+                $mat['thread'] = trim($mat['thread_ru'], '"');
+            } elseif (isset($mat['thread']) && is_string($mat['thread'])) {
+                $mat['thread'] = trim($mat['thread'], '"');
+            }
+            
+            if (isset($mat['inner_d_mm_ru']) && is_string($mat['inner_d_mm_ru'])) {
+                $mat['inner_d_mm'] = floatval(trim($mat['inner_d_mm_ru'], '"'));
+            } elseif (isset($mat['inner_d_mm']) && is_string($mat['inner_d_mm'])) {
+                $mat['inner_d_mm'] = floatval(trim($mat['inner_d_mm'], '"'));
+            }
+            
+            if (isset($mat['outer_d_mm_ru']) && is_string($mat['outer_d_mm_ru'])) {
+                $mat['outer_d_mm'] = floatval(trim($mat['outer_d_mm_ru'], '"'));
+            } elseif (isset($mat['outer_d_mm']) && is_string($mat['outer_d_mm'])) {
+                $mat['outer_d_mm'] = floatval(trim($mat['outer_d_mm'], '"'));
             }
         }
         unset($mat);
@@ -307,6 +389,38 @@ if ($filterThickness !== '') {
     });
 }
 
+// Фильтр по сечению (для проводов)
+$filterCrossSection = $_GET['cross_section'] ?? '';
+if ($filterCrossSection !== '') {
+    $filteredMaterials = array_filter($filteredMaterials, function($m) use ($filterCrossSection) {
+        return isset($m['cross_section_mm2']) && $m['cross_section_mm2'] == $filterCrossSection;
+    });
+}
+
+// Фильтр по материалу (для проводов)
+$filterMaterialProp = $_GET['material_prop'] ?? '';
+if ($filterMaterialProp !== '') {
+    $filteredMaterials = array_filter($filteredMaterials, function($m) use ($filterMaterialProp) {
+        return isset($m['material_property']) && $m['material_property'] === $filterMaterialProp;
+    });
+}
+
+// Фильтр по изоляции (для проводов)
+$filterInsulation = $_GET['insulation'] ?? '';
+if ($filterInsulation !== '') {
+    $filteredMaterials = array_filter($filteredMaterials, function($m) use ($filterInsulation) {
+        return isset($m['insulation']) && $m['insulation'] === $filterInsulation;
+    });
+}
+
+// Фильтр по резьбе (для крепежа)
+$filterThread = $_GET['thread'] ?? '';
+if ($filterThread !== '') {
+    $filteredMaterials = array_filter($filteredMaterials, function($m) use ($filterThread) {
+        return isset($m['thread']) && $m['thread'] === $filterThread;
+    });
+}
+
 // Сортировка
 $sortBy = $_GET['sort'] ?? 'name';
 $sortOrder = $_GET['order'] ?? 'asc';
@@ -341,14 +455,46 @@ foreach ($allMaterials as $mat) {
             'diameters' => [],
             'lengths' => [],
             'strength_classes' => [],
-            'coatings' => []
+            'coatings' => [],
+            'cross_sections' => [],
+            'materials' => [],
+            'insulations' => [],
+            'threads' => []
         ];
     }
-    if (isset($mat['diameter_mm']) && $mat['diameter_mm'] !== null && !in_array($mat['diameter_mm'], $availableCombinations[$catId]['diameters'])) {
-        $availableCombinations[$catId]['diameters'][] = $mat['diameter_mm'];
+    // Диаметр (из любого поля)
+    $diameter = $mat['diameter_mm'] ?? null;
+    if ($diameter !== null && !in_array($diameter, $availableCombinations[$catId]['diameters'])) {
+        $availableCombinations[$catId]['diameters'][] = $diameter;
     }
-    if (isset($mat['length_mm']) && $mat['length_mm'] !== null && !in_array($mat['length_mm'], $availableCombinations[$catId]['lengths'])) {
-        $availableCombinations[$catId]['lengths'][] = $mat['length_mm'];
+    // Длина (из любого поля)
+    $length = $mat['length_mm'] ?? $mat['length_m'] ?? null;
+    if ($length !== null && !in_array($length, $availableCombinations[$catId]['lengths'])) {
+        $availableCombinations[$catId]['lengths'][] = $length;
+    }
+    // Класс прочности
+    if (isset($mat['strength_class']) && $mat['strength_class'] !== '' && !in_array($mat['strength_class'], $availableCombinations[$catId]['strength_classes'])) {
+        $availableCombinations[$catId]['strength_classes'][] = $mat['strength_class'];
+    }
+    // Покрытие
+    if (isset($mat['coating']) && $mat['coating'] !== '' && !in_array($mat['coating'], $availableCombinations[$catId]['coatings'])) {
+        $availableCombinations[$catId]['coatings'][] = $mat['coating'];
+    }
+    // Сечение (для проводов)
+    if (isset($mat['cross_section_mm2']) && $mat['cross_section_mm2'] !== null && !in_array($mat['cross_section_mm2'], $availableCombinations[$catId]['cross_sections'])) {
+        $availableCombinations[$catId]['cross_sections'][] = $mat['cross_section_mm2'];
+    }
+    // Материал (для проводов)
+    if (isset($mat['material_property']) && $mat['material_property'] !== '' && !in_array($mat['material_property'], $availableCombinations[$catId]['materials'])) {
+        $availableCombinations[$catId]['materials'][] = $mat['material_property'];
+    }
+    // Изоляция (для проводов)
+    if (isset($mat['insulation']) && $mat['insulation'] !== '' && !in_array($mat['insulation'], $availableCombinations[$catId]['insulations'])) {
+        $availableCombinations[$catId]['insulations'][] = $mat['insulation'];
+    }
+    // Резьба (для крепежа)
+    if (isset($mat['thread']) && $mat['thread'] !== '' && !in_array($mat['thread'], $availableCombinations[$catId]['threads'])) {
+        $availableCombinations[$catId]['threads'][] = $mat['thread'];
     }
 }
 $availableCombinationsJson = json_encode($availableCombinations, JSON_UNESCAPED_UNICODE);
@@ -837,7 +983,7 @@ $availableCombinationsJson = json_encode($availableCombinations, JSON_UNESCAPED_
                 </div>
                 
                 <div class="filter-group dynamic-filter" id="lengthFilter" style="display: none;">
-                    <label class="filter-label">Длина (мм)</label>
+                    <label class="filter-label">Длина</label>
                     <select name="length" class="filter-select" id="lengthSelect" onchange="this.form.submit()">
                         <option value="">Все</option>
                     </select>
@@ -853,6 +999,34 @@ $availableCombinationsJson = json_encode($availableCombinations, JSON_UNESCAPED_
                 <div class="filter-group dynamic-filter" id="coatingFilter" style="display: none;">
                     <label class="filter-label">Покрытие</label>
                     <select name="coating" class="filter-select" id="coatingSelect" onchange="this.form.submit()">
+                        <option value="">Все</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group dynamic-filter" id="crossSectionFilter" style="display: none;">
+                    <label class="filter-label">Сечение (мм²)</label>
+                    <select name="cross_section" class="filter-select" id="crossSectionSelect" onchange="this.form.submit()">
+                        <option value="">Все</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group dynamic-filter" id="materialFilter" style="display: none;">
+                    <label class="filter-label">Материал</label>
+                    <select name="material_prop" class="filter-select" id="materialSelect" onchange="this.form.submit()">
+                        <option value="">Все</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group dynamic-filter" id="insulationFilter" style="display: none;">
+                    <label class="filter-label">Изоляция</label>
+                    <select name="insulation" class="filter-select" id="insulationSelect" onchange="this.form.submit()">
+                        <option value="">Все</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group dynamic-filter" id="threadFilter" style="display: none;">
+                    <label class="filter-label">Резьба</label>
+                    <select name="thread" class="filter-select" id="threadSelect" onchange="this.form.submit()">
                         <option value="">Все</option>
                     </select>
                 </div>
@@ -926,7 +1100,7 @@ $availableCombinationsJson = json_encode($availableCombinations, JSON_UNESCAPED_
                 <button type="submit" class="btn btn-primary">Применить фильтры</button>
                 <a href="materials.php" class="btn btn-outline">Сбросить</a>
                 
-                <?php if ($filterSearch || $filterCategory || $filterGrade || $filterStandard || $filterForm || $filterCritical || $filterCert || $filterDiameter || $filterLength || $filterStrengthClass || $filterCoating): ?>
+                <?php if ($filterSearch || $filterCategory || $filterGrade || $filterStandard || $filterForm || $filterCritical || $filterCert || $filterDiameter || $filterLength || $filterStrengthClass || $filterCoating || $filterCrossSection || $filterMaterialProp || $filterInsulation || $filterThread): ?>
                     <div class="active-filters">
                         <span style="font-size: 13px; color: var(--text-secondary); align-self: center;">Активные фильтры:</span>
                         <?php if ($filterSearch): ?>
@@ -961,7 +1135,7 @@ $availableCombinationsJson = json_encode($availableCombinations, JSON_UNESCAPED_
                         <?php endif; ?>
                         <?php if ($filterLength): ?>
                             <span class="filter-chip">
-                                Длина: <?= e($filterLength) ?> мм
+                                Длина: <?= e($filterLength) ?> <?= $filterLength >= 1000 ? 'мм' : 'м' ?>
                                 <a href="?<?= http_build_query(array_filter($_GET, fn($k) => $k !== 'length', ARRAY_FILTER_USE_KEY)) ?>" class="filter-chip-remove">✕</a>
                             </span>
                         <?php endif; ?>
@@ -975,6 +1149,30 @@ $availableCombinationsJson = json_encode($availableCombinations, JSON_UNESCAPED_
                             <span class="filter-chip">
                                 Покрытие: <?= e($filterCoating) ?>
                                 <a href="?<?= http_build_query(array_filter($_GET, fn($k) => $k !== 'coating', ARRAY_FILTER_USE_KEY)) ?>" class="filter-chip-remove">✕</a>
+                            </span>
+                        <?php endif; ?>
+                        <?php if ($filterCrossSection): ?>
+                            <span class="filter-chip">
+                                Сечение: <?= e($filterCrossSection) ?> мм²
+                                <a href="?<?= http_build_query(array_filter($_GET, fn($k) => $k !== 'cross_section', ARRAY_FILTER_USE_KEY)) ?>" class="filter-chip-remove">✕</a>
+                            </span>
+                        <?php endif; ?>
+                        <?php if ($filterMaterialProp): ?>
+                            <span class="filter-chip">
+                                Материал: <?= e($filterMaterialProp) ?>
+                                <a href="?<?= http_build_query(array_filter($_GET, fn($k) => $k !== 'material_prop', ARRAY_FILTER_USE_KEY)) ?>" class="filter-chip-remove">✕</a>
+                            </span>
+                        <?php endif; ?>
+                        <?php if ($filterInsulation): ?>
+                            <span class="filter-chip">
+                                Изоляция: <?= e($filterInsulation) ?>
+                                <a href="?<?= http_build_query(array_filter($_GET, fn($k) => $k !== 'insulation', ARRAY_FILTER_USE_KEY)) ?>" class="filter-chip-remove">✕</a>
+                            </span>
+                        <?php endif; ?>
+                        <?php if ($filterThread): ?>
+                            <span class="filter-chip">
+                                Резьба: <?= e($filterThread) ?>
+                                <a href="?<?= http_build_query(array_filter($_GET, fn($k) => $k !== 'thread', ARRAY_FILTER_USE_KEY)) ?>" class="filter-chip-remove">✕</a>
                             </span>
                         <?php endif; ?>
                         <?php if ($filterGrade): ?>
@@ -1216,83 +1414,123 @@ function updatePropertyFilters() {
     }
     
     // Заполняем и показываем фильтр диаметра
-    if (combinations.thread_diameter_mm || combinations.diameter_mm || combinations.conductor_diameter_mm || combinations.nominal_diameter_mm) {
+    if (combinations.diameters && combinations.diameters.length > 0) {
         const diameterSelect = document.getElementById('diameterSelect');
         const diameterFilter = document.getElementById('diameterFilter');
         diameterSelect.innerHTML = '<option value="">Все</option>';
         
-        let diameters = combinations.thread_diameter_mm || combinations.diameter_mm || combinations.conductor_diameter_mm || combinations.nominal_diameter_mm || [];
-        if (Array.isArray(diameters)) {
-            diameters.forEach(d => {
-                const option = document.createElement('option');
-                option.value = d;
-                option.textContent = d + ' мм';
-                diameterSelect.appendChild(option);
-            });
-        }
+        combinations.diameters.sort((a, b) => a - b).forEach(d => {
+            const option = document.createElement('option');
+            option.value = d;
+            option.textContent = d + ' мм';
+            diameterSelect.appendChild(option);
+        });
         diameterFilter.style.display = 'flex';
     }
     
     // Заполняем и показываем фильтр длины
-    if (combinations.length_mm) {
+    if (combinations.lengths && combinations.lengths.length > 0) {
         const lengthSelect = document.getElementById('lengthSelect');
         const lengthFilter = document.getElementById('lengthFilter');
         lengthSelect.innerHTML = '<option value="">Все</option>';
         
-        let lengths = combinations.length_mm;
-        if (typeof lengths === 'object' && !Array.isArray(lengths)) {
-            // Если длины зависят от диаметра, берём все уникальные значения
-            const allLengths = new Set();
-            Object.values(lengths).forEach(lenArray => {
-                if (Array.isArray(lenArray)) {
-                    lenArray.forEach(l => allLengths.add(l));
-                }
-            });
-            lengths = Array.from(allLengths).sort((a, b) => a - b);
-        }
-        if (Array.isArray(lengths)) {
-            lengths.forEach(l => {
-                const option = document.createElement('option');
-                option.value = l;
-                option.textContent = l + ' мм';
-                lengthSelect.appendChild(option);
-            });
-        }
+        combinations.lengths.sort((a, b) => a - b).forEach(l => {
+            const option = document.createElement('option');
+            option.value = l;
+            option.textContent = l + (l >= 1000 ? ' мм' : ' м');
+            lengthSelect.appendChild(option);
+        });
         lengthFilter.style.display = 'flex';
     }
     
     // Заполняем и показываем фильтр класса прочности
-    if (combinations.strength_class) {
+    if (combinations.strength_classes && combinations.strength_classes.length > 0) {
         const strengthSelect = document.getElementById('strengthClassSelect');
         const strengthFilter = document.getElementById('strengthClassFilter');
         strengthSelect.innerHTML = '<option value="">Все</option>';
         
-        if (Array.isArray(combinations.strength_class)) {
-            combinations.strength_class.forEach(s => {
-                const option = document.createElement('option');
-                option.value = s;
-                option.textContent = s;
-                strengthSelect.appendChild(option);
-            });
-        }
+        combinations.strength_classes.forEach(s => {
+            const option = document.createElement('option');
+            option.value = s;
+            option.textContent = s;
+            strengthSelect.appendChild(option);
+        });
         strengthFilter.style.display = 'flex';
     }
     
     // Заполняем и показываем фильтр покрытия
-    if (combinations.coating) {
+    if (combinations.coatings && combinations.coatings.length > 0) {
         const coatingSelect = document.getElementById('coatingSelect');
         const coatingFilter = document.getElementById('coatingFilter');
         coatingSelect.innerHTML = '<option value="">Все</option>';
         
-        if (Array.isArray(combinations.coating)) {
-            combinations.coating.forEach(c => {
-                const option = document.createElement('option');
-                option.value = c;
-                option.textContent = c;
-                coatingSelect.appendChild(option);
-            });
-        }
+        combinations.coatings.forEach(c => {
+            const option = document.createElement('option');
+            option.value = c;
+            option.textContent = c;
+            coatingSelect.appendChild(option);
+        });
         coatingFilter.style.display = 'flex';
+    }
+    
+    // Заполняем и показываем фильтр сечения (для проводов)
+    if (combinations.cross_sections && combinations.cross_sections.length > 0) {
+        const crossSectionSelect = document.getElementById('crossSectionSelect');
+        const crossSectionFilter = document.getElementById('crossSectionFilter');
+        crossSectionSelect.innerHTML = '<option value="">Все</option>';
+        
+        combinations.cross_sections.sort((a, b) => a - b).forEach(s => {
+            const option = document.createElement('option');
+            option.value = s;
+            option.textContent = s + ' мм²';
+            crossSectionSelect.appendChild(option);
+        });
+        crossSectionFilter.style.display = 'flex';
+    }
+    
+    // Заполняем и показываем фильтр материала (для проводов)
+    if (combinations.materials && combinations.materials.length > 0) {
+        const materialSelect = document.getElementById('materialSelect');
+        const materialFilter = document.getElementById('materialFilter');
+        materialSelect.innerHTML = '<option value="">Все</option>';
+        
+        combinations.materials.forEach(m => {
+            const option = document.createElement('option');
+            option.value = m;
+            option.textContent = m;
+            materialSelect.appendChild(option);
+        });
+        materialFilter.style.display = 'flex';
+    }
+    
+    // Заполняем и показываем фильтр изоляции (для проводов)
+    if (combinations.insulations && combinations.insulations.length > 0) {
+        const insulationSelect = document.getElementById('insulationSelect');
+        const insulationFilter = document.getElementById('insulationFilter');
+        insulationSelect.innerHTML = '<option value="">Все</option>';
+        
+        combinations.insulations.forEach(i => {
+            const option = document.createElement('option');
+            option.value = i;
+            option.textContent = i;
+            insulationSelect.appendChild(option);
+        });
+        insulationFilter.style.display = 'flex';
+    }
+    
+    // Заполняем и показываем фильтр резьбы (для крепежа)
+    if (combinations.threads && combinations.threads.length > 0) {
+        const threadSelect = document.getElementById('threadSelect');
+        const threadFilter = document.getElementById('threadFilter');
+        threadSelect.innerHTML = '<option value="">Все</option>';
+        
+        combinations.threads.forEach(t => {
+            const option = document.createElement('option');
+            option.value = t;
+            option.textContent = t;
+            threadSelect.appendChild(option);
+        });
+        threadFilter.style.display = 'flex';
     }
 
     // Показываем расшифровку формата кода для выбранной категории

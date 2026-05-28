@@ -19,27 +19,28 @@ $pageTitle = 'Продукция';
 $search = $_GET['search'] ?? '';
 $category = $_GET['category'] ?? '';
 
-$sql = "SELECT p.*, c.name as category_name, u.symbol as unit_name,
-               -- Извлекаем данные из JSON specifications с JSON_UNQUOTE для корректных значений
-               JSON_UNQUOTE(JSON_EXTRACT(p.specifications, '$.мощность_квт')) as power_kw,
-               JSON_UNQUOTE(JSON_EXTRACT(p.specifications, '$.обороты_мин')) as rpm,
-               JSON_UNQUOTE(JSON_EXTRACT(p.specifications, '$.напряжение_в')) as voltage_v,
-               JSON_UNQUOTE(JSON_EXTRACT(p.specifications, '$.частота_гц')) as frequency_hz,
-               JSON_UNQUOTE(JSON_EXTRACT(p.specifications, '$.класс_эффективности')) as efficiency_class,
-               JSON_UNQUOTE(JSON_EXTRACT(p.specifications, '$.высота_оси_мм')) as shaft_height_mm,
-               JSON_UNQUOTE(JSON_EXTRACT(p.specifications, '$.габарит')) as frame_size,
-               JSON_UNQUOTE(JSON_EXTRACT(p.specifications, '$.климатическое_исполнение')) as climate_versions,
-               JSON_UNQUOTE(JSON_EXTRACT(p.specifications, '$.монтаж')) as mounting_versions,
-               JSON_UNQUOTE(JSON_EXTRACT(p.specifications, '$.степень_защиты')) as protection_class,
-               JSON_UNQUOTE(JSON_EXTRACT(p.specifications, '$.тип_двигателя')) as motor_type,
-               JSON_UNQUOTE(JSON_EXTRACT(p.specifications, '$.область_применения')) as application,
-               JSON_UNQUOTE(JSON_EXTRACT(p.specifications, '$.материал_корпуса')) as housing_material,
-               JSON_UNQUOTE(JSON_EXTRACT(p.specifications, '$.материал_вала')) as shaft_material,
-               JSON_UNQUOTE(JSON_EXTRACT(p.specifications, '$.взрывозащита')) as explosion_protection,
-               JSON_UNQUOTE(JSON_EXTRACT(p.specifications, '$.конденсатор_в_комплекте')) as capacitor_included,
-               JSON_UNQUOTE(JSON_EXTRACT(p.specifications, '$.стандарт')) as standard,
-               JSON_UNQUOTE(JSON_EXTRACT(p.specifications, '$.вес_кг')) as weight_range_kg,
-               JSON_UNQUOTE(JSON_EXTRACT(p.specifications, '$.гарантия_мес')) as warranty_months
+$sql = "SELECT p.*, c.name as category_name, 
+               COALESCE(u.symbol, 'шт') as unit_name,
+               -- Извлекаем данные из JSON specifications (без JSON_UNQUOTE для обработки в PHP)
+               JSON_EXTRACT(p.specifications, '$.мощность_квт') as power_kw,
+               JSON_EXTRACT(p.specifications, '$.обороты_мин') as rpm,
+               JSON_EXTRACT(p.specifications, '$.напряжение_в') as voltage_v,
+               JSON_EXTRACT(p.specifications, '$.частота_гц') as frequency_hz,
+               JSON_EXTRACT(p.specifications, '$.класс_эффективности') as efficiency_class,
+               JSON_EXTRACT(p.specifications, '$.высота_оси_мм') as shaft_height_mm,
+               JSON_EXTRACT(p.specifications, '$.габарит') as frame_size,
+               JSON_EXTRACT(p.specifications, '$.климатическое_исполнение') as climate_versions,
+               JSON_EXTRACT(p.specifications, '$.монтаж') as mounting_versions,
+               JSON_EXTRACT(p.specifications, '$.степень_защиты') as protection_class,
+               JSON_EXTRACT(p.specifications, '$.тип_двигателя') as motor_type,
+               JSON_EXTRACT(p.specifications, '$.область_применения') as application,
+               JSON_EXTRACT(p.specifications, '$.материал_корпуса') as housing_material,
+               JSON_EXTRACT(p.specifications, '$.материал_вала') as shaft_material,
+               JSON_EXTRACT(p.specifications, '$.взрывозащита') as explosion_protection,
+               JSON_EXTRACT(p.specifications, '$.конденсатор_в_комплекте') as capacitor_included,
+               JSON_EXTRACT(p.specifications, '$.стандарт') as standard,
+               JSON_EXTRACT(p.specifications, '$.вес_кг') as weight_range_kg,
+               JSON_EXTRACT(p.specifications, '$.гарантия_мес') as warranty_months
         FROM products p 
         LEFT JOIN product_categories c ON p.category_id = c.id 
         LEFT JOIN base_units u ON p.base_unit_id = u.id
@@ -84,10 +85,105 @@ $sql .= " ORDER BY p.$sortField ASC";
 try {
     $stmt = $pdo->prepare($sql);
     $stmt->execute($params);
-    $products = $stmt->fetchAll();
+    $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
     error_log("Загружено продукции: " . count($products));
     error_log("SQL запрос: " . $sql);
     error_log("Параметры: " . json_encode($params));
+    
+    // Преобразуем JSON значения в обычные строки/числа И добавляем specifications как массив
+    foreach ($products as &$product) {
+        // Декодируем specifications JSON в массив для использования в JS
+        $specsArray = [];
+        if (!empty($product['specifications'])) {
+            $decodedSpecs = json_decode($product['specifications'], true);
+            if (is_array($decodedSpecs)) {
+                $specsArray = $decodedSpecs;
+            }
+        }
+        // Добавляем decoded specifications как отдельное поле
+        $product['specifications'] = $specsArray;
+        
+        // Обработка характеристик с приоритетом русским ключам если есть
+        // Мощность
+        if (isset($product['power_kw']) && is_string($product['power_kw'])) {
+            $product['power_kw'] = floatval(trim($product['power_kw'], '"'));
+        }
+        // Обороты
+        if (isset($product['rpm']) && is_string($product['rpm'])) {
+            $product['rpm'] = intval(trim($product['rpm'], '"'));
+        }
+        // Напряжение
+        if (isset($product['voltage_v']) && is_string($product['voltage_v'])) {
+            $product['voltage_v'] = intval(trim($product['voltage_v'], '"'));
+        }
+        // Частота
+        if (isset($product['frequency_hz']) && is_string($product['frequency_hz'])) {
+            $product['frequency_hz'] = intval(trim($product['frequency_hz'], '"'));
+        }
+        // Класс эффективности
+        if (isset($product['efficiency_class']) && is_string($product['efficiency_class'])) {
+            $product['efficiency_class'] = trim($product['efficiency_class'], '"');
+        }
+        // Высота оси
+        if (isset($product['shaft_height_mm']) && is_string($product['shaft_height_mm'])) {
+            $product['shaft_height_mm'] = floatval(trim($product['shaft_height_mm'], '"'));
+        }
+        // Габарит
+        if (isset($product['frame_size']) && is_string($product['frame_size'])) {
+            $product['frame_size'] = trim($product['frame_size'], '"');
+        }
+        // Климатическое исполнение
+        if (isset($product['climate_versions']) && is_string($product['climate_versions'])) {
+            $product['climate_versions'] = trim($product['climate_versions'], '"');
+        }
+        // Монтаж
+        if (isset($product['mounting_versions']) && is_string($product['mounting_versions'])) {
+            $product['mounting_versions'] = trim($product['mounting_versions'], '"');
+        }
+        // Степень защиты
+        if (isset($product['protection_class']) && is_string($product['protection_class'])) {
+            $product['protection_class'] = trim($product['protection_class'], '"');
+        }
+        // Тип двигателя
+        if (isset($product['motor_type']) && is_string($product['motor_type'])) {
+            $product['motor_type'] = trim($product['motor_type'], '"');
+        }
+        // Область применения
+        if (isset($product['application']) && is_string($product['application'])) {
+            $product['application'] = trim($product['application'], '"');
+        }
+        // Материал корпуса
+        if (isset($product['housing_material']) && is_string($product['housing_material'])) {
+            $product['housing_material'] = trim($product['housing_material'], '"');
+        }
+        // Материал вала
+        if (isset($product['shaft_material']) && is_string($product['shaft_material'])) {
+            $product['shaft_material'] = trim($product['shaft_material'], '"');
+        }
+        // Взрывозащита
+        if (isset($product['explosion_protection']) && is_string($product['explosion_protection'])) {
+            $product['explosion_protection'] = trim($product['explosion_protection'], '"');
+        }
+        // Конденсатор в комплекте
+        if (isset($product['capacitor_included']) && is_string($product['capacitor_included'])) {
+            $product['capacitor_included'] = trim($product['capacitor_included'], '"') === 'true' || trim($product['capacitor_included'], '"') === '1';
+        }
+        // Стандарт
+        if (isset($product['standard']) && is_string($product['standard'])) {
+            $product['standard'] = trim($product['standard'], '"');
+        }
+        // Вес
+        if (isset($product['weight_range_kg']) && is_string($product['weight_range_kg'])) {
+            $product['weight_range_kg'] = floatval(trim($product['weight_range_kg'], '"'));
+        }
+        // Гарантия
+        if (isset($product['warranty_months']) && is_string($product['warranty_months'])) {
+            $product['warranty_months'] = intval(trim($product['warranty_months'], '"'));
+        }
+    }
+    unset($product);
+    
+    error_log("Преобразовано продуктов: " . count($products));
 } catch (Exception $e) {
     error_log("Ошибка при загрузке продукции: " . $e->getMessage());
     error_log("SQL: " . $sql);
@@ -100,68 +196,6 @@ error_log("Начинаем обработку " . count($products) . " прод
 foreach ($products as &$product) {
     error_log("Обработка продукта ID=" . $product['id'] . ", name=" . ($product['name_full'] ?? $product['name_short'] ?? $product['name'] ?? 'N/A'));
     
-    // Преобразуем JSON значения в обычные строки/числа (аналогично materials.php)
-    // Извлеченные из JSON specifications значения могут быть в формате JSON строк
-    
-    // Обработка числовых и строковых характеристик
-    if (isset($product['power_kw']) && is_string($product['power_kw'])) {
-        $product['power_kw'] = floatval(trim($product['power_kw'], '"'));
-    }
-    if (isset($product['rpm']) && is_string($product['rpm'])) {
-        $product['rpm'] = intval(trim($product['rpm'], '"'));
-    }
-    if (isset($product['voltage_v']) && is_string($product['voltage_v'])) {
-        $product['voltage_v'] = intval(trim($product['voltage_v'], '"'));
-    }
-    if (isset($product['frequency_hz']) && is_string($product['frequency_hz'])) {
-        $product['frequency_hz'] = intval(trim($product['frequency_hz'], '"'));
-    }
-    if (isset($product['efficiency_class']) && is_string($product['efficiency_class'])) {
-        $product['efficiency_class'] = trim($product['efficiency_class'], '"');
-    }
-    if (isset($product['shaft_height_mm']) && is_string($product['shaft_height_mm'])) {
-        $product['shaft_height_mm'] = floatval(trim($product['shaft_height_mm'], '"'));
-    }
-    if (isset($product['frame_size']) && is_string($product['frame_size'])) {
-        $product['frame_size'] = trim($product['frame_size'], '"');
-    }
-    if (isset($product['climate_versions']) && is_string($product['climate_versions'])) {
-        $product['climate_versions'] = trim($product['climate_versions'], '"');
-    }
-    if (isset($product['mounting_versions']) && is_string($product['mounting_versions'])) {
-        $product['mounting_versions'] = trim($product['mounting_versions'], '"');
-    }
-    if (isset($product['protection_class']) && is_string($product['protection_class'])) {
-        $product['protection_class'] = trim($product['protection_class'], '"');
-    }
-    if (isset($product['motor_type']) && is_string($product['motor_type'])) {
-        $product['motor_type'] = trim($product['motor_type'], '"');
-    }
-    if (isset($product['application']) && is_string($product['application'])) {
-        $product['application'] = trim($product['application'], '"');
-    }
-    if (isset($product['housing_material']) && is_string($product['housing_material'])) {
-        $product['housing_material'] = trim($product['housing_material'], '"');
-    }
-    if (isset($product['shaft_material']) && is_string($product['shaft_material'])) {
-        $product['shaft_material'] = trim($product['shaft_material'], '"');
-    }
-    if (isset($product['explosion_protection']) && is_string($product['explosion_protection'])) {
-        $product['explosion_protection'] = trim($product['explosion_protection'], '"');
-    }
-    if (isset($product['capacitor_included']) && is_string($product['capacitor_included'])) {
-        $product['capacitor_included'] = trim($product['capacitor_included'], '"') === 'true' || trim($product['capacitor_included'], '"') === '1';
-    }
-    if (isset($product['standard']) && is_string($product['standard'])) {
-        $product['standard'] = trim($product['standard'], '"');
-    }
-    if (isset($product['weight_range_kg']) && is_string($product['weight_range_kg'])) {
-        $product['weight_range_kg'] = floatval(trim($product['weight_range_kg'], '"'));
-    }
-    if (isset($product['warranty_months']) && is_string($product['warranty_months'])) {
-        $product['warranty_months'] = intval(trim($product['warranty_months'], '"'));
-    }
-    
     // Получение последнего серийного номера для продукта
     try {
         $serialStmt = $pdo->prepare("SELECT id, serial_number, production_date, warranty_start, warranty_end, notes 
@@ -169,7 +203,7 @@ foreach ($products as &$product) {
                                       WHERE product_id = ? 
                                       ORDER BY created_at DESC LIMIT 1");
         $serialStmt->execute([$product['id']]);
-        $serialData = $serialStmt->fetch();
+        $serialData = $serialStmt->fetch(PDO::FETCH_ASSOC);
     } catch (Exception $e) {
         error_log("Ошибка получения серийного номера для продукта ID=" . $product['id'] . ": " . $e->getMessage());
         $serialData = false;
@@ -188,7 +222,7 @@ foreach ($products as &$product) {
                                    WHERE serial_number_id = ? 
                                    ORDER BY uploaded_at DESC");
         $docsStmt->execute([$serialData['id']]);
-        $docs = $docsStmt->fetchAll();
+        $docs = $docsStmt->fetchAll(PDO::FETCH_ASSOC);
         
         $product['documents'] = [];
         foreach ($docs as $doc) {
@@ -216,7 +250,7 @@ foreach ($products as &$product) {
 // Получение категорий
 try {
     $catStmt = $pdo->query("SELECT * FROM product_categories ORDER BY name");
-    $categories = $catStmt->fetchAll();
+    $categories = $catStmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (Exception $e) {
     error_log("Ошибка при загрузке категорий: " . $e->getMessage());
     $categories = [];
@@ -225,11 +259,11 @@ try {
 // Получение шаблонов свойств для всех категорий
 try {
     $templatesStmt = $pdo->query("SELECT category_id, code, name, property_type, unit, sort_order FROM product_property_templates ORDER BY category_id, sort_order");
-    $propertyTemplates = $templatesStmt->fetchAll();
+    $propertyTemplates = $templatesStmt->fetchAll(PDO::FETCH_ASSOC);
     
     // Группируем шаблоны по category_id
     $templatesByCategory = [];
-    foreach ($templatesStmt->fetchAll() as $tmpl) {
+    foreach ($propertyTemplates as $tmpl) {
         if (!isset($templatesByCategory[$tmpl['category_id']])) {
             $templatesByCategory[$tmpl['category_id']] = [];
         }

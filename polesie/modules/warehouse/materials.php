@@ -213,7 +213,7 @@ if ($filterCoating !== '') {
 $filterDiameter = $_GET['diameter'] ?? '';
 if ($filterDiameter !== '') {
     $filteredMaterials = array_filter($filteredMaterials, function($m) use ($filterDiameter) {
-        return isset($m['diameter']) && $m['diameter'] == $filterDiameter;
+        return isset($m['diameter_mm']) && $m['diameter_mm'] == $filterDiameter;
     });
 }
 
@@ -221,7 +221,7 @@ if ($filterDiameter !== '') {
 $filterLength = $_GET['length'] ?? '';
 if ($filterLength !== '') {
     $filteredMaterials = array_filter($filteredMaterials, function($m) use ($filterLength) {
-        return isset($m['length']) && $m['length'] == $filterLength;
+        return isset($m['length_mm']) && $m['length_mm'] == $filterLength;
     });
 }
 
@@ -229,7 +229,7 @@ if ($filterLength !== '') {
 $filterWidth = $_GET['width'] ?? '';
 if ($filterWidth !== '') {
     $filteredMaterials = array_filter($filteredMaterials, function($m) use ($filterWidth) {
-        return isset($m['width']) && $m['width'] == $filterWidth;
+        return isset($m['width_mm']) && $m['width_mm'] == $filterWidth;
     });
 }
 
@@ -237,7 +237,7 @@ if ($filterWidth !== '') {
 $filterThickness = $_GET['thickness'] ?? '';
 if ($filterThickness !== '') {
     $filteredMaterials = array_filter($filteredMaterials, function($m) use ($filterThickness) {
-        return isset($m['thickness']) && $m['thickness'] == $filterThickness;
+        return isset($m['thickness_mm']) && $m['thickness_mm'] == $filterThickness;
     });
 }
 
@@ -266,8 +266,25 @@ usort($filteredMaterials, function($a, $b) use ($sortBy, $sortOrder) {
     return $sortOrder === 'desc' ? -$result : $result;
 });
 
-// Подготовка данных о комбинациях свойств для JS (пустой массив, т.к. данные берутся из БД)
+// Подготовка данных о комбинациях свойств для JS из БД
 $availableCombinations = [];
+foreach ($allMaterials as $mat) {
+    $catId = $mat['category_id'];
+    if (!isset($availableCombinations[$catId])) {
+        $availableCombinations[$catId] = [
+            'diameters' => [],
+            'lengths' => [],
+            'strength_classes' => [],
+            'coatings' => []
+        ];
+    }
+    if (isset($mat['diameter_mm']) && $mat['diameter_mm'] !== null && !in_array($mat['diameter_mm'], $availableCombinations[$catId]['diameters'])) {
+        $availableCombinations[$catId]['diameters'][] = $mat['diameter_mm'];
+    }
+    if (isset($mat['length_mm']) && $mat['length_mm'] !== null && !in_array($mat['length_mm'], $availableCombinations[$catId]['lengths'])) {
+        $availableCombinations[$catId]['lengths'][] = $mat['length_mm'];
+    }
+}
 $availableCombinationsJson = json_encode($availableCombinations, JSON_UNESCAPED_UNICODE);
 ?>
 <!DOCTYPE html>

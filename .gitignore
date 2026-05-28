@@ -1,1 +1,1 @@
-Nothing should be ignored based on the provided file changes. The only modified file is 'polesie/modules/warehouse/materials.php', which appears to be a source code file and should not be added to .gitignore.
+Nothing should be ignored based on the provided file changes, as they are only source/config files (.php and .sql).

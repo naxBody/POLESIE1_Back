@@ -77,6 +77,7 @@ CREATE TABLE `material_categories` (
   `id` INT AUTO_INCREMENT PRIMARY KEY,
   `parent_id` INT,
   `name` VARCHAR(100) NOT NULL,
+  `name_ru` VARCHAR(100),
   `code` VARCHAR(50) UNIQUE,
   `description` TEXT,
   CONSTRAINT `fk_mat_cat_parent` FOREIGN KEY (`parent_id`) REFERENCES `material_categories`(`id`) ON DELETE CASCADE
@@ -87,6 +88,7 @@ CREATE TABLE `product_categories` (
   `id` INT AUTO_INCREMENT PRIMARY KEY,
   `parent_id` INT,
   `name` VARCHAR(100) NOT NULL,
+  `name_ru` VARCHAR(100),
   `code` VARCHAR(50) UNIQUE,
   `description` TEXT,
   CONSTRAINT `fk_prod_cat_parent` FOREIGN KEY (`parent_id`) REFERENCES `product_categories`(`id`) ON DELETE CASCADE
@@ -360,39 +362,39 @@ INSERT INTO `contractors` (`name`, `inn`, `type`, `contact_person`, `phone`, `em
 ('ООО "СтройМонтаж"', '400456789', 'customer', 'Орлов О.О.', '+375 29 444-55-66', 'order@stroymontazh.by', 'г. Гомель, ул. Строителей 20'),
 ('ЧТУП "АгроСервис"', '500567890', 'customer', 'Зеленая З.З.', '+375 29 555-66-77', 'agro@service.by', 'г. Витебск, пер. Полевой 3');
 
-INSERT INTO `material_categories` (`parent_id`, `name`, `code`, `description`) VALUES
-(NULL, 'Металлы', 'METAL', 'Черные и цветные металлы'),
-(1, 'Прутки', 'METAL_BAR', 'Стальные прутки круглого сечения'),
-(1, 'Листовой прокат', 'METAL_SHEET', 'Листы стальные горячекатаные'),
-(1, 'Чугун', 'METAL_CAST', 'Чугунные заготовки'),
-(NULL, 'Электротехника', 'ELECTRO', 'Электротехнические материалы'),
-(5, 'Провода', 'ELECTRO_WIRE', 'Медные и алюминиевые провода'),
-(5, 'Шины', 'ELECTRO_BUS', 'Медные шины'),
-(NULL, 'Крепеж', 'FASTENER', 'Болты, гайки, шайбы'),
-(8, 'Болты', 'FAST_BOLT', 'Болты различных классов прочности'),
-(8, 'Гайки', 'FAST_NUT', 'Гайки шестигранные'),
-(NULL, 'Подшипники', 'BEARING', 'Подшипники качения');
+INSERT INTO `material_categories` (`parent_id`, `name`, `name_ru`, `code`, `description`) VALUES
+(NULL, 'Metals', 'Металлы', 'METAL', 'Черные и цветные металлы'),
+(1, 'Bars', 'Прутки', 'METAL_BAR', 'Стальные прутки круглого сечения'),
+(1, 'Sheet Metal', 'Листовой прокат', 'METAL_SHEET', 'Листы стальные горячекатаные'),
+(1, 'Cast Iron', 'Чугун', 'METAL_CAST', 'Чугунные заготовки'),
+(NULL, 'Electrical Engineering', 'Электротехника', 'ELECTRO', 'Электротехнические материалы'),
+(5, 'Wires', 'Провода', 'ELECTRO_WIRE', 'Медные и алюминиевые провода'),
+(5, 'Busbars', 'Шины', 'ELECTRO_BUS', 'Медные шины'),
+(NULL, 'Fasteners', 'Крепеж', 'FASTENER', 'Болты, гайки, шайбы'),
+(8, 'Bolts', 'Болты', 'FAST_BOLT', 'Болты различных классов прочности'),
+(8, 'Nuts', 'Гайки', 'FAST_NUT', 'Гайки шестигранные'),
+(NULL, 'Bearings', 'Подшипники', 'BEARING', 'Подшипники качения');
 
-INSERT INTO `product_categories` (`parent_id`, `name`, `code`, `description`) VALUES
-(NULL, 'Электродвигатели', 'MOTOR', 'Асинхронные электродвигатели'),
-(1, 'Общепромышленные двигатели', 'MOTOR_GENERAL', 'Двигатели общего назначения'),
-(1, 'Взрывозащищенные двигатели', 'MOTOR_EX', 'Двигатели для взрывоопасных сред'),
-(1, 'Крановые двигатели', 'MOTOR_CRANE', 'Двигатели для кранового оборудования'),
-(NULL, 'Генераторы', 'GENERATOR', 'Дизельные и бензиновые генераторы'),
-(5, 'Дизельные генераторы', 'GEN_DIESEL', 'Дизельные электростанции'),
-(5, 'Бензиновые генераторы', 'GEN_PETROL', 'Бензиновые электростанции'),
-(NULL, 'Трансформаторы', 'TRANSFORMER', 'Силовые трансформаторы'),
-(8, 'Масляные трансформаторы', 'TR_OIL', 'Трансформаторы с масляным охлаждением'),
-(8, 'Сухие трансформаторы', 'TR_DRY', 'Трансформаторы с воздушным охлаждением'),
-(NULL, 'Щитовое оборудование', 'SWITCHGEAR', 'Распределительные щиты и шкафы'),
-(10, 'Вводно-распределительные устройства', 'SWITCH_VRU', 'ВРУ для промышленных объектов'),
-(10, 'Щиты управления', 'SWITCH_CONTROL', 'Шкафы управления двигателями'),
-(10, 'Щиты освещения', 'SWITCH_LIGHT', 'Щиты распределения освещения'),
-(NULL, 'Запчасти', 'SPARE_PARTS', 'Запасные части и комплектующие'),
-(14, 'Роторы', 'PART_ROTOR', 'Роторы для электродвигателей'),
-(14, 'Статоры', 'PART_STATOR', 'Статоры для электродвигателей'),
-(14, 'Подшипниковые щиты', 'PART_SHIELD', 'Подшипниковые щиты'),
-(14, 'Клеммные коробки', 'PART_BOX', 'Клеммные коробки');
+INSERT INTO `product_categories` (`parent_id`, `name`, `name_ru`, `code`, `description`) VALUES
+(NULL, 'Electric Motors', 'Электродвигатели', 'MOTOR', 'Асинхронные электродвигатели'),
+(1, 'General Purpose Motors', 'Общепромышленные двигатели', 'MOTOR_GENERAL', 'Двигатели общего назначения'),
+(1, 'Explosion-proof Motors', 'Взрывозащищенные двигатели', 'MOTOR_EX', 'Двигатели для взрывоопасных сред'),
+(1, 'Crane Motors', 'Крановые двигатели', 'MOTOR_CRANE', 'Двигатели для кранового оборудования'),
+(NULL, 'Generators', 'Генераторы', 'GENERATOR', 'Дизельные и бензиновые генераторы'),
+(5, 'Diesel Generators', 'Дизельные генераторы', 'GEN_DIESEL', 'Дизельные электростанции'),
+(5, 'Petrol Generators', 'Бензиновые генераторы', 'GEN_PETROL', 'Бензиновые электростанции'),
+(NULL, 'Transformers', 'Трансформаторы', 'TRANSFORMER', 'Силовые трансформаторы'),
+(8, 'Oil Transformers', 'Масляные трансформаторы', 'TR_OIL', 'Трансформаторы с масляным охлаждением'),
+(8, 'Dry Transformers', 'Сухие трансформаторы', 'TR_DRY', 'Трансформаторы с воздушным охлаждением'),
+(NULL, 'Switchgear', 'Щитовое оборудование', 'SWITCHGEAR', 'Распределительные щиты и шкафы'),
+(10, 'Main Distribution Boards', 'Вводно-распределительные устройства', 'SWITCH_VRU', 'ВРУ для промышленных объектов'),
+(10, 'Control Panels', 'Щиты управления', 'SWITCH_CONTROL', 'Шкафы управления двигателями'),
+(10, 'Lighting Panels', 'Щиты освещения', 'SWITCH_LIGHT', 'Щиты распределения освещения'),
+(NULL, 'Spare Parts', 'Запчасти', 'SPARE_PARTS', 'Запасные части и комплектующие'),
+(14, 'Rotors', 'Роторы', 'PART_ROTOR', 'Роторы для электродвигателей'),
+(14, 'Stators', 'Статоры', 'PART_STATOR', 'Статоры для электродвигателей'),
+(14, 'Bearing Shields', 'Подшипниковые щиты', 'PART_SHIELD', 'Подшипниковые щиты'),
+(14, 'Terminal Boxes', 'Клеммные коробки', 'PART_BOX', 'Клеммные коробки');
 
 INSERT INTO `materials` (`code`, `name_full`, `name_short`, `category_id`, `base_unit_id`, `specifications`, `current_stock`, `min_stock`, `location`, `supplier_id`, `last_price`, `currency`) VALUES
 -- Металлы - прутки

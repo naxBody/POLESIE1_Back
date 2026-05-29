@@ -1132,7 +1132,7 @@ foreach ($ordersData as $oid => $data) {
                 html += '<div style="margin-bottom: 16px; padding: 12px; background: #fff; border-radius: 6px; border: 1px solid #e9ecef;">';
                 html += '<div style="display: flex; justify-content: space-between; margin-bottom: 8px;">';
                 html += '<span style="font-size: 13px; color: #7f8c8d;">Выполнено:</span>';
-                html += '<span style="font-size: 13px; font-weight: 600; color: #2c3e50;">' + orderProgress + '% (' + completedQty + ' из ' + totalQty + ' шт.)</span>';
+                html += '<span style="font-size: 13px; font-weight: 600; color: #2c3e50;">' + orderProgress + '% (' + formatNumber(completedQty) + ' из ' + formatNumber(totalQty) + ' шт.)</span>';
                 html += '</div>';
                 html += '<div class="modal-progress-bar" style="height: 12px;">';
                 html += '<div class="modal-progress-fill" style="width: ' + orderProgress + '%; background: linear-gradient(90deg, #3498db, #2ecc71);"></div>';
@@ -1148,7 +1148,7 @@ foreach ($ordersData as $oid => $data) {
                     html += '<tr>';
                     html += '<td><strong>' + escapeHtml(item.product_name) + '</strong></td>';
                     html += '<td><code style="background: #f8f9fa; padding: 2px 6px; border-radius: 4px; font-size: 11px;">' + escapeHtml(item.article) + '</code></td>';
-                    html += '<td style="text-align: center; font-weight: 600;">' + item.quantity + '</td>';
+                    html += '<td style="text-align: center; font-weight: 600;">' + formatNumber(item.quantity) + '</td>';
                     html += '<td style="text-align: right;">' + formatMoney(item.price) + '</td>';
                     html += '<td style="text-align: right;"><strong>' + formatMoney(itemSum) + '</strong></td>';
                     html += '</tr>';
@@ -1167,7 +1167,7 @@ foreach ($ordersData as $oid => $data) {
                     if (item.materials && item.materials.length > 0) {
                         html += '<div style="margin-top: 16px; border: 1px solid #e9ecef; border-radius: 6px; overflow: hidden;">';
                         html += '<div style="background: #f8f9fa; padding: 12px 16px; border-bottom: 1px solid #e9ecef; display: flex; justify-content: space-between; align-items: center;">';
-                        html += '<div style="font-weight: 600; color: #2c3e50;">' + escapeHtml(item.product_name) + ' (' + item.quantity + ' шт.)</div>';
+                        html += '<div style="font-weight: 600; color: #2c3e50;">' + escapeHtml(item.product_name) + ' (' + formatNumber(item.quantity) + ' шт.)</div>';
                         html += '<button class="toggle-details-btn" onclick="toggleItemMaterials(' + itemIndex + ', this)">';
                         html += '<span>📋</span><span class="btn-text">Материалы</span>';
                         html += '</button>';
@@ -1181,14 +1181,14 @@ foreach ($ordersData as $oid => $data) {
                             var isSufficient = mat.stock >= mat.required;
                             var statusHtml = isSufficient 
                                 ? '<span class="badge badge-success"><span class="material-status-indicator sufficient"></span>Хватает</span>'
-                                : '<span class="badge badge-danger"><span class="material-status-indicator insufficient"></span>Не хватает (' + (mat.required - mat.stock) + ' ' + mat.unit + ')</span>';
+                                : '<span class="badge badge-danger"><span class="material-status-indicator insufficient"></span>Не хватает (' + formatNumber(mat.required - mat.stock) + ' ' + mat.unit + ')</span>';
                             itemMatCost += mat.cost;
                             html += '<tr style="' + (!isSufficient ? 'background: #fff5f5;' : '') + '">';
                             html += '<td><strong>' + escapeHtml(mat.name) + '</strong></td>';
                             html += '<td><code style="background: #f8f9fa; padding: 2px 6px; border-radius: 4px; font-size: 10px;">' + escapeHtml(mat.article) + '</code></td>';
-                            html += '<td style="text-align: center;">' + mat.norm + ' ' + mat.unit + '</td>';
-                            html += '<td style="text-align: center; font-weight: 600;">' + mat.required + ' ' + mat.unit + '</td>';
-                            html += '<td style="text-align: center;">' + mat.stock + ' ' + mat.unit + '</td>';
+                            html += '<td style="text-align: center;">' + formatNumber(mat.norm) + ' ' + mat.unit + '</td>';
+                            html += '<td style="text-align: center; font-weight: 600;">' + formatNumber(mat.required) + ' ' + mat.unit + '</td>';
+                            html += '<td style="text-align: center;">' + formatNumber(mat.stock) + ' ' + mat.unit + '</td>';
                             html += '<td style="text-align: right;">' + formatMoney(mat.price) + '</td>';
                             html += '<td style="text-align: right;"><strong>' + formatMoney(mat.cost) + '</strong></td>';
                             html += '<td>' + statusHtml + '</td>';
@@ -1224,12 +1224,12 @@ foreach ($ordersData as $oid => $data) {
                         var ms = materialSummary[mid];
                         var statusHtml = ms.is_enough 
                             ? '<span class="badge badge-success"><span class="material-status-indicator sufficient"></span>Хватает</span>'
-                            : '<span class="badge badge-danger"><span class="material-status-indicator insufficient"></span>Не хватает (' + ms.shortage + ' ' + ms.unit + ')</span>';
+                            : '<span class="badge badge-danger"><span class="material-status-indicator insufficient"></span>Не хватает (' + formatNumber(ms.shortage) + ' ' + ms.unit + ')</span>';
                         html += '<tr style="' + (!ms.is_enough ? 'background: #fff5f5;' : '') + '">';
                         html += '<td><strong>' + escapeHtml(ms.name) + '</strong></td>';
                         html += '<td><code style="background: #f8f9fa; padding: 2px 6px; border-radius: 4px; font-size: 10px;">' + escapeHtml(ms.article) + '</code></td>';
-                        html += '<td style="text-align: center; font-weight: 600;">' + ms.required + ' ' + ms.unit + '</td>';
-                        html += '<td style="text-align: center;">' + ms.stock + ' ' + ms.unit + '</td>';
+                        html += '<td style="text-align: center; font-weight: 600;">' + formatNumber(ms.required) + ' ' + ms.unit + '</td>';
+                        html += '<td style="text-align: center;">' + formatNumber(ms.stock) + ' ' + ms.unit + '</td>';
                         html += '<td style="text-align: right;">' + formatMoney(ms.price) + '</td>';
                         html += '<td style="text-align: right;"><strong>' + formatMoney(ms.total_cost) + '</strong></td>';
                         html += '<td>' + statusHtml + '</td>';
@@ -1484,6 +1484,19 @@ foreach ($ordersData as $oid => $data) {
         function formatMoney(amount) {
             if (!amount) return '—';
             return Number(amount).toFixed(2).replace('.', ',') + ' BYN';
+        }
+        
+        function formatNumber(num) {
+            if (!num && num !== 0) return '—';
+            // Преобразуем в число и убираем лишние нули после запятой
+            var n = Number(num);
+            if (n % 1 === 0) {
+                // Если целое число, возвращаем без десятичной части
+                return n.toString();
+            } else {
+                // Если дробное, убираем лишние нули в конце
+                return parseFloat(n.toFixed(3)).toString().replace('.', ',');
+            }
         }
         
         function formatDate(dateStr) {

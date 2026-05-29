@@ -93,6 +93,10 @@
                 <span class="sidebar-nav-icon">📦</span>
                 <span>Материалы</span>
             </a>
+            <a href="<?= pageUrl('modules/warehouse/receipt.php') ?>" class="sidebar-nav-item <?= $relativePath === 'modules/warehouse/receipt.php' ? 'active' : '' ?>">
+                <span class="sidebar-nav-icon">📥</span>
+                <span>Поступление материалов</span>
+            </a>
             <a href="<?= pageUrl('modules/warehouse/production.php') ?>" class="sidebar-nav-item <?= $relativePath === 'modules/warehouse/production.php' ? 'active' : '' ?>">
                 <span class="sidebar-nav-icon">⚡</span>
                 <span>Продукция (каталог)</span>

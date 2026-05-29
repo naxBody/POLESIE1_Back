@@ -390,9 +390,7 @@ error_log("Всего категорий продукции: " . count($categori
                 <!-- Контент будет заполнен через JS -->
             </div>
             <div class="product-modal-footer passport-footer" style="padding: 20px 24px; background: white; border-top: 1px solid var(--border-color); display: flex; justify-content: center; gap: 12px; flex-shrink: 0;">
-                <button id="btnPrintProductPassport" onclick="printProductPassport()" style="background: var(--primary-color); border: none; color: white; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-size: 15px; font-weight: 500; min-width: 200px;" title="Распечатать паспорт изделия">
-                    🖨️ Распечатать паспорт
-                </button>
+                <!-- Кнопка перемещена в раздел Паспорт -->
             </div>
         </div>
     </div>
@@ -543,10 +541,15 @@ error_log("Всего категорий продукции: " . count($categori
                 html += '</div>';
             }
             
-            // Документы и паспорт
+            // Паспорт (документы)
             if (product.documents && product.documents.length > 0) {
                 html += '<div class="passport-section">';
-                html += '<div class="passport-section-title">📎 Документы</div>';
+                html += '<div class="passport-section-title">📄 Паспорт</div>';
+                html += '<div style="margin-bottom: 16px;">';
+                html += '<button onclick="printProductPassport()" style="background: var(--primary-color); border: none; color: white; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500; display: inline-flex; align-items: center; gap: 8px;" title="Сформировать паспорт изделия">';
+                html += '📄 Сформировать паспорт';
+                html += '</button>';
+                html += '</div>';
                 html += '<ul class="document-list">';
                 for (var i = 0; i < product.documents.length; i++) {
                     var doc = product.documents[i];

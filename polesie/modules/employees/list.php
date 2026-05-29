@@ -234,7 +234,7 @@ require_once BASE_PATH . '/includes/topbar.php';
     border: 1px solid var(--border-color);
     cursor: pointer;
     text-decoration: none;
-    font-size: 16px;
+    color: var(--text-secondary);
     transition: all var(--transition-fast);
 }
 
@@ -429,37 +429,34 @@ require_once BASE_PATH . '/includes/topbar.php';
                             </td>
                             <td>
                                 <?php 
-                                $deptBadges = [
-                                    'production' => ['badge-info', '🏭 Производство'],
-                                    'quality' => ['badge-success', '✅ ОТК'],
-                                    'warehouse' => ['badge-warning', '📦 Склад'],
-                                    'management' => ['badge-purple', '👔 Руководство'],
-                                    'sales' => ['badge-info', '📞 Продажи'],
-                                    'it' => ['badge-secondary', '💻 IT'],
-                                    'hr' => ['badge-success', '👥 HR'],
-                                    'accounting' => ['badge-warning', '📊 Бухгалтерия'],
+                                $deptLabels = [
+                                    'production' => '🏭 Производство',
+                                    'quality' => '✅ ОТК',
+                                    'warehouse' => '📦 Склад',
+                                    'management' => '👔 Руководство',
+                                    'sales' => '📞 Продажи',
+                                    'it' => '💻 IT',
+                                    'hr' => '👥 HR',
+                                    'accounting' => '📊 Бухгалтерия',
                                 ];
-                                $badgeClass = $deptBadges[$e['department']][0] ?? 'badge-secondary';
-                                $badgeLabel = $deptBadges[$e['department']][1] ?? e($e['department']);
+                                $deptLabel = $deptLabels[$e['department']] ?? e($e['department']);
                                 ?>
-                                <span class="badge <?= $badgeClass ?>"><?= $badgeLabel ?></span>
+                                <span class="badge badge-secondary"><?= $deptLabel ?></span>
                             </td>
                             <td>
-                                <div style="display: flex; flex-direction: column; gap: 4px;">
-                                    <?php if ($e['phone']): ?>
-                                        <a href="tel:<?= e($e['phone']) ?>" style="font-size: 13px; color: var(--text-secondary); text-decoration: none;">
-                                            📞 <?= e($e['phone']) ?>
-                                        </a>
-                                    <?php endif; ?>
-                                    <?php if ($e['email']): ?>
-                                        <a href="mailto:<?= e($e['email']) ?>" style="font-size: 13px; color: var(--text-secondary); text-decoration: none;">
-                                            ✉️ <?= e($e['email']) ?>
-                                        </a>
-                                    <?php endif; ?>
-                                    <?php if (!$e['phone'] && !$e['email']): ?>
-                                        <span style="color: var(--text-muted); font-size: 13px;">—</span>
-                                    <?php endif; ?>
-                                </div>
+                                <?php if ($e['phone']): ?>
+                                    <a href="tel:<?= e($e['phone']) ?>" style="font-size: 13px; color: var(--text-secondary); text-decoration: none;">
+                                        📞 <?= e($e['phone']) ?>
+                                    </a>
+                                <?php endif; ?>
+                                <?php if ($e['email']): ?>
+                                    <div style="font-size: 13px; color: var(--text-secondary);">
+                                        ✉️ <?= e($e['email']) ?>
+                                    </div>
+                                <?php endif; ?>
+                                <?php if (!$e['phone'] && !$e['email']): ?>
+                                    <span style="color: var(--text-muted); font-size: 13px;">—</span>
+                                <?php endif; ?>
                             </td>
                             <td>
                                 <?php if ($e['role_name']): ?>
@@ -470,18 +467,30 @@ require_once BASE_PATH . '/includes/topbar.php';
                             </td>
                             <td>
                                 <?php if ($e['is_active']): ?>
-                                    <span class="badge badge-success">✓ Работает</span>
+                                    <span class="badge badge-success">Работает</span>
                                 <?php else: ?>
-                                    <span class="badge badge-danger">✕ Уволен</span>
+                                    <span class="badge badge-danger">Уволен</span>
                                 <?php endif; ?>
                             </td>
                             <td>
                                 <div style="display: flex; gap: 6px;">
                                     <?php if (hasPermission('employees.edit')): ?>
-                                        <a href="edit.php?id=<?= $e['id'] ?>" class="btn-icon" title="Редактировать">✏️</a>
+                                        <a href="edit.php?id=<?= $e['id'] ?>" class="btn-icon" title="Редактировать">
+                                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                                            </svg>
+                                        </a>
                                     <?php endif; ?>
                                     <?php if (hasPermission('employees.delete')): ?>
-                                        <a href="delete.php?id=<?= $e['id'] ?>" class="btn-icon delete" title="Удалить" onclick="return confirm('Вы уверены, что хотите удалить этого сотрудника?')">🗑️</a>
+                                        <a href="delete.php?id=<?= $e['id'] ?>" class="btn-icon delete" title="Удалить" onclick="return confirm('Вы уверены, что хотите удалить этого сотрудника?')">
+                                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                <polyline points="3 6 5 6 21 6"></polyline>
+                                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                                <line x1="10" y1="11" x2="10" y2="17"></line>
+                                                <line x1="14" y1="11" x2="14" y2="17"></line>
+                                            </svg>
+                                        </a>
                                     <?php endif; ?>
                                 </div>
                             </td>

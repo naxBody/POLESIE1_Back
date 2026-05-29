@@ -262,6 +262,19 @@ try {
                     
                     $docId = $pdo->lastInsertId();
                 }
+
+                // Считаем общую сумму документа
+                $totalAmount = 0;
+                if (isset($input['items']) && is_array($input['items'])) {
+                    foreach ($input['items'] as $item) {
+                        $totalAmount += (float)($item['total_price'] ?? 0);
+                    }
+                }
+
+                // Обновляем общую сумму документа
+                $updateTotalSql = "UPDATE material_receipt_documents SET total_amount = ? WHERE id = ?";
+                $updateTotalStmt = $pdo->prepare($updateTotalSql);
+                $updateTotalStmt->execute([$totalAmount, $docId]);
                 
                 // Обработка позиций документа
                 if (isset($input['items']) && is_array($input['items'])) {

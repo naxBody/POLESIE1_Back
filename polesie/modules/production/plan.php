@@ -3,6 +3,7 @@
  * План выпуска - все заказы и производственные задания
  * Отображение статуса производства по каждому заказу
  * Компактная таблица с детальной информацией по клику
+ * Расширенная версия с планируемыми/фактическими датами и материалами
  */
 
 // API endpoint для получения детальной информации о заказе (должен быть В САМОМ НАЧАЛЕ до любых подключений и вывода)
@@ -164,8 +165,40 @@ if (isset($_GET['api_order_detail'])) {
     }
     unset($task);
     
+    // Материалы по продуктам из паспортов (для каждой позиции заказа)
+    foreach ($items as &$item) {
+        if ($item['product_id']) {
+            $stmt = $pdo->prepare("
+                SELECT 
+                    m.id as material_id,
+                    m.name_full as material_name,
+                    m.code as material_article,
+                    ppm.quantity as quantity_per_unit,
+                    ppm.quantity * ? as total_quantity,
+                    COALESCE(m.current_stock, 0) as current_stock,
+                    COALESCE(m.last_price, 0) as last_price,
+                    mu.symbol as unit_name,
+                    CASE 
+                        WHEN COALESCE(m.current_stock, 0) >= (ppm.quantity * ?) THEN 'sufficient'
+                        ELSE 'insufficient'
+                    END as availability_status
+                FROM product_passport_materials ppm
+                JOIN product_passports pp ON ppm.passport_id = pp.id
+                JOIN materials m ON ppm.material_id = m.id
+                LEFT JOIN base_units mu ON m.base_unit_id = mu.id
+                WHERE pp.product_id = ?
+                ORDER BY ppm.sort_order
+            ");
+            $stmt->execute([$item['quantity'], $item['quantity'], $item['product_id']]);
+            $item['materials'] = $stmt->fetchAll();
+        } else {
+            $item['materials'] = [];
+        }
+    }
+    unset($item);
+    
     $jsonResult = json_encode([
-        'order' => $orderInfo,
+        'order' => $orderInfo, 
         'items' => $items, 
         'tasks' => $tasks
     ], JSON_UNESCAPED_UNICODE);
@@ -848,7 +881,7 @@ foreach ($ordersData as $oid => $data) {
                                     <th>№ заказа</th>
                                     <th>Статус</th>
                                     <th>Заказчик</th>
-                                    <th>Дата доставки</th>
+                                    <th>Дата доставки (план/факт)</th>
                                     <th>Позиций</th>
                                     <th>Заданий</th>
                                     <th>Ответственный</th>
@@ -859,6 +892,19 @@ foreach ($ordersData as $oid => $data) {
                                 <?php foreach ($orders as $order): 
                                     $isOverdue = isset($order['days_until_delivery']) && $order['days_until_delivery'] < 0;
                                     $hasMaterialIssues = isset($order['material_shortages']) && $order['material_shortages'] > 0;
+                                    
+                                    // Получаем фактическую дату отгрузки из заданий
+                                    $actualDate = null;
+                                    if (!empty($order['id'])) {
+                                        $stmtActual = $pdo->prepare("
+                                            SELECT MAX(actual_end) as actual_date 
+                                            FROM production_tasks 
+                                            WHERE order_id = ? AND status = 'completed'
+                                        ");
+                                        $stmtActual->execute([$order['id']]);
+                                        $actualResult = $stmtActual->fetch();
+                                        $actualDate = $actualResult['actual_date'] ?? null;
+                                    }
                                 ?>
                                 <tr style="cursor: pointer;" onclick="openOrderDetailModal('<?= $order['id'] ?>')" 
                                     class="<?= $isOverdue ? 'row-overdue' : '' ?> <?= $hasMaterialIssues ? 'row-material-issue' : '' ?>">
@@ -876,14 +922,23 @@ foreach ($ordersData as $oid => $data) {
                                     </td>
                                     <td><?= e($order['contractor_name'] ?? '—') ?></td>
                                     <td>
-                                        <?php if ($order['delivery_date']): ?>
-                                            <?= formatDate($order['delivery_date']) ?>
-                                            <span style="color: <?= $order['days_until_delivery'] < 0 ? '#e74c3c' : ($order['days_until_delivery'] <= 3 ? '#f39c12' : '#27ae60') ?>; font-size: 12px;">
-                                                (<?= $order['days_until_delivery'] ?> дн.)
-                                            </span>
-                                        <?php else: ?>
-                                            —
-                                        <?php endif; ?>
+                                        <div style="display: flex; flex-direction: column; gap: 4px;">
+                                            <?php if ($order['delivery_date']): ?>
+                                                <span style="color: <?= $order['days_until_delivery'] < 0 ? '#e74c3c' : ($order['days_until_delivery'] <= 3 ? '#f39c12' : '#27ae60') ?>; font-size: 12px;">
+                                                    📅 План: <?= formatDate($order['delivery_date']) ?>
+                                                    <span style="color: #7f8c8d;">(<?= $order['days_until_delivery'] ?> дн.)</span>
+                                                </span>
+                                            <?php else: ?>
+                                                <span style="color: #7f8c8d;">План: —</span>
+                                            <?php endif; ?>
+                                            <?php if ($actualDate): ?>
+                                                <span style="color: #27ae60; font-size: 12px;">
+                                                    ✅ Факт: <?= formatDate($actualDate) ?>
+                                                </span>
+                                            <?php else: ?>
+                                                <span style="color: #7f8c8d;">Факт: —</span>
+                                            <?php endif; ?>
+                                        </div>
                                     </td>
                                     <td><?= $order['items_count'] ?? 0 ?></td>
                                     <td><?= $order['tasks_count'] ?? 0 ?></td>
@@ -1172,7 +1227,7 @@ foreach ($ordersData as $oid => $data) {
                         html += '<span>📋</span><span class="btn-text">Материалы</span>';
                         html += '</button>';
                         html += '</div>';
-                        html += '<div class="item-materials-section" id="item-materials-' + itemIndex + '" style="display: block; padding: 12px 16px; background: white;">';
+                        html += '<div class="item-materials-section" id="item-materials-' + itemIndex + '" style="display: none; padding: 12px 16px; background: white;">';
                         html += '<table class="materials-table" style="font-size: 12px;">';
                         html += '<thead><tr><th>Материал</th><th>Артикул</th><th style="text-align: center;">Норма</th><th style="text-align: center;">Требуется</th><th style="text-align: center;">На складе</th><th style="text-align: right;">Цена</th><th style="text-align: right;">Сумма</th><th>Статус</th></tr></thead>';
                         html += '<tbody>';

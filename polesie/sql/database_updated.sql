@@ -2024,3 +2024,25 @@ INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantit
 ((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'EKCH1-1.0')), (SELECT id FROM materials WHERE code = 'STEEL-SHEET-0.8'), 0.4, 2, 0.200, 15.9, 4, 'Стальной кожух'),
 ((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'EKCH1-1.0')), (SELECT id FROM materials WHERE code = 'CABLE-POWER-3x1.5'), 0.5, 4, 0.150, 11.93, 5, 'Силовой кабель');
 
+
+-- ============================================
+-- МАРШРУТНЫЕ КАРТЫ ДЛЯ ВСЕХ ОСТАЛЬНЫХ ПРОДУКТОВ
+-- ============================================
+
+-- Маршрутная карта для AIR71В2
+INSERT INTO `route_cards` (`product_id`, `name`, `version`, `description`, `total_time_hours`, `is_active`) VALUES
+((SELECT id FROM products WHERE article = 'AIR71В2'), 'Маршрутная карта AIR71В2', '1.0', 'Полный технологический процесс производства двигателя AIR71В2', 8.5, TRUE);
+
+INSERT INTO `route_card_operations` (`route_card_id`, `operation_number`, `stage_id`, `name`, `description`, `work_center`, `equipment`, `time_norm_hours`, `materials_required`, `instructions`, `sort_order`) VALUES
+((SELECT id FROM route_cards WHERE product_id = (SELECT id FROM products WHERE article = 'AIR71В2')), 10, (SELECT id FROM production_stages WHERE code = 'blank'), 'Раскрой стали', 'Раскрой электротехнической стали', 'Заготовительный участок', 'Гильотинные ножницы', 0.5, '{"материалы": ["STEEL-SHEET-0.5"]}', 'Соблюдать размеры', 1),
+((SELECT id FROM route_cards WHERE product_id = (SELECT id FROM products WHERE article = 'AIR71В2')), 20, (SELECT id FROM production_stages WHERE code = 'machining'), 'Штамповка пластин', 'Вырубка пластин статора и ротора', 'Прессовый участок', 'Пресс механический', 1.0, '{}', 'Контролировать качество', 2),
+((SELECT id FROM route_cards WHERE product_id = (SELECT id FROM products WHERE article = 'AIR71В2')), 30, (SELECT id FROM production_stages WHERE code = 'casting'), 'Литье ротора', 'Литье алюминиевой клетки ротора', 'Литейный участок', 'Машина литьевая ДПА-250', 1.5, '{"материалы": ["ALUM-BAR-10"]}', 'Температура 680-700°C', 3),
+((SELECT id FROM route_cards WHERE product_id = (SELECT id FROM products WHERE article = 'AIR71В2')), 40, (SELECT id FROM production_stages WHERE code = 'winding'), 'Намотка статора', 'Намотка обмотки статора', 'Намоточный участок', 'Станок намоточный', 2.0, '{"материалы": ["WIRE-CU-0.8"]}', 'Натяжение провода 2-3 Н', 4),
+((SELECT id FROM route_cards WHERE product_id = (SELECT id FROM products WHERE article = 'AIR71В2')), 50, (SELECT id FROM production_stages WHERE code = 'assembly'), 'Сборка двигателя', 'Установка ротора в статор', 'Сборочный участок', 'Пресс гидравлический', 1.5, '{"материалы": ["BEARING-6203-2RS"]}', 'Зазор 0.3-0.5 мм', 5),
+((SELECT id FROM route_cards WHERE product_id = (SELECT id FROM products WHERE article = 'AIR71В2')), 60, (SELECT id FROM production_stages WHERE code = 'painting'), 'Покраска корпуса', 'Нанесение порошкового покрытия', 'Окрасочный участок', 'Камера напыления', 0.8, '{"материалы": ["PAINT-POLYMER"]}', 'Толщина 60-80 мкм', 6),
+((SELECT id FROM route_cards WHERE product_id = (SELECT id FROM products WHERE article = 'AIR71В2')), 70, (SELECT id FROM production_stages WHERE code = 'drying'), 'Полимеризация', 'Сушка в печи', 'Участок сушки', 'Печь конвейерная', 0.7, '{}', 'Температура 180-200°C', 7),
+((SELECT id FROM route_cards WHERE product_id = (SELECT id FROM products WHERE article = 'AIR71В2')), 80, (SELECT id FROM production_stages WHERE code = 'balancing'), 'Балансировка ротора', 'Динамическая балансировка', 'Балансировочный участок', 'Станок балансировочный', 0.3, '{}', 'Дисбаланс ≤15 г·мм', 8),
+((SELECT id FROM route_cards WHERE product_id = (SELECT id FROM products WHERE article = 'AIR71В2')), 90, (SELECT id FROM production_stages WHERE code = 'qc'), 'Контроль качества', 'Проверка электрических параметров', 'Контрольный участок', 'Стенд испытательный', 0.5, '{}', 'Проверка сопротивления изоляции', 9),
+((SELECT id FROM route_cards WHERE product_id = (SELECT id FROM products WHERE article = 'AIR71В2')), 100, (SELECT id FROM production_stages WHERE code = 'packing'), 'Упаковка', 'Консервация и упаковка', 'Упаковочный участок', '', 0.2, '{}', 'Упаковка в коробку', 10);
+
+SET FOREIGN_KEY_CHECKS = 1;

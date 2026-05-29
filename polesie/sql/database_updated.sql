@@ -944,3 +944,1083 @@ INSERT INTO `route_card_operations` (`route_card_id`, `operation_number`, `stage
  'Контроль и испытания', 'Проверка сопротивления изоляции, включение на нагрев', 'Контрольный участок', 'Стенд испытательный', 0.3, 
  '{}', 
 'Ток утечки не более 0.5 мА, время нагрева до 300°C не более 5 мин', 5);
+
+-- ============================================
+-- ДОПОЛНИТЕЛЬНЫЕ ПАСПОРТА ПРОДУКЦИИ (для всех товаров)
+-- ============================================
+
+-- Паспорт для Двигатель АИР71В2
+INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`) VALUES
+((SELECT id FROM products WHERE article = 'AIR71В2'), 10.0, 12, TRUE, 
+'Стандартный производственный процесс для Двигатель АИР71В2', 
+'Соответствие ГОСТ, проверка электрических параметров и качества сборки');
+
+INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`) VALUES
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR71В2')), (SELECT id FROM materials WHERE code = 'STEEL-SHEET-0.5'), 2.5, 2, 1.250, 50.71, 1, 'Сталь для корпуса статора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR71В2')), (SELECT id FROM materials WHERE code = 'WIRE-CU-0.8'), 0.15, 4, 0.045, 1.83, 2, 'Обмоточный провод'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR71В2')), (SELECT id FROM materials WHERE code = 'BEARING-6203-2RS'), 2, 1, 0.200, 8.11, 3, 'Подшипники'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR71В2')), (SELECT id FROM materials WHERE code = 'ALUM-BAR-10'), 1.8, 2, 0.900, 36.51, 4, 'Алюминий для литья ротора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR71В2')), (SELECT id FROM materials WHERE code = 'PAINT-POLYMER'), 0.12, 2, 0.060, 2.43, 5, 'Порошковая краска'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR71В2')), (SELECT id FROM materials WHERE code = 'LUBE-GREASE-LITO'), 0.02, 2, 0.010, 0.41, 6, 'Смазка для подшипников');
+
+-- Паспорт для Двигатель АИР71А4
+INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`) VALUES
+((SELECT id FROM products WHERE article = 'AIR71А4'), 10.0, 12, TRUE, 
+'Стандартный производственный процесс для Двигатель АИР71А4', 
+'Соответствие ГОСТ, проверка электрических параметров и качества сборки');
+
+INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`) VALUES
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR71А4')), (SELECT id FROM materials WHERE code = 'STEEL-SHEET-0.5'), 2.8, 2, 1.400, 51.3, 1, 'Сталь для корпуса статора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR71А4')), (SELECT id FROM materials WHERE code = 'WIRE-CU-0.9'), 0.18, 4, 0.054, 1.98, 2, 'Обмоточный провод'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR71А4')), (SELECT id FROM materials WHERE code = 'BEARING-6203-2RS'), 2, 1, 0.200, 7.33, 3, 'Подшипники'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR71А4')), (SELECT id FROM materials WHERE code = 'ALUM-BAR-10'), 2.0, 2, 1.000, 36.64, 4, 'Алюминий для литья ротора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR71А4')), (SELECT id FROM materials WHERE code = 'PAINT-POLYMER'), 0.13, 2, 0.065, 2.38, 5, 'Порошковая краска'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR71А4')), (SELECT id FROM materials WHERE code = 'LUBE-GREASE-LITO'), 0.02, 2, 0.010, 0.37, 6, 'Смазка для подшипников');
+
+-- Паспорт для Двигатель АИР71В4
+INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`) VALUES
+((SELECT id FROM products WHERE article = 'AIR71В4'), 10.0, 12, TRUE, 
+'Стандартный производственный процесс для Двигатель АИР71В4', 
+'Соответствие ГОСТ, проверка электрических параметров и качества сборки');
+
+INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`) VALUES
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR71В4')), (SELECT id FROM materials WHERE code = 'STEEL-SHEET-0.5'), 2.8, 2, 1.400, 51.3, 1, 'Сталь для корпуса статора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR71В4')), (SELECT id FROM materials WHERE code = 'WIRE-CU-0.9'), 0.18, 4, 0.054, 1.98, 2, 'Обмоточный провод'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR71В4')), (SELECT id FROM materials WHERE code = 'BEARING-6203-2RS'), 2, 1, 0.200, 7.33, 3, 'Подшипники'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR71В4')), (SELECT id FROM materials WHERE code = 'ALUM-BAR-10'), 2.0, 2, 1.000, 36.64, 4, 'Алюминий для литья ротора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR71В4')), (SELECT id FROM materials WHERE code = 'PAINT-POLYMER'), 0.13, 2, 0.065, 2.38, 5, 'Порошковая краска'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR71В4')), (SELECT id FROM materials WHERE code = 'LUBE-GREASE-LITO'), 0.02, 2, 0.010, 0.37, 6, 'Смазка для подшипников');
+
+-- Паспорт для Двигатель АИР71А6
+INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`) VALUES
+((SELECT id FROM products WHERE article = 'AIR71А6'), 10.0, 12, TRUE, 
+'Стандартный производственный процесс для Двигатель АИР71А6', 
+'Соответствие ГОСТ, проверка электрических параметров и качества сборки');
+
+INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`) VALUES
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR71А6')), (SELECT id FROM materials WHERE code = 'STEEL-SHEET-0.5'), 3.0, 2, 1.500, 50.98, 1, 'Сталь для корпуса статора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR71А6')), (SELECT id FROM materials WHERE code = 'WIRE-CU-1.0'), 0.2, 4, 0.060, 2.04, 2, 'Обмоточный провод'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR71А6')), (SELECT id FROM materials WHERE code = 'BEARING-6204-2RS'), 2, 1, 0.200, 6.8, 3, 'Подшипники'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR71А6')), (SELECT id FROM materials WHERE code = 'ALUM-BAR-10'), 2.2, 2, 1.100, 37.38, 4, 'Алюминий для литья ротора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR71А6')), (SELECT id FROM materials WHERE code = 'PAINT-POLYMER'), 0.14, 2, 0.070, 2.38, 5, 'Порошковая краска'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR71А6')), (SELECT id FROM materials WHERE code = 'LUBE-GREASE-LITO'), 0.025, 2, 0.013, 0.42, 6, 'Смазка для подшипников');
+
+-- Паспорт для Двигатель АИР71В6
+INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`) VALUES
+((SELECT id FROM products WHERE article = 'AIR71В6'), 10.0, 12, TRUE, 
+'Стандартный производственный процесс для Двигатель АИР71В6', 
+'Соответствие ГОСТ, проверка электрических параметров и качества сборки');
+
+INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`) VALUES
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR71В6')), (SELECT id FROM materials WHERE code = 'STEEL-SHEET-0.5'), 3.0, 2, 1.500, 50.98, 1, 'Сталь для корпуса статора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR71В6')), (SELECT id FROM materials WHERE code = 'WIRE-CU-1.0'), 0.2, 4, 0.060, 2.04, 2, 'Обмоточный провод'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR71В6')), (SELECT id FROM materials WHERE code = 'BEARING-6204-2RS'), 2, 1, 0.200, 6.8, 3, 'Подшипники'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR71В6')), (SELECT id FROM materials WHERE code = 'ALUM-BAR-10'), 2.2, 2, 1.100, 37.38, 4, 'Алюминий для литья ротора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR71В6')), (SELECT id FROM materials WHERE code = 'PAINT-POLYMER'), 0.14, 2, 0.070, 2.38, 5, 'Порошковая краска'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR71В6')), (SELECT id FROM materials WHERE code = 'LUBE-GREASE-LITO'), 0.025, 2, 0.013, 0.42, 6, 'Смазка для подшипников');
+
+-- Паспорт для Двигатель АИР80В2
+INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`) VALUES
+((SELECT id FROM products WHERE article = 'AIR80В2'), 14.0, 12, TRUE, 
+'Стандартный производственный процесс для Двигатель АИР80В2', 
+'Соответствие ГОСТ, проверка электрических параметров и качества сборки');
+
+INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`) VALUES
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR80В2')), (SELECT id FROM materials WHERE code = 'STEEL-SHEET-0.5'), 2.5, 2, 1.250, 50.71, 1, 'Сталь для корпуса статора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR80В2')), (SELECT id FROM materials WHERE code = 'WIRE-CU-0.8'), 0.15, 4, 0.045, 1.83, 2, 'Обмоточный провод'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR80В2')), (SELECT id FROM materials WHERE code = 'BEARING-6203-2RS'), 2, 1, 0.200, 8.11, 3, 'Подшипники'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR80В2')), (SELECT id FROM materials WHERE code = 'ALUM-BAR-10'), 1.8, 2, 0.900, 36.51, 4, 'Алюминий для литья ротора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR80В2')), (SELECT id FROM materials WHERE code = 'PAINT-POLYMER'), 0.12, 2, 0.060, 2.43, 5, 'Порошковая краска'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR80В2')), (SELECT id FROM materials WHERE code = 'LUBE-GREASE-LITO'), 0.02, 2, 0.010, 0.41, 6, 'Смазка для подшипников');
+
+-- Паспорт для Двигатель АИР80А4
+INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`) VALUES
+((SELECT id FROM products WHERE article = 'AIR80А4'), 14.0, 12, TRUE, 
+'Стандартный производственный процесс для Двигатель АИР80А4', 
+'Соответствие ГОСТ, проверка электрических параметров и качества сборки');
+
+INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`) VALUES
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR80А4')), (SELECT id FROM materials WHERE code = 'STEEL-SHEET-0.5'), 2.8, 2, 1.400, 51.3, 1, 'Сталь для корпуса статора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR80А4')), (SELECT id FROM materials WHERE code = 'WIRE-CU-0.9'), 0.18, 4, 0.054, 1.98, 2, 'Обмоточный провод'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR80А4')), (SELECT id FROM materials WHERE code = 'BEARING-6203-2RS'), 2, 1, 0.200, 7.33, 3, 'Подшипники'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR80А4')), (SELECT id FROM materials WHERE code = 'ALUM-BAR-10'), 2.0, 2, 1.000, 36.64, 4, 'Алюминий для литья ротора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR80А4')), (SELECT id FROM materials WHERE code = 'PAINT-POLYMER'), 0.13, 2, 0.065, 2.38, 5, 'Порошковая краска'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR80А4')), (SELECT id FROM materials WHERE code = 'LUBE-GREASE-LITO'), 0.02, 2, 0.010, 0.37, 6, 'Смазка для подшипников');
+
+-- Паспорт для Двигатель АИР80В4
+INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`) VALUES
+((SELECT id FROM products WHERE article = 'AIR80В4'), 14.0, 12, TRUE, 
+'Стандартный производственный процесс для Двигатель АИР80В4', 
+'Соответствие ГОСТ, проверка электрических параметров и качества сборки');
+
+INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`) VALUES
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR80В4')), (SELECT id FROM materials WHERE code = 'STEEL-SHEET-0.5'), 2.8, 2, 1.400, 51.3, 1, 'Сталь для корпуса статора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR80В4')), (SELECT id FROM materials WHERE code = 'WIRE-CU-0.9'), 0.18, 4, 0.054, 1.98, 2, 'Обмоточный провод'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR80В4')), (SELECT id FROM materials WHERE code = 'BEARING-6203-2RS'), 2, 1, 0.200, 7.33, 3, 'Подшипники'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR80В4')), (SELECT id FROM materials WHERE code = 'ALUM-BAR-10'), 2.0, 2, 1.000, 36.64, 4, 'Алюминий для литья ротора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR80В4')), (SELECT id FROM materials WHERE code = 'PAINT-POLYMER'), 0.13, 2, 0.065, 2.38, 5, 'Порошковая краска'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR80В4')), (SELECT id FROM materials WHERE code = 'LUBE-GREASE-LITO'), 0.02, 2, 0.010, 0.37, 6, 'Смазка для подшипников');
+
+-- Паспорт для Двигатель АИР80А6
+INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`) VALUES
+((SELECT id FROM products WHERE article = 'AIR80А6'), 14.0, 12, TRUE, 
+'Стандартный производственный процесс для Двигатель АИР80А6', 
+'Соответствие ГОСТ, проверка электрических параметров и качества сборки');
+
+INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`) VALUES
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR80А6')), (SELECT id FROM materials WHERE code = 'STEEL-SHEET-0.5'), 3.0, 2, 1.500, 50.98, 1, 'Сталь для корпуса статора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR80А6')), (SELECT id FROM materials WHERE code = 'WIRE-CU-1.0'), 0.2, 4, 0.060, 2.04, 2, 'Обмоточный провод'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR80А6')), (SELECT id FROM materials WHERE code = 'BEARING-6204-2RS'), 2, 1, 0.200, 6.8, 3, 'Подшипники'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR80А6')), (SELECT id FROM materials WHERE code = 'ALUM-BAR-10'), 2.2, 2, 1.100, 37.38, 4, 'Алюминий для литья ротора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR80А6')), (SELECT id FROM materials WHERE code = 'PAINT-POLYMER'), 0.14, 2, 0.070, 2.38, 5, 'Порошковая краска'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR80А6')), (SELECT id FROM materials WHERE code = 'LUBE-GREASE-LITO'), 0.025, 2, 0.013, 0.42, 6, 'Смазка для подшипников');
+
+-- Паспорт для Двигатель АИР80В6
+INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`) VALUES
+((SELECT id FROM products WHERE article = 'AIR80В6'), 14.0, 12, TRUE, 
+'Стандартный производственный процесс для Двигатель АИР80В6', 
+'Соответствие ГОСТ, проверка электрических параметров и качества сборки');
+
+INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`) VALUES
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR80В6')), (SELECT id FROM materials WHERE code = 'STEEL-SHEET-0.5'), 3.0, 2, 1.500, 50.98, 1, 'Сталь для корпуса статора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR80В6')), (SELECT id FROM materials WHERE code = 'WIRE-CU-1.0'), 0.2, 4, 0.060, 2.04, 2, 'Обмоточный провод'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR80В6')), (SELECT id FROM materials WHERE code = 'BEARING-6204-2RS'), 2, 1, 0.200, 6.8, 3, 'Подшипники'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR80В6')), (SELECT id FROM materials WHERE code = 'ALUM-BAR-10'), 2.2, 2, 1.100, 37.38, 4, 'Алюминий для литья ротора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR80В6')), (SELECT id FROM materials WHERE code = 'PAINT-POLYMER'), 0.14, 2, 0.070, 2.38, 5, 'Порошковая краска'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR80В6')), (SELECT id FROM materials WHERE code = 'LUBE-GREASE-LITO'), 0.025, 2, 0.013, 0.42, 6, 'Смазка для подшипников');
+
+-- Паспорт для Двигатель АИР90L2
+INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`) VALUES
+((SELECT id FROM products WHERE article = 'AIR90L2'), 22.0, 12, TRUE, 
+'Стандартный производственный процесс для Двигатель АИР90L2', 
+'Соответствие ГОСТ, проверка электрических параметров и качества сборки');
+
+INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`) VALUES
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR90L2')), (SELECT id FROM materials WHERE code = 'STEEL-SHEET-0.5'), 2.5, 2, 1.250, 50.71, 1, 'Сталь для корпуса статора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR90L2')), (SELECT id FROM materials WHERE code = 'WIRE-CU-0.8'), 0.15, 4, 0.045, 1.83, 2, 'Обмоточный провод'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR90L2')), (SELECT id FROM materials WHERE code = 'BEARING-6203-2RS'), 2, 1, 0.200, 8.11, 3, 'Подшипники'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR90L2')), (SELECT id FROM materials WHERE code = 'ALUM-BAR-10'), 1.8, 2, 0.900, 36.51, 4, 'Алюминий для литья ротора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR90L2')), (SELECT id FROM materials WHERE code = 'PAINT-POLYMER'), 0.12, 2, 0.060, 2.43, 5, 'Порошковая краска'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR90L2')), (SELECT id FROM materials WHERE code = 'LUBE-GREASE-LITO'), 0.02, 2, 0.010, 0.41, 6, 'Смазка для подшипников');
+
+-- Паспорт для Двигатель АИР90LB2
+INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`) VALUES
+((SELECT id FROM products WHERE article = 'AIR90LB2'), 22.0, 12, TRUE, 
+'Стандартный производственный процесс для Двигатель АИР90LB2', 
+'Соответствие ГОСТ, проверка электрических параметров и качества сборки');
+
+INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`) VALUES
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR90LB2')), (SELECT id FROM materials WHERE code = 'STEEL-SHEET-0.5'), 2.5, 2, 1.250, 50.71, 1, 'Сталь для корпуса статора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR90LB2')), (SELECT id FROM materials WHERE code = 'WIRE-CU-0.8'), 0.15, 4, 0.045, 1.83, 2, 'Обмоточный провод'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR90LB2')), (SELECT id FROM materials WHERE code = 'BEARING-6203-2RS'), 2, 1, 0.200, 8.11, 3, 'Подшипники'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR90LB2')), (SELECT id FROM materials WHERE code = 'ALUM-BAR-10'), 1.8, 2, 0.900, 36.51, 4, 'Алюминий для литья ротора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR90LB2')), (SELECT id FROM materials WHERE code = 'PAINT-POLYMER'), 0.12, 2, 0.060, 2.43, 5, 'Порошковая краска'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR90LB2')), (SELECT id FROM materials WHERE code = 'LUBE-GREASE-LITO'), 0.02, 2, 0.010, 0.41, 6, 'Смазка для подшипников');
+
+-- Паспорт для Двигатель АИР90L4
+INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`) VALUES
+((SELECT id FROM products WHERE article = 'AIR90L4'), 22.0, 12, TRUE, 
+'Стандартный производственный процесс для Двигатель АИР90L4', 
+'Соответствие ГОСТ, проверка электрических параметров и качества сборки');
+
+INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`) VALUES
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR90L4')), (SELECT id FROM materials WHERE code = 'STEEL-SHEET-0.5'), 2.8, 2, 1.400, 51.3, 1, 'Сталь для корпуса статора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR90L4')), (SELECT id FROM materials WHERE code = 'WIRE-CU-0.9'), 0.18, 4, 0.054, 1.98, 2, 'Обмоточный провод'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR90L4')), (SELECT id FROM materials WHERE code = 'BEARING-6203-2RS'), 2, 1, 0.200, 7.33, 3, 'Подшипники'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR90L4')), (SELECT id FROM materials WHERE code = 'ALUM-BAR-10'), 2.0, 2, 1.000, 36.64, 4, 'Алюминий для литья ротора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR90L4')), (SELECT id FROM materials WHERE code = 'PAINT-POLYMER'), 0.13, 2, 0.065, 2.38, 5, 'Порошковая краска'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR90L4')), (SELECT id FROM materials WHERE code = 'LUBE-GREASE-LITO'), 0.02, 2, 0.010, 0.37, 6, 'Смазка для подшипников');
+
+-- Паспорт для Двигатель АИР90LB4
+INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`) VALUES
+((SELECT id FROM products WHERE article = 'AIR90LB4'), 22.0, 12, TRUE, 
+'Стандартный производственный процесс для Двигатель АИР90LB4', 
+'Соответствие ГОСТ, проверка электрических параметров и качества сборки');
+
+INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`) VALUES
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR90LB4')), (SELECT id FROM materials WHERE code = 'STEEL-SHEET-0.5'), 2.8, 2, 1.400, 51.3, 1, 'Сталь для корпуса статора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR90LB4')), (SELECT id FROM materials WHERE code = 'WIRE-CU-0.9'), 0.18, 4, 0.054, 1.98, 2, 'Обмоточный провод'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR90LB4')), (SELECT id FROM materials WHERE code = 'BEARING-6203-2RS'), 2, 1, 0.200, 7.33, 3, 'Подшипники'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR90LB4')), (SELECT id FROM materials WHERE code = 'ALUM-BAR-10'), 2.0, 2, 1.000, 36.64, 4, 'Алюминий для литья ротора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR90LB4')), (SELECT id FROM materials WHERE code = 'PAINT-POLYMER'), 0.13, 2, 0.065, 2.38, 5, 'Порошковая краска'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR90LB4')), (SELECT id FROM materials WHERE code = 'LUBE-GREASE-LITO'), 0.02, 2, 0.010, 0.37, 6, 'Смазка для подшипников');
+
+-- Паспорт для Двигатель АИР90L6
+INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`) VALUES
+((SELECT id FROM products WHERE article = 'AIR90L6'), 22.0, 12, TRUE, 
+'Стандартный производственный процесс для Двигатель АИР90L6', 
+'Соответствие ГОСТ, проверка электрических параметров и качества сборки');
+
+INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`) VALUES
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR90L6')), (SELECT id FROM materials WHERE code = 'STEEL-SHEET-0.5'), 3.0, 2, 1.500, 50.98, 1, 'Сталь для корпуса статора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR90L6')), (SELECT id FROM materials WHERE code = 'WIRE-CU-1.0'), 0.2, 4, 0.060, 2.04, 2, 'Обмоточный провод'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR90L6')), (SELECT id FROM materials WHERE code = 'BEARING-6204-2RS'), 2, 1, 0.200, 6.8, 3, 'Подшипники'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR90L6')), (SELECT id FROM materials WHERE code = 'ALUM-BAR-10'), 2.2, 2, 1.100, 37.38, 4, 'Алюминий для литья ротора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR90L6')), (SELECT id FROM materials WHERE code = 'PAINT-POLYMER'), 0.14, 2, 0.070, 2.38, 5, 'Порошковая краска'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR90L6')), (SELECT id FROM materials WHERE code = 'LUBE-GREASE-LITO'), 0.025, 2, 0.013, 0.42, 6, 'Смазка для подшипников');
+
+-- Паспорт для Двигатель АИР90LA8
+INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`) VALUES
+((SELECT id FROM products WHERE article = 'AIR90LA8'), 22.0, 12, TRUE, 
+'Стандартный производственный процесс для Двигатель АИР90LA8', 
+'Соответствие ГОСТ, проверка электрических параметров и качества сборки');
+
+INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`) VALUES
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR90LA8')), (SELECT id FROM materials WHERE code = 'STEEL-SHEET-0.5'), 3.5, 2, 1.750, 49.72, 1, 'Сталь для корпуса статора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR90LA8')), (SELECT id FROM materials WHERE code = 'WIRE-CU-1.2'), 0.25, 4, 0.075, 2.13, 2, 'Обмоточный провод'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR90LA8')), (SELECT id FROM materials WHERE code = 'BEARING-6205-2RS'), 2, 1, 0.200, 5.68, 3, 'Подшипники'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR90LA8')), (SELECT id FROM materials WHERE code = 'ALUM-BAR-10'), 2.8, 2, 1.400, 39.77, 4, 'Алюминий для литья ротора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR90LA8')), (SELECT id FROM materials WHERE code = 'PAINT-POLYMER'), 0.16, 2, 0.080, 2.27, 5, 'Порошковая краска'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR90LA8')), (SELECT id FROM materials WHERE code = 'LUBE-GREASE-LITO'), 0.03, 2, 0.015, 0.43, 6, 'Смазка для подшипников');
+
+-- Паспорт для Двигатель АИР90LB8
+INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`) VALUES
+((SELECT id FROM products WHERE article = 'AIR90LB8'), 22.0, 12, TRUE, 
+'Стандартный производственный процесс для Двигатель АИР90LB8', 
+'Соответствие ГОСТ, проверка электрических параметров и качества сборки');
+
+INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`) VALUES
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR90LB8')), (SELECT id FROM materials WHERE code = 'STEEL-SHEET-0.5'), 3.5, 2, 1.750, 49.72, 1, 'Сталь для корпуса статора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR90LB8')), (SELECT id FROM materials WHERE code = 'WIRE-CU-1.2'), 0.25, 4, 0.075, 2.13, 2, 'Обмоточный провод'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR90LB8')), (SELECT id FROM materials WHERE code = 'BEARING-6205-2RS'), 2, 1, 0.200, 5.68, 3, 'Подшипники'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR90LB8')), (SELECT id FROM materials WHERE code = 'ALUM-BAR-10'), 2.8, 2, 1.400, 39.77, 4, 'Алюминий для литья ротора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR90LB8')), (SELECT id FROM materials WHERE code = 'PAINT-POLYMER'), 0.16, 2, 0.080, 2.27, 5, 'Порошковая краска'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR90LB8')), (SELECT id FROM materials WHERE code = 'LUBE-GREASE-LITO'), 0.03, 2, 0.015, 0.43, 6, 'Смазка для подшипников');
+
+-- Паспорт для Двигатель АИР100S2
+INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`) VALUES
+((SELECT id FROM products WHERE article = 'AIR100S2'), 28.0, 12, TRUE, 
+'Стандартный производственный процесс для Двигатель АИР100S2', 
+'Соответствие ГОСТ, проверка электрических параметров и качества сборки');
+
+INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`) VALUES
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR100S2')), (SELECT id FROM materials WHERE code = 'STEEL-SHEET-0.5'), 2.5, 2, 1.250, 50.71, 1, 'Сталь для корпуса статора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR100S2')), (SELECT id FROM materials WHERE code = 'WIRE-CU-0.8'), 0.15, 4, 0.045, 1.83, 2, 'Обмоточный провод'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR100S2')), (SELECT id FROM materials WHERE code = 'BEARING-6203-2RS'), 2, 1, 0.200, 8.11, 3, 'Подшипники'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR100S2')), (SELECT id FROM materials WHERE code = 'ALUM-BAR-10'), 1.8, 2, 0.900, 36.51, 4, 'Алюминий для литья ротора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR100S2')), (SELECT id FROM materials WHERE code = 'PAINT-POLYMER'), 0.12, 2, 0.060, 2.43, 5, 'Порошковая краска'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR100S2')), (SELECT id FROM materials WHERE code = 'LUBE-GREASE-LITO'), 0.02, 2, 0.010, 0.41, 6, 'Смазка для подшипников');
+
+-- Паспорт для Двигатель АИР100S4
+INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`) VALUES
+((SELECT id FROM products WHERE article = 'AIR100S4'), 28.0, 12, TRUE, 
+'Стандартный производственный процесс для Двигатель АИР100S4', 
+'Соответствие ГОСТ, проверка электрических параметров и качества сборки');
+
+INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`) VALUES
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR100S4')), (SELECT id FROM materials WHERE code = 'STEEL-SHEET-0.5'), 2.8, 2, 1.400, 51.3, 1, 'Сталь для корпуса статора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR100S4')), (SELECT id FROM materials WHERE code = 'WIRE-CU-0.9'), 0.18, 4, 0.054, 1.98, 2, 'Обмоточный провод'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR100S4')), (SELECT id FROM materials WHERE code = 'BEARING-6203-2RS'), 2, 1, 0.200, 7.33, 3, 'Подшипники'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR100S4')), (SELECT id FROM materials WHERE code = 'ALUM-BAR-10'), 2.0, 2, 1.000, 36.64, 4, 'Алюминий для литья ротора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR100S4')), (SELECT id FROM materials WHERE code = 'PAINT-POLYMER'), 0.13, 2, 0.065, 2.38, 5, 'Порошковая краска'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR100S4')), (SELECT id FROM materials WHERE code = 'LUBE-GREASE-LITO'), 0.02, 2, 0.010, 0.37, 6, 'Смазка для подшипников');
+
+-- Паспорт для Двигатель АИР100L4
+INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`) VALUES
+((SELECT id FROM products WHERE article = 'AIR100L4'), 28.0, 12, TRUE, 
+'Стандартный производственный процесс для Двигатель АИР100L4', 
+'Соответствие ГОСТ, проверка электрических параметров и качества сборки');
+
+INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`) VALUES
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR100L4')), (SELECT id FROM materials WHERE code = 'STEEL-SHEET-0.5'), 2.8, 2, 1.400, 51.3, 1, 'Сталь для корпуса статора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR100L4')), (SELECT id FROM materials WHERE code = 'WIRE-CU-0.9'), 0.18, 4, 0.054, 1.98, 2, 'Обмоточный провод'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR100L4')), (SELECT id FROM materials WHERE code = 'BEARING-6203-2RS'), 2, 1, 0.200, 7.33, 3, 'Подшипники'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR100L4')), (SELECT id FROM materials WHERE code = 'ALUM-BAR-10'), 2.0, 2, 1.000, 36.64, 4, 'Алюминий для литья ротора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR100L4')), (SELECT id FROM materials WHERE code = 'PAINT-POLYMER'), 0.13, 2, 0.065, 2.38, 5, 'Порошковая краска'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR100L4')), (SELECT id FROM materials WHERE code = 'LUBE-GREASE-LITO'), 0.02, 2, 0.010, 0.37, 6, 'Смазка для подшипников');
+
+-- Паспорт для Двигатель АИР100L6
+INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`) VALUES
+((SELECT id FROM products WHERE article = 'AIR100L6'), 28.0, 12, TRUE, 
+'Стандартный производственный процесс для Двигатель АИР100L6', 
+'Соответствие ГОСТ, проверка электрических параметров и качества сборки');
+
+INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`) VALUES
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR100L6')), (SELECT id FROM materials WHERE code = 'STEEL-SHEET-0.5'), 3.0, 2, 1.500, 50.98, 1, 'Сталь для корпуса статора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR100L6')), (SELECT id FROM materials WHERE code = 'WIRE-CU-1.0'), 0.2, 4, 0.060, 2.04, 2, 'Обмоточный провод'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR100L6')), (SELECT id FROM materials WHERE code = 'BEARING-6204-2RS'), 2, 1, 0.200, 6.8, 3, 'Подшипники'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR100L6')), (SELECT id FROM materials WHERE code = 'ALUM-BAR-10'), 2.2, 2, 1.100, 37.38, 4, 'Алюминий для литья ротора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR100L6')), (SELECT id FROM materials WHERE code = 'PAINT-POLYMER'), 0.14, 2, 0.070, 2.38, 5, 'Порошковая краска'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR100L6')), (SELECT id FROM materials WHERE code = 'LUBE-GREASE-LITO'), 0.025, 2, 0.013, 0.42, 6, 'Смазка для подшипников');
+
+-- Паспорт для Двигатель АИР100L2
+INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`) VALUES
+((SELECT id FROM products WHERE article = 'AIR100L2'), 28.0, 12, TRUE, 
+'Стандартный производственный процесс для Двигатель АИР100L2', 
+'Соответствие ГОСТ, проверка электрических параметров и качества сборки');
+
+INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`) VALUES
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR100L2')), (SELECT id FROM materials WHERE code = 'STEEL-SHEET-0.5'), 2.5, 2, 1.250, 50.71, 1, 'Сталь для корпуса статора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR100L2')), (SELECT id FROM materials WHERE code = 'WIRE-CU-0.8'), 0.15, 4, 0.045, 1.83, 2, 'Обмоточный провод'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR100L2')), (SELECT id FROM materials WHERE code = 'BEARING-6203-2RS'), 2, 1, 0.200, 8.11, 3, 'Подшипники'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR100L2')), (SELECT id FROM materials WHERE code = 'ALUM-BAR-10'), 1.8, 2, 0.900, 36.51, 4, 'Алюминий для литья ротора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR100L2')), (SELECT id FROM materials WHERE code = 'PAINT-POLYMER'), 0.12, 2, 0.060, 2.43, 5, 'Порошковая краска'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR100L2')), (SELECT id FROM materials WHERE code = 'LUBE-GREASE-LITO'), 0.02, 2, 0.010, 0.41, 6, 'Смазка для подшипников');
+
+-- Паспорт для Двигатель АИР112M2
+INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`) VALUES
+((SELECT id FROM products WHERE article = 'AIR112M2'), 35.0, 12, TRUE, 
+'Стандартный производственный процесс для Двигатель АИР112M2', 
+'Соответствие ГОСТ, проверка электрических параметров и качества сборки');
+
+INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`) VALUES
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR112M2')), (SELECT id FROM materials WHERE code = 'STEEL-SHEET-0.5'), 2.5, 2, 1.250, 50.71, 1, 'Сталь для корпуса статора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR112M2')), (SELECT id FROM materials WHERE code = 'WIRE-CU-0.8'), 0.15, 4, 0.045, 1.83, 2, 'Обмоточный провод'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR112M2')), (SELECT id FROM materials WHERE code = 'BEARING-6203-2RS'), 2, 1, 0.200, 8.11, 3, 'Подшипники'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR112M2')), (SELECT id FROM materials WHERE code = 'ALUM-BAR-10'), 1.8, 2, 0.900, 36.51, 4, 'Алюминий для литья ротора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR112M2')), (SELECT id FROM materials WHERE code = 'PAINT-POLYMER'), 0.12, 2, 0.060, 2.43, 5, 'Порошковая краска'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR112M2')), (SELECT id FROM materials WHERE code = 'LUBE-GREASE-LITO'), 0.02, 2, 0.010, 0.41, 6, 'Смазка для подшипников');
+
+-- Паспорт для Двигатель АИР112M4
+INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`) VALUES
+((SELECT id FROM products WHERE article = 'AIR112M4'), 35.0, 12, TRUE, 
+'Стандартный производственный процесс для Двигатель АИР112M4', 
+'Соответствие ГОСТ, проверка электрических параметров и качества сборки');
+
+INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`) VALUES
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR112M4')), (SELECT id FROM materials WHERE code = 'STEEL-SHEET-0.5'), 2.8, 2, 1.400, 51.3, 1, 'Сталь для корпуса статора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR112M4')), (SELECT id FROM materials WHERE code = 'WIRE-CU-0.9'), 0.18, 4, 0.054, 1.98, 2, 'Обмоточный провод'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR112M4')), (SELECT id FROM materials WHERE code = 'BEARING-6203-2RS'), 2, 1, 0.200, 7.33, 3, 'Подшипники'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR112M4')), (SELECT id FROM materials WHERE code = 'ALUM-BAR-10'), 2.0, 2, 1.000, 36.64, 4, 'Алюминий для литья ротора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR112M4')), (SELECT id FROM materials WHERE code = 'PAINT-POLYMER'), 0.13, 2, 0.065, 2.38, 5, 'Порошковая краска'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR112M4')), (SELECT id FROM materials WHERE code = 'LUBE-GREASE-LITO'), 0.02, 2, 0.010, 0.37, 6, 'Смазка для подшипников');
+
+-- Паспорт для Двигатель АИР112MA6
+INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`) VALUES
+((SELECT id FROM products WHERE article = 'AIR112MA6'), 35.0, 12, TRUE, 
+'Стандартный производственный процесс для Двигатель АИР112MA6', 
+'Соответствие ГОСТ, проверка электрических параметров и качества сборки');
+
+INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`) VALUES
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR112MA6')), (SELECT id FROM materials WHERE code = 'STEEL-SHEET-0.5'), 3.0, 2, 1.500, 50.98, 1, 'Сталь для корпуса статора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR112MA6')), (SELECT id FROM materials WHERE code = 'WIRE-CU-1.0'), 0.2, 4, 0.060, 2.04, 2, 'Обмоточный провод'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR112MA6')), (SELECT id FROM materials WHERE code = 'BEARING-6204-2RS'), 2, 1, 0.200, 6.8, 3, 'Подшипники'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR112MA6')), (SELECT id FROM materials WHERE code = 'ALUM-BAR-10'), 2.2, 2, 1.100, 37.38, 4, 'Алюминий для литья ротора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR112MA6')), (SELECT id FROM materials WHERE code = 'PAINT-POLYMER'), 0.14, 2, 0.070, 2.38, 5, 'Порошковая краска'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR112MA6')), (SELECT id FROM materials WHERE code = 'LUBE-GREASE-LITO'), 0.025, 2, 0.013, 0.42, 6, 'Смазка для подшипников');
+
+-- Паспорт для Двигатель АИР112MB6
+INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`) VALUES
+((SELECT id FROM products WHERE article = 'AIR112MB6'), 35.0, 12, TRUE, 
+'Стандартный производственный процесс для Двигатель АИР112MB6', 
+'Соответствие ГОСТ, проверка электрических параметров и качества сборки');
+
+INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`) VALUES
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR112MB6')), (SELECT id FROM materials WHERE code = 'STEEL-SHEET-0.5'), 3.0, 2, 1.500, 50.98, 1, 'Сталь для корпуса статора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR112MB6')), (SELECT id FROM materials WHERE code = 'WIRE-CU-1.0'), 0.2, 4, 0.060, 2.04, 2, 'Обмоточный провод'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR112MB6')), (SELECT id FROM materials WHERE code = 'BEARING-6204-2RS'), 2, 1, 0.200, 6.8, 3, 'Подшипники'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR112MB6')), (SELECT id FROM materials WHERE code = 'ALUM-BAR-10'), 2.2, 2, 1.100, 37.38, 4, 'Алюминий для литья ротора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR112MB6')), (SELECT id FROM materials WHERE code = 'PAINT-POLYMER'), 0.14, 2, 0.070, 2.38, 5, 'Порошковая краска'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR112MB6')), (SELECT id FROM materials WHERE code = 'LUBE-GREASE-LITO'), 0.025, 2, 0.013, 0.42, 6, 'Смазка для подшипников');
+
+-- Паспорт для Двигатель АИР112MA8
+INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`) VALUES
+((SELECT id FROM products WHERE article = 'AIR112MA8'), 35.0, 12, TRUE, 
+'Стандартный производственный процесс для Двигатель АИР112MA8', 
+'Соответствие ГОСТ, проверка электрических параметров и качества сборки');
+
+INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`) VALUES
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR112MA8')), (SELECT id FROM materials WHERE code = 'STEEL-SHEET-0.5'), 3.5, 2, 1.750, 49.72, 1, 'Сталь для корпуса статора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR112MA8')), (SELECT id FROM materials WHERE code = 'WIRE-CU-1.2'), 0.25, 4, 0.075, 2.13, 2, 'Обмоточный провод'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR112MA8')), (SELECT id FROM materials WHERE code = 'BEARING-6205-2RS'), 2, 1, 0.200, 5.68, 3, 'Подшипники'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR112MA8')), (SELECT id FROM materials WHERE code = 'ALUM-BAR-10'), 2.8, 2, 1.400, 39.77, 4, 'Алюминий для литья ротора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR112MA8')), (SELECT id FROM materials WHERE code = 'PAINT-POLYMER'), 0.16, 2, 0.080, 2.27, 5, 'Порошковая краска'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR112MA8')), (SELECT id FROM materials WHERE code = 'LUBE-GREASE-LITO'), 0.03, 2, 0.015, 0.43, 6, 'Смазка для подшипников');
+
+-- Паспорт для Двигатель АИР112MB8
+INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`) VALUES
+((SELECT id FROM products WHERE article = 'AIR112MB8'), 35.0, 12, TRUE, 
+'Стандартный производственный процесс для Двигатель АИР112MB8', 
+'Соответствие ГОСТ, проверка электрических параметров и качества сборки');
+
+INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`) VALUES
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR112MB8')), (SELECT id FROM materials WHERE code = 'STEEL-SHEET-0.5'), 3.5, 2, 1.750, 49.72, 1, 'Сталь для корпуса статора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR112MB8')), (SELECT id FROM materials WHERE code = 'WIRE-CU-1.2'), 0.25, 4, 0.075, 2.13, 2, 'Обмоточный провод'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR112MB8')), (SELECT id FROM materials WHERE code = 'BEARING-6205-2RS'), 2, 1, 0.200, 5.68, 3, 'Подшипники'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR112MB8')), (SELECT id FROM materials WHERE code = 'ALUM-BAR-10'), 2.8, 2, 1.400, 39.77, 4, 'Алюминий для литья ротора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR112MB8')), (SELECT id FROM materials WHERE code = 'PAINT-POLYMER'), 0.16, 2, 0.080, 2.27, 5, 'Порошковая краска'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR112MB8')), (SELECT id FROM materials WHERE code = 'LUBE-GREASE-LITO'), 0.03, 2, 0.015, 0.43, 6, 'Смазка для подшипников');
+
+-- Паспорт для Двигатель АИР80А4/2
+INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`) VALUES
+((SELECT id FROM products WHERE article = 'AIR80А4/2'), 14.0, 12, TRUE, 
+'Стандартный производственный процесс для Двигатель АИР80А4/2', 
+'Соответствие ГОСТ, проверка электрических параметров и качества сборки');
+
+INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`) VALUES
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR80А4/2')), (SELECT id FROM materials WHERE code = 'STEEL-SHEET-0.5'), 2.5, 2, 1.250, 50.71, 1, 'Сталь для корпуса статора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR80А4/2')), (SELECT id FROM materials WHERE code = 'WIRE-CU-0.8'), 0.15, 4, 0.045, 1.83, 2, 'Обмоточный провод'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR80А4/2')), (SELECT id FROM materials WHERE code = 'BEARING-6203-2RS'), 2, 1, 0.200, 8.11, 3, 'Подшипники'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR80А4/2')), (SELECT id FROM materials WHERE code = 'ALUM-BAR-10'), 1.8, 2, 0.900, 36.51, 4, 'Алюминий для литья ротора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR80А4/2')), (SELECT id FROM materials WHERE code = 'PAINT-POLYMER'), 0.12, 2, 0.060, 2.43, 5, 'Порошковая краска'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR80А4/2')), (SELECT id FROM materials WHERE code = 'LUBE-GREASE-LITO'), 0.02, 2, 0.010, 0.41, 6, 'Смазка для подшипников');
+
+-- Паспорт для Двигатель АИР90L4/2
+INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`) VALUES
+((SELECT id FROM products WHERE article = 'AIR90L4/2'), 22.0, 12, TRUE, 
+'Стандартный производственный процесс для Двигатель АИР90L4/2', 
+'Соответствие ГОСТ, проверка электрических параметров и качества сборки');
+
+INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`) VALUES
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR90L4/2')), (SELECT id FROM materials WHERE code = 'STEEL-SHEET-0.5'), 2.5, 2, 1.250, 50.71, 1, 'Сталь для корпуса статора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR90L4/2')), (SELECT id FROM materials WHERE code = 'WIRE-CU-0.8'), 0.15, 4, 0.045, 1.83, 2, 'Обмоточный провод'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR90L4/2')), (SELECT id FROM materials WHERE code = 'BEARING-6203-2RS'), 2, 1, 0.200, 8.11, 3, 'Подшипники'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR90L4/2')), (SELECT id FROM materials WHERE code = 'ALUM-BAR-10'), 1.8, 2, 0.900, 36.51, 4, 'Алюминий для литья ротора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR90L4/2')), (SELECT id FROM materials WHERE code = 'PAINT-POLYMER'), 0.12, 2, 0.060, 2.43, 5, 'Порошковая краска'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR90L4/2')), (SELECT id FROM materials WHERE code = 'LUBE-GREASE-LITO'), 0.02, 2, 0.010, 0.41, 6, 'Смазка для подшипников');
+
+-- Паспорт для Двигатель АИР90L6/4
+INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`) VALUES
+((SELECT id FROM products WHERE article = 'AIR90L6/4'), 22.0, 12, TRUE, 
+'Стандартный производственный процесс для Двигатель АИР90L6/4', 
+'Соответствие ГОСТ, проверка электрических параметров и качества сборки');
+
+INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`) VALUES
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR90L6/4')), (SELECT id FROM materials WHERE code = 'STEEL-SHEET-0.5'), 2.8, 2, 1.400, 51.3, 1, 'Сталь для корпуса статора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR90L6/4')), (SELECT id FROM materials WHERE code = 'WIRE-CU-0.9'), 0.18, 4, 0.054, 1.98, 2, 'Обмоточный провод'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR90L6/4')), (SELECT id FROM materials WHERE code = 'BEARING-6203-2RS'), 2, 1, 0.200, 7.33, 3, 'Подшипники'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR90L6/4')), (SELECT id FROM materials WHERE code = 'ALUM-BAR-10'), 2.0, 2, 1.000, 36.64, 4, 'Алюминий для литья ротора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR90L6/4')), (SELECT id FROM materials WHERE code = 'PAINT-POLYMER'), 0.13, 2, 0.065, 2.38, 5, 'Порошковая краска'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR90L6/4')), (SELECT id FROM materials WHERE code = 'LUBE-GREASE-LITO'), 0.02, 2, 0.010, 0.37, 6, 'Смазка для подшипников');
+
+-- Паспорт для Двигатель АИР90L8/4
+INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`) VALUES
+((SELECT id FROM products WHERE article = 'AIR90L8/4'), 22.0, 12, TRUE, 
+'Стандартный производственный процесс для Двигатель АИР90L8/4', 
+'Соответствие ГОСТ, проверка электрических параметров и качества сборки');
+
+INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`) VALUES
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR90L8/4')), (SELECT id FROM materials WHERE code = 'STEEL-SHEET-0.5'), 2.8, 2, 1.400, 51.3, 1, 'Сталь для корпуса статора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR90L8/4')), (SELECT id FROM materials WHERE code = 'WIRE-CU-0.9'), 0.18, 4, 0.054, 1.98, 2, 'Обмоточный провод'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR90L8/4')), (SELECT id FROM materials WHERE code = 'BEARING-6203-2RS'), 2, 1, 0.200, 7.33, 3, 'Подшипники'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR90L8/4')), (SELECT id FROM materials WHERE code = 'ALUM-BAR-10'), 2.0, 2, 1.000, 36.64, 4, 'Алюминий для литья ротора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR90L8/4')), (SELECT id FROM materials WHERE code = 'PAINT-POLYMER'), 0.13, 2, 0.065, 2.38, 5, 'Порошковая краска'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR90L8/4')), (SELECT id FROM materials WHERE code = 'LUBE-GREASE-LITO'), 0.02, 2, 0.010, 0.37, 6, 'Смазка для подшипников');
+
+-- Паспорт для Двигатель АИР100S8/4
+INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`) VALUES
+((SELECT id FROM products WHERE article = 'AIR100S8/4'), 28.0, 12, TRUE, 
+'Стандартный производственный процесс для Двигатель АИР100S8/4', 
+'Соответствие ГОСТ, проверка электрических параметров и качества сборки');
+
+INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`) VALUES
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR100S8/4')), (SELECT id FROM materials WHERE code = 'STEEL-SHEET-0.5'), 2.8, 2, 1.400, 51.3, 1, 'Сталь для корпуса статора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR100S8/4')), (SELECT id FROM materials WHERE code = 'WIRE-CU-0.9'), 0.18, 4, 0.054, 1.98, 2, 'Обмоточный провод'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR100S8/4')), (SELECT id FROM materials WHERE code = 'BEARING-6203-2RS'), 2, 1, 0.200, 7.33, 3, 'Подшипники'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR100S8/4')), (SELECT id FROM materials WHERE code = 'ALUM-BAR-10'), 2.0, 2, 1.000, 36.64, 4, 'Алюминий для литья ротора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR100S8/4')), (SELECT id FROM materials WHERE code = 'PAINT-POLYMER'), 0.13, 2, 0.065, 2.38, 5, 'Порошковая краска'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR100S8/4')), (SELECT id FROM materials WHERE code = 'LUBE-GREASE-LITO'), 0.02, 2, 0.010, 0.37, 6, 'Смазка для подшипников');
+
+-- Паспорт для Двигатель АИРС80А2
+INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`) VALUES
+((SELECT id FROM products WHERE article = 'AIRС80А2'), 14.0, 12, TRUE, 
+'Стандартный производственный процесс для Двигатель АИРС80А2', 
+'Соответствие ГОСТ, проверка электрических параметров и качества сборки');
+
+INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`) VALUES
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRС80А2')), (SELECT id FROM materials WHERE code = 'STEEL-SHEET-0.5'), 2.5, 2, 1.250, 50.71, 1, 'Сталь для корпуса статора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRС80А2')), (SELECT id FROM materials WHERE code = 'WIRE-CU-0.8'), 0.15, 4, 0.045, 1.83, 2, 'Обмоточный провод'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRС80А2')), (SELECT id FROM materials WHERE code = 'BEARING-6203-2RS'), 2, 1, 0.200, 8.11, 3, 'Подшипники'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRС80А2')), (SELECT id FROM materials WHERE code = 'ALUM-BAR-10'), 1.8, 2, 0.900, 36.51, 4, 'Алюминий для литья ротора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRС80А2')), (SELECT id FROM materials WHERE code = 'PAINT-POLYMER'), 0.12, 2, 0.060, 2.43, 5, 'Порошковая краска'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRС80А2')), (SELECT id FROM materials WHERE code = 'LUBE-GREASE-LITO'), 0.02, 2, 0.010, 0.41, 6, 'Смазка для подшипников');
+
+-- Паспорт для Двигатель АИРС80В2
+INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`) VALUES
+((SELECT id FROM products WHERE article = 'AIRС80В2'), 14.0, 12, TRUE, 
+'Стандартный производственный процесс для Двигатель АИРС80В2', 
+'Соответствие ГОСТ, проверка электрических параметров и качества сборки');
+
+INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`) VALUES
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRС80В2')), (SELECT id FROM materials WHERE code = 'STEEL-SHEET-0.5'), 2.5, 2, 1.250, 50.71, 1, 'Сталь для корпуса статора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRС80В2')), (SELECT id FROM materials WHERE code = 'WIRE-CU-0.8'), 0.15, 4, 0.045, 1.83, 2, 'Обмоточный провод'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRС80В2')), (SELECT id FROM materials WHERE code = 'BEARING-6203-2RS'), 2, 1, 0.200, 8.11, 3, 'Подшипники'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRС80В2')), (SELECT id FROM materials WHERE code = 'ALUM-BAR-10'), 1.8, 2, 0.900, 36.51, 4, 'Алюминий для литья ротора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRС80В2')), (SELECT id FROM materials WHERE code = 'PAINT-POLYMER'), 0.12, 2, 0.060, 2.43, 5, 'Порошковая краска'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRС80В2')), (SELECT id FROM materials WHERE code = 'LUBE-GREASE-LITO'), 0.02, 2, 0.010, 0.41, 6, 'Смазка для подшипников');
+
+-- Паспорт для Двигатель АИРС80А4
+INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`) VALUES
+((SELECT id FROM products WHERE article = 'AIRС80А4'), 14.0, 12, TRUE, 
+'Стандартный производственный процесс для Двигатель АИРС80А4', 
+'Соответствие ГОСТ, проверка электрических параметров и качества сборки');
+
+INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`) VALUES
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRС80А4')), (SELECT id FROM materials WHERE code = 'STEEL-SHEET-0.5'), 2.8, 2, 1.400, 51.3, 1, 'Сталь для корпуса статора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRС80А4')), (SELECT id FROM materials WHERE code = 'WIRE-CU-0.9'), 0.18, 4, 0.054, 1.98, 2, 'Обмоточный провод'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRС80А4')), (SELECT id FROM materials WHERE code = 'BEARING-6203-2RS'), 2, 1, 0.200, 7.33, 3, 'Подшипники'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRС80А4')), (SELECT id FROM materials WHERE code = 'ALUM-BAR-10'), 2.0, 2, 1.000, 36.64, 4, 'Алюминий для литья ротора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRС80А4')), (SELECT id FROM materials WHERE code = 'PAINT-POLYMER'), 0.13, 2, 0.065, 2.38, 5, 'Порошковая краска'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRС80А4')), (SELECT id FROM materials WHERE code = 'LUBE-GREASE-LITO'), 0.02, 2, 0.010, 0.37, 6, 'Смазка для подшипников');
+
+-- Паспорт для Двигатель АИРС80В4
+INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`) VALUES
+((SELECT id FROM products WHERE article = 'AIRС80В4'), 14.0, 12, TRUE, 
+'Стандартный производственный процесс для Двигатель АИРС80В4', 
+'Соответствие ГОСТ, проверка электрических параметров и качества сборки');
+
+INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`) VALUES
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRС80В4')), (SELECT id FROM materials WHERE code = 'STEEL-SHEET-0.5'), 2.8, 2, 1.400, 51.3, 1, 'Сталь для корпуса статора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRС80В4')), (SELECT id FROM materials WHERE code = 'WIRE-CU-0.9'), 0.18, 4, 0.054, 1.98, 2, 'Обмоточный провод'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRС80В4')), (SELECT id FROM materials WHERE code = 'BEARING-6203-2RS'), 2, 1, 0.200, 7.33, 3, 'Подшипники'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRС80В4')), (SELECT id FROM materials WHERE code = 'ALUM-BAR-10'), 2.0, 2, 1.000, 36.64, 4, 'Алюминий для литья ротора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRС80В4')), (SELECT id FROM materials WHERE code = 'PAINT-POLYMER'), 0.13, 2, 0.065, 2.38, 5, 'Порошковая краска'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRС80В4')), (SELECT id FROM materials WHERE code = 'LUBE-GREASE-LITO'), 0.02, 2, 0.010, 0.37, 6, 'Смазка для подшипников');
+
+-- Паспорт для Двигатель АИРС90L2
+INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`) VALUES
+((SELECT id FROM products WHERE article = 'AIRС90L2'), 22.0, 12, TRUE, 
+'Стандартный производственный процесс для Двигатель АИРС90L2', 
+'Соответствие ГОСТ, проверка электрических параметров и качества сборки');
+
+INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`) VALUES
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRС90L2')), (SELECT id FROM materials WHERE code = 'STEEL-SHEET-0.5'), 2.5, 2, 1.250, 50.71, 1, 'Сталь для корпуса статора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRС90L2')), (SELECT id FROM materials WHERE code = 'WIRE-CU-0.8'), 0.15, 4, 0.045, 1.83, 2, 'Обмоточный провод'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRС90L2')), (SELECT id FROM materials WHERE code = 'BEARING-6203-2RS'), 2, 1, 0.200, 8.11, 3, 'Подшипники'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRС90L2')), (SELECT id FROM materials WHERE code = 'ALUM-BAR-10'), 1.8, 2, 0.900, 36.51, 4, 'Алюминий для литья ротора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRС90L2')), (SELECT id FROM materials WHERE code = 'PAINT-POLYMER'), 0.12, 2, 0.060, 2.43, 5, 'Порошковая краска'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRС90L2')), (SELECT id FROM materials WHERE code = 'LUBE-GREASE-LITO'), 0.02, 2, 0.010, 0.41, 6, 'Смазка для подшипников');
+
+-- Паспорт для Двигатель АИРС90LB2
+INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`) VALUES
+((SELECT id FROM products WHERE article = 'AIRС90LB2'), 22.0, 12, TRUE, 
+'Стандартный производственный процесс для Двигатель АИРС90LB2', 
+'Соответствие ГОСТ, проверка электрических параметров и качества сборки');
+
+INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`) VALUES
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRС90LB2')), (SELECT id FROM materials WHERE code = 'STEEL-SHEET-0.5'), 2.5, 2, 1.250, 50.71, 1, 'Сталь для корпуса статора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRС90LB2')), (SELECT id FROM materials WHERE code = 'WIRE-CU-0.8'), 0.15, 4, 0.045, 1.83, 2, 'Обмоточный провод'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRС90LB2')), (SELECT id FROM materials WHERE code = 'BEARING-6203-2RS'), 2, 1, 0.200, 8.11, 3, 'Подшипники'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRС90LB2')), (SELECT id FROM materials WHERE code = 'ALUM-BAR-10'), 1.8, 2, 0.900, 36.51, 4, 'Алюминий для литья ротора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRС90LB2')), (SELECT id FROM materials WHERE code = 'PAINT-POLYMER'), 0.12, 2, 0.060, 2.43, 5, 'Порошковая краска'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRС90LB2')), (SELECT id FROM materials WHERE code = 'LUBE-GREASE-LITO'), 0.02, 2, 0.010, 0.41, 6, 'Смазка для подшипников');
+
+-- Паспорт для Двигатель АИРС90L4
+INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`) VALUES
+((SELECT id FROM products WHERE article = 'AIRС90L4'), 22.0, 12, TRUE, 
+'Стандартный производственный процесс для Двигатель АИРС90L4', 
+'Соответствие ГОСТ, проверка электрических параметров и качества сборки');
+
+INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`) VALUES
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRС90L4')), (SELECT id FROM materials WHERE code = 'STEEL-SHEET-0.5'), 2.8, 2, 1.400, 51.3, 1, 'Сталь для корпуса статора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRС90L4')), (SELECT id FROM materials WHERE code = 'WIRE-CU-0.9'), 0.18, 4, 0.054, 1.98, 2, 'Обмоточный провод'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRС90L4')), (SELECT id FROM materials WHERE code = 'BEARING-6203-2RS'), 2, 1, 0.200, 7.33, 3, 'Подшипники'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRС90L4')), (SELECT id FROM materials WHERE code = 'ALUM-BAR-10'), 2.0, 2, 1.000, 36.64, 4, 'Алюминий для литья ротора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRС90L4')), (SELECT id FROM materials WHERE code = 'PAINT-POLYMER'), 0.13, 2, 0.065, 2.38, 5, 'Порошковая краска'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRС90L4')), (SELECT id FROM materials WHERE code = 'LUBE-GREASE-LITO'), 0.02, 2, 0.010, 0.37, 6, 'Смазка для подшипников');
+
+-- Паспорт для Двигатель АИРС90LB4
+INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`) VALUES
+((SELECT id FROM products WHERE article = 'AIRС90LB4'), 22.0, 12, TRUE, 
+'Стандартный производственный процесс для Двигатель АИРС90LB4', 
+'Соответствие ГОСТ, проверка электрических параметров и качества сборки');
+
+INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`) VALUES
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRС90LB4')), (SELECT id FROM materials WHERE code = 'STEEL-SHEET-0.5'), 2.8, 2, 1.400, 51.3, 1, 'Сталь для корпуса статора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRС90LB4')), (SELECT id FROM materials WHERE code = 'WIRE-CU-0.9'), 0.18, 4, 0.054, 1.98, 2, 'Обмоточный провод'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRС90LB4')), (SELECT id FROM materials WHERE code = 'BEARING-6203-2RS'), 2, 1, 0.200, 7.33, 3, 'Подшипники'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRС90LB4')), (SELECT id FROM materials WHERE code = 'ALUM-BAR-10'), 2.0, 2, 1.000, 36.64, 4, 'Алюминий для литья ротора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRС90LB4')), (SELECT id FROM materials WHERE code = 'PAINT-POLYMER'), 0.13, 2, 0.065, 2.38, 5, 'Порошковая краска'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRС90LB4')), (SELECT id FROM materials WHERE code = 'LUBE-GREASE-LITO'), 0.02, 2, 0.010, 0.37, 6, 'Смазка для подшипников');
+
+-- Паспорт для Двигатель АИРС100S2
+INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`) VALUES
+((SELECT id FROM products WHERE article = 'AIRС100S2'), 28.0, 12, TRUE, 
+'Стандартный производственный процесс для Двигатель АИРС100S2', 
+'Соответствие ГОСТ, проверка электрических параметров и качества сборки');
+
+INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`) VALUES
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRС100S2')), (SELECT id FROM materials WHERE code = 'STEEL-SHEET-0.5'), 2.5, 2, 1.250, 50.71, 1, 'Сталь для корпуса статора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRС100S2')), (SELECT id FROM materials WHERE code = 'WIRE-CU-0.8'), 0.15, 4, 0.045, 1.83, 2, 'Обмоточный провод'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRС100S2')), (SELECT id FROM materials WHERE code = 'BEARING-6203-2RS'), 2, 1, 0.200, 8.11, 3, 'Подшипники'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRС100S2')), (SELECT id FROM materials WHERE code = 'ALUM-BAR-10'), 1.8, 2, 0.900, 36.51, 4, 'Алюминий для литья ротора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRС100S2')), (SELECT id FROM materials WHERE code = 'PAINT-POLYMER'), 0.12, 2, 0.060, 2.43, 5, 'Порошковая краска'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRС100S2')), (SELECT id FROM materials WHERE code = 'LUBE-GREASE-LITO'), 0.02, 2, 0.010, 0.41, 6, 'Смазка для подшипников');
+
+-- Паспорт для Двигатель АИРС100S4
+INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`) VALUES
+((SELECT id FROM products WHERE article = 'AIRС100S4'), 28.0, 12, TRUE, 
+'Стандартный производственный процесс для Двигатель АИРС100S4', 
+'Соответствие ГОСТ, проверка электрических параметров и качества сборки');
+
+INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`) VALUES
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRС100S4')), (SELECT id FROM materials WHERE code = 'STEEL-SHEET-0.5'), 2.8, 2, 1.400, 51.3, 1, 'Сталь для корпуса статора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRС100S4')), (SELECT id FROM materials WHERE code = 'WIRE-CU-0.9'), 0.18, 4, 0.054, 1.98, 2, 'Обмоточный провод'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRС100S4')), (SELECT id FROM materials WHERE code = 'BEARING-6203-2RS'), 2, 1, 0.200, 7.33, 3, 'Подшипники'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRС100S4')), (SELECT id FROM materials WHERE code = 'ALUM-BAR-10'), 2.0, 2, 1.000, 36.64, 4, 'Алюминий для литья ротора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRС100S4')), (SELECT id FROM materials WHERE code = 'PAINT-POLYMER'), 0.13, 2, 0.065, 2.38, 5, 'Порошковая краска'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRС100S4')), (SELECT id FROM materials WHERE code = 'LUBE-GREASE-LITO'), 0.02, 2, 0.010, 0.37, 6, 'Смазка для подшипников');
+
+-- Паспорт для Двигатель АИР80А2Ж
+INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`) VALUES
+((SELECT id FROM products WHERE article = 'AIR80А2Ж'), 14.0, 12, TRUE, 
+'Стандартный производственный процесс для Двигатель АИР80А2Ж', 
+'Соответствие ГОСТ, проверка электрических параметров и качества сборки');
+
+INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`) VALUES
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR80А2Ж')), (SELECT id FROM materials WHERE code = 'STEEL-SHEET-0.5'), 2.5, 2, 1.250, 50.71, 1, 'Сталь для корпуса статора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR80А2Ж')), (SELECT id FROM materials WHERE code = 'WIRE-CU-0.8'), 0.15, 4, 0.045, 1.83, 2, 'Обмоточный провод'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR80А2Ж')), (SELECT id FROM materials WHERE code = 'BEARING-6203-2RS'), 2, 1, 0.200, 8.11, 3, 'Подшипники'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR80А2Ж')), (SELECT id FROM materials WHERE code = 'ALUM-BAR-10'), 1.8, 2, 0.900, 36.51, 4, 'Алюминий для литья ротора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR80А2Ж')), (SELECT id FROM materials WHERE code = 'PAINT-POLYMER'), 0.12, 2, 0.060, 2.43, 5, 'Порошковая краска'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR80А2Ж')), (SELECT id FROM materials WHERE code = 'LUBE-GREASE-LITO'), 0.02, 2, 0.010, 0.41, 6, 'Смазка для подшипников');
+
+-- Паспорт для Двигатель АИР80В2Ж
+INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`) VALUES
+((SELECT id FROM products WHERE article = 'AIR80В2Ж'), 14.0, 12, TRUE, 
+'Стандартный производственный процесс для Двигатель АИР80В2Ж', 
+'Соответствие ГОСТ, проверка электрических параметров и качества сборки');
+
+INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`) VALUES
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR80В2Ж')), (SELECT id FROM materials WHERE code = 'STEEL-SHEET-0.5'), 2.5, 2, 1.250, 50.71, 1, 'Сталь для корпуса статора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR80В2Ж')), (SELECT id FROM materials WHERE code = 'WIRE-CU-0.8'), 0.15, 4, 0.045, 1.83, 2, 'Обмоточный провод'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR80В2Ж')), (SELECT id FROM materials WHERE code = 'BEARING-6203-2RS'), 2, 1, 0.200, 8.11, 3, 'Подшипники'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR80В2Ж')), (SELECT id FROM materials WHERE code = 'ALUM-BAR-10'), 1.8, 2, 0.900, 36.51, 4, 'Алюминий для литья ротора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR80В2Ж')), (SELECT id FROM materials WHERE code = 'PAINT-POLYMER'), 0.12, 2, 0.060, 2.43, 5, 'Порошковая краска'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR80В2Ж')), (SELECT id FROM materials WHERE code = 'LUBE-GREASE-LITO'), 0.02, 2, 0.010, 0.41, 6, 'Смазка для подшипников');
+
+-- Паспорт для Двигатель АИР80В4Ж
+INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`) VALUES
+((SELECT id FROM products WHERE article = 'AIR80В4Ж'), 14.0, 12, TRUE, 
+'Стандартный производственный процесс для Двигатель АИР80В4Ж', 
+'Соответствие ГОСТ, проверка электрических параметров и качества сборки');
+
+INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`) VALUES
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR80В4Ж')), (SELECT id FROM materials WHERE code = 'STEEL-SHEET-0.5'), 2.5, 2, 1.250, 50.71, 1, 'Сталь для корпуса статора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR80В4Ж')), (SELECT id FROM materials WHERE code = 'WIRE-CU-0.8'), 0.15, 4, 0.045, 1.83, 2, 'Обмоточный провод'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR80В4Ж')), (SELECT id FROM materials WHERE code = 'BEARING-6203-2RS'), 2, 1, 0.200, 8.11, 3, 'Подшипники'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR80В4Ж')), (SELECT id FROM materials WHERE code = 'ALUM-BAR-10'), 1.8, 2, 0.900, 36.51, 4, 'Алюминий для литья ротора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR80В4Ж')), (SELECT id FROM materials WHERE code = 'PAINT-POLYMER'), 0.12, 2, 0.060, 2.43, 5, 'Порошковая краска'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR80В4Ж')), (SELECT id FROM materials WHERE code = 'LUBE-GREASE-LITO'), 0.02, 2, 0.010, 0.41, 6, 'Смазка для подшипников');
+
+-- Паспорт для Двигатель АИР90L2Ж
+INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`) VALUES
+((SELECT id FROM products WHERE article = 'AIR90L2Ж'), 22.0, 12, TRUE, 
+'Стандартный производственный процесс для Двигатель АИР90L2Ж', 
+'Соответствие ГОСТ, проверка электрических параметров и качества сборки');
+
+INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`) VALUES
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR90L2Ж')), (SELECT id FROM materials WHERE code = 'STEEL-SHEET-0.5'), 2.5, 2, 1.250, 50.71, 1, 'Сталь для корпуса статора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR90L2Ж')), (SELECT id FROM materials WHERE code = 'WIRE-CU-0.8'), 0.15, 4, 0.045, 1.83, 2, 'Обмоточный провод'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR90L2Ж')), (SELECT id FROM materials WHERE code = 'BEARING-6203-2RS'), 2, 1, 0.200, 8.11, 3, 'Подшипники'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR90L2Ж')), (SELECT id FROM materials WHERE code = 'ALUM-BAR-10'), 1.8, 2, 0.900, 36.51, 4, 'Алюминий для литья ротора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR90L2Ж')), (SELECT id FROM materials WHERE code = 'PAINT-POLYMER'), 0.12, 2, 0.060, 2.43, 5, 'Порошковая краска'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR90L2Ж')), (SELECT id FROM materials WHERE code = 'LUBE-GREASE-LITO'), 0.02, 2, 0.010, 0.41, 6, 'Смазка для подшипников');
+
+-- Паспорт для Двигатель АИР90L4Ж
+INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`) VALUES
+((SELECT id FROM products WHERE article = 'AIR90L4Ж'), 22.0, 12, TRUE, 
+'Стандартный производственный процесс для Двигатель АИР90L4Ж', 
+'Соответствие ГОСТ, проверка электрических параметров и качества сборки');
+
+INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`) VALUES
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR90L4Ж')), (SELECT id FROM materials WHERE code = 'STEEL-SHEET-0.5'), 2.5, 2, 1.250, 50.71, 1, 'Сталь для корпуса статора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR90L4Ж')), (SELECT id FROM materials WHERE code = 'WIRE-CU-0.8'), 0.15, 4, 0.045, 1.83, 2, 'Обмоточный провод'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR90L4Ж')), (SELECT id FROM materials WHERE code = 'BEARING-6203-2RS'), 2, 1, 0.200, 8.11, 3, 'Подшипники'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR90L4Ж')), (SELECT id FROM materials WHERE code = 'ALUM-BAR-10'), 1.8, 2, 0.900, 36.51, 4, 'Алюминий для литья ротора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR90L4Ж')), (SELECT id FROM materials WHERE code = 'PAINT-POLYMER'), 0.12, 2, 0.060, 2.43, 5, 'Порошковая краска'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR90L4Ж')), (SELECT id FROM materials WHERE code = 'LUBE-GREASE-LITO'), 0.02, 2, 0.010, 0.41, 6, 'Смазка для подшипников');
+
+-- Паспорт для Двигатель АИР100S2Ж
+INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`) VALUES
+((SELECT id FROM products WHERE article = 'AIR100S2Ж'), 28.0, 12, TRUE, 
+'Стандартный производственный процесс для Двигатель АИР100S2Ж', 
+'Соответствие ГОСТ, проверка электрических параметров и качества сборки');
+
+INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`) VALUES
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR100S2Ж')), (SELECT id FROM materials WHERE code = 'STEEL-SHEET-0.5'), 2.5, 2, 1.250, 50.71, 1, 'Сталь для корпуса статора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR100S2Ж')), (SELECT id FROM materials WHERE code = 'WIRE-CU-0.8'), 0.15, 4, 0.045, 1.83, 2, 'Обмоточный провод'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR100S2Ж')), (SELECT id FROM materials WHERE code = 'BEARING-6203-2RS'), 2, 1, 0.200, 8.11, 3, 'Подшипники'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR100S2Ж')), (SELECT id FROM materials WHERE code = 'ALUM-BAR-10'), 1.8, 2, 0.900, 36.51, 4, 'Алюминий для литья ротора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR100S2Ж')), (SELECT id FROM materials WHERE code = 'PAINT-POLYMER'), 0.12, 2, 0.060, 2.43, 5, 'Порошковая краска'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR100S2Ж')), (SELECT id FROM materials WHERE code = 'LUBE-GREASE-LITO'), 0.02, 2, 0.010, 0.41, 6, 'Смазка для подшипников');
+
+-- Паспорт для Двигатель АИР90L2РЗ
+INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`) VALUES
+((SELECT id FROM products WHERE article = 'AIR90L2РЗ'), 22.0, 12, TRUE, 
+'Стандартный производственный процесс для Двигатель АИР90L2РЗ', 
+'Соответствие ГОСТ, проверка электрических параметров и качества сборки');
+
+INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`) VALUES
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR90L2РЗ')), (SELECT id FROM materials WHERE code = 'STEEL-SHEET-0.5'), 2.5, 2, 1.250, 50.71, 1, 'Сталь для корпуса статора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR90L2РЗ')), (SELECT id FROM materials WHERE code = 'WIRE-CU-0.8'), 0.15, 4, 0.045, 1.83, 2, 'Обмоточный провод'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR90L2РЗ')), (SELECT id FROM materials WHERE code = 'BEARING-6203-2RS'), 2, 1, 0.200, 8.11, 3, 'Подшипники'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR90L2РЗ')), (SELECT id FROM materials WHERE code = 'ALUM-BAR-10'), 1.8, 2, 0.900, 36.51, 4, 'Алюминий для литья ротора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR90L2РЗ')), (SELECT id FROM materials WHERE code = 'PAINT-POLYMER'), 0.12, 2, 0.060, 2.43, 5, 'Порошковая краска'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR90L2РЗ')), (SELECT id FROM materials WHERE code = 'LUBE-GREASE-LITO'), 0.02, 2, 0.010, 0.41, 6, 'Смазка для подшипников');
+
+-- Паспорт для Двигатель АИР90L4РЗ
+INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`) VALUES
+((SELECT id FROM products WHERE article = 'AIR90L4РЗ'), 22.0, 12, TRUE, 
+'Стандартный производственный процесс для Двигатель АИР90L4РЗ', 
+'Соответствие ГОСТ, проверка электрических параметров и качества сборки');
+
+INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`) VALUES
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR90L4РЗ')), (SELECT id FROM materials WHERE code = 'STEEL-SHEET-0.5'), 2.5, 2, 1.250, 50.71, 1, 'Сталь для корпуса статора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR90L4РЗ')), (SELECT id FROM materials WHERE code = 'WIRE-CU-0.8'), 0.15, 4, 0.045, 1.83, 2, 'Обмоточный провод'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR90L4РЗ')), (SELECT id FROM materials WHERE code = 'BEARING-6203-2RS'), 2, 1, 0.200, 8.11, 3, 'Подшипники'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR90L4РЗ')), (SELECT id FROM materials WHERE code = 'ALUM-BAR-10'), 1.8, 2, 0.900, 36.51, 4, 'Алюминий для литья ротора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR90L4РЗ')), (SELECT id FROM materials WHERE code = 'PAINT-POLYMER'), 0.12, 2, 0.060, 2.43, 5, 'Порошковая краска'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR90L4РЗ')), (SELECT id FROM materials WHERE code = 'LUBE-GREASE-LITO'), 0.02, 2, 0.010, 0.41, 6, 'Смазка для подшипников');
+
+-- Паспорт для Двигатель АИР90L6РЗ
+INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`) VALUES
+((SELECT id FROM products WHERE article = 'AIR90L6РЗ'), 22.0, 12, TRUE, 
+'Стандартный производственный процесс для Двигатель АИР90L6РЗ', 
+'Соответствие ГОСТ, проверка электрических параметров и качества сборки');
+
+INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`) VALUES
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR90L6РЗ')), (SELECT id FROM materials WHERE code = 'STEEL-SHEET-0.5'), 2.5, 2, 1.250, 50.71, 1, 'Сталь для корпуса статора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR90L6РЗ')), (SELECT id FROM materials WHERE code = 'WIRE-CU-0.8'), 0.15, 4, 0.045, 1.83, 2, 'Обмоточный провод'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR90L6РЗ')), (SELECT id FROM materials WHERE code = 'BEARING-6203-2RS'), 2, 1, 0.200, 8.11, 3, 'Подшипники'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR90L6РЗ')), (SELECT id FROM materials WHERE code = 'ALUM-BAR-10'), 1.8, 2, 0.900, 36.51, 4, 'Алюминий для литья ротора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR90L6РЗ')), (SELECT id FROM materials WHERE code = 'PAINT-POLYMER'), 0.12, 2, 0.060, 2.43, 5, 'Порошковая краска'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR90L6РЗ')), (SELECT id FROM materials WHERE code = 'LUBE-GREASE-LITO'), 0.02, 2, 0.010, 0.41, 6, 'Смазка для подшипников');
+
+-- Паспорт для Двигатель АИР90LA8РЗ
+INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`) VALUES
+((SELECT id FROM products WHERE article = 'AIR90LA8РЗ'), 22.0, 12, TRUE, 
+'Стандартный производственный процесс для Двигатель АИР90LA8РЗ', 
+'Соответствие ГОСТ, проверка электрических параметров и качества сборки');
+
+INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`) VALUES
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR90LA8РЗ')), (SELECT id FROM materials WHERE code = 'STEEL-SHEET-0.5'), 2.5, 2, 1.250, 50.71, 1, 'Сталь для корпуса статора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR90LA8РЗ')), (SELECT id FROM materials WHERE code = 'WIRE-CU-0.8'), 0.15, 4, 0.045, 1.83, 2, 'Обмоточный провод'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR90LA8РЗ')), (SELECT id FROM materials WHERE code = 'BEARING-6203-2RS'), 2, 1, 0.200, 8.11, 3, 'Подшипники'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR90LA8РЗ')), (SELECT id FROM materials WHERE code = 'ALUM-BAR-10'), 1.8, 2, 0.900, 36.51, 4, 'Алюминий для литья ротора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR90LA8РЗ')), (SELECT id FROM materials WHERE code = 'PAINT-POLYMER'), 0.12, 2, 0.060, 2.43, 5, 'Порошковая краска'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR90LA8РЗ')), (SELECT id FROM materials WHERE code = 'LUBE-GREASE-LITO'), 0.02, 2, 0.010, 0.41, 6, 'Смазка для подшипников');
+
+-- Паспорт для Двигатель АИР90LB8РЗ
+INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`) VALUES
+((SELECT id FROM products WHERE article = 'AIR90LB8РЗ'), 22.0, 12, TRUE, 
+'Стандартный производственный процесс для Двигатель АИР90LB8РЗ', 
+'Соответствие ГОСТ, проверка электрических параметров и качества сборки');
+
+INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`) VALUES
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR90LB8РЗ')), (SELECT id FROM materials WHERE code = 'STEEL-SHEET-0.5'), 2.5, 2, 1.250, 50.71, 1, 'Сталь для корпуса статора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR90LB8РЗ')), (SELECT id FROM materials WHERE code = 'WIRE-CU-0.8'), 0.15, 4, 0.045, 1.83, 2, 'Обмоточный провод'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR90LB8РЗ')), (SELECT id FROM materials WHERE code = 'BEARING-6203-2RS'), 2, 1, 0.200, 8.11, 3, 'Подшипники'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR90LB8РЗ')), (SELECT id FROM materials WHERE code = 'ALUM-BAR-10'), 1.8, 2, 0.900, 36.51, 4, 'Алюминий для литья ротора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR90LB8РЗ')), (SELECT id FROM materials WHERE code = 'PAINT-POLYMER'), 0.12, 2, 0.060, 2.43, 5, 'Порошковая краска'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR90LB8РЗ')), (SELECT id FROM materials WHERE code = 'LUBE-GREASE-LITO'), 0.02, 2, 0.010, 0.41, 6, 'Смазка для подшипников');
+
+-- Паспорт для Двигатель АИРП80А6
+INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`) VALUES
+((SELECT id FROM products WHERE article = 'AIRП80А6'), 14.0, 12, TRUE, 
+'Стандартный производственный процесс для Двигатель АИРП80А6', 
+'Соответствие ГОСТ, проверка электрических параметров и качества сборки');
+
+INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`) VALUES
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRП80А6')), (SELECT id FROM materials WHERE code = 'STEEL-SHEET-0.5'), 3.0, 2, 1.500, 50.98, 1, 'Сталь для корпуса статора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRП80А6')), (SELECT id FROM materials WHERE code = 'WIRE-CU-1.0'), 0.2, 4, 0.060, 2.04, 2, 'Обмоточный провод'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRП80А6')), (SELECT id FROM materials WHERE code = 'BEARING-6204-2RS'), 2, 1, 0.200, 6.8, 3, 'Подшипники'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRП80А6')), (SELECT id FROM materials WHERE code = 'ALUM-BAR-10'), 2.2, 2, 1.100, 37.38, 4, 'Алюминий для литья ротора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRП80А6')), (SELECT id FROM materials WHERE code = 'PAINT-POLYMER'), 0.14, 2, 0.070, 2.38, 5, 'Порошковая краска'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRП80А6')), (SELECT id FROM materials WHERE code = 'LUBE-GREASE-LITO'), 0.025, 2, 0.013, 0.42, 6, 'Смазка для подшипников');
+
+-- Паспорт для Двигатель АИРП80С6
+INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`) VALUES
+((SELECT id FROM products WHERE article = 'AIRП80С6'), 14.0, 12, TRUE, 
+'Стандартный производственный процесс для Двигатель АИРП80С6', 
+'Соответствие ГОСТ, проверка электрических параметров и качества сборки');
+
+INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`) VALUES
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRП80С6')), (SELECT id FROM materials WHERE code = 'STEEL-SHEET-0.5'), 3.0, 2, 1.500, 50.98, 1, 'Сталь для корпуса статора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRП80С6')), (SELECT id FROM materials WHERE code = 'WIRE-CU-1.0'), 0.2, 4, 0.060, 2.04, 2, 'Обмоточный провод'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRП80С6')), (SELECT id FROM materials WHERE code = 'BEARING-6204-2RS'), 2, 1, 0.200, 6.8, 3, 'Подшипники'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRП80С6')), (SELECT id FROM materials WHERE code = 'ALUM-BAR-10'), 2.2, 2, 1.100, 37.38, 4, 'Алюминий для литья ротора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRП80С6')), (SELECT id FROM materials WHERE code = 'PAINT-POLYMER'), 0.14, 2, 0.070, 2.38, 5, 'Порошковая краска'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRП80С6')), (SELECT id FROM materials WHERE code = 'LUBE-GREASE-LITO'), 0.025, 2, 0.013, 0.42, 6, 'Смазка для подшипников');
+
+-- Паспорт для Двигатель АИРЧ80В4
+INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`) VALUES
+((SELECT id FROM products WHERE article = 'AIRЧ80В4'), 14.0, 12, TRUE, 
+'Стандартный производственный процесс для Двигатель АИРЧ80В4', 
+'Соответствие ГОСТ, проверка электрических параметров и качества сборки');
+
+INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`) VALUES
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRЧ80В4')), (SELECT id FROM materials WHERE code = 'STEEL-SHEET-0.5'), 2.8, 2, 1.400, 51.3, 1, 'Сталь для корпуса статора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRЧ80В4')), (SELECT id FROM materials WHERE code = 'WIRE-CU-0.9'), 0.18, 4, 0.054, 1.98, 2, 'Обмоточный провод'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRЧ80В4')), (SELECT id FROM materials WHERE code = 'BEARING-6203-2RS'), 2, 1, 0.200, 7.33, 3, 'Подшипники'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRЧ80В4')), (SELECT id FROM materials WHERE code = 'ALUM-BAR-10'), 2.0, 2, 1.000, 36.64, 4, 'Алюминий для литья ротора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRЧ80В4')), (SELECT id FROM materials WHERE code = 'PAINT-POLYMER'), 0.13, 2, 0.065, 2.38, 5, 'Порошковая краска'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRЧ80В4')), (SELECT id FROM materials WHERE code = 'LUBE-GREASE-LITO'), 0.02, 2, 0.010, 0.37, 6, 'Смазка для подшипников');
+
+-- Паспорт для Двигатель АИРЧ80В6
+INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`) VALUES
+((SELECT id FROM products WHERE article = 'AIRЧ80В6'), 14.0, 12, TRUE, 
+'Стандартный производственный процесс для Двигатель АИРЧ80В6', 
+'Соответствие ГОСТ, проверка электрических параметров и качества сборки');
+
+INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`) VALUES
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRЧ80В6')), (SELECT id FROM materials WHERE code = 'STEEL-SHEET-0.5'), 3.0, 2, 1.500, 50.98, 1, 'Сталь для корпуса статора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRЧ80В6')), (SELECT id FROM materials WHERE code = 'WIRE-CU-1.0'), 0.2, 4, 0.060, 2.04, 2, 'Обмоточный провод'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRЧ80В6')), (SELECT id FROM materials WHERE code = 'BEARING-6204-2RS'), 2, 1, 0.200, 6.8, 3, 'Подшипники'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRЧ80В6')), (SELECT id FROM materials WHERE code = 'ALUM-BAR-10'), 2.2, 2, 1.100, 37.38, 4, 'Алюминий для литья ротора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRЧ80В6')), (SELECT id FROM materials WHERE code = 'PAINT-POLYMER'), 0.14, 2, 0.070, 2.38, 5, 'Порошковая краска'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRЧ80В6')), (SELECT id FROM materials WHERE code = 'LUBE-GREASE-LITO'), 0.025, 2, 0.013, 0.42, 6, 'Смазка для подшипников');
+
+-- Паспорт для Двигатель АИРЕ71А2
+INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`) VALUES
+((SELECT id FROM products WHERE article = 'AIRЕ71А2'), 10.0, 12, TRUE, 
+'Стандартный производственный процесс для Двигатель АИРЕ71А2', 
+'Соответствие ГОСТ, проверка электрических параметров и качества сборки');
+
+INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`) VALUES
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRЕ71А2')), (SELECT id FROM materials WHERE code = 'STEEL-SHEET-0.5'), 2.5, 2, 1.250, 50.71, 1, 'Сталь для корпуса статора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRЕ71А2')), (SELECT id FROM materials WHERE code = 'WIRE-CU-0.8'), 0.15, 4, 0.045, 1.83, 2, 'Обмоточный провод'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRЕ71А2')), (SELECT id FROM materials WHERE code = 'BEARING-6203-2RS'), 2, 1, 0.200, 8.11, 3, 'Подшипники'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRЕ71А2')), (SELECT id FROM materials WHERE code = 'ALUM-BAR-10'), 1.8, 2, 0.900, 36.51, 4, 'Алюминий для литья ротора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRЕ71А2')), (SELECT id FROM materials WHERE code = 'PAINT-POLYMER'), 0.12, 2, 0.060, 2.43, 5, 'Порошковая краска'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRЕ71А2')), (SELECT id FROM materials WHERE code = 'LUBE-GREASE-LITO'), 0.02, 2, 0.010, 0.41, 6, 'Смазка для подшипников');
+
+-- Паспорт для Двигатель АИРЕ71В2
+INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`) VALUES
+((SELECT id FROM products WHERE article = 'AIRЕ71В2'), 10.0, 12, TRUE, 
+'Стандартный производственный процесс для Двигатель АИРЕ71В2', 
+'Соответствие ГОСТ, проверка электрических параметров и качества сборки');
+
+INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`) VALUES
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRЕ71В2')), (SELECT id FROM materials WHERE code = 'STEEL-SHEET-0.5'), 2.5, 2, 1.250, 50.71, 1, 'Сталь для корпуса статора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRЕ71В2')), (SELECT id FROM materials WHERE code = 'WIRE-CU-0.8'), 0.15, 4, 0.045, 1.83, 2, 'Обмоточный провод'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRЕ71В2')), (SELECT id FROM materials WHERE code = 'BEARING-6203-2RS'), 2, 1, 0.200, 8.11, 3, 'Подшипники'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRЕ71В2')), (SELECT id FROM materials WHERE code = 'ALUM-BAR-10'), 1.8, 2, 0.900, 36.51, 4, 'Алюминий для литья ротора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRЕ71В2')), (SELECT id FROM materials WHERE code = 'PAINT-POLYMER'), 0.12, 2, 0.060, 2.43, 5, 'Порошковая краска'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRЕ71В2')), (SELECT id FROM materials WHERE code = 'LUBE-GREASE-LITO'), 0.02, 2, 0.010, 0.41, 6, 'Смазка для подшипников');
+
+-- Паспорт для Двигатель АИРЕ71С2
+INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`) VALUES
+((SELECT id FROM products WHERE article = 'AIRЕ71С2'), 10.0, 12, TRUE, 
+'Стандартный производственный процесс для Двигатель АИРЕ71С2', 
+'Соответствие ГОСТ, проверка электрических параметров и качества сборки');
+
+INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`) VALUES
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRЕ71С2')), (SELECT id FROM materials WHERE code = 'STEEL-SHEET-0.5'), 2.5, 2, 1.250, 50.71, 1, 'Сталь для корпуса статора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRЕ71С2')), (SELECT id FROM materials WHERE code = 'WIRE-CU-0.8'), 0.15, 4, 0.045, 1.83, 2, 'Обмоточный провод'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRЕ71С2')), (SELECT id FROM materials WHERE code = 'BEARING-6203-2RS'), 2, 1, 0.200, 8.11, 3, 'Подшипники'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRЕ71С2')), (SELECT id FROM materials WHERE code = 'ALUM-BAR-10'), 1.8, 2, 0.900, 36.51, 4, 'Алюминий для литья ротора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRЕ71С2')), (SELECT id FROM materials WHERE code = 'PAINT-POLYMER'), 0.12, 2, 0.060, 2.43, 5, 'Порошковая краска'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRЕ71С2')), (SELECT id FROM materials WHERE code = 'LUBE-GREASE-LITO'), 0.02, 2, 0.010, 0.41, 6, 'Смазка для подшипников');
+
+-- Паспорт для Двигатель АИРЕ71А4
+INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`) VALUES
+((SELECT id FROM products WHERE article = 'AIRЕ71А4'), 10.0, 12, TRUE, 
+'Стандартный производственный процесс для Двигатель АИРЕ71А4', 
+'Соответствие ГОСТ, проверка электрических параметров и качества сборки');
+
+INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`) VALUES
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRЕ71А4')), (SELECT id FROM materials WHERE code = 'STEEL-SHEET-0.5'), 2.8, 2, 1.400, 51.3, 1, 'Сталь для корпуса статора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRЕ71А4')), (SELECT id FROM materials WHERE code = 'WIRE-CU-0.9'), 0.18, 4, 0.054, 1.98, 2, 'Обмоточный провод'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRЕ71А4')), (SELECT id FROM materials WHERE code = 'BEARING-6203-2RS'), 2, 1, 0.200, 7.33, 3, 'Подшипники'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRЕ71А4')), (SELECT id FROM materials WHERE code = 'ALUM-BAR-10'), 2.0, 2, 1.000, 36.64, 4, 'Алюминий для литья ротора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRЕ71А4')), (SELECT id FROM materials WHERE code = 'PAINT-POLYMER'), 0.13, 2, 0.065, 2.38, 5, 'Порошковая краска'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRЕ71А4')), (SELECT id FROM materials WHERE code = 'LUBE-GREASE-LITO'), 0.02, 2, 0.010, 0.37, 6, 'Смазка для подшипников');
+
+-- Паспорт для Двигатель АИРЕ71В4
+INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`) VALUES
+((SELECT id FROM products WHERE article = 'AIRЕ71В4'), 10.0, 12, TRUE, 
+'Стандартный производственный процесс для Двигатель АИРЕ71В4', 
+'Соответствие ГОСТ, проверка электрических параметров и качества сборки');
+
+INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`) VALUES
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRЕ71В4')), (SELECT id FROM materials WHERE code = 'STEEL-SHEET-0.5'), 2.8, 2, 1.400, 51.3, 1, 'Сталь для корпуса статора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRЕ71В4')), (SELECT id FROM materials WHERE code = 'WIRE-CU-0.9'), 0.18, 4, 0.054, 1.98, 2, 'Обмоточный провод'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRЕ71В4')), (SELECT id FROM materials WHERE code = 'BEARING-6203-2RS'), 2, 1, 0.200, 7.33, 3, 'Подшипники'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRЕ71В4')), (SELECT id FROM materials WHERE code = 'ALUM-BAR-10'), 2.0, 2, 1.000, 36.64, 4, 'Алюминий для литья ротора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRЕ71В4')), (SELECT id FROM materials WHERE code = 'PAINT-POLYMER'), 0.13, 2, 0.065, 2.38, 5, 'Порошковая краска'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRЕ71В4')), (SELECT id FROM materials WHERE code = 'LUBE-GREASE-LITO'), 0.02, 2, 0.010, 0.37, 6, 'Смазка для подшипников');
+
+-- Паспорт для Двигатель АИРЕ71С4
+INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`) VALUES
+((SELECT id FROM products WHERE article = 'AIRЕ71С4'), 10.0, 12, TRUE, 
+'Стандартный производственный процесс для Двигатель АИРЕ71С4', 
+'Соответствие ГОСТ, проверка электрических параметров и качества сборки');
+
+INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`) VALUES
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRЕ71С4')), (SELECT id FROM materials WHERE code = 'STEEL-SHEET-0.5'), 2.8, 2, 1.400, 51.3, 1, 'Сталь для корпуса статора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRЕ71С4')), (SELECT id FROM materials WHERE code = 'WIRE-CU-0.9'), 0.18, 4, 0.054, 1.98, 2, 'Обмоточный провод'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRЕ71С4')), (SELECT id FROM materials WHERE code = 'BEARING-6203-2RS'), 2, 1, 0.200, 7.33, 3, 'Подшипники'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRЕ71С4')), (SELECT id FROM materials WHERE code = 'ALUM-BAR-10'), 2.0, 2, 1.000, 36.64, 4, 'Алюминий для литья ротора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRЕ71С4')), (SELECT id FROM materials WHERE code = 'PAINT-POLYMER'), 0.13, 2, 0.065, 2.38, 5, 'Порошковая краска'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRЕ71С4')), (SELECT id FROM materials WHERE code = 'LUBE-GREASE-LITO'), 0.02, 2, 0.010, 0.37, 6, 'Смазка для подшипников');
+
+-- Паспорт для Двигатель АИРЕ80А2
+INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`) VALUES
+((SELECT id FROM products WHERE article = 'AIRЕ80А2'), 14.0, 12, TRUE, 
+'Стандартный производственный процесс для Двигатель АИРЕ80А2', 
+'Соответствие ГОСТ, проверка электрических параметров и качества сборки');
+
+INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`) VALUES
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRЕ80А2')), (SELECT id FROM materials WHERE code = 'STEEL-SHEET-0.5'), 2.5, 2, 1.250, 50.71, 1, 'Сталь для корпуса статора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRЕ80А2')), (SELECT id FROM materials WHERE code = 'WIRE-CU-0.8'), 0.15, 4, 0.045, 1.83, 2, 'Обмоточный провод'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRЕ80А2')), (SELECT id FROM materials WHERE code = 'BEARING-6203-2RS'), 2, 1, 0.200, 8.11, 3, 'Подшипники'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRЕ80А2')), (SELECT id FROM materials WHERE code = 'ALUM-BAR-10'), 1.8, 2, 0.900, 36.51, 4, 'Алюминий для литья ротора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRЕ80А2')), (SELECT id FROM materials WHERE code = 'PAINT-POLYMER'), 0.12, 2, 0.060, 2.43, 5, 'Порошковая краска'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRЕ80А2')), (SELECT id FROM materials WHERE code = 'LUBE-GREASE-LITO'), 0.02, 2, 0.010, 0.41, 6, 'Смазка для подшипников');
+
+-- Паспорт для Двигатель АИРЕ80В2
+INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`) VALUES
+((SELECT id FROM products WHERE article = 'AIRЕ80В2'), 14.0, 12, TRUE, 
+'Стандартный производственный процесс для Двигатель АИРЕ80В2', 
+'Соответствие ГОСТ, проверка электрических параметров и качества сборки');
+
+INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`) VALUES
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRЕ80В2')), (SELECT id FROM materials WHERE code = 'STEEL-SHEET-0.5'), 2.5, 2, 1.250, 50.71, 1, 'Сталь для корпуса статора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRЕ80В2')), (SELECT id FROM materials WHERE code = 'WIRE-CU-0.8'), 0.15, 4, 0.045, 1.83, 2, 'Обмоточный провод'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRЕ80В2')), (SELECT id FROM materials WHERE code = 'BEARING-6203-2RS'), 2, 1, 0.200, 8.11, 3, 'Подшипники'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRЕ80В2')), (SELECT id FROM materials WHERE code = 'ALUM-BAR-10'), 1.8, 2, 0.900, 36.51, 4, 'Алюминий для литья ротора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRЕ80В2')), (SELECT id FROM materials WHERE code = 'PAINT-POLYMER'), 0.12, 2, 0.060, 2.43, 5, 'Порошковая краска'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRЕ80В2')), (SELECT id FROM materials WHERE code = 'LUBE-GREASE-LITO'), 0.02, 2, 0.010, 0.41, 6, 'Смазка для подшипников');
+
+-- Паспорт для Двигатель АИРЕ80С2
+INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`) VALUES
+((SELECT id FROM products WHERE article = 'AIRЕ80С2'), 14.0, 12, TRUE, 
+'Стандартный производственный процесс для Двигатель АИРЕ80С2', 
+'Соответствие ГОСТ, проверка электрических параметров и качества сборки');
+
+INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`) VALUES
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRЕ80С2')), (SELECT id FROM materials WHERE code = 'STEEL-SHEET-0.5'), 2.5, 2, 1.250, 50.71, 1, 'Сталь для корпуса статора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRЕ80С2')), (SELECT id FROM materials WHERE code = 'WIRE-CU-0.8'), 0.15, 4, 0.045, 1.83, 2, 'Обмоточный провод'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRЕ80С2')), (SELECT id FROM materials WHERE code = 'BEARING-6203-2RS'), 2, 1, 0.200, 8.11, 3, 'Подшипники'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRЕ80С2')), (SELECT id FROM materials WHERE code = 'ALUM-BAR-10'), 1.8, 2, 0.900, 36.51, 4, 'Алюминий для литья ротора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRЕ80С2')), (SELECT id FROM materials WHERE code = 'PAINT-POLYMER'), 0.12, 2, 0.060, 2.43, 5, 'Порошковая краска'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRЕ80С2')), (SELECT id FROM materials WHERE code = 'LUBE-GREASE-LITO'), 0.02, 2, 0.010, 0.41, 6, 'Смазка для подшипников');
+
+-- Паспорт для Двигатель АИРЕ80D2
+INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`) VALUES
+((SELECT id FROM products WHERE article = 'AIRЕ80D2'), 14.0, 12, TRUE, 
+'Стандартный производственный процесс для Двигатель АИРЕ80D2', 
+'Соответствие ГОСТ, проверка электрических параметров и качества сборки');
+
+INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`) VALUES
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRЕ80D2')), (SELECT id FROM materials WHERE code = 'STEEL-SHEET-0.5'), 2.5, 2, 1.250, 50.71, 1, 'Сталь для корпуса статора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRЕ80D2')), (SELECT id FROM materials WHERE code = 'WIRE-CU-0.8'), 0.15, 4, 0.045, 1.83, 2, 'Обмоточный провод'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRЕ80D2')), (SELECT id FROM materials WHERE code = 'BEARING-6203-2RS'), 2, 1, 0.200, 8.11, 3, 'Подшипники'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRЕ80D2')), (SELECT id FROM materials WHERE code = 'ALUM-BAR-10'), 1.8, 2, 0.900, 36.51, 4, 'Алюминий для литья ротора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRЕ80D2')), (SELECT id FROM materials WHERE code = 'PAINT-POLYMER'), 0.12, 2, 0.060, 2.43, 5, 'Порошковая краска'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRЕ80D2')), (SELECT id FROM materials WHERE code = 'LUBE-GREASE-LITO'), 0.02, 2, 0.010, 0.41, 6, 'Смазка для подшипников');
+
+-- Паспорт для Двигатель АИРЕ80А4
+INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`) VALUES
+((SELECT id FROM products WHERE article = 'AIRЕ80А4'), 14.0, 12, TRUE, 
+'Стандартный производственный процесс для Двигатель АИРЕ80А4', 
+'Соответствие ГОСТ, проверка электрических параметров и качества сборки');
+
+INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`) VALUES
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRЕ80А4')), (SELECT id FROM materials WHERE code = 'STEEL-SHEET-0.5'), 2.8, 2, 1.400, 51.3, 1, 'Сталь для корпуса статора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRЕ80А4')), (SELECT id FROM materials WHERE code = 'WIRE-CU-0.9'), 0.18, 4, 0.054, 1.98, 2, 'Обмоточный провод'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRЕ80А4')), (SELECT id FROM materials WHERE code = 'BEARING-6203-2RS'), 2, 1, 0.200, 7.33, 3, 'Подшипники'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRЕ80А4')), (SELECT id FROM materials WHERE code = 'ALUM-BAR-10'), 2.0, 2, 1.000, 36.64, 4, 'Алюминий для литья ротора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRЕ80А4')), (SELECT id FROM materials WHERE code = 'PAINT-POLYMER'), 0.13, 2, 0.065, 2.38, 5, 'Порошковая краска'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRЕ80А4')), (SELECT id FROM materials WHERE code = 'LUBE-GREASE-LITO'), 0.02, 2, 0.010, 0.37, 6, 'Смазка для подшипников');
+
+-- Паспорт для Двигатель АИРЕ80В4
+INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`) VALUES
+((SELECT id FROM products WHERE article = 'AIRЕ80В4'), 14.0, 12, TRUE, 
+'Стандартный производственный процесс для Двигатель АИРЕ80В4', 
+'Соответствие ГОСТ, проверка электрических параметров и качества сборки');
+
+INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`) VALUES
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRЕ80В4')), (SELECT id FROM materials WHERE code = 'STEEL-SHEET-0.5'), 2.8, 2, 1.400, 51.3, 1, 'Сталь для корпуса статора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRЕ80В4')), (SELECT id FROM materials WHERE code = 'WIRE-CU-0.9'), 0.18, 4, 0.054, 1.98, 2, 'Обмоточный провод'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRЕ80В4')), (SELECT id FROM materials WHERE code = 'BEARING-6203-2RS'), 2, 1, 0.200, 7.33, 3, 'Подшипники'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRЕ80В4')), (SELECT id FROM materials WHERE code = 'ALUM-BAR-10'), 2.0, 2, 1.000, 36.64, 4, 'Алюминий для литья ротора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRЕ80В4')), (SELECT id FROM materials WHERE code = 'PAINT-POLYMER'), 0.13, 2, 0.065, 2.38, 5, 'Порошковая краска'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRЕ80В4')), (SELECT id FROM materials WHERE code = 'LUBE-GREASE-LITO'), 0.02, 2, 0.010, 0.37, 6, 'Смазка для подшипников');
+
+-- Паспорт для Двигатель АИРЕ80С4
+INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`) VALUES
+((SELECT id FROM products WHERE article = 'AIRЕ80С4'), 14.0, 12, TRUE, 
+'Стандартный производственный процесс для Двигатель АИРЕ80С4', 
+'Соответствие ГОСТ, проверка электрических параметров и качества сборки');
+
+INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`) VALUES
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRЕ80С4')), (SELECT id FROM materials WHERE code = 'STEEL-SHEET-0.5'), 2.8, 2, 1.400, 51.3, 1, 'Сталь для корпуса статора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRЕ80С4')), (SELECT id FROM materials WHERE code = 'WIRE-CU-0.9'), 0.18, 4, 0.054, 1.98, 2, 'Обмоточный провод'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRЕ80С4')), (SELECT id FROM materials WHERE code = 'BEARING-6203-2RS'), 2, 1, 0.200, 7.33, 3, 'Подшипники'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRЕ80С4')), (SELECT id FROM materials WHERE code = 'ALUM-BAR-10'), 2.0, 2, 1.000, 36.64, 4, 'Алюминий для литья ротора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRЕ80С4')), (SELECT id FROM materials WHERE code = 'PAINT-POLYMER'), 0.13, 2, 0.065, 2.38, 5, 'Порошковая краска'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRЕ80С4')), (SELECT id FROM materials WHERE code = 'LUBE-GREASE-LITO'), 0.02, 2, 0.010, 0.37, 6, 'Смазка для подшипников');
+
+-- Паспорт для Двигатель АИРЕ90L2
+INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`) VALUES
+((SELECT id FROM products WHERE article = 'AIRЕ90L2'), 22.0, 12, TRUE, 
+'Стандартный производственный процесс для Двигатель АИРЕ90L2', 
+'Соответствие ГОСТ, проверка электрических параметров и качества сборки');
+
+INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`) VALUES
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRЕ90L2')), (SELECT id FROM materials WHERE code = 'STEEL-SHEET-0.5'), 2.5, 2, 1.250, 50.71, 1, 'Сталь для корпуса статора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRЕ90L2')), (SELECT id FROM materials WHERE code = 'WIRE-CU-0.8'), 0.15, 4, 0.045, 1.83, 2, 'Обмоточный провод'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRЕ90L2')), (SELECT id FROM materials WHERE code = 'BEARING-6203-2RS'), 2, 1, 0.200, 8.11, 3, 'Подшипники'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRЕ90L2')), (SELECT id FROM materials WHERE code = 'ALUM-BAR-10'), 1.8, 2, 0.900, 36.51, 4, 'Алюминий для литья ротора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRЕ90L2')), (SELECT id FROM materials WHERE code = 'PAINT-POLYMER'), 0.12, 2, 0.060, 2.43, 5, 'Порошковая краска'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRЕ90L2')), (SELECT id FROM materials WHERE code = 'LUBE-GREASE-LITO'), 0.02, 2, 0.010, 0.41, 6, 'Смазка для подшипников');
+
+-- Паспорт для Двигатель АИРЕ90L4
+INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`) VALUES
+((SELECT id FROM products WHERE article = 'AIRЕ90L4'), 22.0, 12, TRUE, 
+'Стандартный производственный процесс для Двигатель АИРЕ90L4', 
+'Соответствие ГОСТ, проверка электрических параметров и качества сборки');
+
+INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`) VALUES
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRЕ90L4')), (SELECT id FROM materials WHERE code = 'STEEL-SHEET-0.5'), 2.8, 2, 1.400, 51.3, 1, 'Сталь для корпуса статора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRЕ90L4')), (SELECT id FROM materials WHERE code = 'WIRE-CU-0.9'), 0.18, 4, 0.054, 1.98, 2, 'Обмоточный провод'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRЕ90L4')), (SELECT id FROM materials WHERE code = 'BEARING-6203-2RS'), 2, 1, 0.200, 7.33, 3, 'Подшипники'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRЕ90L4')), (SELECT id FROM materials WHERE code = 'ALUM-BAR-10'), 2.0, 2, 1.000, 36.64, 4, 'Алюминий для литья ротора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRЕ90L4')), (SELECT id FROM materials WHERE code = 'PAINT-POLYMER'), 0.13, 2, 0.065, 2.38, 5, 'Порошковая краска'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIRЕ90L4')), (SELECT id FROM materials WHERE code = 'LUBE-GREASE-LITO'), 0.02, 2, 0.010, 0.37, 6, 'Смазка для подшипников');
+
+-- Паспорт для Электронасос погружной ГНОМ 10-10
+INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`) VALUES
+((SELECT id FROM products WHERE article = 'GNOM-10-10'), 15.0, 12, TRUE, 
+'Стандартный производственный процесс для Электронасос погружной ГНОМ 10-10', 
+'Соответствие ГОСТ, проверка электрических параметров и качества сборки');
+
+INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`) VALUES
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'GNOM-10-10')), (SELECT id FROM materials WHERE code = 'CAST-AK5M2'), 2.5, 2, 1.250, 40.45, 1, 'Корпус насоса'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'GNOM-10-10')), (SELECT id FROM materials WHERE code = 'STEEL-SHEET-1.5'), 1.5, 2, 0.750, 24.27, 2, 'Защитный кожух'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'GNOM-10-10')), (SELECT id FROM materials WHERE code = 'WIRE-CU-1.0'), 0.3, 4, 0.090, 2.91, 3, 'Обмоточный провод'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'GNOM-10-10')), (SELECT id FROM materials WHERE code = 'BEARING-6202-2RS'), 2, 1, 0.200, 6.47, 4, 'Подшипники'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'GNOM-10-10')), (SELECT id FROM materials WHERE code = 'SEAL-MECH-25'), 2, 1, 0.200, 6.47, 5, 'Торцевые уплотнения'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'GNOM-10-10')), (SELECT id FROM materials WHERE code = 'CABLE-POWER-3x2.5'), 2.0, 4, 0.600, 19.42, 6, 'Силовой кабель');
+
+-- Паспорт для Электроконфорка чугунная ЭКЧ-180
+INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`) VALUES
+((SELECT id FROM products WHERE article = 'EKCH-180'), 2.5, 12, TRUE, 
+'Стандартный производственный процесс для Электроконфорка чугунная ЭКЧ-180', 
+'Соответствие ГОСТ, проверка электрических параметров и качества сборки');
+
+INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`) VALUES
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'EKCH-180')), (SELECT id FROM materials WHERE code = 'CAST-SCH20'), 2.0, 2, 1.000, 66.33, 1, 'Чугунная плита d180'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'EKCH-180')), (SELECT id FROM materials WHERE code = 'WIRE-NICHROME-2.0'), 0.025, 4, 0.007, 0.5, 2, 'Нихромовая спираль'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'EKCH-180')), (SELECT id FROM materials WHERE code = 'INSULATION-PERIKLAZ'), 0.3, 2, 0.150, 9.95, 3, 'Периклазовый наполнитель'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'EKCH-180')), (SELECT id FROM materials WHERE code = 'STEEL-SHEET-0.8'), 0.4, 2, 0.200, 13.27, 4, 'Стальной кожух'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'EKCH-180')), (SELECT id FROM materials WHERE code = 'CABLE-POWER-3x1.5'), 0.5, 4, 0.150, 9.95, 5, 'Силовой кабель');
+
+-- Паспорт для Электроконфорка чугунная ЭКЧ220-2.0/220
+INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`) VALUES
+((SELECT id FROM products WHERE article = 'EKCH220-2.0'), 2.5, 12, TRUE, 
+'Стандартный производственный процесс для Электроконфорка чугунная ЭКЧ220-2.0/220', 
+'Соответствие ГОСТ, проверка электрических параметров и качества сборки');
+
+INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`) VALUES
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'EKCH220-2.0')), (SELECT id FROM materials WHERE code = 'CAST-SCH20'), 2.8, 2, 1.400, 73.39, 1, 'Чугунная плита d220'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'EKCH220-2.0')), (SELECT id FROM materials WHERE code = 'WIRE-NICHROME-2.0'), 0.025, 4, 0.007, 0.39, 2, 'Нихромовая спираль'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'EKCH220-2.0')), (SELECT id FROM materials WHERE code = 'INSULATION-PERIKLAZ'), 0.3, 2, 0.150, 7.86, 3, 'Периклазовый наполнитель'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'EKCH220-2.0')), (SELECT id FROM materials WHERE code = 'STEEL-SHEET-0.8'), 0.4, 2, 0.200, 10.48, 4, 'Стальной кожух'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'EKCH220-2.0')), (SELECT id FROM materials WHERE code = 'CABLE-POWER-3x1.5'), 0.5, 4, 0.150, 7.86, 5, 'Силовой кабель');
+
+-- Паспорт для Электроконфорка чугунная ЭКЧ1-1.0/220
+INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`) VALUES
+((SELECT id FROM products WHERE article = 'EKCH1-1.0'), 2.5, 12, TRUE, 
+'Стандартный производственный процесс для Электроконфорка чугунная ЭКЧ1-1.0/220', 
+'Соответствие ГОСТ, проверка электрических параметров и качества сборки');
+
+INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`) VALUES
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'EKCH1-1.0')), (SELECT id FROM materials WHERE code = 'CAST-SCH20'), 1.5, 2, 0.750, 59.64, 1, 'Чугунная плита d145'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'EKCH1-1.0')), (SELECT id FROM materials WHERE code = 'WIRE-NICHROME-2.0'), 0.025, 4, 0.007, 0.6, 2, 'Нихромовая спираль'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'EKCH1-1.0')), (SELECT id FROM materials WHERE code = 'INSULATION-PERIKLAZ'), 0.3, 2, 0.150, 11.93, 3, 'Периклазовый наполнитель'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'EKCH1-1.0')), (SELECT id FROM materials WHERE code = 'STEEL-SHEET-0.8'), 0.4, 2, 0.200, 15.9, 4, 'Стальной кожух'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'EKCH1-1.0')), (SELECT id FROM materials WHERE code = 'CABLE-POWER-3x1.5'), 0.5, 4, 0.150, 11.93, 5, 'Силовой кабель');
+

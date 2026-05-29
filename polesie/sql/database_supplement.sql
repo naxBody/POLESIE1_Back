@@ -10,10 +10,14 @@ USE `polesie_production`;
 -- ============================================
 
 -- Паспорт для 2AIR80A2
-INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`) VALUES
-((SELECT id FROM products WHERE article = '2AIR80A2'), 14.5, 12, TRUE,
-'Стандартный производственный процесс для двигателя 2AIR80A2',
-'Соответствие ГОСТ, проверка электрических параметров и качества сборки');
+INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`)
+SELECT 
+    (SELECT id FROM products WHERE article = '2AIR80A2'), 14.5, 12, TRUE,
+    'Стандартный производственный процесс для двигателя 2AIR80A2',
+    'Соответствие ГОСТ, проверка электрических параметров и качества сборки'
+WHERE NOT EXISTS (
+    SELECT 1 FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = '2AIR80A2')
+);
 
 INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`) VALUES
 ((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = '2AIR80A2')), (SELECT id FROM materials WHERE code = 'STEEL-SHEET-0.5'), 2.6, 2, 1.300, 51.2, 1, 'Сталь для корпуса статора'),
@@ -24,10 +28,15 @@ INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantit
 ((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = '2AIR80A2')), (SELECT id FROM materials WHERE code = 'LUBE-GREASE-LITO'), 0.02, 2, 0.010, 0.39, 6, 'Смазка для подшипников');
 
 -- Паспорт для 2AIR80B2
-INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`) VALUES
-((SELECT id FROM products WHERE article = '2AIR80B2'), 16.5, 12, TRUE,
-'Стандартный производственный процесс для двигателя 2AIR80B2',
-'Соответствие ГОСТ, проверка электрических параметров и качества сборки');
+INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`)
+SELECT 
+    (SELECT id FROM products WHERE article = '2AIR80B2'), 16.5, 12, TRUE,
+    'Стандартный производственный процесс для двигателя 2AIR80B2',
+    'Соответствие ГОСТ, проверка электрических параметров и качества сборки'
+WHERE NOT EXISTS (
+    SELECT 1 FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = '2AIR80B2')
+);
+
 
 INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`) VALUES
 ((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = '2AIR80B2')), (SELECT id FROM materials WHERE code = 'STEEL-SHEET-0.5'), 2.9, 2, 1.450, 51.8, 1, 'Сталь для корпуса статора'),
@@ -38,10 +47,15 @@ INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantit
 ((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = '2AIR80B2')), (SELECT id FROM materials WHERE code = 'LUBE-GREASE-LITO'), 0.02, 2, 0.010, 0.36, 6, 'Смазка для подшипников');
 
 -- Паспорт для 2AIR80A6
-INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`) VALUES
-((SELECT id FROM products WHERE article = '2AIR80A6'), 13.5, 12, TRUE,
-'Стандартный производственный процесс для двигателя 2AIR80A6',
-'Соответствие ГОСТ, проверка электрических параметров и качества сборки');
+INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`)
+SELECT 
+    (SELECT id FROM products WHERE article = '2AIR80A6'), 13.5, 12, TRUE,
+    'Стандартный производственный процесс для двигателя 2AIR80A6',
+    'Соответствие ГОСТ, проверка электрических параметров и качества сборки'
+WHERE NOT EXISTS (
+    SELECT 1 FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = '2AIR80A6')
+);
+
 
 INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`) VALUES
 ((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = '2AIR80A6')), (SELECT id FROM materials WHERE code = 'STEEL-SHEET-0.5'), 2.4, 2, 1.200, 50.5, 1, 'Сталь для корпуса статора'),
@@ -52,10 +66,15 @@ INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantit
 ((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = '2AIR80A6')), (SELECT id FROM materials WHERE code = 'LUBE-GREASE-LITO'), 0.02, 2, 0.010, 0.42, 6, 'Смазка для подшипников');
 
 -- Паспорт для 2AIR80B6
-INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`) VALUES
-((SELECT id FROM products WHERE article = '2AIR80B6'), 17.0, 12, TRUE,
-'Стандартный производственный процесс для двигателя 2AIR80B6',
-'Соответствие ГОСТ, проверка электрических параметров и качества сборки');
+INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`)
+SELECT 
+    (SELECT id FROM products WHERE article = '2AIR80B6'), 17.0, 12, TRUE,
+    'Стандартный производственный процесс для двигателя 2AIR80B6',
+    'Соответствие ГОСТ, проверка электрических параметров и качества сборки'
+WHERE NOT EXISTS (
+    SELECT 1 FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = '2AIR80B6')
+);
+
 
 INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`) VALUES
 ((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = '2AIR80B6')), (SELECT id FROM materials WHERE code = 'STEEL-SHEET-0.5'), 3.0, 2, 1.500, 51.5, 1, 'Сталь для корпуса статора'),
@@ -66,10 +85,15 @@ INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantit
 ((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = '2AIR80B6')), (SELECT id FROM materials WHERE code = 'LUBE-GREASE-LITO'), 0.02, 2, 0.010, 0.34, 6, 'Смазка для подшипников');
 
 -- Паспорт для 2AIR90L2
-INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`) VALUES
-((SELECT id FROM products WHERE article = '2AIR90L2'), 22.0, 12, TRUE,
-'Стандартный производственный процесс для двигателя 2AIR90L2',
-'Соответствие ГОСТ, проверка электрических параметров и качества сборки');
+INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`)
+SELECT 
+    (SELECT id FROM products WHERE article = '2AIR90L2'), 22.0, 12, TRUE,
+    'Стандартный производственный процесс для двигателя 2AIR90L2',
+    'Соответствие ГОСТ, проверка электрических параметров и качества сборки'
+WHERE NOT EXISTS (
+    SELECT 1 FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = '2AIR90L2')
+);
+
 
 INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`) VALUES
 ((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = '2AIR90L2')), (SELECT id FROM materials WHERE code = 'STEEL-SHEET-0.5'), 3.8, 2, 1.900, 51.4, 1, 'Сталь для корпуса статора'),
@@ -80,10 +104,15 @@ INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantit
 ((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = '2AIR90L2')), (SELECT id FROM materials WHERE code = 'LUBE-GREASE-LITO'), 0.03, 2, 0.015, 0.41, 6, 'Смазка для подшипников');
 
 -- Паспорт для 2AIR90L4
-INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`) VALUES
-((SELECT id FROM products WHERE article = '2AIR90L4'), 25.0, 12, TRUE,
-'Стандартный производственный процесс для двигателя 2AIR90L4',
-'Соответствие ГОСТ, проверка электрических параметров и качества сборки');
+INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`)
+SELECT 
+    (SELECT id FROM products WHERE article = '2AIR90L4'), 25.0, 12, TRUE,
+    'Стандартный производственный процесс для двигателя 2AIR90L4',
+    'Соответствие ГОСТ, проверка электрических параметров и качества сборки'
+WHERE NOT EXISTS (
+    SELECT 1 FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = '2AIR90L4')
+);
+
 
 INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`) VALUES
 ((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = '2AIR90L4')), (SELECT id FROM materials WHERE code = 'STEEL-SHEET-0.5'), 4.2, 2, 2.100, 51.2, 1, 'Сталь для корпуса статора'),
@@ -94,10 +123,15 @@ INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantit
 ((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = '2AIR90L4')), (SELECT id FROM materials WHERE code = 'LUBE-GREASE-LITO'), 0.03, 2, 0.015, 0.37, 6, 'Смазка для подшипников');
 
 -- Паспорт для 2AIR90L6
-INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`) VALUES
-((SELECT id FROM products WHERE article = '2AIR90L6'), 21.5, 12, TRUE,
-'Стандартный производственный процесс для двигателя 2AIR90L6',
-'Соответствие ГОСТ, проверка электрических параметров и качества сборки');
+INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`)
+SELECT 
+    (SELECT id FROM products WHERE article = '2AIR90L6'), 21.5, 12, TRUE,
+    'Стандартный производственный процесс для двигателя 2AIR90L6',
+    'Соответствие ГОСТ, проверка электрических параметров и качества сборки'
+WHERE NOT EXISTS (
+    SELECT 1 FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = '2AIR90L6')
+);
+
 
 INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`) VALUES
 ((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = '2AIR90L6')), (SELECT id FROM materials WHERE code = 'STEEL-SHEET-0.5'), 3.7, 2, 1.850, 51.6, 1, 'Сталь для корпуса статора'),
@@ -108,10 +142,15 @@ INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantit
 ((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = '2AIR90L6')), (SELECT id FROM materials WHERE code = 'LUBE-GREASE-LITO'), 0.03, 2, 0.015, 0.42, 6, 'Смазка для подшипников');
 
 -- Паспорт для 2AIR100S2
-INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`) VALUES
-((SELECT id FROM products WHERE article = '2AIR100S2'), 28.0, 12, TRUE,
-'Стандартный производственный процесс для двигателя 2AIR100S2',
-'Соответствие ГОСТ, проверка электрических параметров и качества сборки');
+INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`)
+SELECT 
+    (SELECT id FROM products WHERE article = '2AIR100S2'), 28.0, 12, TRUE,
+    'Стандартный производственный процесс для двигателя 2AIR100S2',
+    'Соответствие ГОСТ, проверка электрических параметров и качества сборки'
+WHERE NOT EXISTS (
+    SELECT 1 FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = '2AIR100S2')
+);
+
 
 INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`) VALUES
 ((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = '2AIR100S2')), (SELECT id FROM materials WHERE code = 'STEEL-SHEET-0.5'), 4.8, 2, 2.400, 51.8, 1, 'Сталь для корпуса статора'),
@@ -122,10 +161,15 @@ INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantit
 ((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = '2AIR100S2')), (SELECT id FROM materials WHERE code = 'LUBE-GREASE-LITO'), 0.03, 2, 0.015, 0.32, 6, 'Смазка для подшипников');
 
 -- Паспорт для 2AIR100S4
-INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`) VALUES
-((SELECT id FROM products WHERE article = '2AIR100S4'), 30.0, 12, TRUE,
-'Стандартный производственный процесс для двигателя 2AIR100S4',
-'Соответствие ГОСТ, проверка электрических параметров и качества сборки');
+INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`)
+SELECT 
+    (SELECT id FROM products WHERE article = '2AIR100S4'), 30.0, 12, TRUE,
+    'Стандартный производственный процесс для двигателя 2AIR100S4',
+    'Соответствие ГОСТ, проверка электрических параметров и качества сборки'
+WHERE NOT EXISTS (
+    SELECT 1 FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = '2AIR100S4')
+);
+
 
 INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`) VALUES
 ((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = '2AIR100S4')), (SELECT id FROM materials WHERE code = 'STEEL-SHEET-0.5'), 5.1, 2, 2.550, 51.9, 1, 'Сталь для корпуса статора'),
@@ -136,10 +180,15 @@ INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantit
 ((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = '2AIR100S4')), (SELECT id FROM materials WHERE code = 'LUBE-GREASE-LITO'), 0.03, 2, 0.015, 0.31, 6, 'Смазка для подшипников');
 
 -- Паспорт для 2AIR100L2
-INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`) VALUES
-((SELECT id FROM products WHERE article = '2AIR100L2'), 32.0, 12, TRUE,
-'Стандартный производственный процесс для двигателя 2AIR100L2',
-'Соответствие ГОСТ, проверка электрических параметров и качества сборки');
+INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`)
+SELECT 
+    (SELECT id FROM products WHERE article = '2AIR100L2'), 32.0, 12, TRUE,
+    'Стандартный производственный процесс для двигателя 2AIR100L2',
+    'Соответствие ГОСТ, проверка электрических параметров и качества сборки'
+WHERE NOT EXISTS (
+    SELECT 1 FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = '2AIR100L2')
+);
+
 
 INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`) VALUES
 ((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = '2AIR100L2')), (SELECT id FROM materials WHERE code = 'STEEL-SHEET-0.5'), 5.4, 2, 2.700, 51.7, 1, 'Сталь для корпуса статора'),
@@ -150,10 +199,15 @@ INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantit
 ((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = '2AIR100L2')), (SELECT id FROM materials WHERE code = 'LUBE-GREASE-LITO'), 0.04, 2, 0.020, 0.38, 6, 'Смазка для подшипников');
 
 -- Паспорт для 2AIR100L4
-INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`) VALUES
-((SELECT id FROM products WHERE article = '2AIR100L4'), 34.0, 12, TRUE,
-'Стандартный производственный процесс для двигателя 2AIR100L4',
-'Соответствие ГОСТ, проверка электрических параметров и качества сборки');
+INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`)
+SELECT 
+    (SELECT id FROM products WHERE article = '2AIR100L4'), 34.0, 12, TRUE,
+    'Стандартный производственный процесс для двигателя 2AIR100L4',
+    'Соответствие ГОСТ, проверка электрических параметров и качества сборки'
+WHERE NOT EXISTS (
+    SELECT 1 FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = '2AIR100L4')
+);
+
 
 INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`) VALUES
 ((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = '2AIR100L4')), (SELECT id FROM materials WHERE code = 'STEEL-SHEET-0.5'), 5.7, 2, 2.850, 51.6, 1, 'Сталь для корпуса статора'),
@@ -164,10 +218,15 @@ INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantit
 ((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = '2AIR100L4')), (SELECT id FROM materials WHERE code = 'LUBE-GREASE-LITO'), 0.04, 2, 0.020, 0.36, 6, 'Смазка для подшипников');
 
 -- Паспорт для 2AIR100L6
-INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`) VALUES
-((SELECT id FROM products WHERE article = '2AIR100L6'), 30.0, 12, TRUE,
-'Стандартный производственный процесс для двигателя 2AIR100L6',
-'Соответствие ГОСТ, проверка электрических параметров и качества сборки');
+INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`)
+SELECT 
+    (SELECT id FROM products WHERE article = '2AIR100L6'), 30.0, 12, TRUE,
+    'Стандартный производственный процесс для двигателя 2AIR100L6',
+    'Соответствие ГОСТ, проверка электрических параметров и качества сборки'
+WHERE NOT EXISTS (
+    SELECT 1 FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = '2AIR100L6')
+);
+
 
 INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`) VALUES
 ((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = '2AIR100L6')), (SELECT id FROM materials WHERE code = 'STEEL-SHEET-0.5'), 5.1, 2, 2.550, 51.8, 1, 'Сталь для корпуса статора'),
@@ -182,10 +241,15 @@ INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantit
 -- ============================================
 
 -- Паспорт для CAST-SCH20
-INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`) VALUES
-((SELECT id FROM products WHERE article = 'CAST-SCH20'), 100.0, 12, FALSE,
-'Серый чугун СЧ20 - стандартный литейный сплав',
-'Соответствие ГОСТ 1412-85, контроль химического состава и механических свойств');
+INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`)
+SELECT 
+    (SELECT id FROM products WHERE article = 'CAST-SCH20'), 100.0, 12, FALSE, 'Серый чугун СЧ20 - стандартный литейный сплав', TRUE,
+    'Серый чугун СЧ20 - стандартный литейный сплав',
+    'Соответствие ГОСТ 1412-85, контроль химического состава и механических свойств'
+WHERE NOT EXISTS (
+    SELECT 1 FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'CAST-SCH20')
+);
+
 
 INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`) VALUES
 ((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'CAST-SCH20')), (SELECT id FROM materials WHERE code = 'CAST-SCH20'), 100, 2, 100.0, 92.5, 1, 'Основной материал'),
@@ -193,10 +257,15 @@ INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantit
 ((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'CAST-SCH20')), (SELECT id FROM materials WHERE code = 'COKE-FOUNDARY'), 3, 2, 3.0, 2.8, 3, 'Кокс литейный');
 
 -- Паспорт для CAST-SCH25
-INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`) VALUES
-((SELECT id FROM products WHERE article = 'CAST-SCH25'), 100.0, 12, FALSE,
-'Серый чугун СЧ25 - повышенная прочность',
-'Соответствие ГОСТ 1412-85, контроль твердости и микроструктуры');
+INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`)
+SELECT 
+    (SELECT id FROM products WHERE article = 'CAST-SCH25'), 100.0, 12, FALSE, 'Серый чугун СЧ25 - повышенная прочность', TRUE,
+    'Серый чугун СЧ25 - повышенная прочность',
+    'Соответствие ГОСТ 1412-85, контроль твердости и микроструктуры'
+WHERE NOT EXISTS (
+    SELECT 1 FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'CAST-SCH25')
+);
+
 
 INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`) VALUES
 ((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'CAST-SCH25')), (SELECT id FROM materials WHERE code = 'CAST-SCH25'), 100, 2, 100.0, 92.0, 1, 'Основной материал'),
@@ -204,10 +273,15 @@ INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantit
 ((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'CAST-SCH25')), (SELECT id FROM materials WHERE code = 'COKE-FOUNDARY'), 3.5, 2, 3.5, 3.2, 3, 'Кокс литейный');
 
 -- Паспорт для CAST-VCH40
-INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`) VALUES
-((SELECT id FROM products WHERE article = 'CAST-VCH40'), 100.0, 12, FALSE,
-'Высокопрочный чугун ВЧ40 с шаровидным графитом',
-'Соответствие ГОСТ 7293-85, контроль формы графита и механических свойств');
+INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`)
+SELECT 
+    (SELECT id FROM products WHERE article = 'CAST-VCH40'), 100.0, 12, FALSE, 'Высокопрочный чугун ВЧ40 с шаровидным графитом', TRUE,
+    'Высокопрочный чугун ВЧ40 с шаровидным графитом',
+    'Соответствие ГОСТ 7293-85, контроль формы графита и механических свойств'
+WHERE NOT EXISTS (
+    SELECT 1 FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'CAST-VCH40')
+);
+
 
 INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`) VALUES
 ((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'CAST-VCH40')), (SELECT id FROM materials WHERE code = 'CAST-VCH40'), 100, 2, 100.0, 91.5, 1, 'Основной материал'),
@@ -216,10 +290,15 @@ INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantit
 ((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'CAST-VCH40')), (SELECT id FROM materials WHERE code = 'COKE-FOUNDARY'), 3, 2, 3.0, 2.75, 4, 'Кокс литейный');
 
 -- Паспорт для CAST-A5
-INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`) VALUES
-((SELECT id FROM products WHERE article = 'CAST-A5'), 100.0, 12, FALSE,
-'Алюминиевый сплав АК5 - литейный',
-'Соответствие ГОСТ 1583-93, контроль химического состава');
+INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`)
+SELECT 
+    (SELECT id FROM products WHERE article = 'CAST-A5'), 100.0, 12, FALSE, 'Алюминиевый сплав АК5 - литейный', TRUE,
+    'Алюминиевый сплав АК5 - литейный',
+    'Соответствие ГОСТ 1583-93, контроль химического состава'
+WHERE NOT EXISTS (
+    SELECT 1 FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'CAST-A5')
+);
+
 
 INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`) VALUES
 ((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'CAST-A5')), (SELECT id FROM materials WHERE code = 'ALUM-BAR-10'), 95, 2, 95.0, 94.0, 1, 'Алюминий первичный'),
@@ -227,10 +306,15 @@ INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantit
 ((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'CAST-A5')), (SELECT id FROM materials WHERE code = 'REFINER-ALU'), 1, 2, 1.0, 1.0, 3, 'Рафинирующая добавка');
 
 -- Паспорт для CAST-A6
-INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`) VALUES
-((SELECT id FROM products WHERE article = 'CAST-A6'), 100.0, 12, FALSE,
-'Алюминиевый сплав АК6 - литейный',
-'Соответствие ГОСТ 1583-93, контроль химического состава и механических свойств');
+INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`)
+SELECT 
+    (SELECT id FROM products WHERE article = 'CAST-A6'), 100.0, 12, FALSE, 'Алюминиевый сплав АК6 - литейный', TRUE,
+    'Алюминиевый сплав АК6 - литейный',
+    'Соответствие ГОСТ 1583-93, контроль химического состава и механических свойств'
+WHERE NOT EXISTS (
+    SELECT 1 FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'CAST-A6')
+);
+
 
 INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`) VALUES
 ((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'CAST-A6')), (SELECT id FROM materials WHERE code = 'ALUM-BAR-10'), 92, 2, 92.0, 91.0, 1, 'Алюминий первичный'),
@@ -239,10 +323,15 @@ INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantit
 ((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'CAST-A6')), (SELECT id FROM materials WHERE code = 'REFINER-ALU'), 1, 2, 1.0, 1.0, 4, 'Рафинирующая добавка');
 
 -- Паспорт для CAST-AK5M2
-INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`) VALUES
-((SELECT id FROM products WHERE article = 'CAST-AK5M2'), 100.0, 12, FALSE,
-'Алюминиевый сплав АК5М2 - кремнистый с медью',
-'Соответствие ГОСТ 1583-93, контроль химического состава');
+INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`)
+SELECT 
+    (SELECT id FROM products WHERE article = 'CAST-AK5M2'), 100.0, 12, FALSE, 'Алюминиевый сплав АК5М2 - кремнистый с медью', TRUE,
+    'Алюминиевый сплав АК5М2 - кремнистый с медью',
+    'Соответствие ГОСТ 1583-93, контроль химического состава'
+WHERE NOT EXISTS (
+    SELECT 1 FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'CAST-AK5M2')
+);
+
 
 INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`) VALUES
 ((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'CAST-AK5M2')), (SELECT id FROM materials WHERE code = 'ALUM-BAR-10'), 90, 2, 90.0, 89.0, 1, 'Алюминий первичный'),
@@ -252,10 +341,15 @@ INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantit
 ((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'CAST-AK5M2')), (SELECT id FROM materials WHERE code = 'REFINER-ALU'), 2.5, 2, 2.5, 2.5, 5, 'Рафинирующая добавка');
 
 -- Паспорт для CAST-AK7
-INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`) VALUES
-((SELECT id FROM products WHERE article = 'CAST-AK7'), 100.0, 12, FALSE,
-'Алюминиевый сплав АК7 - силумин',
-'Соответствие ГОСТ 1583-93, хорошие литейные свойства');
+INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`)
+SELECT 
+    (SELECT id FROM products WHERE article = 'CAST-AK7'), 100.0, 12, FALSE, 'Алюминиевый сплав АК7 - силумин', TRUE,
+    'Алюминиевый сплав АК7 - силумин',
+    'Соответствие ГОСТ 1583-93, хорошие литейные свойства'
+WHERE NOT EXISTS (
+    SELECT 1 FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'CAST-AK7')
+);
+
 
 INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`) VALUES
 ((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'CAST-AK7')), (SELECT id FROM materials WHERE code = 'ALUM-BAR-10'), 93, 2, 93.0, 92.5, 1, 'Алюминий первичный'),
@@ -263,10 +357,15 @@ INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantit
 ((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'CAST-AK7')), (SELECT id FROM materials WHERE code = 'REFINER-ALU'), 0.5, 2, 0.5, 0.5, 3, 'Рафинирующая добавка');
 
 -- Паспорт для CAST-AK9
-INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`) VALUES
-((SELECT id FROM products WHERE article = 'CAST-AK9'), 100.0, 12, FALSE,
-'Алюминиевый сплав АК9 - высококремнистый',
-'Соответствие ГОСТ 1583-93, отличные литейные свойства');
+INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`)
+SELECT 
+    (SELECT id FROM products WHERE article = 'CAST-AK9'), 100.0, 12, FALSE, 'Алюминиевый сплав АК9 - высококремнистый', TRUE,
+    'Алюминиевый сплав АК9 - высококремнистый',
+    'Соответствие ГОСТ 1583-93, отличные литейные свойства'
+WHERE NOT EXISTS (
+    SELECT 1 FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'CAST-AK9')
+);
+
 
 INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`) VALUES
 ((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'CAST-AK9')), (SELECT id FROM materials WHERE code = 'ALUM-BAR-10'), 91, 2, 91.0, 90.5, 1, 'Алюминий первичный'),
@@ -274,10 +373,15 @@ INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantit
 ((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'CAST-AK9')), (SELECT id FROM materials WHERE code = 'REFINER-ALU'), 0.5, 2, 0.5, 0.5, 3, 'Рафинирующая добавка');
 
 -- Паспорт для CAST-AV87
-INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`) VALUES
-((SELECT id FROM products WHERE article = 'CAST-AV87'), 100.0, 12, FALSE,
-'Алюминиевый сплав АВ87 - антифрикционный',
-'Соответствие ГОСТ 1412-85, специальные свойства');
+INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`)
+SELECT 
+    (SELECT id FROM products WHERE article = 'CAST-AV87'), 100.0, 12, FALSE, 'Алюминиевый сплав АВ87 - антифрикционный', TRUE,
+    'Алюминиевый сплав АВ87 - антифрикционный',
+    'Соответствие ГОСТ 1412-85, специальные свойства'
+WHERE NOT EXISTS (
+    SELECT 1 FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'CAST-AV87')
+);
+
 
 INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`) VALUES
 ((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'CAST-AV87')), (SELECT id FROM materials WHERE code = 'ALUM-BAR-10'), 87, 2, 87.0, 86.5, 1, 'Алюминий первичный'),
@@ -286,10 +390,15 @@ INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantit
 ((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'CAST-AV87')), (SELECT id FROM materials WHERE code = 'REFINER-ALU'), 1.5, 2, 1.5, 1.5, 4, 'Рафинирующая добавка');
 
 -- Паспорт для CAST-AK12
-INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`) VALUES
-((SELECT id FROM products WHERE article = 'CAST-AK12'), 100.0, 12, FALSE,
-'Алюминиевый сплав АК12 - эвтектический силумин',
-'Соответствие ГОСТ 1583-93, отличная жидкотекучесть');
+INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`)
+SELECT 
+    (SELECT id FROM products WHERE article = 'CAST-AK12'), 100.0, 12, FALSE, 'Алюминиевый сплав АК12 - эвтектический силумин', TRUE,
+    'Алюминиевый сплав АК12 - эвтектический силумин',
+    'Соответствие ГОСТ 1583-93, отличная жидкотекучесть'
+WHERE NOT EXISTS (
+    SELECT 1 FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'CAST-AK12')
+);
+
 
 INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`) VALUES
 ((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'CAST-AK12')), (SELECT id FROM materials WHERE code = 'ALUM-BAR-10'), 88, 2, 88.0, 87.5, 1, 'Алюминий первичный'),
@@ -301,10 +410,15 @@ INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantit
 -- ============================================
 
 -- Паспорт для АИВР80
-INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`) VALUES
-((SELECT id FROM products WHERE article = 'АИВР80'), 18.0, 18, TRUE,
-'Взрывозащищенный двигатель АИВР80',
-'Соответствие ГОСТ Р МЭК 60079, сертификат взрывозащиты Ex d IIB T4');
+INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`)
+SELECT 
+    (SELECT id FROM products WHERE article = 'АИВР80'), 18.0, 18, TRUE,
+    'Взрывозащищенный двигатель АИВР80',
+    'Соответствие ГОСТ Р МЭК 60079, сертификат взрывозащиты Ex d IIB T4'
+WHERE NOT EXISTS (
+    SELECT 1 FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'АИВР80')
+);
+
 
 INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`) VALUES
 ((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'АИВР80')), (SELECT id FROM materials WHERE code = 'STEEL-SHEET-0.5'), 3.2, 2, 1.600, 48.5, 1, 'Сталь для корпуса статора'),
@@ -316,10 +430,15 @@ INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantit
 ((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'АИВР80')), (SELECT id FROM materials WHERE code = 'SEAL-RUBBER'), 0.15, 2, 0.075, 2.27, 7, 'Уплотнения взрывозащиты');
 
 -- Паспорт для АИВР90L
-INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`) VALUES
-((SELECT id FROM products WHERE article = 'АИВР90L'), 26.0, 18, TRUE,
-'Взрывозащищенный двигатель АИВР90L',
-'Соответствие ГОСТ Р МЭК 60079, сертификат взрывозащиты Ex d IIB T4');
+INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`)
+SELECT 
+    (SELECT id FROM products WHERE article = 'АИВР90L'), 26.0, 18, TRUE,
+    'Взрывозащищенный двигатель АИВР90L',
+    'Соответствие ГОСТ Р МЭК 60079, сертификат взрывозащиты Ex d IIB T4'
+WHERE NOT EXISTS (
+    SELECT 1 FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'АИВР90L')
+);
+
 
 INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`) VALUES
 ((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'АИВР90L')), (SELECT id FROM materials WHERE code = 'STEEL-SHEET-0.5'), 4.5, 2, 2.250, 48.9, 1, 'Сталь для корпуса статора'),

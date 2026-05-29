@@ -132,7 +132,7 @@ INSERT INTO `order_items` (`order_id`, `product_id`, `quantity`, `price`, `total
 (4, @p_AIR80А4, 15, 353.85, 5307.75, 'packed'),
 (4, @p_AIR80В4, 10, 355.25, 3552.50, 'packed'),
 (4, @p_AIR90L6, 5, 588.70, 2943.50, 'packed'),
-(4, @p_EKCH-145, 100, 45.00, 4500.00, 'packed');
+(4, @p_EKCH_145, 100, 45.00, 4500.00, 'packed');
 
 -- Заказ ORD-2025-005 (отгруженный)
 INSERT INTO `order_items` (`order_id`, `product_id`, `quantity`, `price`, `total`, `production_status`) VALUES
@@ -165,7 +165,7 @@ INSERT INTO `order_items` (`order_id`, `product_id`, `quantity`, `price`, `total
 (8, @p_AIR71В6, 8, 291.60, 2332.80, 'in_progress'),
 (8, @p_AIR80А6, 6, 392.93, 2357.58, 'completed'),
 (8, @p_AIR80В6, 5, 394.29, 1971.45, 'packed'),
-(8, @p_EKCH-145, 50, 45.00, 2250.00, 'packed');
+(8, @p_EKCH_145, 50, 45.00, 2250.00, 'packed');
 
 -- Заказ ORD-2025-009 (отмененный)
 INSERT INTO `order_items` (`order_id`, `product_id`, `quantity`, `price`, `total`, `production_status`) VALUES
@@ -211,7 +211,7 @@ INSERT INTO `production_tasks` (`task_number`, `order_id`, `order_item_id`, `pro
 ('TASK-2025-014', 4, 14, @p_AIR80А4, NULL, 15, 'completed', 'normal', '2025-01-06', '2025-01-20', '2025-01-06 08:00:00', '2025-01-20 17:00:00', 3, 6, 'Yпаковано'),
 ('TASK-2025-015', 4, 15, @p_AIR80В4, NULL, 10, 'completed', 'normal', '2025-01-07', '2025-01-22', '2025-01-07 08:00:00', '2025-01-22 17:00:00', 4, 6, 'Yпаковано'),
 ('TASK-2025-016', 4, 16, @p_AIR90L6, NULL, 5, 'completed', 'normal', '2025-01-08', '2025-01-25', '2025-01-08 08:00:00', '2025-01-25 17:00:00', 3, 6, 'Yпаковано'),
-('TASK-2025-017', 4, 17, @p_EKCH-145, NULL, 100, 'completed', 'low', '2025-01-06', '2025-01-15', '2025-01-06 08:00:00', '2025-01-15 17:00:00', 4, 6, 'Yпаковано');
+('TASK-2025-017', 4, 17, @p_EKCH_145, NULL, 100, 'completed', 'low', '2025-01-06', '2025-01-15', '2025-01-06 08:00:00', '2025-01-15 17:00:00', 4, 6, 'Yпаковано');
 
 -- Задания для заказа ORD-2025-005
 INSERT INTO `production_tasks` (`task_number`, `order_id`, `order_item_id`, `product_id`, `route_card_id`, `quantity_plan`, `status`, `priority`, `start_date`, `end_date`, `planned_start`, `planned_end`, `responsible_id`, `worker_id`, `notes`) VALUES
@@ -244,7 +244,7 @@ INSERT INTO `production_tasks` (`task_number`, `order_id`, `order_item_id`, `pro
 ('TASK-2025-035', 8, 35, @p_AIR71В6, NULL, 8, 'in_progress', 'normal', '2025-01-14', '2025-02-03', '2025-01-14 08:00:00', '2025-02-03 17:00:00', 4, 6, NULL),
 ('TASK-2025-036', 8, 36, @p_AIR80А6, NULL, 6, 'completed', 'normal', '2025-01-13', '2025-01-28', '2025-01-13 08:00:00', '2025-01-28 17:00:00', 3, 6, 'Готово'),
 ('TASK-2025-037', 8, 37, @p_AIR80В6, NULL, 5, 'completed', 'normal', '2025-01-14', '2025-01-29', '2025-01-14 08:00:00', '2025-01-29 17:00:00', 4, 6, 'Yпаковано'),
-('TASK-2025-038', 8, 38, @p_EKCH-145, NULL, 50, 'completed', 'low', '2025-01-13', '2025-01-25', '2025-01-13 08:00:00', '2025-01-25 17:00:00', 3, 6, 'Yпаковано');
+('TASK-2025-038', 8, 38, @p_EKCH_145, NULL, 50, 'completed', 'low', '2025-01-13', '2025-01-25', '2025-01-13 08:00:00', '2025-01-25 17:00:00', 3, 6, 'Yпаковано');
 
 -- Задания для заказа ORD-2025-009 (отменен)
 INSERT INTO `production_tasks` (`task_number`, `order_id`, `order_item_id`, `product_id`, `route_card_id`, `quantity_plan`, `status`, `priority`, `start_date`, `end_date`, `planned_start`, `planned_end`, `responsible_id`, `worker_id`, `notes`) VALUES

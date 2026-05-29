@@ -340,7 +340,7 @@ if (!empty($orders)) {
 
     // 0. Загружаем материалы для всех продуктов из паспортов (для кэша)
     $sqlProductMaterials = "SELECT 
-                                ppm.product_id,
+                                pp.product_id,
                                 m.id as material_id,
                                 m.name_full as material_name,
                                 m.code as material_article,
@@ -349,10 +349,9 @@ if (!empty($orders)) {
                                 COALESCE(m.last_price, 0) as last_price
                             FROM product_passport_materials ppm
                             JOIN materials m ON ppm.material_id = m.id
-                            WHERE ppm.passport_id IN (
-                                SELECT id FROM product_passports WHERE product_id IN ($orderIdsPlaceholder)
-                            )
-                            ORDER BY ppm.product_id, ppm.sort_order";
+                            JOIN product_passports pp ON ppm.passport_id = pp.id
+                            WHERE pp.product_id IN ($orderIdsPlaceholder)
+                            ORDER BY pp.product_id, ppm.sort_order";
     $stmtProductMaterials = $pdo->prepare($sqlProductMaterials);
     $stmtProductMaterials->execute($orderIds);
     $resProductMaterials = $stmtProductMaterials->fetchAll();

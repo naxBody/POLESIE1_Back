@@ -1,1 +1,1 @@
-Nothing should be ignored based on the provided file changes. The modified file 'polesie/includes/sidebar.php' is a source code file that should not be added to .gitignore.
+Nothing should be ignored based on the provided file changes. The only modified file is a PHP source code file (`polesie/modules/production/execute.php`), which should not be added to .gitignore.

@@ -509,13 +509,14 @@ $totalProducts = count($passports);
                                             $matStmt = $pdo->prepare("
                                                 SELECT 
                                                     ppm.quantity,
-                                                    ppm.unit,
+                                                    bu.name as unit,
                                                     m.code as material_code,
                                                     m.name_full as material_name,
                                                     mc.name as material_category
                                                 FROM product_passport_materials ppm
                                                 JOIN materials m ON ppm.material_id = m.id
                                                 LEFT JOIN material_categories mc ON m.category_id = mc.id
+                                                LEFT JOIN base_units bu ON ppm.unit_id = bu.id
                                                 WHERE ppm.passport_id = :passport_id
                                                 ORDER BY ppm.sort_order, m.name_full
                                             ");

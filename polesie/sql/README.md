@@ -27,10 +27,11 @@
 
 ```
 sql/
-├── database_updated.sql   # Основная схема БД + тестовые данные (заказы, задания)
-├── insert_orders.sql      # Отдельный файл с заказами и производственными заданиями
-├── matrials_info.php      # Скрипт для получения информации о материалах
-└── product_info.php       # Скрипт для получения информации о продукции
+├── database_updated.sql        # Основная схема БД + тестовые данные
+├── create_employees_table.sql  # Таблица сотрудников с тестовыми данными
+├── insert_orders.sql           # Отдельный файл с заказами и производственными заданиями
+├── matrials_info.php           # Скрипт для получения информации о материалах
+└── product_info.php            # Скрипт для получения информации о продукции
 ```
 
 ### Как использовать:
@@ -40,14 +41,19 @@ sql/
 mysql -u root -p polesie_production < database_updated.sql
 ```
 
-2. **Или отдельно добавить заказы в существующую базу:**
+2. **Добавить таблицу сотрудников:**
+```bash
+mysql -u root -p polesie_production < create_employees_table.sql
+```
+
+3. **Или отдельно добавить заказы в существующую базу:**
 ```bash
 mysql -u root -p polesie_production < insert_orders.sql
 ```
 
 ---
 
-## 🗃️ Структура базы данных (17 таблиц)
+## 🗃️ Структура базы данных (18 таблиц)
 
 ### Справочники (6 таблиц)
 1. **order_statuses** - Статусы заказов
@@ -57,26 +63,27 @@ mysql -u root -p polesie_production < insert_orders.sql
 5. **quality_check_types** - Типы проверок качества
 6. **user_roles** - Роли пользователей
 
-### Основные таблицы (11 таблиц)
+### Основные таблицы (12 таблиц)
 7. **users** - Пользователи системы
-8. **contractors** - Контрагенты (заказчики, поставщики)
-9. **products** - Продукция (каталог изделий)
-10. **orders** - Заказы
-11. **order_items** - Позиции заказа
-12. **production_orders** - Производственные задания (объединённая)
-13. **quality_checks** - Контроль качества (упрощённая)
-14. **warehouse_materials** - Склад материалов и сырья
-15. **warehouse_products** - Готовая продукция на складе
-16. **system_settings** - Настройки системы
+8. **employees** - Сотрудники предприятия ⭐ НОВОЕ
+9. **contractors** - Контрагенты (заказчики, поставщики)
+10. **products** - Продукция (каталог изделий)
+11. **orders** - Заказы
+12. **order_items** - Позиции заказа
+13. **production_orders** - Производственные задания (объединённая)
+14. **quality_checks** - Контроль качества (упрощённая)
+15. **warehouse_materials** - Склад материалов и сырья
+16. **warehouse_products** - Готовая продукция на складе
+17. **system_settings** - Настройки системы
 
 ### Таблицы серийных номеров и документов (3 таблицы)
-17. **product_serial_numbers** - Серийные номера готовой продукции
-18. **passport_dynamic_data** - Динамические данные паспорта изделия
-19. **product_passport_versions** - Версии паспортов (история изменений)
-20. **product_documents** - Прикреплённые документы
-21. **passport_templates** - Шаблоны разделов паспорта
+18. **product_serial_numbers** - Серийные номера готовой продукции
+19. **passport_dynamic_data** - Динамические данные паспорта изделия
+20. **product_passport_versions** - Версии паспортов (история изменений)
+21. **product_documents** - Прикреплённые документы
+22. **passport_templates** - Шаблоны разделов паспорта
 
-*Итого: 17 основных таблиц*
+*Итого: 18 основных таблиц*
 
 ---
 
@@ -103,10 +110,13 @@ mysql -u root -p polesie_production < database_updated.sql
 ```sql
 USE polesie_production;
 SHOW TABLES;
--- Должно быть 17 таблиц
+-- Должно быть 18 таблиц (включая employees)
 
 SELECT COUNT(*) FROM users;
 -- Должно быть 7 пользователей
+
+SELECT COUNT(*) FROM employees;
+-- Должно быть 15 сотрудников
 
 SELECT COUNT(*) FROM products;
 -- Должно быть 12 товаров

@@ -1256,11 +1256,6 @@ if ($filterCategory !== '') {
             <div class="product-modal-body" id="modalProductBody" style="background: #f9fafb;">
                 <!-- Контент будет заполнен через JS -->
             </div>
-            <div class="product-modal-footer" style="display: flex; justify-content: flex-end; gap: 12px; padding: 16px 24px; background: white; border-top: 1px solid #e5e7eb;">
-                <button id="btnPrintPassport" onclick="printPassport()" style="background: var(--primary-color); border: none; color: white; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500;" title="Распечатать паспорт изделия">
-                    🖨️ Распечатать паспорт
-                </button>
-            </div>
         </div>
     </div>
 
@@ -1659,9 +1654,12 @@ if ($filterCategory !== '') {
                 html += '</div>';
             }
             
-            // === ДОКУМЕНТЫ ===
+            // === ПАСПОРТ ===
             html += '<div class="passport-section" style="background: white; padding: 16px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 16px;">';
-            html += '<div class="passport-section-title" style="font-size: 14px; font-weight: 600; color: #2563eb; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px solid #e5e7eb;">📄 Документы</div>';
+            html += '<div class="passport-section-title" style="font-size: 14px; font-weight: 600; color: #2563eb; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px solid #e5e7eb; display: flex; justify-content: space-between; align-items: center;">';
+            html += '<span>📄 Паспорт</span>';
+            html += '<button id="btnPrintPassportModal" onclick="printPassport()" style="background: var(--primary-color); border: none; color: white; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 500;" title="Сформировать паспорт изделия">📄 Сформировать паспорт</button>';
+            html += '</div>';
             html += '<div class="document-list" id="modalDocumentsList">';
             html += '<div style="text-align: center; padding: 20px; color: #6b7280;">Документы не прикреплены</div>';
             html += '</div>';

@@ -569,7 +569,10 @@ error_log("Всего категорий продукции: " . count($categori
                 }
                 html += '</ul>';
             } else {
-                html += '<p style="color: #999; font-style: italic;">Документы отсутствуют</p>';
+                // Если документов нет, показываем только кнопку
+                html += '<button type="button" class="btn-print-passport-single" onclick="printProductPassport(' + productId + ')" style="width: 100%; padding: 12px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);">';
+                html += '📄 Сформировать паспорт';
+                html += '</button>';
             }
             html += '</div>';
             

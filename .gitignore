@@ -20,7 +20,6 @@ target/
 .gradle/
 .mypy_cache/
 .pytest_cache/
-.julia/
 
 # Logs and temp files
 *.log

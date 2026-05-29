@@ -241,6 +241,17 @@ require_once BASE_PATH . '/includes/topbar.php';
     border-color: var(--danger-color);
 }
 
+/* Table action buttons - larger icons */
+.data-table .btn-icon {
+    width: 40px;
+    height: 40px;
+}
+
+.data-table .btn-icon svg {
+    width: 20px;
+    height: 20px;
+}
+
 /* Empty State */
 .empty-state {
     text-align: center;

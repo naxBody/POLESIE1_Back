@@ -1656,12 +1656,12 @@ if ($filterCategory !== '') {
             
             // === ПАСПОРТ ===
             html += '<div class="passport-section" style="background: white; padding: 16px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 16px;">';
-            html += '<div class="passport-section-title" style="font-size: 14px; font-weight: 600; color: #2563eb; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px solid #e5e7eb; display: flex; justify-content: space-between; align-items: center;">';
-            html += '<span>📄 Паспорт</span>';
-            html += '<button id="btnPrintPassportModal" onclick="printPassport()" style="background: var(--primary-color); border: none; color: white; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 500;" title="Сформировать паспорт изделия">📄 Сформировать паспорт</button>';
-            html += '</div>';
+            html += '<div class="passport-section-title" style="font-size: 14px; font-weight: 600; color: #2563eb; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px solid #e5e7eb;">📄 Паспорт</div>';
             html += '<div class="document-list" id="modalDocumentsList">';
-            html += '<div style="text-align: center; padding: 20px; color: #6b7280;">Документы не прикреплены</div>';
+            html += '<div style="text-align: center; padding: 30px 20px;">';
+            html += '<button onclick="printPassport()" style="background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); border: none; color: white; padding: 14px 28px; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 600; display: inline-flex; align-items: center; gap: 10px; box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3); transition: all 0.3s ease;" onmouseover="this.style.transform=\'translateY(-2px)\'; this.style.boxShadow=\'0 6px 20px rgba(37, 99, 235, 0.4)\'" onmouseout="this.style.transform=\'translateY(0)\'; this.style.boxShadow=\'0 4px 14px rgba(37, 99, 235, 0.3)\'">📄 Сформировать паспорт</button>';
+            html += '<div style="margin-top: 12px; font-size: 13px; color: #9ca3af;">Документы отсутствуют</div>';
+            html += '</div>';
             html += '</div>';
             html += '</div>';
             
@@ -1742,7 +1742,7 @@ if ($filterCategory !== '') {
             
             // Обновляем документы - показываем реальные данные или пустой список
             if (data.documents && data.documents.length > 0) {
-                var docsHtml = '';
+                var docsHtml = '<button onclick="printPassport()" style="background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); border: none; color: white; padding: 14px 28px; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 600; display: inline-flex; align-items: center; gap: 10px; box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3); transition: all 0.3s ease; margin-bottom: 20px;" onmouseover="this.style.transform=\'translateY(-2px)\'; this.style.boxShadow=\'0 6px 20px rgba(37, 99, 235, 0.4)\'" onmouseout="this.style.transform=\'translateY(0)\'; this.style.boxShadow=\'0 4px 14px rgba(37, 99, 235, 0.3)\'">📄 Сформировать паспорт</button>';
                 data.documents.forEach(function(doc) {
                     var icon = '📄';
                     if (doc.document_type === 'manual') icon = '📖';
@@ -1767,7 +1767,7 @@ if ($filterCategory !== '') {
             } else {
                 var docsList = document.getElementById('modalDocumentsList');
                 if (docsList) {
-                    docsList.innerHTML = '<div style="text-align: center; padding: 20px; color: #9ca3af;">Документы не прикреплены</div>';
+                    docsList.innerHTML = '<div style="text-align: center; padding: 30px 20px;"><button onclick="printPassport()" style="background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); border: none; color: white; padding: 14px 28px; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 600; display: inline-flex; align-items: center; gap: 10px; box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3); transition: all 0.3s ease;" onmouseover="this.style.transform=\'translateY(-2px)\'; this.style.boxShadow=\'0 6px 20px rgba(37, 99, 235, 0.4)\'" onmouseout="this.style.transform=\'translateY(0)\'; this.style.boxShadow=\'0 4px 14px rgba(37, 99, 235, 0.3)\'">📄 Сформировать паспорт</button><div style="margin-top: 12px; font-size: 13px; color: #9ca3af;">Документы отсутствуют</div></div>';
                 }
             }
             

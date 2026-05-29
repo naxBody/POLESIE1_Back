@@ -1383,7 +1383,7 @@ $availableCombinationsJson = json_encode($availableCombinations, JSON_UNESCAPED_
                     <th>Стандарт</th>
                     <th>Ед.</th>
                     <th>На складе</th>
-                    <th>Цена за ед.</th>
+                    <th>Цена, BYN</th>
                     <th>Статус</th>
                 </tr>
             </thead>
@@ -1405,12 +1405,11 @@ $availableCombinationsJson = json_encode($availableCombinations, JSON_UNESCAPED_
                         }
                     }
                     
-                    // Форматирование цены за единицу
+                    // Форматирование цены за единицу (только цифра)
                     $priceText = '—';
                     if (isset($material['price_per_unit']) && $material['price_per_unit'] !== null) {
                         $price = floatval($material['price_per_unit']);
-                        $currency = $material['price_currency'] ?? 'BYN';
-                        $priceText = number_format($price, 2, ',', ' ') . ' ' . $currency;
+                        $priceText = number_format($price, 2, ',', ' ');
                     }
                     ?>
                     <tr onclick="openMaterialModal(<?= htmlspecialchars(json_encode($material), ENT_QUOTES, 'UTF-8') ?>)" style="cursor: pointer;">

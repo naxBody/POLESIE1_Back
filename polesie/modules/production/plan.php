@@ -409,7 +409,8 @@ if (!empty($orders)) {
             $sqlMat = "SELECT m.name_full as material_name, m.code as material_article, 
                               ptm.quantity_required as required_qty, 
                               COALESCE(m.current_stock, 0) as available_qty,
-                              mu.symbol as unit_name
+                              mu.symbol as unit_name,
+                              COALESCE(m.last_price, 0) as price_per_unit
                        FROM production_tasks_materials ptm
                        JOIN materials m ON ptm.material_id = m.id
                        LEFT JOIN base_units mu ON m.base_unit_id = mu.id
@@ -426,7 +427,8 @@ if (!empty($orders)) {
                                           'шт.' as unit_name,
                                           m.name_full as material_name, 
                                           m.code as material_article,
-                                          COALESCE(m.current_stock, 0) as available_qty
+                                          COALESCE(m.current_stock, 0) as available_qty,
+                                          COALESCE(m.last_price, 0) as price_per_unit
                                    FROM product_passport_materials ppm
                                    JOIN materials m ON ppm.material_id = m.id
                                    WHERE ppm.passport_id IN (
@@ -439,10 +441,11 @@ if (!empty($orders)) {
                 
                 // Добавляем информацию о складе для материалов из паспорта
                 foreach ($resMat as &$matRow) {
-                    if (empty($matRow['unit_name']) && !empty($matRow['unit_name'])) {
-                        // unit_name уже есть
-                    } else {
-                        $matRow['unit_name'] = $matRow['unit_name'] ?? 'шт.';
+                    if (empty($matRow['unit_name'])) {
+                        $matRow['unit_name'] = 'шт.';
+                    }
+                    if (!isset($matRow['price_per_unit'])) {
+                        $matRow['price_per_unit'] = 0;
                     }
                 }
                 unset($matRow);
@@ -1078,14 +1081,20 @@ foreach ($ordersData as $oid => $data) {
                     
                     // Материалы
                     if (task.materials && task.materials.length > 0) {
+                        var totalMaterialsCost = 0;
+                        
                         html += '<div style="margin-bottom: 16px;">';
                         html += '<h5 style="margin-bottom: 10px; font-size: 13px; color: #2c3e50; font-weight: 600;">📦 Материалы для задания:</h5>';
                         html += '<table class="materials-table">';
-                        html += '<thead><tr><th>Материал</th><th>Артикул</th><th style="text-align: center;">Требуется</th><th style="text-align: center;">На складе</th><th>Статус</th></tr></thead>';
+                        html += '<thead><tr><th>Материал</th><th>Артикул</th><th style="text-align: center;">Требуется</th><th style="text-align: center;">На складе</th><th style="text-align: right;">Цена</th><th style="text-align: right;">Сумма</th><th>Статус</th></tr></thead>';
                         html += '<tbody>';
                         task.materials.forEach(function(mat) {
                             var isSufficient = mat.available_qty >= mat.required_qty;
                             var unit = mat.unit_name || 'шт.';
+                            var pricePerUnit = mat.price_per_unit || 0;
+                            var totalCost = mat.required_qty * pricePerUnit;
+                            totalMaterialsCost += totalCost;
+                            
                             var statusHtml = isSufficient 
                                 ? '<span class="badge badge-success"><span class="material-status-indicator sufficient"></span>Хватает</span>'
                                 : '<span class="badge badge-danger"><span class="material-status-indicator insufficient"></span>Не хватает (' + (mat.required_qty - mat.available_qty) + ' ' + unit + ')</span>';
@@ -1094,11 +1103,19 @@ foreach ($ordersData as $oid => $data) {
                             html += '<td><code style="background: #f8f9fa; padding: 2px 6px; border-radius: 4px; font-size: 11px;">' + escapeHtml(mat.material_article) + '</code></td>';
                             html += '<td style="text-align: center;">' + mat.required_qty + ' ' + unit + '</td>';
                             html += '<td style="text-align: center;">' + mat.available_qty + ' ' + unit + '</td>';
+                            html += '<td style="text-align: right;">' + formatMoney(pricePerUnit) + '</td>';
+                            html += '<td style="text-align: right;"><strong>' + formatMoney(totalCost) + '</strong></td>';
                             html += '<td>' + statusHtml + '</td>';
                             html += '</tr>';
                         });
-                        html += '</tbody></table>';
-                        html += '</div>';
+                        html += '</tbody>';
+                        html += '<tfoot>';
+                        html += '<tr style="background: #f8f9fa; font-weight: 700;">';
+                        html += '<td colspan="5" style="text-align: right; padding: 12px;">Итого материалы:</td>';
+                        html += '<td colspan="2" style="text-align: right; padding: 12px; color: #2c3e50;">' + formatMoney(totalMaterialsCost) + '</td>';
+                        html += '</tr>';
+                        html += '</tfoot>';
+                        html += '</table></div>';
                     }
                     
                     // Этапы производства - Timeline

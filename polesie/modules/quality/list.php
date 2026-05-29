@@ -143,7 +143,7 @@ $inspections = $stmt->fetchAll();
                         <td><?= $i['inspection_date'] ? date('d.m.Y H:i', strtotime($i['inspection_date'])) : '—' ?></td>
                         <td>
                             <?php if (!$i['is_inspected'] && hasPermission('quality.create')): ?>
-                                <a href="create.php?task=<?= (int)$i['task_id'] ?>" class="btn btn-success" title="Проверить">
+                                <a href="index.php?m=quality&a=create&task=<?= (int)$i['task_id'] ?>" class="btn btn-success" title="Проверить">
                                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="vertical-align: middle; margin-right: 6px;">
                                         <path d="M12 2L3 7V12C3 17.52 6.84 22.74 12 24C17.16 22.74 21 17.52 21 12V7L12 2Z" fill="#66BB6A" stroke="#4CAF50" stroke-width="1.5"/>
                                         <path d="M9 12L11 14L15 10" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>

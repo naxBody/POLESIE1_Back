@@ -383,8 +383,8 @@ try {
                     </div>
                     <div class="form-group">
                         <label>Поставщик *</label>
-                        <select id="supplier">
-                            <option value="">Выберите поставщика</option>
+                        <select id="supplier" disabled>
+                            <option value="">Загрузка...</option>
                         </select>
                     </div>
                     <div class="form-group">
@@ -512,7 +512,7 @@ try {
             document.getElementById('btnPost').style.display = 'none';
             document.getElementById('documentModal').classList.add('active');
             
-            // Загружаем справочники если еще не загружены
+            // Загружаем справочники сразу при открытии окна
             loadFormDataIfNeeded();
         }
         
@@ -527,21 +527,34 @@ try {
                         formData = data.data;
                         formInitialized = true;
                         
-                        // Заполняем селекты
+                        // Заполняем селекты поставщиков
                         const supplierSelect = document.getElementById('supplier');
-                        supplierSelect.innerHTML = '<option value="">Выберите поставщика</option>' +
-                            formData.suppliers.map(s => 
-                                `<option value="${s.id}">${escapeHtml(s.name)}</option>`
-                            ).join('');
+                        supplierSelect.disabled = false;
+                        if (formData.suppliers && formData.suppliers.length > 0) {
+                            supplierSelect.innerHTML = '<option value="">Выберите поставщика</option>' +
+                                formData.suppliers.map(s => 
+                                    `<option value="${s.id}">${escapeHtml(s.name)}</option>`
+                                ).join('');
+                        } else {
+                            supplierSelect.innerHTML = '<option value="">Нет поставщиков (добавьте в справочнике)</option>';
+                        }
                         
                         // Обновляем таблицу материалов если она открыта
                         if (currentItems.length > 0) {
                             renderItemsTable();
                         }
+                    } else {
+                        console.error('Ошибка получения данных формы:', data.error);
+                        const supplierSelect = document.getElementById('supplier');
+                        supplierSelect.disabled = false;
+                        supplierSelect.innerHTML = '<option value="">Ошибка загрузки</option>';
                     }
                 })
                 .catch(err => {
                     console.error('Ошибка загрузки данных формы:', err);
+                    const supplierSelect = document.getElementById('supplier');
+                    supplierSelect.disabled = false;
+                    supplierSelect.innerHTML = '<option value="">Ошибка загрузки</option>';
                 });
         }
         
@@ -549,8 +562,20 @@ try {
         function addMaterialRow(material = null) {
             // Проверяем, загружены ли данные формы
             if (!formData.materials || formData.materials.length === 0) {
-                alert('Справочник материалов еще не загружен. Пожалуйста, подождите...');
-                loadFormDataIfNeeded();
+                // Если данные еще не загружены, пробуем загрузить
+                if (!formInitialized) {
+                    loadFormDataIfNeeded();
+                    // Ждем загрузки и повторяем попытку
+                    setTimeout(() => {
+                        if (formData.materials && formData.materials.length > 0) {
+                            addMaterialRow(material);
+                        } else {
+                            alert('Справочник материалов пуст или не загружен. Пожалуйста, добавьте материалы в систему.');
+                        }
+                    }, 1000);
+                } else {
+                    alert('Справочник материалов пуст. Добавьте хотя бы один материал в систему.');
+                }
                 return;
             }
             

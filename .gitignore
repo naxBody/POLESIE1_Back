@@ -1,1 +1,48 @@
-Nothing should be ignored since only a SQL source file was modified and no build artifacts, dependencies, or temporary files are present in the changes.
+```
+# Compiled and build artifacts
+*.pyc
+__pycache__/
+*.o
+*.obj
+dist/
+build/
+target/
+# Dependencies
+.venv/
+venv/
+node_modules/
+.julia/
+.zig-cache/
+# Logs and temp files
+*.log
+*.tmp
+*.swp
+# Environment
+.env
+.env.local
+*.env.*
+# Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+# Coverage reports
+coverage/
+htmlcov/
+.coverage
+# Python specific
+*.pyc
+__pycache__/
+*.pyo
+*.pyd
+.Python
+*.so
+*.egg-info/
+# MyPy cache
+.mypy_cache/
+# Pytest cache
+.pytest_cache/
+# OS generated files
+.DS_Store
+Thumbs.db
+```

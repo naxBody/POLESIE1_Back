@@ -1,7 +1,12 @@
 ```
-# SQL related
-*.sql.bak
-*.sql~
+# Compiled and build artifacts
+*.pyc
+__pycache__/
+
+# Dependencies
+.venv/
+venv/
+node_modules/
 
 # Logs and temp files
 *.log
@@ -11,62 +16,14 @@
 # Environment
 .env
 .env.local
-.env.*
+*.env.*
 
 # Editors
 .vscode/
 .idea/
 
-# Python
-__pycache__/
-*.pyc
-*.pyo
-*.pyd
-.Python
-*.so
-.Python
-*.py[cod]
-*$py.class
-*$pyc.class
-*$pyo.class
-*.sqlite3
-*.db
-*.db-journal
-
-# Build and distribution artifacts
+# Build directories
 dist/
 build/
-*.egg-info/
-.eggs/
-.coverage
-htmlcov/
-.coverage.*
-.nyc_output/
-coverage-final.json
-
-# Virtual environments
-venv/
-.venv/
-env/
-ENV/
-.ENV/
-.envrc
-
-# IDE specific
-.vscode/
-.idea/
-*.swp
-*.swo
-*~
-.DS_Store
-Thumbs.db
-
-# Testing
-.pytest_cache/
-.mypy_cache/
-.hypothesis/
-
-# System
-.DS_Store
-Thumbs.db
+target/
 ```

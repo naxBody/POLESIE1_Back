@@ -16,10 +16,18 @@ $pdo = getDbConnection();
 
 $pageTitle = 'Паспорта продуктов';
 
-// Получение всех активных продуктов с паспортами (или без них)
-$search = $_GET['search'] ?? '';
+// Параметры фильтрации и сортировки
+$search = trim($_GET['search'] ?? '');
 $categoryFilter = $_GET['category'] ?? '';
+$weightFilter = $_GET['weight'] ?? '';
+$warrantyFilter = $_GET['warranty'] ?? '';
+$serialFilter = $_GET['serial'] ?? '';
+$sortBy = $_GET['sort'] ?? 'category';
+$sortOrder = $_GET['order'] ?? 'asc';
+$page = max(1, (int)($_GET['page'] ?? 1));
+$perPage = 24;
 
+// Построение основного запроса
 $query = "
     SELECT 
         pp.id as passport_id,
@@ -42,20 +50,100 @@ $query = "
 
 $params = [];
 
+// Фильтр по поиску
 if ($search) {
     $query .= " AND (p.article LIKE :search OR p.name LIKE :search)";
     $params[':search'] = "%{$search}%";
 }
 
+// Фильтр по категории
 if ($categoryFilter) {
     $query .= " AND pc.code = :category";
     $params[':category'] = $categoryFilter;
 }
 
-$query .= " ORDER BY pc.name, p.name";
+// Фильтр по весу
+if ($weightFilter) {
+    switch ($weightFilter) {
+        case 'light':
+            $query .= " AND pp.total_weight_kg < 5";
+            break;
+        case 'medium':
+            $query .= " AND pp.total_weight_kg >= 5 AND pp.total_weight_kg < 20";
+            break;
+        case 'heavy':
+            $query .= " AND pp.total_weight_kg >= 20";
+            break;
+    }
+}
 
+// Фильтр по гарантии
+if ($warrantyFilter) {
+    switch ($warrantyFilter) {
+        case 'short':
+            $query .= " AND pp.warranty_months <= 12";
+            break;
+        case 'standard':
+            $query .= " AND pp.warranty_months > 12 AND pp.warranty_months <= 36";
+            break;
+        case 'long':
+            $query .= " AND pp.warranty_months > 36";
+            break;
+    }
+}
+
+// Фильтр по серийному учёту
+if ($serialFilter !== '') {
+    if ($serialFilter === 'yes') {
+        $query .= " AND pp.is_serial_tracked = TRUE";
+    } elseif ($serialFilter === 'no') {
+        $query .= " AND pp.is_serial_tracked = FALSE";
+    }
+}
+
+// Сортировка
+$allowedSorts = ['category', 'name', 'sku', 'weight', 'warranty'];
+if (!in_array($sortBy, $allowedSorts)) {
+    $sortBy = 'category';
+}
+$sortOrder = strtolower($sortOrder) === 'desc' ? 'DESC' : 'ASC';
+
+switch ($sortBy) {
+    case 'name':
+        $query .= " ORDER BY p.name {$sortOrder}";
+        break;
+    case 'sku':
+        $query .= " ORDER BY p.article {$sortOrder}";
+        break;
+    case 'weight':
+        $query .= " ORDER BY pp.total_weight_kg {$sortOrder}";
+        break;
+    case 'warranty':
+        $query .= " ORDER BY pp.warranty_months {$sortOrder}";
+        break;
+    case 'category':
+    default:
+        $query .= " ORDER BY pc.name {$sortOrder}, p.name ASC";
+        break;
+}
+
+// Получение общего количества для пагинации
+$countQuery = "SELECT COUNT(*) as total FROM ({$query}) as count_query";
+$countStmt = $pdo->prepare($countQuery);
+$countStmt->execute($params);
+$totalProducts = (int)$countStmt->fetch()['total'];
+$totalPages = ceil($totalProducts / $perPage);
+$page = min($page, $totalPages ?: 1);
+
+// Добавление лимита и оффсета
+$query .= " LIMIT :limit OFFSET :offset";
 $stmt = $pdo->prepare($query);
-$stmt->execute($params);
+foreach ($params as $key => $value) {
+    $stmt->bindValue($key, $value);
+}
+$stmt->bindValue(':limit', (int)$perPage, PDO::PARAM_INT);
+$stmt->bindValue(':offset', (int)(($page - 1) * $perPage), PDO::PARAM_INT);
+$stmt->execute();
 $passports = $stmt->fetchAll();
 
 // Для продуктов без паспорта создаем запись
@@ -86,8 +174,6 @@ $catQuery = "SELECT DISTINCT pc.code, pc.name
              WHERE p.is_active = TRUE
              ORDER BY pc.name";
 $categories = $pdo->query($catQuery)->fetchAll();
-
-$totalProducts = count($passports);
 ?>
 <!DOCTYPE html>
 <html lang="ru">
@@ -504,6 +590,191 @@ $totalProducts = count($passports);
             color: var(--text-secondary);
         }
     </style>
+    <style>
+        /* Стили для фильтров */
+        .filters-panel {
+            background: linear-gradient(135deg, #f8f9fa, #ffffff);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            margin-bottom: 24px;
+            border: 1px solid var(--border-color);
+        }
+        .filters-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid var(--border-color);
+        }
+        .filters-header h3 {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .filters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            align-items: end;
+        }
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .filter-group label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .filter-group input,
+        .filter-group select {
+            padding: 10px 14px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            font-size: 14px;
+            transition: all 0.2s;
+            background: white;
+        }
+        .filter-group input:focus,
+        .filter-group select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.1);
+        }
+        .filter-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px dashed var(--border-color);
+        }
+        .active-filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border-color);
+        }
+        .filter-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        .filter-chip-remove {
+            cursor: pointer;
+            opacity: 0.8;
+            transition: opacity 0.2s;
+        }
+        .filter-chip-remove:hover {
+            opacity: 1;
+        }
+        /* Сортировка */
+        .sort-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 12px 16px;
+            background: var(--bg-secondary);
+            border-radius: var(--border-radius);
+        }
+        .sort-info {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+        .sort-controls {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .sort-select {
+            padding: 8px 14px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            font-size: 13px;
+            background: white;
+            cursor: pointer;
+        }
+        .sort-order-btn {
+            width: 36px;
+            height: 36px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            background: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+        .sort-order-btn:hover {
+            background: var(--bg-tertiary);
+            border-color: var(--primary-color);
+        }
+        /* Пагинация */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            margin-top: 24px;
+            padding: 16px;
+        }
+        .pagination a,
+        .pagination span {
+            padding: 8px 14px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            text-decoration: none;
+            color: var(--text-primary);
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+        .pagination a:hover {
+            background: var(--bg-tertiary);
+            border-color: var(--primary-color);
+        }
+        .pagination .current {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            border-color: var(--primary-color);
+        }
+        .pagination .disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        /* Улучшенные карточки */
+        .passport-card {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            margin-bottom: 12px;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+        }
+        .passport-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+            border-color: var(--primary-color);
+        }
+    </style>
 </head>
 <body>
     <div class="app-container">
@@ -533,23 +804,161 @@ $totalProducts = count($passports);
                                     <div class="stat-value"><?= count($categories) ?></div>
                                     <div class="stat-label">Категорий</div>
                                 </div>
+                                <div class="stat-item" style="background: linear-gradient(135deg, #f59e0b, #d97706);">
+                                    <div class="stat-value"><?= $totalPages ?></div>
+                                    <div class="stat-label">Страниц</div>
+                                </div>
                             </div>
 
-                            <!-- Фильтры -->
-                            <form method="GET" class="filter-form">
-                                <div class="filter-row">
-                                    <input type="text" name="search" placeholder="Поиск по SKU или названию..." value="<?= e($search) ?>" 
-                                           style="flex: 1; padding: 10px 14px; border: 1px solid var(--border-color); border-radius: var(--border-radius);">
-                                    <select name="category" style="width: 250px; padding: 10px 14px; border: 1px solid var(--border-color); border-radius: var(--border-radius);">
-                                        <option value="">Все категории</option>
-                                        <?php foreach ($categories as $cat): ?>
-                                            <option value="<?= e($cat['code']) ?>" <?= $categoryFilter == $cat['code'] ? 'selected' : '' ?>><?= e($cat['name']) ?></option>
-                                        <?php endforeach; ?>
-                                    </select>
-                                    <button type="submit" class="btn btn-secondary">Фильтр</button>
-                                    <a href="passports.php" class="btn btn-outline">Сброс</a>
+                            <!-- Панель фильтров -->
+                            <div class="filters-panel">
+                                <div class="filters-header">
+                                    <span style="font-size: 20px;">🔍</span>
+                                    <h3>Фильтры и поиск</h3>
                                 </div>
-                            </form>
+                                
+                                <form method="GET" id="filterForm">
+                                    <div class="filters-grid">
+                                        <!-- Поиск -->
+                                        <div class="filter-group">
+                                            <label for="search">🔎 Поиск</label>
+                                            <input type="text" id="search" name="search" placeholder="SKU или название..." value="<?= e($search) ?>">
+                                        </div>
+                                        
+                                        <!-- Категория -->
+                                        <div class="filter-group">
+                                            <label for="category">📁 Категория</label>
+                                            <select id="category" name="category">
+                                                <option value="">Все категории</option>
+                                                <?php foreach ($categories as $cat): ?>
+                                                    <option value="<?= e($cat['code']) ?>" <?= $categoryFilter == $cat['code'] ? 'selected' : '' ?>><?= e($cat['name']) ?></option>
+                                                <?php endforeach; ?>
+                                            </select>
+                                        </div>
+                                        
+                                        <!-- Вес -->
+                                        <div class="filter-group">
+                                            <label for="weight">⚖️ Вес</label>
+                                            <select id="weight" name="weight">
+                                                <option value="">Любой вес</option>
+                                                <option value="light" <?= $weightFilter === 'light' ? 'selected' : '' ?>>Лёгкие (&lt; 5 кг)</option>
+                                                <option value="medium" <?= $weightFilter === 'medium' ? 'selected' : '' ?>>Средние (5-20 кг)</option>
+                                                <option value="heavy" <?= $weightFilter === 'heavy' ? 'selected' : '' ?>>Тяжёлые (&gt; 20 кг)</option>
+                                            </select>
+                                        </div>
+                                        
+                                        <!-- Гарантия -->
+                                        <div class="filter-group">
+                                            <label for="warranty">🛡️ Гарантия</label>
+                                            <select id="warranty" name="warranty">
+                                                <option value="">Любая</option>
+                                                <option value="short" <?= $warrantyFilter === 'short' ? 'selected' : '' ?>>Короткая (≤ 1 год)</option>
+                                                <option value="standard" <?= $warrantyFilter === 'standard' ? 'selected' : '' ?>>Стандарт (1-3 года)</option>
+                                                <option value="long" <?= $warrantyFilter === 'long' ? 'selected' : '' ?>>Длинная (&gt; 3 лет)</option>
+                                            </select>
+                                        </div>
+                                        
+                                        <!-- Серийный учёт -->
+                                        <div class="filter-group">
+                                            <label for="serial">📋 Серийный учёт</label>
+                                            <select id="serial" name="serial">
+                                                <option value="">Все</option>
+                                                <option value="yes" <?= $serialFilter === 'yes' ? 'selected' : '' ?>>Требуется</option>
+                                                <option value="no" <?= $serialFilter === 'no' ? 'selected' : '' ?>>Не требуется</option>
+                                            </select>
+                                        </div>
+                                        
+                                        <!-- Сортировка -->
+                                        <div class="filter-group">
+                                            <label for="sort">🔀 Сортировка</label>
+                                            <select id="sort" name="sort">
+                                                <option value="category" <?= $sortBy === 'category' ? 'selected' : '' ?>>По категории</option>
+                                                <option value="name" <?= $sortBy === 'name' ? 'selected' : '' ?>>По названию</option>
+                                                <option value="sku" <?= $sortBy === 'sku' ? 'selected' : '' ?>>По артикулу</option>
+                                                <option value="weight" <?= $sortBy === 'weight' ? 'selected' : '' ?>>По весу</option>
+                                                <option value="warranty" <?= $sortBy === 'warranty' ? 'selected' : '' ?>>По гарантии</option>
+                                            </select>
+                                        </div>
+                                        
+                                        <!-- Порядок сортировки -->
+                                        <div class="filter-group">
+                                            <label for="order">📊 Порядок</label>
+                                            <select id="order" name="order">
+                                                <option value="asc" <?= $sortOrder === 'asc' ? 'selected' : '' ?>>⬆️ По возрастанию</option>
+                                                <option value="desc" <?= $sortOrder === 'desc' ? 'selected' : '' ?>>⬇️ По убыванию</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="filter-actions">
+                                        <button type="submit" class="btn btn-primary">🔍 Применить фильтры</button>
+                                        <a href="passports.php" class="btn btn-outline">🔄 Сбросить всё</a>
+                                    </div>
+                                    
+                                    <!-- Активные фильтры -->
+                                    <?php 
+                                    $hasActiveFilters = $search || $categoryFilter || $weightFilter || $warrantyFilter || $serialFilter !== '';
+                                    if ($hasActiveFilters): 
+                                    ?>
+                                    <div class="active-filters">
+                                        <span style="font-size: 12px; color: var(--text-secondary); align-self: center;">Активные фильтры:</span>
+                                        <?php if ($search): ?>
+                                            <span class="filter-chip">
+                                                🔎 «<?= e($search) ?>»
+                                                <a href="?<?= http_build_query(array_filter($_GET, function($k) { return $k !== 'search'; }, ARRAY_FILTER_USE_KEY)) ?>" class="filter-chip-remove">✕</a>
+                                            </span>
+                                        <?php endif; ?>
+                                        <?php if ($categoryFilter): ?>
+                                            <span class="filter-chip">
+                                                📁 <?= e($categories[array_search($categoryFilter, array_column($categories, 'code'))]['name'] ?? $categoryFilter) ?>
+                                                <a href="?<?= http_build_query(array_filter($_GET, function($k) { return $k !== 'category'; }, ARRAY_FILTER_USE_KEY)) ?>" class="filter-chip-remove">✕</a>
+                                            </span>
+                                        <?php endif; ?>
+                                        <?php if ($weightFilter): ?>
+                                            <span class="filter-chip">
+                                                ⚖️ <?= ['light' => 'Лёгкие', 'medium' => 'Средние', 'heavy' => 'Тяжёлые'][$weightFilter] ?>
+                                                <a href="?<?= http_build_query(array_filter($_GET, function($k) { return $k !== 'weight'; }, ARRAY_FILTER_USE_KEY)) ?>" class="filter-chip-remove">✕</a>
+                                            </span>
+                                        <?php endif; ?>
+                                        <?php if ($warrantyFilter): ?>
+                                            <span class="filter-chip">
+                                                🛡️ <?= ['short' => 'Короткая', 'standard' => 'Стандарт', 'long' => 'Длинная'][$warrantyFilter] ?>
+                                                <a href="?<?= http_build_query(array_filter($_GET, function($k) { return $k !== 'warranty'; }, ARRAY_FILTER_USE_KEY)) ?>" class="filter-chip-remove">✕</a>
+                                            </span>
+                                        <?php endif; ?>
+                                        <?php if ($serialFilter !== ''): ?>
+                                            <span class="filter-chip">
+                                                📋 <?= $serialFilter === 'yes' ? 'Требуется' : 'Не требуется' ?>
+                                                <a href="?<?= http_build_query(array_filter($_GET, function($k) { return $k !== 'serial'; }, ARRAY_FILTER_USE_KEY)) ?>" class="filter-chip-remove">✕</a>
+                                            </span>
+                                        <?php endif; ?>
+                                    </div>
+                                    <?php endif; ?>
+                                </form>
+                            </div>
+                            
+                            <!-- Строка сортировки и информации -->
+                            <div class="sort-bar">
+                                <div class="sort-info">
+                                    Показано <strong><?= count($passports) ?></strong> из <strong><?= $totalProducts ?></strong> продуктов
+                                </div>
+                                <div class="sort-controls">
+                                    <span style="font-size: 13px; color: var(--text-secondary);">Сортировать:</span>
+                                    <select class="sort-select" onchange="window.location.href=this.value">
+                                        <option value="?<?= http_build_query(array_merge($_GET, ['sort' => 'category', 'order' => 'asc'])) ?>" <?= $sortBy === 'category' && $sortOrder === 'asc' ? 'selected' : '' ?>>По категории ⬆️</option>
+                                        <option value="?<?= http_build_query(array_merge($_GET, ['sort' => 'category', 'order' => 'desc'])) ?>" <?= $sortBy === 'category' && $sortOrder === 'desc' ? 'selected' : '' ?>>По категории ⬇️</option>
+                                        <option value="?<?= http_build_query(array_merge($_GET, ['sort' => 'name', 'order' => 'asc'])) ?>" <?= $sortBy === 'name' && $sortOrder === 'asc' ? 'selected' : '' ?>>По названию ⬆️</option>
+                                        <option value="?<?= http_build_query(array_merge($_GET, ['sort' => 'name', 'order' => 'desc'])) ?>" <?= $sortBy === 'name' && $sortOrder === 'desc' ? 'selected' : '' ?>>По названию ⬇️</option>
+                                        <option value="?<?= http_build_query(array_merge($_GET, ['sort' => 'sku', 'order' => 'asc'])) ?>" <?= $sortBy === 'sku' && $sortOrder === 'asc' ? 'selected' : '' ?>>По артикулу ⬆️</option>
+                                        <option value="?<?= http_build_query(array_merge($_GET, ['sort' => 'sku', 'order' => 'desc'])) ?>" <?= $sortBy === 'sku' && $sortOrder === 'desc' ? 'selected' : '' ?>>По артикулу ⬇️</option>
+                                        <option value="?<?= http_build_query(array_merge($_GET, ['sort' => 'weight', 'order' => 'asc'])) ?>" <?= $sortBy === 'weight' && $sortOrder === 'asc' ? 'selected' : '' ?>>По весу ⬆️</option>
+                                        <option value="?<?= http_build_query(array_merge($_GET, ['sort' => 'weight', 'order' => 'desc'])) ?>" <?= $sortBy === 'weight' && $sortOrder === 'desc' ? 'selected' : '' ?>>По весу ⬇️</option>
+                                    </select>
+                                    <a href="?<?= http_build_query(array_merge($_GET, ['order' => $sortOrder === 'asc' ? 'desc' : 'asc'])) ?>" class="sort-order-btn" title="<?= $sortOrder === 'asc' ? 'По убыванию' : 'По возрастанию' ?>">
+                                        <?= $sortOrder === 'asc' ? '⬆️' : '⬇️' ?>
+                                    </a>
+                                </div>
+                            </div>
 
                             <!-- Список паспортов -->
                             <div style="margin-top: 20px;">
@@ -557,7 +966,8 @@ $totalProducts = count($passports);
                                     <div class="empty-state">
                                         <div class="empty-state-icon">📄</div>
                                         <h3>Паспорта не найдены</h3>
-                                        <p>Паспорта продуктов создаются в базе данных или измените параметры поиска</p>
+                                        <p>Измените параметры поиска или сбросьте фильтры</p>
+                                        <a href="passports.php" class="btn btn-primary" style="margin-top: 16px;">🔄 Сбросить фильтры</a>
                                     </div>
                                 <?php else: ?>
                                     <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 16px;">
@@ -648,6 +1058,29 @@ $totalProducts = count($passports);
                                             </div>
                                         <?php endforeach; ?>
                                     </div>
+                                    
+                                    <!-- Пагинация -->
+                                    <?php if ($totalPages > 1): ?>
+                                    <div class="pagination">
+                                        <?php if ($page > 1): ?>
+                                            <a href="?<?= http_build_query(array_merge($_GET, ['page' => 1])) ?>">⏮ Первая</a>
+                                            <a href="?<?= http_build_query(array_merge($_GET, ['page' => $page - 1])) ?>">← Назад</a>
+                                        <?php else: ?>
+                                            <span class="disabled">⏮ Первая</span>
+                                            <span class="disabled">← Назад</span>
+                                        <?php endif; ?>
+                                        
+                                        <span class="current"><?= $page ?> из <?= $totalPages ?></span>
+                                        
+                                        <?php if ($page < $totalPages): ?>
+                                            <a href="?<?= http_build_query(array_merge($_GET, ['page' => $page + 1])) ?>">Вперёд →</a>
+                                            <a href="?<?= http_build_query(array_merge($_GET, ['page' => $totalPages])) ?>">Последняя ⏭</a>
+                                        <?php else: ?>
+                                            <span class="disabled">Вперёд →</span>
+                                            <span class="disabled">Последняя ⏭</span>
+                                        <?php endif; ?>
+                                    </div>
+                                    <?php endif; ?>
                                 <?php endif; ?>
                             </div>
                         </div>

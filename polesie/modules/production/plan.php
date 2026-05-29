@@ -346,10 +346,12 @@ if (!empty($orders)) {
                                 m.code as material_article,
                                 ppm.quantity as quantity_per_unit,
                                 COALESCE(m.current_stock, 0) as current_stock,
-                                COALESCE(m.last_price, 0) as last_price
+                                COALESCE(m.last_price, 0) as last_price,
+                                mu.symbol as unit_name
                             FROM product_passport_materials ppm
                             JOIN materials m ON ppm.material_id = m.id
                             JOIN product_passports pp ON ppm.passport_id = pp.id
+                            LEFT JOIN base_units mu ON m.base_unit_id = mu.id
                             WHERE pp.product_id IN ($orderIdsPlaceholder)
                             ORDER BY pp.product_id, ppm.sort_order";
     $stmtProductMaterials = $pdo->prepare($sqlProductMaterials);
@@ -368,7 +370,8 @@ if (!empty($orders)) {
             'material_article' => $row['material_article'],
             'quantity_per_unit' => (float)$row['quantity_per_unit'],
             'current_stock' => (float)$row['current_stock'],
-            'last_price' => (float)$row['last_price']
+            'last_price' => (float)$row['last_price'],
+            'unit_name' => $row['unit_name'] ?? 'шт.'
         ];
     }
 
@@ -409,6 +412,26 @@ if (!empty($orders)) {
         foreach ($resItems as $row) {
             $oid = (string)$row['order_id'];
             if (isset($ordersData[$oid])) {
+                // Добавляем материалы для каждой позиции заказа сразу из кэша
+                $pid = (string)$row['product_id'];
+                $itemMaterials = [];
+                if (isset($productMaterialsCache[$pid])) {
+                    foreach ($productMaterialsCache[$pid] as $mat) {
+                        $requiredTotal = $mat['quantity_per_unit'] * $row['quantity'];
+                        $itemMaterials[] = [
+                            'material_id' => $mat['material_id'],
+                            'name' => $mat['material_name'],
+                            'article' => $mat['material_article'],
+                            'norm' => $mat['quantity_per_unit'],
+                            'required' => $requiredTotal,
+                            'stock' => $mat['current_stock'],
+                            'price' => $mat['last_price'],
+                            'cost' => $requiredTotal * $mat['last_price'],
+                            'unit' => $mat['unit_name']
+                        ];
+                    }
+                }
+                $row['materials'] = $itemMaterials;
                 $ordersData[$oid]['items'][] = $row;
             }
         }
@@ -999,25 +1022,27 @@ foreach ($ordersData as $oid => $data) {
                         });
                     }
                     
-                    // Загружаем материалы из паспорта продукта для этого товара
-                    item.materials = [];
-                    if (window.productMaterialsCache && window.productMaterialsCache[item.product_id]) {
-                        var norms = window.productMaterialsCache[item.product_id];
-                        norms.forEach(function(norm) {
-                            var requiredTotal = norm.quantity_per_unit * item.quantity;
-                            var cost = requiredTotal * (norm.last_price || 0);
-                            item.materials.push({
-                                name: norm.material_name,
-                                article: norm.material_article,
-                                norm: norm.quantity_per_unit,
-                                required: requiredTotal,
-                                stock: norm.current_stock || 0,
-                                price: norm.last_price || 0,
-                                cost: cost,
-                                unit: 'шт.',
-                                material_id: norm.material_id
+                    // Материалы уже загружены на сервере, используем их
+                    if (!item.materials || item.materials.length === 0) {
+                        item.materials = [];
+                        if (window.productMaterialsCache && window.productMaterialsCache[item.product_id]) {
+                            var norms = window.productMaterialsCache[item.product_id];
+                            norms.forEach(function(norm) {
+                                var requiredTotal = norm.quantity_per_unit * item.quantity;
+                                var cost = requiredTotal * (norm.last_price || 0);
+                                item.materials.push({
+                                    name: norm.material_name,
+                                    article: norm.material_article,
+                                    norm: norm.quantity_per_unit,
+                                    required: requiredTotal,
+                                    stock: norm.current_stock || 0,
+                                    price: norm.last_price || 0,
+                                    cost: cost,
+                                    unit: norm.unit_name || 'шт.',
+                                    material_id: norm.material_id
+                                });
                             });
-                        });
+                        }
                     }
                 });
                 

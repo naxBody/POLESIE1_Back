@@ -84,6 +84,7 @@ if (!empty($items)) {
             m.code as material_article,
             ppm.quantity as quantity_per_unit,
             COALESCE(m.current_stock, 0) as current_stock,
+            COALESCE(m.last_price, 0) as last_price,
             m.base_unit_id,
             bu.symbol as unit_name
         FROM product_passport_materials ppm
@@ -123,6 +124,7 @@ if (!empty($items)) {
             'quantity_per_unit' => $qtyPerUnit,
             'total_needed' => $totalNeeded,
             'current_stock' => (float)$mat['current_stock'],
+            'last_price' => (float)$mat['last_price'],
             'unit_name' => $mat['unit_name'] ?? 'шт.'
         ];
         
@@ -135,6 +137,7 @@ if (!empty($items)) {
                 'material_article' => $mat['material_article'],
                 'total_needed' => 0,
                 'current_stock' => (float)$mat['current_stock'],
+                'last_price' => (float)$mat['last_price'],
                 'unit_name' => $mat['unit_name'] ?? 'шт.'
             ];
         }
@@ -496,6 +499,8 @@ $pageTitle = 'Заказ №' . e($order['order_number']);
                                                                 <th style="text-align: right; padding: 6px;">На 1 ед.</th>
                                                                 <th style="text-align: right; padding: 6px;">Всего нужно</th>
                                                                 <th style="text-align: right; padding: 6px;">На складе</th>
+                                                                <th style="text-align: right; padding: 6px;">Цена</th>
+                                                                <th style="text-align: right; padding: 6px;">Сумма</th>
                                                                 <th style="text-align: center; padding: 6px;">Статус</th>
                                                             </tr>
                                                         </thead>
@@ -503,6 +508,7 @@ $pageTitle = 'Заказ №' . e($order['order_number']);
                                                             <?php foreach ($productMaterials[$productId] as $mat): 
                                                                 $isEnough = $mat['current_stock'] >= $mat['total_needed'];
                                                                 $shortage = max(0, $mat['total_needed'] - $mat['current_stock']);
+                                                                $materialCost = $mat['total_needed'] * $mat['last_price'];
                                                             ?>
                                                             <tr>
                                                                 <td style="padding: 6px;">
@@ -514,6 +520,8 @@ $pageTitle = 'Заказ №' . e($order['order_number']);
                                                                 <td style="text-align: right; padding: 6px;"><?= $mat['quantity_per_unit'] ?> <?= e($mat['unit_name']) ?></td>
                                                                 <td style="text-align: right; padding: 6px;"><strong><?= $mat['total_needed'] ?> <?= e($mat['unit_name']) ?></strong></td>
                                                                 <td style="text-align: right; padding: 6px;"><?= $mat['current_stock'] ?> <?= e($mat['unit_name']) ?></td>
+                                                                <td style="text-align: right; padding: 6px;"><?= formatMoney($mat['last_price']) ?></td>
+                                                                <td style="text-align: right; padding: 6px;"><strong><?= formatMoney($materialCost) ?></strong></td>
                                                                 <td style="text-align: center; padding: 6px;">
                                                                     <?php if ($isEnough): ?>
                                                                         <span class="badge" style="background: #27ae6020; color: #27ae60;">✓ Достаточно</span>
@@ -554,6 +562,8 @@ $pageTitle = 'Заказ №' . e($order['order_number']);
                                         <th>Всего нужно</th>
                                         <th>На складе</th>
                                         <th>Не хватает</th>
+                                        <th style="text-align: right;">Цена</th>
+                                        <th style="text-align: right;">Сумма</th>
                                         <th>Статус</th>
                                     </tr>
                                 </thead>
@@ -561,9 +571,12 @@ $pageTitle = 'Заказ №' . e($order['order_number']);
                                     <?php 
                                     $totalShortage = 0;
                                     $totalEnough = 0;
+                                    $totalMaterialsCost = 0;
                                     foreach ($totalMaterials as $index => $mat): 
                                         $isEnough = $mat['current_stock'] >= $mat['total_needed'];
                                         $shortage = max(0, $mat['total_needed'] - $mat['current_stock']);
+                                        $materialTotalCost = $mat['total_needed'] * $mat['last_price'];
+                                        $totalMaterialsCost += $materialTotalCost;
                                         if ($isEnough) {
                                             $totalEnough++;
                                         } else {
@@ -585,6 +598,8 @@ $pageTitle = 'Заказ №' . e($order['order_number']);
                                                 <span style="color: var(--text-secondary);">—</span>
                                             <?php endif; ?>
                                         </td>
+                                        <td style="text-align: right;"><?= formatMoney($mat['last_price']) ?></td>
+                                        <td style="text-align: right;"><strong><?= formatMoney($materialTotalCost) ?></strong></td>
                                         <td>
                                             <?php if ($isEnough): ?>
                                                 <span class="badge" style="background: #27ae6020; color: #27ae60;">✓ Достаточно</span>
@@ -597,10 +612,9 @@ $pageTitle = 'Заказ №' . e($order['order_number']);
                                 </tbody>
                                 <tfoot style="background: #f8f9fa; font-weight: 600;">
                                     <tr>
-                                        <td colspan="3" style="text-align: right; padding: 12px;">Итого:</td>
+                                        <td colspan="6" style="text-align: right; padding: 12px;">Итого:</td>
                                         <td><?= count($totalMaterials) ?> материалов</td>
-                                        <td style="color: #27ae60;"><?= $totalEnough ?> достаточно</td>
-                                        <td style="color: #e74c3c;"><?= count($totalMaterials) - $totalEnough ?> с дефицитом</td>
+                                        <td style="text-align: right; color: #2c3e50;"><?= formatMoney($totalMaterialsCost) ?></td>
                                         <td></td>
                                     </tr>
                                 </tfoot>

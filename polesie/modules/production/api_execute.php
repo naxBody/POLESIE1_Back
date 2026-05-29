@@ -516,6 +516,38 @@ try {
 }
 
 /**
+ * Создание этапов для задания на основе маршрутной карты
+ */
+function createStagesForTask($pdo, $taskId, $routeCardId) {
+    // Получаем операции из маршрутной карты
+    $operationsStmt = $pdo->prepare("
+        SELECT rco.stage_id, rco.operation_number, rco.name, rco.sort_order
+        FROM route_card_operations rco
+        WHERE rco.route_card_id = ?
+        ORDER BY rco.sort_order, rco.operation_number
+    ");
+    $operationsStmt->execute([$routeCardId]);
+    $operations = $operationsStmt->fetchAll();
+    
+    if (empty($operations)) {
+        return false;
+    }
+    
+    // Создаем этапы для задания
+    $insertStmt = $pdo->prepare("
+        INSERT INTO production_task_stages 
+        (task_id, stage_id, status, sort_order, created_at)
+        VALUES (?, ?, 'pending', ?, NOW())
+    ");
+    
+    foreach ($operations as $op) {
+        $insertStmt->execute([$taskId, $op['stage_id'], $op['sort_order']]);
+    }
+    
+    return true;
+}
+
+/**
  * Резервирование материалов для задания
  */
 function reserveMaterialsForTask($pdo, $taskId) {

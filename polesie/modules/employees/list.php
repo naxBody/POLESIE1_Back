@@ -18,6 +18,7 @@ $pageTitle = 'Сотрудники';
 
 $search = $_GET['search'] ?? '';
 $department = $_GET['department'] ?? '';
+$status = $_GET['status'] ?? '';
 
 $sql = "SELECT e.*, u.username, r.name as role_name 
         FROM employees e 
@@ -27,13 +28,18 @@ $sql = "SELECT e.*, u.username, r.name as role_name
 $params = [];
 
 if ($search) {
-    $sql .= " AND (e.full_name LIKE ? OR e.position LIKE ?)";
-    $params = ["%$search%", "%$search%"];
+    $sql .= " AND (e.full_name LIKE ? OR e.position LIKE ? OR e.email LIKE ?)";
+    $params = ["%$search%", "%$search%", "%$search%"];
 }
 
 if ($department) {
     $sql .= " AND e.department = ?";
     $params[] = $department;
+}
+
+if ($status !== '') {
+    $sql .= " AND e.is_active = ?";
+    $params[] = $status === 'active' ? 1 : 0;
 }
 
 $sql .= " ORDER BY e.full_name ASC";
@@ -42,9 +48,342 @@ $stmt = $pdo->prepare($sql);
 $stmt->execute($params);
 $employees = $stmt->fetchAll();
 
+// Подсчет статистики
+$statsSql = "SELECT 
+    COUNT(*) as total,
+    SUM(CASE WHEN is_active = 1 THEN 1 ELSE 0 END) as active,
+    SUM(CASE WHEN is_active = 0 THEN 1 ELSE 0 END) as inactive
+    FROM employees";
+$statsStmt = $pdo->query($statsSql);
+$stats = $statsStmt->fetch();
+
 require_once BASE_PATH . '/includes/sidebar.php';
 require_once BASE_PATH . '/includes/topbar.php';
 ?>
+
+<style>
+/* Page Header */
+.page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+    gap: 20px;
+}
+
+.page-header-title h2 {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+}
+
+.page-header-title p {
+    font-size: 13px;
+    color: var(--text-secondary);
+}
+
+/* Stats Cards */
+.employees-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.stat-card-mini {
+    background: var(--bg-primary);
+    border-radius: var(--border-radius);
+    padding: 16px 20px;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--border-color);
+    transition: all var(--transition-fast);
+}
+
+.stat-card-mini:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+}
+
+.stat-card-mini-value {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--text-primary);
+    line-height: 1;
+    margin-bottom: 4px;
+}
+
+.stat-card-mini-label {
+    font-size: 12px;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+}
+
+.stat-card-mini.total .stat-card-mini-value { color: var(--primary-color); }
+.stat-card-mini.active .stat-card-mini-value { color: var(--success-color); }
+.stat-card-mini.inactive .stat-card-mini-value { color: var(--text-muted); }
+
+/* Filter Form */
+.filter-form {
+    margin-bottom: 20px;
+}
+
+.filter-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.filter-row input[type="text"],
+.filter-row select {
+    padding: 10px 14px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    font-size: 14px;
+    background: var(--bg-primary);
+    transition: all var(--transition-fast);
+}
+
+.filter-row input[type="text"]:focus,
+.filter-row select:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.filter-row input[type="text"] {
+    flex: 1;
+    min-width: 250px;
+}
+
+.filter-row select {
+    min-width: 180px;
+    cursor: pointer;
+}
+
+/* Data Table */
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--bg-primary);
+    border-radius: var(--border-radius);
+    overflow: hidden;
+}
+
+.data-table thead th {
+    padding: 14px 16px;
+    text-align: left;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-secondary);
+    background: linear-gradient(180deg, var(--gray-50) 0%, var(--gray-100) 100%);
+    border-bottom: 2px solid var(--border-color);
+}
+
+.data-table tbody td {
+    padding: 16px;
+    border-bottom: 1px solid var(--border-color);
+    vertical-align: middle;
+    font-size: 14px;
+}
+
+.data-table tbody tr {
+    transition: background var(--transition-fast);
+}
+
+.data-table tbody tr:hover {
+    background: linear-gradient(90deg, rgba(37, 99, 235, 0.03) 0%, transparent 100%);
+}
+
+.data-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* Badges */
+.badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.badge::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+}
+
+.badge-info { background: rgba(6, 182, 212, 0.1); color: var(--info-color); }
+.badge-success { background: rgba(16, 185, 129, 0.1); color: var(--success-color); }
+.badge-warning { background: rgba(245, 158, 11, 0.1); color: var(--warning-color); }
+.badge-purple { background: rgba(139, 92, 246, 0.1); color: #8b5cf6; }
+.badge-secondary { background: var(--gray-100); color: var(--text-secondary); }
+.badge-danger { background: rgba(239, 68, 68, 0.1); color: var(--danger-color); }
+
+/* Buttons */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border-radius: var(--border-radius);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    border: none;
+    outline: none;
+    text-decoration: none;
+}
+
+.btn-primary {
+    background: var(--primary-color);
+    color: white;
+}
+
+.btn-primary:hover {
+    background: var(--primary-dark);
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+}
+
+.btn-secondary {
+    background: var(--gray-100);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+}
+
+.btn-secondary:hover {
+    background: var(--gray-200);
+}
+
+.btn-outline {
+    background: transparent;
+    color: var(--text-secondary);
+    border: 1px solid var(--border-color);
+}
+
+.btn-outline:hover {
+    background: var(--gray-50);
+    color: var(--text-primary);
+}
+
+.btn-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--gray-100);
+    border: 1px solid var(--border-color);
+    cursor: pointer;
+    text-decoration: none;
+    font-size: 16px;
+    transition: all var(--transition-fast);
+}
+
+.btn-icon:hover {
+    background: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+    transform: scale(1.1);
+}
+
+.btn-icon.delete:hover {
+    background: var(--danger-color);
+    border-color: var(--danger-color);
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+}
+
+.empty-state-icon {
+    font-size: 64px;
+    margin-bottom: 16px;
+    opacity: 0.5;
+}
+
+.empty-state h3 {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 8px;
+}
+
+.empty-state p {
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin-bottom: 24px;
+}
+
+/* Avatar */
+.employee-avatar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
+    color: white;
+    font-weight: 600;
+    font-size: 14px;
+    margin-right: 12px;
+}
+
+.employee-name-cell {
+    display: flex;
+    align-items: center;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .data-table {
+        font-size: 13px;
+    }
+    
+    .data-table thead th,
+    .data-table tbody td {
+        padding: 12px 10px;
+    }
+    
+    .page-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
+
+@media (max-width: 768px) {
+    .filter-row {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .filter-row input[type="text"],
+    .filter-row select {
+        min-width: 100%;
+    }
+    
+    .employees-stats {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
 
 <div class="content">
     <div class="page-header">
@@ -54,92 +393,174 @@ require_once BASE_PATH . '/includes/topbar.php';
         </div>
         <div class="page-header-actions">
             <?php if (hasPermission('employees.create')): ?>
-                <a href="create.php" class="btn btn-primary">+ Добавить</a>
+                <a href="create.php" class="btn btn-primary">
+                    <span>➕</span> Добавить сотрудника
+                </a>
             <?php endif; ?>
+        </div>
+    </div>
+
+    <!-- Статистика -->
+    <div class="employees-stats">
+        <div class="stat-card-mini total">
+            <div class="stat-card-mini-value"><?= $stats['total'] ?? 0 ?></div>
+            <div class="stat-card-mini-label">Всего сотрудников</div>
+        </div>
+        <div class="stat-card-mini active">
+            <div class="stat-card-mini-value"><?= $stats['active'] ?? 0 ?></div>
+            <div class="stat-card-mini-label">Работают</div>
+        </div>
+        <div class="stat-card-mini inactive">
+            <div class="stat-card-mini-value"><?= $stats['inactive'] ?? 0 ?></div>
+            <div class="stat-card-mini-label">Уволены</div>
         </div>
     </div>
 
     <div class="card">
         <div class="card-body">
+            <!-- Фильтры -->
             <form method="GET" class="filter-form">
                 <div class="filter-row">
-                    <input type="text" name="search" placeholder="Поиск по ФИО, должности..." value="<?= e($search) ?>" 
-                           style="flex: 1; padding: 10px 14px; border: 1px solid var(--border-color); border-radius: var(--border-radius);">
-                    <select name="department" style="width: 200px; padding: 10px 14px; border: 1px solid var(--border-color); border-radius: var(--border-radius);">
+                    <input type="text" name="search" placeholder="🔍 Поиск по ФИО, должности, email..." value="<?= e($search) ?>">
+                    <select name="department">
                         <option value="">Все отделы</option>
-                        <option value="production" <?= $department === 'production' ? 'selected' : '' ?>>Производство</option>
-                        <option value="quality" <?= $department === 'quality' ? 'selected' : '' ?>>ОТК</option>
-                        <option value="warehouse" <?= $department === 'warehouse' ? 'selected' : '' ?>>Склад</option>
-                        <option value="management" <?= $department === 'management' ? 'selected' : '' ?>>Руководство</option>
-                        <option value="sales" <?= $department === 'sales' ? 'selected' : '' ?>>Отдел продаж</option>
+                        <option value="production" <?= $department === 'production' ? 'selected' : '' ?>>🏭 Производство</option>
+                        <option value="quality" <?= $department === 'quality' ? 'selected' : '' ?>>✅ ОТК</option>
+                        <option value="warehouse" <?= $department === 'warehouse' ? 'selected' : '' ?>>📦 Склад</option>
+                        <option value="management" <?= $department === 'management' ? 'selected' : '' ?>>👔 Руководство</option>
+                        <option value="sales" <?= $department === 'sales' ? 'selected' : '' ?>>📞 Отдел продаж</option>
+                        <option value="it" <?= $department === 'it' ? 'selected' : '' ?>>💻 IT отдел</option>
+                        <option value="hr" <?= $department === 'hr' ? 'selected' : '' ?>>👥 HR отдел</option>
+                        <option value="accounting" <?= $department === 'accounting' ? 'selected' : '' ?>>📊 Бухгалтерия</option>
+                    </select>
+                    <select name="status">
+                        <option value="">Все статусы</option>
+                        <option value="active" <?= $status === 'active' ? 'selected' : '' ?>>Работают</option>
+                        <option value="inactive" <?= $status === 'inactive' ? 'selected' : '' ?>>Уволены</option>
                     </select>
                     <button type="submit" class="btn btn-secondary">Найти</button>
                     <a href="list.php" class="btn btn-outline">Сброс</a>
                 </div>
             </form>
 
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th>ФИО</th>
-                        <th>Должность</th>
-                        <th>Отдел</th>
-                        <th>Телефон</th>
-                        <th>Email</th>
-                        <th>Роль в системе</th>
-                        <th>Статус</th>
-                        <th>Действия</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php foreach ($employees as $e): ?>
-                    <tr>
-                        <td><strong><?= e($e['full_name']) ?></strong></td>
-                        <td><?= e($e['position']) ?></td>
-                        <td>
-                            <?php if ($e['department'] === 'production'): ?>
-                                <span class="badge badge-info">Производство</span>
-                            <?php elseif ($e['department'] === 'quality'): ?>
-                                <span class="badge badge-success">ОТК</span>
-                            <?php elseif ($e['department'] === 'warehouse'): ?>
-                                <span class="badge badge-warning">Склад</span>
-                            <?php elseif ($e['department'] === 'management'): ?>
-                                <span class="badge badge-purple">Руководство</span>
-                            <?php else: ?>
-                                <span class="badge badge-secondary"><?= e($e['department']) ?></span>
-                            <?php endif; ?>
-                        </td>
-                        <td><?= e($e['phone'] ?? '—') ?></td>
-                        <td><?= e($e['email'] ?? '—') ?></td>
-                        <td><?= e($e['role_name'] ?? '—') ?></td>
-                        <td>
-                            <?php if ($e['is_active']): ?>
-                                <span class="badge badge-success">Работает</span>
-                            <?php else: ?>
-                                <span class="badge badge-danger">Уволен</span>
-                            <?php endif; ?>
-                        </td>
-                        <td>
-                            <?php if (hasPermission('employees.edit')): ?>
-                                <a href="edit.php?id=<?= $e['id'] ?>" class="btn-icon" title="Редактировать">✏️</a>
-                            <?php endif; ?>
-                        </td>
-                    </tr>
-                    <?php endforeach; ?>
-                </tbody>
-            </table>
+            <!-- Таблица сотрудников -->
+            <div class="table-responsive">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 40px;">#</th>
+                            <th>Сотрудник</th>
+                            <th>Должность</th>
+                            <th>Отдел</th>
+                            <th>Контакты</th>
+                            <th>Роль в системе</th>
+                            <th>Статус</th>
+                            <th style="width: 120px;">Действия</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php 
+                        $counter = 1;
+                        foreach ($employees as $e): 
+                            $initials = mb_substr(preg_replace('/[^А-Яа-яЁё]/u', '', $e['full_name']), 0, 2);
+                            if (empty($initials)) {
+                                $initials = mb_substr($e['full_name'], 0, 2);
+                            }
+                        ?>
+                        <tr>
+                            <td style="color: var(--text-muted); font-size: 13px;"><?= $counter++ ?></td>
+                            <td>
+                                <div class="employee-name-cell">
+                                    <div class="employee-avatar"><?= e(mb_strtoupper($initials)) ?></div>
+                                    <div>
+                                        <div style="font-weight: 600; color: var(--text-primary);"><?= e($e['full_name']) ?></div>
+                                        <?php if ($e['username']): ?>
+                                            <div style="font-size: 12px; color: var(--text-muted);">@<?= e($e['username']) ?></div>
+                                        <?php endif; ?>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <div style="font-weight: 500;"><?= e($e['position']) ?></div>
+                            </td>
+                            <td>
+                                <?php 
+                                $deptBadges = [
+                                    'production' => ['badge-info', '🏭 Производство'],
+                                    'quality' => ['badge-success', '✅ ОТК'],
+                                    'warehouse' => ['badge-warning', '📦 Склад'],
+                                    'management' => ['badge-purple', '👔 Руководство'],
+                                    'sales' => ['badge-info', '📞 Продажи'],
+                                    'it' => ['badge-secondary', '💻 IT'],
+                                    'hr' => ['badge-success', '👥 HR'],
+                                    'accounting' => ['badge-warning', '📊 Бухгалтерия'],
+                                ];
+                                $badgeClass = $deptBadges[$e['department']][0] ?? 'badge-secondary';
+                                $badgeLabel = $deptBadges[$e['department']][1] ?? e($e['department']);
+                                ?>
+                                <span class="badge <?= $badgeClass ?>"><?= $badgeLabel ?></span>
+                            </td>
+                            <td>
+                                <div style="display: flex; flex-direction: column; gap: 4px;">
+                                    <?php if ($e['phone']): ?>
+                                        <a href="tel:<?= e($e['phone']) ?>" style="font-size: 13px; color: var(--text-secondary); text-decoration: none;">
+                                            📞 <?= e($e['phone']) ?>
+                                        </a>
+                                    <?php endif; ?>
+                                    <?php if ($e['email']): ?>
+                                        <a href="mailto:<?= e($e['email']) ?>" style="font-size: 13px; color: var(--text-secondary); text-decoration: none;">
+                                            ✉️ <?= e($e['email']) ?>
+                                        </a>
+                                    <?php endif; ?>
+                                    <?php if (!$e['phone'] && !$e['email']): ?>
+                                        <span style="color: var(--text-muted); font-size: 13px;">—</span>
+                                    <?php endif; ?>
+                                </div>
+                            </td>
+                            <td>
+                                <?php if ($e['role_name']): ?>
+                                    <span class="badge badge-secondary"><?= e($e['role_name']) ?></span>
+                                <?php else: ?>
+                                    <span style="color: var(--text-muted);">—</span>
+                                <?php endif; ?>
+                            </td>
+                            <td>
+                                <?php if ($e['is_active']): ?>
+                                    <span class="badge badge-success">✓ Работает</span>
+                                <?php else: ?>
+                                    <span class="badge badge-danger">✕ Уволен</span>
+                                <?php endif; ?>
+                            </td>
+                            <td>
+                                <div style="display: flex; gap: 6px;">
+                                    <?php if (hasPermission('employees.edit')): ?>
+                                        <a href="edit.php?id=<?= $e['id'] ?>" class="btn-icon" title="Редактировать">✏️</a>
+                                    <?php endif; ?>
+                                    <?php if (hasPermission('employees.delete')): ?>
+                                        <a href="delete.php?id=<?= $e['id'] ?>" class="btn-icon delete" title="Удалить" onclick="return confirm('Вы уверены, что хотите удалить этого сотрудника?')">🗑️</a>
+                                    <?php endif; ?>
+                                </div>
+                            </td>
+                        </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
 
             <?php if (empty($employees)): ?>
                 <div class="empty-state">
                     <div class="empty-state-icon">👥</div>
                     <h3>Сотрудники не найдены</h3>
-                    <p>Добавьте первого сотрудника</p>
+                    <p>Измените параметры поиска или добавьте первого сотрудника</p>
+                    <?php if (hasPermission('employees.create')): ?>
+                        <a href="create.php" class="btn btn-primary">+ Добавить сотрудника</a>
+                    <?php endif; ?>
                 </div>
             <?php endif; ?>
         </div>
     </div>
 </div>
 
-    <script src="<?= asset('assets/js/main.js') ?>"></script>
+<script src="<?= asset('assets/js/main.js') ?>"></script>
 </body>
 </html>

@@ -1,7 +1,23 @@
 <!-- Верхняя панель -->
 <div class="topbar">
     <div class="topbar-left">
-        <h1 class="topbar-title"><?= e($pageTitle) ?></h1>
+        <div class="topbar-title-wrapper">
+            <div class="topbar-icon">
+                <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" width="30" height="30">
+                    <defs>
+                        <linearGradient id="topbarLogoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#60a5fa;stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:#2563eb;stop-opacity:1" />
+                        </linearGradient>
+                    </defs>
+                    <!-- Звезда/искра -->
+                    <path d="M16 2L18.4 7L24 7L19.6 11L21 16L16 13L11 16L12.4 11L8 7L13.6 7L16 2Z" fill="url(#topbarLogoGradient)" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round" opacity="0.9"/>
+                    <!-- Молния -->
+                    <path d="M16.5 14L14.5 18L17 18L15 22" stroke="var(--primary-color)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" opacity="0.8"/>
+                </svg>
+            </div>
+            <h1 class="topbar-title"><?= e($pageTitle) ?></h1>
+        </div>
         <div class="topbar-breadcrumb">
             <a href="<?= pageUrl('index.php') ?>">Главная</a>
             <span class="topbar-breadcrumb-separator">/</span>

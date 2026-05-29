@@ -4,6 +4,7 @@ __pycache__/
 *.o
 *.obj
 *.class
+*.exe
 *.dll
 *.so
 *.a

@@ -324,19 +324,17 @@ WHERE NOT EXISTS (
 -- Паспорт для CAST-SCH20
 INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`)
 SELECT 
-    (SELECT id FROM products WHERE article = 'CAST-SCH20'), 100.0, 12, FALSE, 'Серый чугун СЧ20 - стандартный литейный сплав', TRUE,
+    (SELECT id FROM products WHERE article = 'CAST-SCH20'), 100.0, 12, FALSE, 
     'Серый чугун СЧ20 - стандартный литейный сплав',
     'Соответствие ГОСТ 1412-85, контроль химического состава и механических свойств'
 WHERE NOT EXISTS (
     SELECT 1 FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'CAST-SCH20')
 );
 
-
-
 -- Паспорт для CAST-SCH25
 INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`)
 SELECT 
-    (SELECT id FROM products WHERE article = 'CAST-SCH25'), 100.0, 12, FALSE, 'Серый чугун СЧ25 - повышенная прочность', TRUE,
+    (SELECT id FROM products WHERE article = 'CAST-SCH25'), 100.0, 12, FALSE, 
     'Серый чугун СЧ25 - повышенная прочность',
     'Соответствие ГОСТ 1412-85, контроль твердости и микроструктуры'
 WHERE NOT EXISTS (
@@ -348,91 +346,77 @@ WHERE NOT EXISTS (
 -- Паспорт для CAST-VCH40
 INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`)
 SELECT 
-    (SELECT id FROM products WHERE article = 'CAST-VCH40'), 100.0, 12, FALSE, 'Высокопрочный чугун ВЧ40 с шаровидным графитом', TRUE,
+    (SELECT id FROM products WHERE article = 'CAST-VCH40'), 100.0, 12, FALSE, 
     'Высокопрочный чугун ВЧ40 с шаровидным графитом',
     'Соответствие ГОСТ 7293-85, контроль формы графита и механических свойств'
 WHERE NOT EXISTS (
     SELECT 1 FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'CAST-VCH40')
 );
 
-
-
 -- Паспорт для CAST-A5
 INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`)
 SELECT 
-    (SELECT id FROM products WHERE article = 'CAST-A5'), 100.0, 12, FALSE, 'Алюминиевый сплав АК5 - литейный', TRUE,
+    (SELECT id FROM products WHERE article = 'CAST-A5'), 100.0, 12, FALSE, 
     'Алюминиевый сплав АК5 - литейный',
     'Соответствие ГОСТ 1583-93, контроль химического состава'
 WHERE NOT EXISTS (
     SELECT 1 FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'CAST-A5')
 );
 
-
-
 -- Паспорт для CAST-A6
 INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`)
 SELECT 
-    (SELECT id FROM products WHERE article = 'CAST-A6'), 100.0, 12, FALSE, 'Алюминиевый сплав АК6 - литейный', TRUE,
+    (SELECT id FROM products WHERE article = 'CAST-A6'), 100.0, 12, FALSE, 
     'Алюминиевый сплав АК6 - литейный',
     'Соответствие ГОСТ 1583-93, контроль химического состава и механических свойств'
 WHERE NOT EXISTS (
     SELECT 1 FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'CAST-A6')
 );
 
-
-
 -- Паспорт для CAST-AK5M2
 INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`)
 SELECT 
-    (SELECT id FROM products WHERE article = 'CAST-AK5M2'), 100.0, 12, FALSE, 'Алюминиевый сплав АК5М2 - кремнистый с медью', TRUE,
+    (SELECT id FROM products WHERE article = 'CAST-AK5M2'), 100.0, 12, FALSE, 
     'Алюминиевый сплав АК5М2 - кремнистый с медью',
     'Соответствие ГОСТ 1583-93, контроль химического состава'
 WHERE NOT EXISTS (
     SELECT 1 FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'CAST-AK5M2')
 );
 
-
-
 -- Паспорт для CAST-AK7
 INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`)
 SELECT 
-    (SELECT id FROM products WHERE article = 'CAST-AK7'), 100.0, 12, FALSE, 'Алюминиевый сплав АК7 - силумин', TRUE,
+    (SELECT id FROM products WHERE article = 'CAST-AK7'), 100.0, 12, FALSE, 
     'Алюминиевый сплав АК7 - силумин',
     'Соответствие ГОСТ 1583-93, хорошие литейные свойства'
 WHERE NOT EXISTS (
     SELECT 1 FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'CAST-AK7')
 );
 
-
-
 -- Паспорт для CAST-AK9
 INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`)
 SELECT 
-    (SELECT id FROM products WHERE article = 'CAST-AK9'), 100.0, 12, FALSE, 'Алюминиевый сплав АК9 - высококремнистый', TRUE,
+    (SELECT id FROM products WHERE article = 'CAST-AK9'), 100.0, 12, FALSE, 
     'Алюминиевый сплав АК9 - высококремнистый',
     'Соответствие ГОСТ 1583-93, отличные литейные свойства'
 WHERE NOT EXISTS (
     SELECT 1 FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'CAST-AK9')
 );
 
-
-
 -- Паспорт для CAST-AV87
 INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`)
 SELECT 
-    (SELECT id FROM products WHERE article = 'CAST-AV87'), 100.0, 12, FALSE, 'Алюминиевый сплав АВ87 - антифрикционный', TRUE,
+    (SELECT id FROM products WHERE article = 'CAST-AV87'), 100.0, 12, FALSE, 
     'Алюминиевый сплав АВ87 - антифрикционный',
     'Соответствие ГОСТ 1412-85, специальные свойства'
 WHERE NOT EXISTS (
     SELECT 1 FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'CAST-AV87')
 );
 
-
-
 -- Паспорт для CAST-AK12
 INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`)
 SELECT 
-    (SELECT id FROM products WHERE article = 'CAST-AK12'), 100.0, 12, FALSE, 'Алюминиевый сплав АК12 - эвтектический силумин', TRUE,
+    (SELECT id FROM products WHERE article = 'CAST-AK12'), 100.0, 12, FALSE, 
     'Алюминиевый сплав АК12 - эвтектический силумин',
     'Соответствие ГОСТ 1583-93, отличная жидкотекучесть'
 WHERE NOT EXISTS (
@@ -454,8 +438,6 @@ SELECT
 WHERE NOT EXISTS (
     SELECT 1 FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'АИВР80')
 );
-
-
 
 -- Паспорт для АИВР90L
 INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`)

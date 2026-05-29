@@ -368,113 +368,24 @@ require_once BASE_PATH . '/includes/topbar.php';
             <!-- Фильтры -->
             <form method="GET" class="filter-form">
                 <div class="filter-row">
-                    <input type="text" name="search" placeholder="<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 6px;"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg> Поиск по названию, УНП, контактному лицу..." value="<?= e($search) ?>">
+                    <div style="position: relative; flex: 1; min-width: 250px;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-secondary);">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                        </svg>
+                        <input type="text" name="search" placeholder="Поиск по названию, УНП, контактному лицу..." value="<?= e($search) ?>" style="padding-left: 40px;">
+                    </div>
                     <select name="type">
                         <option value="">Все типы</option>
-                        <option value="customer" <?= $type === 'customer' ? 'selected' : '' ?>><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 4px;"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg> Заказчик</option>
-                        <option value="supplier" <?= $type === 'supplier' ? 'selected' : '' ?>><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 4px;"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg> Поставщик</option>
-                        <option value="both" <?= $type === 'both' ? 'selected' : '' ?>><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 4px;"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg> Оба</option>
+                        <option value="customer" <?= $type === 'customer' ? 'selected' : '' ?>>Заказчик</option>
+                        <option value="supplier" <?= $type === 'supplier' ? 'selected' : '' ?>>Поставщик</option>
+                        <option value="both" <?= $type === 'both' ? 'selected' : '' ?>>Оба</option>
                     </select>
                     <button type="submit" class="btn btn-secondary">Найти</button>
                     <a href="list.php" class="btn btn-outline">Сброс</a>
                 </div>
             </form>
 
-            <!-- Таблица контрагентов -->
-            <div class="table-responsive">
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th style="width: 50px;"></th>
-                            <th>Название</th>
-                            <th>Тип</th>
-                            <th>УНП</th>
-                            <th>Контактное лицо</th>
-                            <th>Контакты</th>
-                            <th style="width: 120px;">Действия</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php 
-                        foreach ($contractors as $c): 
-                            // Generate initials for avatar
-                            $nameParts = explode(' ', trim($c['name']));
-                            $initials = '';
-                            if (count($nameParts) >= 1) {
-                                $initials .= mb_substr($nameParts[0], 0, 1);
-                            }
-                            if (count($nameParts) >= 2) {
-                                $initials .= mb_substr($nameParts[1], 0, 1);
-                            }
-                            if (empty($initials)) {
-                                $initials = mb_substr($c['name'], 0, 2);
-                            }
-                            $initials = mb_strtoupper($initials);
-                        ?>
-                        <tr>
-                            <td>
-                                <div class="contractor-avatar"><?= e($initials) ?></div>
-                            </td>
-                            <td>
-                                <div class="contractor-name-cell">
-                                    <div>
-                                        <div style="font-weight: 600; color: var(--text-primary);"><?= e($c['name']) ?></div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td>
-                                <?php if ($c['type'] === 'customer'): ?>
-                                    <span class="badge badge-success"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 4px;"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg> Заказчик</span>
-                                <?php elseif ($c['type'] === 'supplier'): ?>
-                                    <span class="badge badge-info"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 4px;"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg> Поставщик</span>
-                                <?php else: ?>
-                                    <span class="badge badge-warning"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 4px;"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg> Оба</span>
-                                <?php endif; ?>
-                            </td>
-                            <td style="font-family: monospace; font-size: 13px;"><?= e($c['unp'] ?? '—') ?></td>
-                            <td><?= e($c['contact_person'] ?? '—') ?></td>
-                            <td>
-                                <?php if ($c['phone']): ?>
-                                    <a href="tel:<?= e($c['phone']) ?>" style="font-size: 13px; color: var(--text-secondary); text-decoration: none; display: flex; align-items: center; gap: 4px;">
-                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                            <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
-                                        </svg>
-                                        <?= e($c['phone']) ?>
-                                    </a>
-                                <?php endif; ?>
-                                <?php if ($c['email']): ?>
-                                    <div style="font-size: 13px; color: var(--text-secondary); display: flex; align-items: center; gap: 4px; margin-top: 4px;">
-                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
-                                            <polyline points="22,6 12,13 2,6"></polyline>
-                                        </svg>
-                                        <?= e($c['email']) ?>
-                                    </div>
-                                <?php endif; ?>
-                                <?php if (!$c['phone'] && !$c['email']): ?>
-                                    <span style="color: var(--text-muted); font-size: 13px;">—</span>
-                                <?php endif; ?>
-                            </td>
-                            <td>
-                                <div style="display: flex; gap: 6px;">
-                                    <?php if (hasPermission('contractors.edit')): ?>
-                                        <a href="edit.php?id=<?= $c['id'] ?>" class="btn-icon" title="Редактировать">
-                                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                                                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                                            </svg>
-                                        </a>
-                                    <?php endif; ?>
-                                    <?php if (hasPermission('contractors.delete')): ?>
-                                        <a href="delete.php?id=<?= $c['id'] ?>" class="btn-icon delete" title="Удалить" onclick="return confirm('Вы уверены, что хотите удалить этого контрагента?')">
-                                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                                <polyline points="3 6 5 6 21 6"></polyline>
-                                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                                                <line x1="10" y1="11" x2="10" y2="17"></line>
-                                                <line x1="14" y1="11" x2="14" y2="17"></line>
-                                            </svg>
-                                        </a>
-                                    <?php endif; ?>
                                 </div>
                             </td>
                         </tr>

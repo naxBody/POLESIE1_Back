@@ -542,14 +542,13 @@ error_log("Всего категорий продукции: " . count($categori
             }
             
             // Паспорт (документы)
+            html += '<div class="passport-section">';
+            html += '<div class="passport-section-title">📄 Паспорт</div>';
+            html += '<button onclick="printProductPassport()" style="background: var(--primary-color); border: none; color: white; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500; display: inline-flex; align-items: center; gap: 8px; margin-bottom: 16px;" title="Сформировать паспорт изделия">';
+            html += '📄 Сформировать паспорт';
+            html += '</button>';
+            
             if (product.documents && product.documents.length > 0) {
-                html += '<div class="passport-section">';
-                html += '<div class="passport-section-title">📄 Паспорт</div>';
-                html += '<div style="margin-bottom: 16px;">';
-                html += '<button onclick="printProductPassport()" style="background: var(--primary-color); border: none; color: white; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500; display: inline-flex; align-items: center; gap: 8px;" title="Сформировать паспорт изделия">';
-                html += '📄 Сформировать паспорт';
-                html += '</button>';
-                html += '</div>';
                 html += '<ul class="document-list">';
                 for (var i = 0; i < product.documents.length; i++) {
                     var doc = product.documents[i];
@@ -569,8 +568,10 @@ error_log("Всего категорий продукции: " . count($categori
                     html += '</li>';
                 }
                 html += '</ul>';
-                html += '</div>';
+            } else {
+                html += '<p style="color: #999; font-style: italic;">Документы отсутствуют</p>';
             }
+            html += '</div>';
             
             // Инструкция по эксплуатации
             if (product.manual_url || product.manual_text) {

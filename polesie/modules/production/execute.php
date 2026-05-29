@@ -18,7 +18,10 @@ $pdo = getDbConnection();
 
 $pageTitle = 'Исполнение производства';
 
-// Получение всех активных заданий
+// Получение выбранного задания из GET параметра
+$selectedTaskId = isset($_GET['task']) ? (int)$_GET['task'] : null;
+
+// Получение всех активных заданий с группировкой по заказам
 $sql = "SELECT pt.*, 
                o.order_number, 
                p.name as product_name, 
@@ -45,6 +48,7 @@ $sql = "SELECT pt.*,
         LEFT JOIN users u3 ON pt.worker_id = u3.id
         WHERE pt.status IN ('planned', 'in_progress')
         ORDER BY 
+            o.order_number ASC,
             CASE pt.priority 
                 WHEN 'urgent' THEN 1 
                 WHEN 'high' THEN 2 
@@ -55,10 +59,38 @@ $sql = "SELECT pt.*,
 
 $stmt = $pdo->prepare($sql);
 $stmt->execute();
-$tasks = $stmt->fetchAll();
+$allTasks = $stmt->fetchAll();
 
-// Получение этапов для каждого задания
-foreach ($tasks as &$task) {
+// Группировка заданий по заказам
+$ordersGrouped = [];
+foreach ($allTasks as $task) {
+    $orderNumber = $task['order_number'];
+    if (!isset($ordersGrouped[$orderNumber])) {
+        $ordersGrouped[$orderNumber] = [
+            'order_number' => $orderNumber,
+            'tasks' => []
+        ];
+    }
+    $ordersGrouped[$orderNumber]['tasks'][] = $task;
+}
+
+// Если выбрано задание, используем его, иначе первое задание из первого заказа
+$tasks = $allTasks;
+$selectedTask = null;
+if ($selectedTaskId) {
+    foreach ($allTasks as $task) {
+        if ($task['id'] == $selectedTaskId) {
+            $selectedTask = $task;
+            break;
+        }
+    }
+}
+if (!$selectedTask && !empty($allTasks)) {
+    $selectedTask = $allTasks[0];
+}
+
+// Получение этапов для выбранного задания
+if ($selectedTask) {
     // Этапы выполнения
     $stagesStmt = $pdo->prepare("
         SELECT pts.id, pts.task_id, pts.stage_id, pts.status, pts.started_at, pts.completed_at,
@@ -69,8 +101,8 @@ foreach ($tasks as &$task) {
         WHERE pts.task_id = ?
         ORDER BY ps.sort_order
     ");
-    $stagesStmt->execute([$task['id']]);
-    $task['stages'] = $stagesStmt->fetchAll();
+    $stagesStmt->execute([$selectedTask['id']]);
+    $selectedTask['stages'] = $stagesStmt->fetchAll();
     
     // Материалы для задания
     $materialsStmt = $pdo->prepare("
@@ -90,8 +122,8 @@ foreach ($tasks as &$task) {
         WHERE ptm.task_id = ?
         ORDER BY m.name_full
     ");
-    $materialsStmt->execute([$task['id']]);
-    $task['materials'] = $materialsStmt->fetchAll();
+    $materialsStmt->execute([$selectedTask['id']]);
+    $selectedTask['materials'] = $materialsStmt->fetchAll();
     
     // Серийные номера для задания
     $serialStmt = $pdo->prepare("
@@ -102,8 +134,21 @@ foreach ($tasks as &$task) {
         WHERE sn.task_id = ?
         ORDER BY sn.created_at DESC
     ");
-    $serialStmt->execute([$task['id']]);
-    $task['serial_numbers'] = $serialStmt->fetchAll();
+    $serialStmt->execute([$selectedTask['id']]);
+    $selectedTask['serial_numbers'] = $serialStmt->fetchAll();
+}
+
+// Получение этапов для всех остальных заданий (для отображения в списке)
+foreach ($allTasks as &$task) {
+    if (!$task['stages']) {
+        $stagesStmt = $pdo->prepare("
+            SELECT COUNT(*) as stages_count
+            FROM production_task_stages pts
+            WHERE pts.task_id = ?
+        ");
+        $stagesStmt->execute([$task['id']]);
+        $task['stages_count'] = $stagesStmt->fetch()['stages_count'];
+    }
 }
 ?>
 <!DOCTYPE html>

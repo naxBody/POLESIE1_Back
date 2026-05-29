@@ -21,14 +21,16 @@ $search = $_GET['search'] ?? '';
 
 if ($type === 'products') {
     $sql = "SELECT p.id, p.name as item_name, p.article, 
-                   p.current_stock as quantity, 'шт.' as unit,
-                   p.location, p.updated_at
+                   COALESCE(SUM(pt.quantity_good), 0) as quantity, 'шт.' as unit,
+                   MAX(pt.updated_at) as updated_at
             FROM products p
-            WHERE p.is_active = 1";
+            LEFT JOIN production_tasks pt ON p.id = pt.product_id AND pt.status = 'completed'
+            WHERE p.is_active = 1
+            GROUP BY p.id, p.name, p.article";
     $params = [];
     
     if ($search) {
-        $sql .= " AND p.name LIKE ?";
+        $sql .= " HAVING p.name LIKE ?";
         $params[] = "%$search%";
     }
 } else {
@@ -110,7 +112,6 @@ $items = $stmt->fetchAll();
                                         <th>Артикул/Код</th>
                                         <th>Остаток</th>
                                         <th>Ед. изм.</th>
-                                        <th>Место хранения</th>
                                         <th>Последнее обновление</th>
                                         <th>Статус</th>
                                     </tr>
@@ -122,8 +123,7 @@ $items = $stmt->fetchAll();
                                         <td><code><?= e($item['article'] ?? '—') ?></code></td>
                                         <td><strong><?= number_format($item['quantity'], 2, ',', ' ') ?></strong></td>
                                         <td><?= e($item['unit'] ?? 'шт.') ?></td>
-                                        <td><?= e($item['location'] ?? '—') ?></td>
-                                        <td><?= date('d.m.Y H:i', strtotime($item['updated_at'])) ?></td>
+                                        <td><?= $item['updated_at'] ? date('d.m.Y H:i', strtotime($item['updated_at'])) : '—' ?></td>
                                         <td>
                                             <?php if ($item['quantity'] <= 10): ?>
                                                 <span class="badge badge-danger">Мало</span>

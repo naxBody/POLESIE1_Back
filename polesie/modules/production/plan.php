@@ -1034,8 +1034,8 @@ foreach ($ordersData as $oid => $data) {
                     // Материалы уже загружены на сервере, используем их
                     if (!item.materials || item.materials.length === 0) {
                         item.materials = [];
-                        if (window.productMaterialsCache && window.productMaterialsCache[item.product_id]) {
-                            var norms = window.productMaterialsCache[item.product_id];
+                        if (productMaterialsCache && productMaterialsCache[item.product_id]) {
+                            var norms = productMaterialsCache[item.product_id];
                             norms.forEach(function(norm) {
                                 var requiredTotal = norm.quantity_per_unit * item.quantity;
                                 var cost = requiredTotal * (norm.last_price || 0);

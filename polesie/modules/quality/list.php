@@ -108,11 +108,11 @@ $inspections = $stmt->fetchAll();
                 <tbody>
                     <?php foreach ($inspections as $i): ?>
                     <tr>
-                        <td><strong>#<?= $i['task_id'] ?></strong></td>
+                        <td><strong>#<?= $i['task_id'] ?? '' ?></strong></td>
                         <td><?= e($i['product_name']) ?></td>
-                        <td><?= $i['task_quantity'] ?></td>
+                        <td><?= $i['task_quantity'] ?? '' ?></td>
                         <td>
-                            <?php if ($i['task_status'] === 'completed'): ?>
+                            <?php if (($i['task_status'] ?? '') === 'completed'): ?>
                                 <span class="badge badge-success">Завершено</span>
                             <?php else: ?>
                                 <span class="badge badge-info">В работе</span>

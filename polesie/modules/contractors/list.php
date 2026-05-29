@@ -19,13 +19,14 @@ $pageTitle = 'Контрагенты';
 // Получение списка контрагентов
 $search = $_GET['search'] ?? '';
 $type = $_GET['type'] ?? '';
+$sort = $_GET['sort'] ?? 'name_asc';
 
 $sql = "SELECT * FROM contractors WHERE 1=1";
 $params = [];
 
 if ($search) {
-    $sql .= " AND (name LIKE ? OR unp LIKE ? OR contact_person LIKE ?)";
-    $params = ["%$search%", "%$search%", "%$search%"];
+    $sql .= " AND (name LIKE ? OR unp LIKE ? OR contact_person LIKE ? OR phone LIKE ?)";
+    $params = ["%$search%", "%$search%", "%$search%", "%$search%"];
 }
 
 if ($type) {
@@ -33,7 +34,22 @@ if ($type) {
     $params[] = $type;
 }
 
-$sql .= " ORDER BY name ASC";
+// Сортировка
+switch ($sort) {
+    case 'name_desc':
+        $sql .= " ORDER BY name DESC";
+        break;
+    case 'date_desc':
+        $sql .= " ORDER BY created_at DESC";
+        break;
+    case 'date_asc':
+        $sql .= " ORDER BY created_at ASC";
+        break;
+    case 'name_asc':
+    default:
+        $sql .= " ORDER BY name ASC";
+        break;
+}
 
 $stmt = $pdo->prepare($sql);
 $stmt->execute($params);
@@ -379,21 +395,53 @@ require_once BASE_PATH . '/includes/topbar.php';
             <!-- Фильтры -->
             <form method="GET" class="filter-form">
                 <div class="filter-row">
+                    <!-- Поиск -->
                     <div style="position: relative; flex: 1; min-width: 250px;">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-secondary);">
                             <circle cx="11" cy="11" r="8"></circle>
                             <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                         </svg>
-                        <input type="text" name="search" placeholder="Поиск по названию, УНП, контактному лицу..." value="<?= e($search) ?>" style="padding-left: 40px;">
+                        <input type="text" name="search" placeholder="Название, УНП, телефон..." value="<?= e($search) ?>" style="padding-left: 40px;">
                     </div>
-                    <select name="type">
+                    
+                    <!-- Тип контрагента -->
+                    <select name="type" style="min-width: 150px;">
                         <option value="">Все типы</option>
                         <option value="customer" <?= $type === 'customer' ? 'selected' : '' ?>>Заказчик</option>
                         <option value="supplier" <?= $type === 'supplier' ? 'selected' : '' ?>>Поставщик</option>
-                        <option value="both" <?= $type === 'both' ? 'selected' : '' ?>>Оба</option>
                     </select>
-                    <button type="submit" class="btn btn-secondary">Найти</button>
-                    <a href="list.php" class="btn btn-outline">Сброс</a>
+                    
+                    <!-- Сортировка -->
+                    <select name="sort" style="min-width: 180px;">
+                        <option value="name_asc" <?= ($sort ?? '') === 'name_asc' ? 'selected' : '' ?>>По названию (А-Я)</option>
+                        <option value="name_desc" <?= ($sort ?? '') === 'name_desc' ? 'selected' : '' ?>>По названию (Я-А)</option>
+                        <option value="date_desc" <?= ($sort ?? '') === 'date_desc' ? 'selected' : '' ?>>Сначала новые</option>
+                        <option value="date_asc" <?= ($sort ?? '') === 'date_asc' ? 'selected' : '' ?>>Сначала старые</option>
+                    </select>
+                    
+                    <!-- Кнопки действий -->
+                    <button type="submit" class="btn btn-primary" title="Применить фильтры">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px; vertical-align: middle;">
+                            <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+                        </svg>
+                        Применить
+                    </button>
+                    <a href="list.php" class="btn btn-outline" title="Сбросить фильтры">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px; vertical-align: middle;">
+                            <polyline points="23 4 23 10 17 10"></polyline>
+                            <polyline points="1 20 1 14 7 14"></polyline>
+                            <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+                        </svg>
+                        Сброс
+                    </a>
+                    <a href="export.php?<?= http_build_query($_GET) ?>" class="btn btn-success" title="Выгрузить в Excel/CSV">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px; vertical-align: middle;">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="7 10 12 15 17 10"></polyline>
+                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                        </svg>
+                        Экспорт
+                    </a>
                 </div>
             </form>
 

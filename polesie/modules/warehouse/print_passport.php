@@ -193,6 +193,32 @@ if ($serial_number_id) {
 // Получаем спецификации
 $specs = !empty($product['specifications']) ? json_decode($product['specifications'], true) : [];
 
+// Получаем материалы для продукта из паспорта продукта
+$materials = [];
+if ($serial_number_id) {
+    $matStmt = $pdo->prepare("
+        SELECT 
+            ppm.quantity,
+            ppm.unit,
+            bu.name as unit_name,
+            m.code as material_code,
+            m.name_full as material_name,
+            m.name_short as material_short,
+            mc.name as material_category,
+            m.material_type
+        FROM product_passport_materials ppm
+        JOIN materials m ON ppm.material_id = m.id
+        LEFT JOIN material_categories mc ON m.category_id = mc.id
+        LEFT JOIN base_units bu ON ppm.unit_id = bu.id
+        WHERE ppm.passport_id = (
+            SELECT id FROM product_passports WHERE product_id = ?
+        )
+        ORDER BY ppm.sort_order, m.name_full
+    ");
+    $matStmt->execute([$isJsonProduct ? ($product['sku'] ?? $product_id) : $product_id]);
+    $materials = $matStmt->fetchAll();
+}
+
 // Получаем данные организации из JSON или используем значения по умолчанию
 $company_name = $productionData['company']['name'] ?? "ОАО «Полесьеэлектромаш»";
 $company_address = $productionData['company']['address'] ?? "225644, Брестская область, г. Лунинец, ул. Красная, 179";
@@ -748,9 +774,39 @@ $warranty_end_display = is_string($warranty_end) ? $warranty_end : date('d.m.Y',
             </div>
         </div>
         
+        <!-- Материалы -->
+        <?php if (!empty($materials)): ?>
+        <div class="section page-break">
+            <div class="section-title">4. МАТЕРИАЛЫ</div>
+            <p style="margin-bottom: 15px;">Материалы, используемые при производстве изделия:</p>
+            <table class="specs-table">
+                <thead>
+                    <tr>
+                        <th style="width: 10%;">№</th>
+                        <th style="width: 35%;">Наименование материала</th>
+                        <th style="width: 20%;">Категория</th>
+                        <th style="width: 15%;">Кол-во</th>
+                        <th style="width: 20%;">Ед. изм.</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($materials as $index => $material): ?>
+                    <tr>
+                        <td><?= $index + 1 ?></td>
+                        <td><?= htmlspecialchars($material['material_name'] ?? $material['material_short'] ?? 'Не указано') ?></td>
+                        <td><?= htmlspecialchars($material['material_category'] ?? 'Без категории') ?></td>
+                        <td><?= number_format($material['quantity'] ?? 0, 2, ',', ' ') ?></td>
+                        <td><?= htmlspecialchars($material['unit_name'] ?? $material['unit'] ?? 'шт') ?></td>
+                    </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+        <?php endif; ?>
+        
         <!-- Комплектность -->
         <div class="section">
-            <div class="section-title">4. КОМПЛЕКТНОСТЬ</div>
+            <div class="section-title"><?= !empty($materials) ? '5. КОМПЛЕКТНОСТЬ' : '4. КОМПЛЕКТНОСТЬ' ?></div>
             <p style="margin-bottom: 15px;">Изделие поставляется в следующей комплектности:</p>
             <table class="specs-table">
                 <thead>
@@ -805,7 +861,7 @@ $warranty_end_display = is_string($warranty_end) ? $warranty_end : date('d.m.Y',
         
         <!-- Сведения о производстве -->
         <div class="section page-break">
-            <div class="section-title">5. СВЕДЕНИЯ О ПРОИЗВОДИТЕЛЕ</div>
+            <div class="section-title"><?= !empty($materials) ? '6. СВЕДЕНИЯ О ПРОИЗВОДИТЕЛЕ' : '5. СВЕДЕНИЯ О ПРОИЗВОДИТЕЛЕ' ?></div>
             <table class="info-table">
                 <tr>
                     <td class="info-label">Наименование предприятия:</td>
@@ -840,7 +896,7 @@ $warranty_end_display = is_string($warranty_end) ? $warranty_end : date('d.m.Y',
         
         <!-- Гарантия -->
         <div class="section">
-            <div class="section-title">6. ГАРАНТИЙНЫЕ ОБЯЗАТЕЛЬСТВА</div>
+            <div class="section-title"><?= !empty($materials) ? '7. ГАРАНТИЙНЫЕ ОБЯЗАТЕЛЬСТВА' : '6. ГАРАНТИЙНЫЕ ОБЯЗАТЕЛЬСТВА' ?></div>
             <table class="info-table">
                 <tr>
                     <td class="info-label">Гарантийный срок:</td>
@@ -868,7 +924,7 @@ $warranty_end_display = is_string($warranty_end) ? $warranty_end : date('d.m.Y',
         
         <!-- Меры безопасности -->
         <div class="section page-break">
-            <div class="section-title">7. МЕРЫ БЕЗОПАСНОСТИ</div>
+            <div class="section-title"><?= !empty($materials) ? '8. МЕРЫ БЕЗОПАСНОСТИ' : '7. МЕРЫ БЕЗОПАСНОСТИ' ?></div>
             <div style="padding: 15px; background: #fff3cd; border: 1px solid #ffc107; margin-bottom: 15px;">
                 <strong>⚠ ВНИМАНИЕ!</strong> Перед началом эксплуатации внимательно изучите настоящий паспорт и руководство по эксплуатации.
             </div>
@@ -892,7 +948,7 @@ $warranty_end_display = is_string($warranty_end) ? $warranty_end : date('d.m.Y',
         
         <!-- Условия хранения -->
         <div class="section">
-            <div class="section-title">8. УСЛОВИЯ ХРАНЕНИЯ И ТРАНСПОРТИРОВАНИЯ</div>
+            <div class="section-title"><?= !empty($materials) ? '9. УСЛОВИЯ ХРАНЕНИЯ И ТРАНСПОРТИРОВАНИЯ' : '8. УСЛОВИЯ ХРАНЕНИЯ И ТРАНСПОРТИРОВАНИЯ' ?></div>
             <table class="specs-table">
                 <thead>
                     <tr>

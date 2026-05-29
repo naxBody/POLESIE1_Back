@@ -56,13 +56,14 @@ try {
     $matStmt = $pdo->prepare("
         SELECT 
             ppm.quantity,
-            ppm.unit,
+            bu.name as unit,
             m.code as material_code,
             m.name_full as material_name,
             mc.name as material_category
         FROM product_passport_materials ppm
         JOIN materials m ON ppm.material_id = m.id
         LEFT JOIN material_categories mc ON m.category_id = mc.id
+        LEFT JOIN base_units bu ON ppm.unit_id = bu.id
         WHERE ppm.passport_id = :passport_id
         ORDER BY ppm.sort_order, m.name_full
     ");
@@ -90,12 +91,61 @@ try {
     $stageStmt->execute([':product_id' => $passport['product_id']]);
     $stages = $stageStmt->fetchAll();
     
+    // Получение фактически использованных материалов из производственных заданий
+    $usedMatStmt = $pdo->prepare("
+        SELECT 
+            ptm.quantity_used,
+            ptm.quantity_required,
+            ptm.status,
+            m.code as material_code,
+            m.name_full as material_name,
+            mc.name as material_category,
+            mu.name as unit_name,
+            pt.task_number,
+            pt.status as task_status
+        FROM production_tasks_materials ptm
+        JOIN materials m ON ptm.material_id = m.id
+        LEFT JOIN material_categories mc ON m.category_id = mc.id
+        LEFT JOIN base_units mu ON m.base_unit_id = mu.id
+        JOIN production_tasks pt ON ptm.task_id = pt.id
+        WHERE pt.product_id = :product_id AND ptm.quantity_used > 0
+        ORDER BY pt.created_at DESC, ptm.id
+        LIMIT 50
+    ");
+    $usedMatStmt->execute([':product_id' => $passport['product_id']]);
+    $usedMaterials = $usedMatStmt->fetchAll();
+    
+    // Группировка использованных материалов по наименованиям
+    $usedMaterialsGrouped = [];
+    foreach ($usedMaterials as $um) {
+        $key = $um['material_code'];
+        if (!isset($usedMaterialsGrouped[$key])) {
+            $usedMaterialsGrouped[$key] = [
+                'material_code' => $um['material_code'],
+                'material_name' => $um['material_name'],
+                'material_category' => $um['material_category'],
+                'unit_name' => $um['unit_name'],
+                'total_used' => 0,
+                'total_required' => 0,
+                'tasks_count' => 0,
+                'tasks' => []
+            ];
+        }
+        $usedMaterialsGrouped[$key]['total_used'] += floatval($um['quantity_used']);
+        $usedMaterialsGrouped[$key]['total_required'] += floatval($um['quantity_required']);
+        $usedMaterialsGrouped[$key]['tasks_count']++;
+        if (!in_array($um['task_number'], $usedMaterialsGrouped[$key]['tasks'])) {
+            $usedMaterialsGrouped[$key]['tasks'][] = $um['task_number'];
+        }
+    }
+    
     // Декодирование JSON полей
     $passport['production_notes'] = $passport['production_notes'] ? json_decode($passport['production_notes'], true) : [];
     $passport['quality_requirements'] = $passport['quality_requirements'] ? json_decode($passport['quality_requirements'], true) : [];
     $passport['specifications'] = $passport['specifications'] ? json_decode($passport['specifications'], true) : [];
     $passport['materials'] = $materials;
     $passport['stages'] = $stages;
+    $passport['used_materials'] = array_values($usedMaterialsGrouped);
     
     echo json_encode([
         'success' => true,

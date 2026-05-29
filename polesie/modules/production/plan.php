@@ -355,7 +355,7 @@ if (!empty($orders)) {
 
     // 2. Состав заказов (продукция)
     if (!empty($ordersData)) {
-        $sqlItems = "SELECT oi.id, oi.order_id, 
+        $sqlItems = "SELECT oi.id, oi.order_id, oi.product_id,
                             p.name as product_name, 
                             p.article as article, 
                             oi.quantity, oi.price 
@@ -375,7 +375,7 @@ if (!empty($orders)) {
 
     // 3. Производственные задания для этих заказов
     if (!empty($ordersData)) {
-        $sqlTasks = "SELECT pt.id, pt.order_id, 
+        $sqlTasks = "SELECT pt.id, pt.order_id, pt.product_id,
                             p.name as product_name, 
                             pt.quantity_plan as plan_qty, pt.quantity_fact as done_qty, pt.status as task_status, pt.start_date, pt.end_date 
                      FROM production_tasks pt 
@@ -399,12 +399,16 @@ if (!empty($orders)) {
         foreach ($ord['tasks'] as &$task) {
             $tid = (int)$task['id'];
             
-            // Материалы
-            $sqlMat = "SELECT m.name_full as material_name, ptm.quantity_required as required_qty, 
-                              COALESCE(m.current_stock, 0) as available_qty
+            // Материалы с полной информацией
+            $sqlMat = "SELECT m.name_full as material_name, m.code as material_article, 
+                              ptm.quantity_required as required_qty, 
+                              COALESCE(m.current_stock, 0) as available_qty,
+                              mu.symbol as unit_name
                        FROM production_tasks_materials ptm
                        JOIN materials m ON ptm.material_id = m.id
-                       WHERE ptm.task_id = ?";
+                       LEFT JOIN base_units mu ON m.base_unit_id = mu.id
+                       WHERE ptm.task_id = ?
+                       ORDER BY m.name_full";
             $stmtMat = $pdo->prepare($sqlMat);
             $stmtMat->execute([$tid]);
             $resMat = $stmtMat->fetchAll();
@@ -894,21 +898,67 @@ foreach ($ordersData as $oid => $data) {
             
             // Позиции заказа
             if (data.items && data.items.length > 0) {
+                // Считаем общую сумму и прогресс
+                var totalSum = 0;
+                var totalQty = 0;
+                var completedQty = 0;
+                
+                data.items.forEach(function(item) {
+                    totalSum += (item.quantity * item.price);
+                    totalQty += parseFloat(item.quantity || 0);
+                    
+                    // Ищем выполненное количество из заданий по product_id
+                    if (data.tasks) {
+                        data.tasks.forEach(function(task) {
+                            // Сопоставляем позицию заказа с заданием по product_id
+                            if (task.product_id === item.product_id) {
+                                completedQty += parseFloat(task.done_qty || 0);
+                            }
+                        });
+                    }
+                });
+                
+                var orderProgress = totalQty > 0 ? Math.round((completedQty / totalQty) * 100) : 0;
+                if (orderProgress > 100) orderProgress = 100;
+                
                 html += '<div class="passport-section fade-in">';
-                html += '<div class="passport-section-title">Состав заказа (' + data.items.length + ' поз.)</div>';
+                html += '<div class="passport-section-title" style="display: flex; justify-content: space-between; align-items: center;">';
+                html += '<span>📦 Состав заказа (' + data.items.length + ' поз.)</span>';
+                html += '</div>';
+                
+                // Прогресс выполнения заказа
+                html += '<div style="margin-bottom: 16px; padding: 12px; background: #fff; border-radius: 6px; border: 1px solid #e9ecef;">';
+                html += '<div style="display: flex; justify-content: space-between; margin-bottom: 8px;">';
+                html += '<span style="font-size: 13px; color: #7f8c8d;">Выполнено:</span>';
+                html += '<span style="font-size: 13px; font-weight: 600; color: #2c3e50;">' + orderProgress + '% (' + completedQty + ' из ' + totalQty + ' шт.)</span>';
+                html += '</div>';
+                html += '<div class="modal-progress-bar" style="height: 12px;">';
+                html += '<div class="modal-progress-fill" style="width: ' + orderProgress + '%; background: linear-gradient(90deg, #3498db, #2ecc71);"></div>';
+                html += '</div>';
+                html += '</div>';
+                
+                // Таблица с позициями
                 html += '<table class="materials-table">';
                 html += '<thead><tr><th>Продукция</th><th>Артикул</th><th style="text-align: center;">Кол-во</th><th style="text-align: right;">Цена</th><th style="text-align: right;">Сумма</th></tr></thead>';
                 html += '<tbody>';
                 data.items.forEach(function(item) {
+                    var itemSum = item.quantity * item.price;
                     html += '<tr>';
                     html += '<td><strong>' + escapeHtml(item.product_name) + '</strong></td>';
                     html += '<td><code style="background: #f8f9fa; padding: 2px 6px; border-radius: 4px; font-size: 11px;">' + escapeHtml(item.article) + '</code></td>';
                     html += '<td style="text-align: center; font-weight: 600;">' + item.quantity + '</td>';
                     html += '<td style="text-align: right;">' + formatMoney(item.price) + '</td>';
-                    html += '<td style="text-align: right;"><strong>' + formatMoney(item.quantity * item.price) + '</strong></td>';
+                    html += '<td style="text-align: right;"><strong>' + formatMoney(itemSum) + '</strong></td>';
                     html += '</tr>';
                 });
-                html += '</tbody></table></div>';
+                html += '</tbody>';
+                html += '<tfoot>';
+                html += '<tr style="background: #f8f9fa; font-weight: 700;">';
+                html += '<td colspan="4" style="text-align: right; padding: 12px;">Итого:</td>';
+                html += '<td style="text-align: right; padding: 12px; color: #2c3e50; font-size: 15px;">' + formatMoney(totalSum) + '</td>';
+                html += '</tr>';
+                html += '</tfoot>';
+                html += '</table></div>';
             } else {
                 html += '<div class="passport-section fade-in"><div class="passport-section-title">Состав заказа</div><p style="color: #95a5a6;">Нет данных</p></div>';
             }
@@ -988,17 +1038,21 @@ foreach ($ordersData as $oid => $data) {
                     // Материалы
                     if (task.materials && task.materials.length > 0) {
                         html += '<div style="margin-bottom: 16px;">';
-                        html += '<h5 style="margin-bottom: 10px; font-size: 13px; color: #2c3e50; font-weight: 600;">Материалы:</h5>';
+                        html += '<h5 style="margin-bottom: 10px; font-size: 13px; color: #2c3e50; font-weight: 600;">📦 Материалы для задания:</h5>';
                         html += '<table class="materials-table">';
-                        html += '<thead><tr><th>Материал</th><th>Статус</th></tr></thead>';
+                        html += '<thead><tr><th>Материал</th><th>Артикул</th><th style="text-align: center;">Требуется</th><th style="text-align: center;">На складе</th><th>Статус</th></tr></thead>';
                         html += '<tbody>';
                         task.materials.forEach(function(mat) {
                             var isSufficient = mat.available_qty >= mat.required_qty;
+                            var unit = mat.unit_name || 'шт.';
                             var statusHtml = isSufficient 
                                 ? '<span class="badge badge-success"><span class="material-status-indicator sufficient"></span>Хватает</span>'
-                                : '<span class="badge badge-danger"><span class="material-status-indicator insufficient"></span>Не хватает (' + (mat.required_qty - mat.available_qty) + ')</span>';
+                                : '<span class="badge badge-danger"><span class="material-status-indicator insufficient"></span>Не хватает (' + (mat.required_qty - mat.available_qty) + ' ' + unit + ')</span>';
                             html += '<tr style="' + (!isSufficient ? 'background: #fff5f5;' : '') + '">';
                             html += '<td><strong>' + escapeHtml(mat.material_name) + '</strong></td>';
+                            html += '<td><code style="background: #f8f9fa; padding: 2px 6px; border-radius: 4px; font-size: 11px;">' + escapeHtml(mat.material_article) + '</code></td>';
+                            html += '<td style="text-align: center;">' + mat.required_qty + ' ' + unit + '</td>';
+                            html += '<td style="text-align: center;">' + mat.available_qty + ' ' + unit + '</td>';
                             html += '<td>' + statusHtml + '</td>';
                             html += '</tr>';
                         });
@@ -1008,8 +1062,8 @@ foreach ($ordersData as $oid => $data) {
                     
                     // Этапы производства - Timeline
                     if (task.stages && task.stages.length > 0) {
-                        html += '<div>';
-                        html += '<h5 style="margin-bottom: 10px; font-size: 13px; color: #2c3e50; font-weight: 600;">Этапы производства:</h5>';
+                        html += '<div style="margin-top: 16px;">';
+                        html += '<h5 style="margin-bottom: 10px; font-size: 13px; color: #2c3e50; font-weight: 600;">🔄 Этапы производства:</h5>';
                         html += '<div class="production-timeline">';
                         
                         // Определяем иконки для этапов
@@ -1041,6 +1095,41 @@ foreach ($ordersData as $oid => $data) {
                     
                     html += '</div></div>';
                 });
+                
+                // Добавляем сводку по материалам для всего заказа
+                var allMaterials = [];
+                var totalShortages = 0;
+                data.tasks.forEach(function(t) {
+                    if (t.materials) {
+                        t.materials.forEach(function(m) {
+                            allMaterials.push(m);
+                            if (m.available_qty < m.required_qty) {
+                                totalShortages++;
+                            }
+                        });
+                    }
+                });
+                
+                if (allMaterials.length > 0) {
+                    html += '<div class="passport-section fade-in" style="margin-top: 20px;">';
+                    html += '<div class="passport-section-title">📊 Общая потребность в материалах:</div>';
+                    html += '<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-top: 12px;">';
+                    html += '<div style="background: #fff; padding: 12px; border-radius: 6px; border: 1px solid #e9ecef;">';
+                    html += '<div style="font-size: 12px; color: #7f8c8d;">Всего материалов:</div>';
+                    html += '<div style="font-size: 20px; font-weight: 700; color: #2c3e50;">' + allMaterials.length + '</div>';
+                    html += '</div>';
+                    html += '<div style="background: #fff; padding: 12px; border-radius: 6px; border: 1px solid #e9ecef;">';
+                    html += '<div style="font-size: 12px; color: #7f8c8d;">Хватает на складе:</div>';
+                    html += '<div style="font-size: 20px; font-weight: 700; color: #27ae60;">' + (allMaterials.length - totalShortages) + '</div>';
+                    html += '</div>';
+                    html += '<div style="background: #fff; padding: 12px; border-radius: 6px; border: 1px solid #e9ecef;">';
+                    html += '<div style="font-size: 12px; color: #7f8c8d;">Не хватает:</div>';
+                    html += '<div style="font-size: 20px; font-weight: 700; color: #e74c3c;">' + totalShortages + '</div>';
+                    html += '</div>';
+                    html += '</div>';
+                    html += '</div>';
+                }
+                
                 html += '</div>';
             }
             

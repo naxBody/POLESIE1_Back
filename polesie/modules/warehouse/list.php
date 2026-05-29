@@ -20,10 +20,11 @@ $type = $_GET['type'] ?? 'materials';
 $search = $_GET['search'] ?? '';
 
 if ($type === 'products') {
-    $sql = "SELECT wi.*, p.name as item_name, p.article 
-            FROM warehouse_items wi 
-            JOIN products p ON wi.item_id = p.id AND p.id IS NOT NULL
-            WHERE wi.item_type = 'product'";
+    $sql = "SELECT p.id, p.name as item_name, p.article, 
+                   p.current_stock as quantity, 'шт.' as unit,
+                   p.location, p.updated_at
+            FROM products p
+            WHERE p.is_active = 1";
     $params = [];
     
     if ($search) {
@@ -31,19 +32,21 @@ if ($type === 'products') {
         $params[] = "%$search%";
     }
 } else {
-    $sql = "SELECT wi.*, m.name as item_name, m.unit 
-            FROM warehouse_items wi 
-            JOIN materials m ON wi.item_id = m.id AND m.id IS NOT NULL
-            WHERE wi.item_type = 'material'";
+    $sql = "SELECT m.id, m.name_full as item_name, m.code as article, 
+                   m.current_stock as quantity, m.base_unit_id, u.symbol as unit,
+                   m.location, m.updated_at
+            FROM materials m
+            LEFT JOIN base_units u ON m.base_unit_id = u.id
+            WHERE 1=1";
     $params = [];
     
     if ($search) {
-        $sql .= " AND m.name LIKE ?";
+        $sql .= " AND m.name_full LIKE ?";
         $params[] = "%$search%";
     }
 }
 
-$sql .= " ORDER BY wi.quantity ASC";
+$sql .= " ORDER BY quantity ASC";
 
 $stmt = $pdo->prepare($sql);
 $stmt->execute($params);

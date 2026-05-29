@@ -345,6 +345,21 @@ CREATE TABLE `product_passports` (
   CONSTRAINT `fk_pp_product` FOREIGN KEY (`product_id`) REFERENCES `products`(`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+-- 21. МАТЕРИАЛЫ В ПАСПОРТЕ ПРОДУКЦИИ
+CREATE TABLE `product_passport_materials` (
+  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `passport_id` INT NOT NULL,
+  `material_id` INT NOT NULL,
+  `quantity` DECIMAL(10,3) DEFAULT 0,
+  `unit_id` INT,
+  `weight_kg` DECIMAL(10,3) DEFAULT 0,
+  `percentage` DECIMAL(5,2) DEFAULT 0,
+  `notes` TEXT,
+  CONSTRAINT `fk_ppm_passport` FOREIGN KEY (`passport_id`) REFERENCES `product_passports`(`id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_ppm_material` FOREIGN KEY (`material_id`) REFERENCES `materials`(`id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_ppm_unit` FOREIGN KEY (`unit_id`) REFERENCES `base_units`(`id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 -- ============================================
 -- ЗАПОЛНЕНИЕ ТЕСТОВЫМИ ДАННЫМИ
 -- ============================================

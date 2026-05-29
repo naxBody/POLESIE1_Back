@@ -20,7 +20,7 @@ $status = $_GET['status'] ?? '';
 
 $sql = "SELECT pt.*, pt.quantity_plan as task_quantity, p.name as product_name, 
                u.full_name as inspector_name,
-               qc.id as check_id, qc.result, qc.inspection_date,
+               qc.id as check_id, qc.status as result, qc.check_date as inspection_date,
                CASE WHEN qc.id IS NOT NULL THEN TRUE ELSE FALSE END as is_inspected
         FROM production_tasks pt 
         JOIN products p ON pt.product_id = p.id 
@@ -32,9 +32,9 @@ $params = [];
 if ($status === 'pending') {
     $sql .= " AND qc.id IS NULL";
 } elseif ($status === 'passed') {
-    $sql .= " AND qc.result = 'pass'";
+    $sql .= " AND qc.status = 'pass'";
 } elseif ($status === 'failed') {
-    $sql .= " AND qc.result = 'fail'";
+    $sql .= " AND qc.status = 'fail'";
 }
 
 $sql .= " ORDER BY pt.created_at DESC";

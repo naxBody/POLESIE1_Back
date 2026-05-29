@@ -423,7 +423,7 @@ if (!empty($orders)) {
             if (empty($resMat) && !empty($task['product_id'])) {
                 $sqlPassportMat = "SELECT 
                                           ppm.quantity as required_qty,
-                                          ppm.unit as unit_name,
+                                          'шт.' as unit_name,
                                           m.name_full as material_name, 
                                           m.code as material_article,
                                           COALESCE(m.current_stock, 0) as available_qty

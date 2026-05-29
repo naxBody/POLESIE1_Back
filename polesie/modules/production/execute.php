@@ -27,6 +27,7 @@ $sql = "SELECT pt.*,
                p.name as product_name, 
                p.article as product_article,
                p.id as product_id,
+               p.route_card_id as product_route_card_id,
                c.name as category_name, 
                u.symbol as unit_name,
                u2.full_name as responsible_name, 
@@ -104,9 +105,10 @@ if ($selectedTask) {
     $stagesStmt->execute([$selectedTask['id']]);
     $selectedTask['stages'] = $stagesStmt->fetchAll();
     
-    // Если этапы не найдены, но есть маршрутная карта, создаем их автоматически
-    if (empty($selectedTask['stages']) && !empty($selectedTask['route_card_id'])) {
-        createStagesForTask($pdo, $selectedTask['id'], $selectedTask['route_card_id']);
+    // Если этапы не найдены, но есть маршрутная карта у продукта, создаем их автоматически
+    $routeCardId = $selectedTask['route_card_id'] ?? $selectedTask['product_route_card_id'] ?? null;
+    if (empty($selectedTask['stages']) && !empty($routeCardId)) {
+        createStagesForTask($pdo, $selectedTask['id'], $routeCardId);
         
         // Повторно получаем этапы
         $stagesStmt->execute([$selectedTask['id']]);
@@ -563,7 +565,7 @@ foreach ($allTasks as &$task) {
                                     </div>
                                 <?php else: ?>
                                     <?php foreach ($tasks as $idx => $task): ?>
-                                        <div class="task-item <?= $idx === 0 ? 'active' : '' ?>" 
+                                        <div class="task-item <?= $selectedTask && $task['id'] == $selectedTask['id'] ? 'active' : '' ?>" 
                                              data-task-id="<?= $task['id'] ?>"
                                              onclick="selectTask(<?= $task['id'] ?>)">
                                             <div class="task-item-header">
@@ -617,19 +619,19 @@ foreach ($allTasks as &$task) {
                                 
                                 <div class="stats-row">
                                     <div class="stat-card">
-                                        <div class="stat-value"><?= number_format($selectedTask['quantity_plan'], 0, ',', ' ') ?></div>
+                                        <div class="stat-value"><?= (int)$selectedTask['quantity_plan'] ?></div>
                                         <div class="stat-label">План</div>
                                     </div>
                                     <div class="stat-card">
-                                        <div class="stat-value" style="color: var(--info-color);"><?= number_format($selectedTask['quantity_fact'], 0, ',', ' ') ?></div>
+                                        <div class="stat-value" style="color: var(--info-color);"><?= (int)$selectedTask['quantity_fact'] ?></div>
                                         <div class="stat-label">Факт</div>
                                     </div>
                                     <div class="stat-card">
-                                        <div class="stat-value" style="color: var(--success-color);"><?= number_format($selectedTask['quantity_good'], 0, ',', ' ') ?></div>
+                                        <div class="stat-value" style="color: var(--success-color);"><?= (int)$selectedTask['quantity_good'] ?></div>
                                         <div class="stat-label">Годные</div>
                                     </div>
                                     <div class="stat-card">
-                                        <div class="stat-value" style="color: var(--danger-color);"><?= number_format($selectedTask['quantity_defect'], 0, ',', ' ') ?></div>
+                                        <div class="stat-value" style="color: var(--danger-color);"><?= (int)$selectedTask['quantity_defect'] ?></div>
                                         <div class="stat-label">Брак</div>
                                     </div>
                                 </div>
@@ -708,9 +710,9 @@ foreach ($allTasks as &$task) {
                                                 <tr>
                                                     <td><?= e($mat['material_name']) ?></td>
                                                     <td><code><?= e($mat['material_code']) ?></code></td>
-                                                    <td><?= number_format($mat['quantity_required'], 0, ',', ' ') ?> <?= e($mat['unit_symbol']) ?></td>
-                                                    <td><?= number_format($mat['quantity_used'], 0, ',', ' ') ?> <?= e($mat['unit_symbol']) ?></td>
-                                                    <td><?= number_format($mat['current_stock'], 0, ',', ' ') ?> <?= e($mat['unit_symbol']) ?></td>
+                                                    <td><?= (int)$mat['quantity_required'] ?> <?= e($mat['unit_symbol']) ?></td>
+                                                    <td><?= (int)$mat['quantity_used'] ?> <?= e($mat['unit_symbol']) ?></td>
+                                                    <td><?= (int)$mat['current_stock'] ?> <?= e($mat['unit_symbol']) ?></td>
                                                     <td>
                                                         <span class="availability-badge availability-<?= $mat['availability'] ?>">
                                                             <?= $mat['availability'] === 'sufficient' ? '✓ Достаточно' : 
@@ -876,8 +878,6 @@ foreach ($allTasks as &$task) {
         let currentTaskId = <?= $selectedTask ? $selectedTask['id'] : 0 ?>;
         
         function selectTask(taskId) {
-            currentTaskId = taskId;
-            
             // Обновляем активный класс
             document.querySelectorAll('.task-item').forEach(item => {
                 item.classList.remove('active');
@@ -901,8 +901,22 @@ foreach ($allTasks as &$task) {
             });
             
             // Показываем выбранную
-            document.getElementById('tab-' + tabName).classList.add('active');
-            event.target.classList.add('active');
+            const tabContent = document.getElementById('tab-' + tabName);
+            if (tabContent) {
+                tabContent.classList.add('active');
+            }
+            
+            // Находим кнопку которая вызвала эту функцию и делаем её активной
+            const buttons = document.querySelectorAll('.tab-button');
+            buttons.forEach(btn => {
+                if (btn.textContent.toLowerCase().includes(
+                    tabName === 'stages' ? 'этапы' : 
+                    tabName === 'materials' ? 'материалы' : 
+                    tabName === 'serial' ? 'серийн' : 'информация'
+                )) {
+                    btn.classList.add('active');
+                }
+            });
         }
         
         function startStage(stageId, taskId) {

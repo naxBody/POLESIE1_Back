@@ -195,29 +195,28 @@ $specs = !empty($product['specifications']) ? json_decode($product['specificatio
 
 // Получаем материалы для продукта из паспорта продукта
 $materials = [];
-if ($serial_number_id) {
-    $matStmt = $pdo->prepare("
-        SELECT 
-            ppm.quantity,
-            ppm.unit,
-            bu.name as unit_name,
-            m.code as material_code,
-            m.name_full as material_name,
-            m.name_short as material_short,
-            mc.name as material_category,
-            m.material_type
-        FROM product_passport_materials ppm
-        JOIN materials m ON ppm.material_id = m.id
-        LEFT JOIN material_categories mc ON m.category_id = mc.id
-        LEFT JOIN base_units bu ON ppm.unit_id = bu.id
-        WHERE ppm.passport_id = (
-            SELECT id FROM product_passports WHERE product_id = ?
-        )
-        ORDER BY ppm.sort_order, m.name_full
-    ");
-    $matStmt->execute([$isJsonProduct ? ($product['sku'] ?? $product_id) : $product_id]);
-    $materials = $matStmt->fetchAll();
-}
+// Получаем материалы независимо от наличия серийного номера
+$matStmt = $pdo->prepare("
+    SELECT 
+        ppm.quantity,
+        ppm.unit,
+        bu.name as unit_name,
+        m.code as material_code,
+        m.name_full as material_name,
+        m.name_short as material_short,
+        mc.name as material_category,
+        m.material_type
+    FROM product_passport_materials ppm
+    JOIN materials m ON ppm.material_id = m.id
+    LEFT JOIN material_categories mc ON m.category_id = mc.id
+    LEFT JOIN base_units bu ON ppm.unit_id = bu.id
+    WHERE ppm.passport_id = (
+        SELECT id FROM product_passports WHERE product_id = ?
+    )
+    ORDER BY ppm.sort_order, m.name_full
+");
+$matStmt->execute([$isJsonProduct ? ($product['sku'] ?? $product_id) : $product_id]);
+$materials = $matStmt->fetchAll();
 
 // Получаем данные организации из JSON или используем значения по умолчанию
 $company_name = $productionData['company']['name'] ?? "ОАО «Полесьеэлектромаш»";

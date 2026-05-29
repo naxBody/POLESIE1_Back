@@ -56,7 +56,7 @@ if (!$order) {
 
 // Получение позиций заказа
 $itemsSql = "
-    SELECT oi.*, p.id as product_id, p.name as product_name, p.article, p.description,
+    SELECT oi.*, p.id as product_id, p.name as product_name, p.article,
            bu.symbol as unit_name
     FROM order_items oi
     LEFT JOIN products p ON oi.product_id = p.id

@@ -267,6 +267,49 @@ WHERE NOT EXISTS (
     SELECT 1 FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = '2AIR100S2')
 );
 
+-- Материалы для 2AIR100S2
+INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`)
+SELECT 
+    (SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = '2AIR100S2')),
+    (SELECT id FROM materials WHERE code = 'STEEL-SHEET-0.5'), 4.8, 2, 2.400, 51.2, 1, 'Сталь для корпуса статора'
+WHERE EXISTS (SELECT 1 FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = '2AIR100S2'))
+  AND EXISTS (SELECT 1 FROM materials WHERE code = 'STEEL-SHEET-0.5');
+
+INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`)
+SELECT 
+    (SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = '2AIR100S2')),
+    (SELECT id FROM materials WHERE code = 'WIRE-CU-1.0'), 0.28, 4, 0.084, 1.79, 2, 'Обмоточный провод'
+WHERE EXISTS (SELECT 1 FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = '2AIR100S2'))
+  AND EXISTS (SELECT 1 FROM materials WHERE code = 'WIRE-CU-1.0');
+
+INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`)
+SELECT 
+    (SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = '2AIR100S2')),
+    (SELECT id FROM materials WHERE code = 'BEARING-6205-2RS'), 2, 1, 0.500, 10.68, 3, 'Подшипники'
+WHERE EXISTS (SELECT 1 FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = '2AIR100S2'))
+  AND EXISTS (SELECT 1 FROM materials WHERE code = 'BEARING-6205-2RS');
+
+INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`)
+SELECT 
+    (SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = '2AIR100S2')),
+    (SELECT id FROM materials WHERE code = 'ALUM-BAR-10'), 3.2, 2, 1.600, 34.19, 4, 'Алюминий для литья ротора'
+WHERE EXISTS (SELECT 1 FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = '2AIR100S2'))
+  AND EXISTS (SELECT 1 FROM materials WHERE code = 'ALUM-BAR-10');
+
+INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`)
+SELECT 
+    (SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = '2AIR100S2')),
+    (SELECT id FROM materials WHERE code = 'PAINT-POLYMER'), 0.18, 2, 0.090, 1.92, 5, 'Порошковая краска'
+WHERE EXISTS (SELECT 1 FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = '2AIR100S2'))
+  AND EXISTS (SELECT 1 FROM materials WHERE code = 'PAINT-POLYMER');
+
+INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`)
+SELECT 
+    (SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = '2AIR100S2')),
+    (SELECT id FROM materials WHERE code = 'LUBE-GREASE-LITO'), 0.03, 2, 0.015, 0.32, 6, 'Смазка для подшипников'
+WHERE EXISTS (SELECT 1 FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = '2AIR100S2'))
+  AND EXISTS (SELECT 1 FROM materials WHERE code = 'LUBE-GREASE-LITO');
+
 
 
 -- Паспорт для 2AIR100S4
@@ -278,6 +321,49 @@ SELECT
 WHERE NOT EXISTS (
     SELECT 1 FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = '2AIR100S4')
 );
+
+-- Материалы для 2AIR100S4
+INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`)
+SELECT 
+    (SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = '2AIR100S4')),
+    (SELECT id FROM materials WHERE code = 'STEEL-SHEET-0.5'), 5.1, 2, 2.550, 51.0, 1, 'Сталь для корпуса статора'
+WHERE EXISTS (SELECT 1 FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = '2AIR100S4'))
+  AND EXISTS (SELECT 1 FROM materials WHERE code = 'STEEL-SHEET-0.5');
+
+INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`)
+SELECT 
+    (SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = '2AIR100S4')),
+    (SELECT id FROM materials WHERE code = 'WIRE-CU-1.0'), 0.30, 4, 0.090, 1.80, 2, 'Обмоточный провод'
+WHERE EXISTS (SELECT 1 FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = '2AIR100S4'))
+  AND EXISTS (SELECT 1 FROM materials WHERE code = 'WIRE-CU-1.0');
+
+INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`)
+SELECT 
+    (SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = '2AIR100S4')),
+    (SELECT id FROM materials WHERE code = 'BEARING-6205-2RS'), 2, 1, 0.500, 10.00, 3, 'Подшипники'
+WHERE EXISTS (SELECT 1 FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = '2AIR100S4'))
+  AND EXISTS (SELECT 1 FROM materials WHERE code = 'BEARING-6205-2RS');
+
+INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`)
+SELECT 
+    (SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = '2AIR100S4')),
+    (SELECT id FROM materials WHERE code = 'ALUM-BAR-10'), 3.4, 2, 1.700, 34.00, 4, 'Алюминий для литья ротора'
+WHERE EXISTS (SELECT 1 FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = '2AIR100S4'))
+  AND EXISTS (SELECT 1 FROM materials WHERE code = 'ALUM-BAR-10');
+
+INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`)
+SELECT 
+    (SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = '2AIR100S4')),
+    (SELECT id FROM materials WHERE code = 'PAINT-POLYMER'), 0.19, 2, 0.095, 1.90, 5, 'Порошковая краска'
+WHERE EXISTS (SELECT 1 FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = '2AIR100S4'))
+  AND EXISTS (SELECT 1 FROM materials WHERE code = 'PAINT-POLYMER');
+
+INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`)
+SELECT 
+    (SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = '2AIR100S4')),
+    (SELECT id FROM materials WHERE code = 'LUBE-GREASE-LITO'), 0.03, 2, 0.015, 0.30, 6, 'Смазка для подшипников'
+WHERE EXISTS (SELECT 1 FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = '2AIR100S4'))
+  AND EXISTS (SELECT 1 FROM materials WHERE code = 'LUBE-GREASE-LITO');
 
 
 
@@ -291,6 +377,49 @@ WHERE NOT EXISTS (
     SELECT 1 FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = '2AIR100L2')
 );
 
+-- Материалы для 2AIR100L2
+INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`)
+SELECT 
+    (SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = '2AIR100L2')),
+    (SELECT id FROM materials WHERE code = 'STEEL-SHEET-0.5'), 5.4, 2, 2.700, 51.1, 1, 'Сталь для корпуса статора'
+WHERE EXISTS (SELECT 1 FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = '2AIR100L2'))
+  AND EXISTS (SELECT 1 FROM materials WHERE code = 'STEEL-SHEET-0.5');
+
+INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`)
+SELECT 
+    (SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = '2AIR100L2')),
+    (SELECT id FROM materials WHERE code = 'WIRE-CU-1.1'), 0.32, 4, 0.096, 1.82, 2, 'Обмоточный провод'
+WHERE EXISTS (SELECT 1 FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = '2AIR100L2'))
+  AND EXISTS (SELECT 1 FROM materials WHERE code = 'WIRE-CU-1.1');
+
+INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`)
+SELECT 
+    (SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = '2AIR100L2')),
+    (SELECT id FROM materials WHERE code = 'BEARING-6205-2RS'), 2, 1, 0.500, 9.47, 3, 'Подшипники'
+WHERE EXISTS (SELECT 1 FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = '2AIR100L2'))
+  AND EXISTS (SELECT 1 FROM materials WHERE code = 'BEARING-6205-2RS');
+
+INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`)
+SELECT 
+    (SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = '2AIR100L2')),
+    (SELECT id FROM materials WHERE code = 'ALUM-BAR-10'), 3.6, 2, 1.800, 34.15, 4, 'Алюминий для литья ротора'
+WHERE EXISTS (SELECT 1 FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = '2AIR100L2'))
+  AND EXISTS (SELECT 1 FROM materials WHERE code = 'ALUM-BAR-10');
+
+INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`)
+SELECT 
+    (SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = '2AIR100L2')),
+    (SELECT id FROM materials WHERE code = 'PAINT-POLYMER'), 0.20, 2, 0.100, 1.89, 5, 'Порошковая краска'
+WHERE EXISTS (SELECT 1 FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = '2AIR100L2'))
+  AND EXISTS (SELECT 1 FROM materials WHERE code = 'PAINT-POLYMER');
+
+INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`)
+SELECT 
+    (SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = '2AIR100L2')),
+    (SELECT id FROM materials WHERE code = 'LUBE-GREASE-LITO'), 0.03, 2, 0.015, 0.28, 6, 'Смазка для подшипников'
+WHERE EXISTS (SELECT 1 FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = '2AIR100L2'))
+  AND EXISTS (SELECT 1 FROM materials WHERE code = 'LUBE-GREASE-LITO');
+
 
 
 -- Паспорт для 2AIR100L4
@@ -303,6 +432,49 @@ WHERE NOT EXISTS (
     SELECT 1 FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = '2AIR100L4')
 );
 
+-- Материалы для 2AIR100L4
+INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`)
+SELECT 
+    (SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = '2AIR100L4')),
+    (SELECT id FROM materials WHERE code = 'STEEL-SHEET-0.5'), 5.7, 2, 2.850, 51.0, 1, 'Сталь для корпуса статора'
+WHERE EXISTS (SELECT 1 FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = '2AIR100L4'))
+  AND EXISTS (SELECT 1 FROM materials WHERE code = 'STEEL-SHEET-0.5');
+
+INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`)
+SELECT 
+    (SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = '2AIR100L4')),
+    (SELECT id FROM materials WHERE code = 'WIRE-CU-1.1'), 0.34, 4, 0.102, 1.83, 2, 'Обмоточный провод'
+WHERE EXISTS (SELECT 1 FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = '2AIR100L4'))
+  AND EXISTS (SELECT 1 FROM materials WHERE code = 'WIRE-CU-1.1');
+
+INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`)
+SELECT 
+    (SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = '2AIR100L4')),
+    (SELECT id FROM materials WHERE code = 'BEARING-6205-2RS'), 2, 1, 0.500, 8.96, 3, 'Подшипники'
+WHERE EXISTS (SELECT 1 FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = '2AIR100L4'))
+  AND EXISTS (SELECT 1 FROM materials WHERE code = 'BEARING-6205-2RS');
+
+INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`)
+SELECT 
+    (SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = '2AIR100L4')),
+    (SELECT id FROM materials WHERE code = 'ALUM-BAR-10'), 3.8, 2, 1.900, 34.04, 4, 'Алюминий для литья ротора'
+WHERE EXISTS (SELECT 1 FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = '2AIR100L4'))
+  AND EXISTS (SELECT 1 FROM materials WHERE code = 'ALUM-BAR-10');
+
+INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`)
+SELECT 
+    (SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = '2AIR100L4')),
+    (SELECT id FROM materials WHERE code = 'PAINT-POLYMER'), 0.21, 2, 0.105, 1.88, 5, 'Порошковая краска'
+WHERE EXISTS (SELECT 1 FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = '2AIR100L4'))
+  AND EXISTS (SELECT 1 FROM materials WHERE code = 'PAINT-POLYMER');
+
+INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`)
+SELECT 
+    (SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = '2AIR100L4')),
+    (SELECT id FROM materials WHERE code = 'LUBE-GREASE-LITO'), 0.03, 2, 0.015, 0.27, 6, 'Смазка для подшипников'
+WHERE EXISTS (SELECT 1 FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = '2AIR100L4'))
+  AND EXISTS (SELECT 1 FROM materials WHERE code = 'LUBE-GREASE-LITO');
+
 
 
 -- Паспорт для 2AIR100L6
@@ -314,6 +486,49 @@ SELECT
 WHERE NOT EXISTS (
     SELECT 1 FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = '2AIR100L6')
 );
+
+-- Материалы для 2AIR100L6
+INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`)
+SELECT 
+    (SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = '2AIR100L6')),
+    (SELECT id FROM materials WHERE code = 'STEEL-SHEET-0.5'), 5.1, 2, 2.550, 51.0, 1, 'Сталь для корпуса статора'
+WHERE EXISTS (SELECT 1 FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = '2AIR100L6'))
+  AND EXISTS (SELECT 1 FROM materials WHERE code = 'STEEL-SHEET-0.5');
+
+INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`)
+SELECT 
+    (SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = '2AIR100L6')),
+    (SELECT id FROM materials WHERE code = 'WIRE-CU-1.0'), 0.30, 4, 0.090, 1.80, 2, 'Обмоточный провод'
+WHERE EXISTS (SELECT 1 FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = '2AIR100L6'))
+  AND EXISTS (SELECT 1 FROM materials WHERE code = 'WIRE-CU-1.0');
+
+INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`)
+SELECT 
+    (SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = '2AIR100L6')),
+    (SELECT id FROM materials WHERE code = 'BEARING-6205-2RS'), 2, 1, 0.500, 10.00, 3, 'Подшипники'
+WHERE EXISTS (SELECT 1 FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = '2AIR100L6'))
+  AND EXISTS (SELECT 1 FROM materials WHERE code = 'BEARING-6205-2RS');
+
+INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`)
+SELECT 
+    (SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = '2AIR100L6')),
+    (SELECT id FROM materials WHERE code = 'ALUM-BAR-10'), 3.4, 2, 1.700, 34.00, 4, 'Алюминий для литья ротора'
+WHERE EXISTS (SELECT 1 FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = '2AIR100L6'))
+  AND EXISTS (SELECT 1 FROM materials WHERE code = 'ALUM-BAR-10');
+
+INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`)
+SELECT 
+    (SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = '2AIR100L6')),
+    (SELECT id FROM materials WHERE code = 'PAINT-POLYMER'), 0.19, 2, 0.095, 1.90, 5, 'Порошковая краска'
+WHERE EXISTS (SELECT 1 FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = '2AIR100L6'))
+  AND EXISTS (SELECT 1 FROM materials WHERE code = 'PAINT-POLYMER');
+
+INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`)
+SELECT 
+    (SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = '2AIR100L6')),
+    (SELECT id FROM materials WHERE code = 'LUBE-GREASE-LITO'), 0.03, 2, 0.015, 0.30, 6, 'Смазка для подшипников'
+WHERE EXISTS (SELECT 1 FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = '2AIR100L6'))
+  AND EXISTS (SELECT 1 FROM materials WHERE code = 'LUBE-GREASE-LITO');
 
 
 

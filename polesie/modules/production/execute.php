@@ -104,6 +104,15 @@ if ($selectedTask) {
     $stagesStmt->execute([$selectedTask['id']]);
     $selectedTask['stages'] = $stagesStmt->fetchAll();
     
+    // Если этапы не найдены, но есть маршрутная карта, создаем их автоматически
+    if (empty($selectedTask['stages']) && !empty($selectedTask['route_card_id'])) {
+        createStagesForTask($pdo, $selectedTask['id'], $selectedTask['route_card_id']);
+        
+        // Повторно получаем этапы
+        $stagesStmt->execute([$selectedTask['id']]);
+        $selectedTask['stages'] = $stagesStmt->fetchAll();
+    }
+    
     // Материалы для задания
     $materialsStmt = $pdo->prepare("
         SELECT ptm.id, ptm.task_id, ptm.material_id, ptm.quantity_required, 
@@ -569,7 +578,7 @@ foreach ($allTasks as &$task) {
                                             <div class="task-product-name"><?= e($task['product_name']) ?></div>
                                             <div class="task-order-info">
                                                 Заказ: <?= e($task['order_number']) ?> • 
-                                                План: <?= number_format($task['quantity_plan'], 0, ',', ' ') ?> <?= e($task['unit_name']) ?>
+                                                План: <?= (int)$task['quantity_plan'] ?> <?= e($task['unit_name']) ?>
                                             </div>
                                             
                                             <div class="task-progress">

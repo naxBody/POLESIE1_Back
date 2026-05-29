@@ -27,8 +27,22 @@
 
 ```
 sql/
-├── schema.sql      # Основная схема БД (17 таблиц + начальные данные)
-└── test_data.sql   # Тестовые данные для разработки и тестирования
+├── database_updated.sql   # Основная схема БД + тестовые данные (заказы, задания)
+├── insert_orders.sql      # Отдельный файл с заказами и производственными заданиями
+├── matrials_info.php      # Скрипт для получения информации о материалах
+└── product_info.php       # Скрипт для получения информации о продукции
+```
+
+### Как использовать:
+
+1. **Полная установка с тестовыми данными:**
+```bash
+mysql -u root -p polesie_production < database_updated.sql
+```
+
+2. **Или отдельно добавить заказы в существующую базу:**
+```bash
+mysql -u root -p polesie_production < insert_orders.sql
 ```
 
 ---
@@ -73,9 +87,16 @@ sql/
 mysql -u root -p < sql/schema.sql
 ```
 
-### 2. Загрузка тестовых данных (опционально)
+### 2. Загрузка тестовых данных (заказы и задания)
+
 ```bash
-mysql -u root -p polesie_production < sql/test_data.sql
+mysql -u root -p polesie_production < insert_orders.sql
+```
+
+Или используйте полный файл с данными:
+
+```bash
+mysql -u root -p polesie_production < database_updated.sql
 ```
 
 ### 3. Проверка установки
@@ -89,6 +110,19 @@ SELECT COUNT(*) FROM users;
 
 SELECT COUNT(*) FROM products;
 -- Должно быть 12 товаров
+
+-- Проверка заказов и заданий:
+SELECT COUNT(*) FROM orders;
+-- Должно быть 10 заказов
+
+SELECT COUNT(*) FROM order_items;
+-- Должно быть 45 позиций
+
+SELECT COUNT(*) FROM production_tasks;
+-- Должно быть 45 производственных заданий
+
+SELECT COUNT(*) FROM production_task_stages;
+-- Должно быть множество этапов выполнения
 ```
 
 ---

@@ -386,6 +386,77 @@ require_once BASE_PATH . '/includes/topbar.php';
                 </div>
             </form>
 
+            <!-- Таблица контрагентов -->
+            <div class="table-responsive">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 40px;"></th>
+                            <th>Название</th>
+                            <th>Тип</th>
+                            <th>УНП</th>
+                            <th>Контактное лицо</th>
+                            <th>Контакты</th>
+                            <th style="width: 120px;">Действия</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($contractors as $c): ?>
+                        <tr>
+                            <td>
+                                <div class="contractor-avatar">
+                                    <?= mb_substr(mb_strtoupper($c['name']), 0, 1) ?>
+                                </div>
+                            </td>
+                            <td><strong><?= e($c['name']) ?></strong></td>
+                            <td>
+                                <?php if ($c['type'] === 'customer'): ?>
+                                    <span class="badge badge-info">
+                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px;"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                                        Заказчик
+                                    </span>
+                                <?php elseif ($c['type'] === 'supplier'): ?>
+                                    <span class="badge badge-success">
+                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px;"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
+                                        Поставщик
+                                    </span>
+                                <?php else: ?>
+                                    <span class="badge badge-secondary">Оба</span>
+                                <?php endif; ?>
+                            </td>
+                            <td><?= e($c['unp'] ?? '-') ?></td>
+                            <td><?= e($c['contact_person'] ?? '-') ?></td>
+                            <td>
+                                <div style="display: flex; flex-direction: column; gap: 4px;">
+                                    <?php if (!empty($c['phone'])): ?>
+                                        <a href="tel:<?= e($c['phone']) ?>" style="display: flex; align-items: center; color: var(--text-primary); text-decoration: none; font-size: 13px;">
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px; color: var(--text-secondary);"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+                                            <?= e($c['phone']) ?>
+                                        </a>
+                                    <?php endif; ?>
+                                    <?php if (!empty($c['email'])): ?>
+                                        <a href="mailto:<?= e($c['email']) ?>" style="display: flex; align-items: center; color: var(--text-primary); text-decoration: none; font-size: 13px;">
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px; color: var(--text-secondary);"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                                            <?= e($c['email']) ?>
+                                        </a>
+                                    <?php endif; ?>
+                                    <?php if (empty($c['phone']) && empty($c['email'])): ?>
+                                        <span style="color: var(--text-secondary); font-size: 13px;">-</span>
+                                    <?php endif; ?>
+                                </div>
+                            </td>
+                            <td>
+                                <div style="display: flex; gap: 8px;">
+                                    <?php if (hasPermission('contractors.edit')): ?>
+                                        <a href="edit.php?id=<?= $c['id'] ?>" class="btn btn-sm btn-icon" title="Редактировать">
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                                        </a>
+                                    <?php endif; ?>
+                                    <?php if (hasPermission('contractors.delete')): ?>
+                                        <a href="delete.php?id=<?= $c['id'] ?>" class="btn btn-sm btn-icon btn-danger" title="Удалить" onclick="return confirm('Вы уверены, что хотите удалить контрагента <?= e($c['name']) ?>?')">
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                                        </a>
+                                    <?php endif; ?>
                                 </div>
                             </td>
                         </tr>

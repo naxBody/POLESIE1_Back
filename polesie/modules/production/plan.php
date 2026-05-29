@@ -199,7 +199,7 @@ $priorityFilter = $_GET['priority'] ?? '';
 $materialIssueFilter = isset($_GET['material_issues']) ? true : false;
 $overdueFilter = isset($_GET['overdue']) ? true : false;
 
-// Построение WHERE clause
+// Построение WHERE clause для основного запроса
 $whereConditions = [];
 $params = [];
 
@@ -217,6 +217,11 @@ if ($statusFilter) {
 if ($priorityFilter) {
     $whereConditions[] = "pt.priority = ?";
     $params[] = $priorityFilter;
+}
+
+// Добавляем фильтр просроченных в основной SQL
+if ($overdueFilter) {
+    $whereConditions[] = "o.delivery_date < CURDATE()";
 }
 
 $whereClause = !empty($whereConditions) ? "WHERE " . implode(" AND ", $whereConditions) : "";
@@ -258,33 +263,33 @@ $stmt = $pdo->prepare($ordersQuery);
 $stmt->execute($params);
 $allOrders = $stmt->fetchAll();
 
-// Фильтрация заказов с проблемами материалов и просроченных
+// Фильтрация заказов с проблемами материалов
 $orders = [];
 foreach ($allOrders as $order) {
-    // Если включен фильтр проблем с материалами
-    if ($materialIssueFilter) {
-        $stmt = $pdo->prepare("
-            SELECT COUNT(*) FROM production_tasks pt
-            JOIN production_tasks_materials ptm ON ptm.task_id = pt.id
-            JOIN materials m ON ptm.material_id = m.id
-            WHERE pt.order_id = ? AND ptm.quantity_required > COALESCE(m.current_stock, 0)
-        ");
-        $stmt->execute([$order['id']]);
-        $materialCount = $stmt->fetchColumn();
-        if ($materialCount == 0) continue;
+    // Проверяем наличие проблем с материалами для каждого заказа
+    $stmt = $pdo->prepare("
+        SELECT COUNT(*) FROM production_tasks pt
+        JOIN production_tasks_materials ptm ON ptm.task_id = pt.id
+        JOIN materials m ON ptm.material_id = m.id
+        WHERE pt.order_id = ? AND ptm.quantity_required > COALESCE(m.current_stock, 0)
+    ");
+    $stmt->execute([$order['id']]);
+    $materialCount = $stmt->fetchColumn();
+    
+    if ($materialCount > 0) {
         $order['material_shortages'] = $materialCount;
     }
     
-    // Если включен фильтр просроченных
-    if ($overdueFilter && $order['days_until_delivery'] >= 0) {
+    // Если включен фильтр проблем с материалами - пропускаем заказы без проблем
+    if ($materialIssueFilter && $materialCount == 0) {
         continue;
     }
     
     $orders[] = $order;
 }
 
-// Если нет специальных фильтров, берем все заказы
-if (!$materialIssueFilter && !$overdueFilter) {
+// Если нет фильтра проблем с материалами, берем все заказы
+if (!$materialIssueFilter) {
     $orders = $allOrders;
 }
 
@@ -399,7 +404,8 @@ if (!empty($orders)) {
         foreach ($ord['tasks'] as &$task) {
             $tid = (int)$task['id'];
             
-            // Материалы с полной информацией
+            // Материалы с полной информацией - берем из паспорта продукта или из задания
+            // Сначала пробуем получить материалы из производственного задания
             $sqlMat = "SELECT m.name_full as material_name, m.code as material_article, 
                               ptm.quantity_required as required_qty, 
                               COALESCE(m.current_stock, 0) as available_qty,
@@ -412,6 +418,36 @@ if (!empty($orders)) {
             $stmtMat = $pdo->prepare($sqlMat);
             $stmtMat->execute([$tid]);
             $resMat = $stmtMat->fetchAll();
+            
+            // Если в задании нет материалов, берем из паспорта продукта
+            if (empty($resMat) && !empty($task['product_id'])) {
+                $sqlPassportMat = "SELECT 
+                                          ppm.quantity as required_qty,
+                                          ppm.unit as unit_name,
+                                          m.name_full as material_name, 
+                                          m.code as material_article,
+                                          COALESCE(m.current_stock, 0) as available_qty
+                                   FROM product_passport_materials ppm
+                                   JOIN materials m ON ppm.material_id = m.id
+                                   WHERE ppm.passport_id IN (
+                                       SELECT id FROM product_passports WHERE product_id = ?
+                                   )
+                                   ORDER BY ppm.sort_order, m.name_full";
+                $stmtPassportMat = $pdo->prepare($sqlPassportMat);
+                $stmtPassportMat->execute([$task['product_id']]);
+                $resMat = $stmtPassportMat->fetchAll();
+                
+                // Добавляем информацию о складе для материалов из паспорта
+                foreach ($resMat as &$matRow) {
+                    if (empty($matRow['unit_name']) && !empty($matRow['unit_name'])) {
+                        // unit_name уже есть
+                    } else {
+                        $matRow['unit_name'] = $matRow['unit_name'] ?? 'шт.';
+                    }
+                }
+                unset($matRow);
+            }
+            
             foreach ($resMat as $row) {
                 $task['materials'][] = $row;
             }
@@ -645,6 +681,11 @@ foreach ($ordersData as $oid => $data) {
         /* Анимация появления контента */
         .fade-in { animation: fadeIn 0.3s ease-in; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        
+        /* Подсветка строк с проблемами */
+        tr.row-overdue { background-color: #fff5f5 !important; }
+        tr.row-material-issue { background-color: #fff9e6 !important; }
+        tr.row-overdue.row-material-issue { background: linear-gradient(90deg, #fff5f5 0%, #fff9e6 50%, #fff5f5 100%) !important; }
     </style>
 </head>
 <body>

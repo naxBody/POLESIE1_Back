@@ -101,80 +101,138 @@ $totalProducts = count($passports);
         .passport-card {
             background: white;
             border-radius: var(--border-radius);
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            margin-bottom: 16px;
-            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            margin-bottom: 12px;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
             cursor: pointer;
+            border: 1px solid var(--border-color);
+            overflow: hidden;
         }
         .passport-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+            border-color: var(--primary-color);
         }
         .passport-card-header {
-            padding: 16px 20px;
+            padding: 12px 16px;
+            background: linear-gradient(135deg, #f8f9fa, #ffffff);
             border-bottom: 1px solid var(--border-color);
             display: flex;
             justify-content: space-between;
             align-items: center;
+            gap: 12px;
         }
         .passport-sku {
             font-family: 'Courier New', monospace;
-            background: var(--primary-color);
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
             color: white;
-            padding: 4px 10px;
-            border-radius: 6px;
-            font-size: 13px;
-            font-weight: 600;
+            padding: 5px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
         .passport-title {
-            font-size: 15px;
+            font-size: 14px;
             font-weight: 600;
             color: var(--text-primary);
-            margin: 8px 0 4px;
+            margin: 6px 0 3px;
+            line-height: 1.3;
         }
         .passport-category {
-            font-size: 13px;
+            font-size: 12px;
             color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .passport-category::before {
+            content: '📁';
+            font-size: 11px;
         }
         .passport-card-body {
-            padding: 16px 20px;
+            padding: 12px 16px;
+        }
+        .card-info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .weight-badge {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            box-shadow: 0 2px 4px rgba(16, 185, 129, 0.2);
+        }
+        .materials-count {
+            font-size: 12px;
+            color: var(--text-secondary);
+            background: var(--bg-tertiary);
+            padding: 5px 10px;
+            border-radius: 12px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .materials-count::before {
+            content: '📦';
+            font-size: 11px;
         }
         .materials-preview {
             display: flex;
             flex-wrap: wrap;
-            gap: 8px;
-            margin-top: 12px;
+            gap: 6px;
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px dashed var(--border-color);
         }
         .material-tag {
-            background: var(--bg-tertiary);
-            padding: 4px 10px;
+            background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
+            padding: 4px 8px;
             border-radius: 6px;
-            font-size: 12px;
+            font-size: 11px;
             color: var(--text-secondary);
+            border: 1px solid #cbd5e1;
+            transition: all 0.2s;
+        }
+        .material-tag:hover {
+            background: linear-gradient(135deg, #e2e8f0, #cbd5e1);
+            transform: scale(1.05);
         }
         .material-tag strong {
             color: var(--text-primary);
+            font-weight: 600;
         }
         .stats-bar {
             display: flex;
-            gap: 24px;
-            margin-bottom: 20px;
+            gap: 16px;
+            margin-bottom: 16px;
             flex-wrap: wrap;
         }
         .stat-item {
             background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
             color: white;
-            padding: 16px 24px;
+            padding: 14px 20px;
             border-radius: var(--border-radius);
-            min-width: 150px;
+            min-width: 140px;
+            flex: 1;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
         .stat-value {
-            font-size: 28px;
+            font-size: 26px;
             font-weight: 700;
         }
         .stat-label {
-            font-size: 13px;
-            opacity: 0.9;
+            font-size: 12px;
+            opacity: 0.95;
             margin-top: 4px;
         }
         .passport-modal-overlay {
@@ -551,19 +609,24 @@ $totalProducts = count($passports);
                                             ?>
                                             <div class="passport-card" data-passport-id="<?= $passport['passport_id'] ?>" onclick="openPassportModal(this)">
                                                 <div class="passport-card-header">
-                                                    <div>
+                                                    <div style="flex: 1;">
                                                         <span class="passport-sku"><?= e($passport['sku']) ?></span>
                                                         <div class="passport-title"><?= e($passport['product_name']) ?></div>
                                                         <div class="passport-category"><?= e($passport['category_name'] ?? 'Без категории') ?></div>
                                                     </div>
                                                 </div>
                                                 <div class="passport-card-body">
-                                                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                                                    <div class="card-info-row">
                                                         <span class="weight-badge">⚖️ <?= number_format($passport['total_weight_kg'] ?? 0, 2, ',', ' ') ?> кг</span>
-                                                        <span style="font-size: 13px; color: var(--text-secondary);">
-                                                            📦 <?= count($materials) ?> материалов
-                                                        </span>
+                                                        <span class="materials-count"><?= count($materials) ?> поз.</span>
                                                     </div>
+                                                    
+                                                    <?php if (count($stages) > 0): ?>
+                                                        <div style="margin-top: 8px; font-size: 11px; color: var(--text-secondary); display: flex; align-items: center; gap: 4px;">
+                                                            <span>🏭</span>
+                                                            <span><?= count($stages) ?> этапов производства</span>
+                                                        </div>
+                                                    <?php endif; ?>
                                                     
                                                     <div class="materials-preview">
                                                         <?php 
@@ -571,11 +634,14 @@ $totalProducts = count($passports);
                                                         foreach ($previewMaterials as $mat): 
                                                         ?>
                                                             <span class="material-tag">
-                                                                <strong><?= number_format($mat['quantity'], 1) ?></strong> <?= e($mat['unit']) ?>
+                                                                <strong><?= number_format($mat['quantity'], 1) ?></strong> <?= e($mat['unit'] ?? 'шт') ?>
                                                             </span>
                                                         <?php endforeach; ?>
                                                         <?php if (count($materials) > 3): ?>
                                                             <span class="material-tag">+ ещё <?= count($materials) - 3 ?></span>
+                                                        <?php endif; ?>
+                                                        <?php if (count($materials) === 0): ?>
+                                                            <span class="material-tag" style="color: var(--text-secondary);">Материалы не указаны</span>
                                                         <?php endif; ?>
                                                     </div>
                                                 </div>

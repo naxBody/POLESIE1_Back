@@ -18,7 +18,7 @@ $pageTitle = 'Контроль качества';
 
 $status = $_GET['status'] ?? '';
 
-$sql = "SELECT pt.*, pt.quantity_plan as task_quantity, p.name as product_name, 
+$sql = "SELECT pt.id as task_id, pt.*, pt.quantity_plan as task_quantity, p.name as product_name, 
                u.full_name as inspector_name,
                qc.id as check_id, qc.status as result, qc.check_date as inspection_date,
                CASE WHEN qc.id IS NOT NULL THEN TRUE ELSE FALSE END as is_inspected

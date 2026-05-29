@@ -67,7 +67,19 @@ $inspections = $stmt->fetchAll();
                 <div class="content">
                     <div class="page-header">
                         <div class="page-header-title">
-                            <h2>✅ ОТК - Контроль качества</h2>
+                            <h2>
+                                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="vertical-align: middle; margin-right: 10px;">
+                                    <path d="M12 2L3 7V12C3 17.52 6.84 22.74 12 24C17.16 22.74 21 17.52 21 12V7L12 2Z" fill="url(#shield-gradient)" stroke="#4CAF50" stroke-width="1.5"/>
+                                    <path d="M9 12L11 14L15 10" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <defs>
+                                        <linearGradient id="shield-gradient" x1="3" y1="2" x2="21" y2="24">
+                                            <stop offset="0%" stop-color="#66BB6A"/>
+                                            <stop offset="100%" stop-color="#43A047"/>
+                                        </linearGradient>
+                                    </defs>
+                                </svg>
+                                ОТК - Контроль качества
+                            </h2>
                             <p>Проверка качества продукции</p>
                         </div>
                         <div class="page-header-actions">
@@ -131,7 +143,12 @@ $inspections = $stmt->fetchAll();
                         <td><?= $i['inspection_date'] ? date('d.m.Y H:i', strtotime($i['inspection_date'])) : '—' ?></td>
                         <td>
                             <?php if (!$i['is_inspected'] && hasPermission('quality.create')): ?>
-                                <a href="create.php?task=<?= $i['task_id'] ?>" class="btn-icon" title="Проверить">✅</a>
+                                <a href="create.php?task=<?= $i['task_id'] ?>" class="btn-icon" title="Проверить">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M12 2L3 7V12C3 17.52 6.84 22.74 12 24C17.16 22.74 21 17.52 21 12V7L12 2Z" fill="#66BB6A" stroke="#4CAF50" stroke-width="1.5"/>
+                                        <path d="M9 12L11 14L15 10" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                </a>
                             <?php elseif ($i['is_inspected'] && hasPermission('quality.view')): ?>
                                 <a href="view.php?id=<?= $i['id'] ?>" class="btn-icon" title="Просмотр">👁️</a>
                             <?php endif; ?>
@@ -143,7 +160,12 @@ $inspections = $stmt->fetchAll();
 
             <?php if (empty($inspections)): ?>
                 <div class="empty-state">
-                    <div class="empty-state-icon">✅</div>
+                    <div class="empty-state-icon">
+                        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 2L3 7V12C3 17.52 6.84 22.74 12 24C17.16 22.74 21 17.52 21 12V7L12 2Z" fill="#E8F5E9" stroke="#4CAF50" stroke-width="1.5"/>
+                            <path d="M9 12L11 14L15 10" stroke="#4CAF50" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
                     <h3>Нет заданий для проверки</h3>
                     <p>Задания появятся после начала производства</p>
                 </div>

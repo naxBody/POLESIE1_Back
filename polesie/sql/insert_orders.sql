@@ -42,12 +42,12 @@ SET @p_AIR80В4 := (SELECT id FROM products WHERE article = 'AIR80В4');
 SET @p_AIR80А6 := (SELECT id FROM products WHERE article = 'AIR80А6');
 SET @p_AIR80В6 := (SELECT id FROM products WHERE article = 'AIR80В6');
 SET @p_AIR90L2 := (SELECT id FROM products WHERE article = 'AIR90L2');
-SET @p_AIR90LВ2 := (SELECT id FROM products WHERE article = 'AIR90LВ2');
+SET @p_AIR90LВ2 := (SELECT id FROM products WHERE article = 'AIR90LB2');
 SET @p_AIR90L4 := (SELECT id FROM products WHERE article = 'AIR90L4');
-SET @p_AIR90LВ4 := (SELECT id FROM products WHERE article = 'AIR90LВ4');
+SET @p_AIR90LВ4 := (SELECT id FROM products WHERE article = 'AIR90LB4');
 SET @p_AIR90L6 := (SELECT id FROM products WHERE article = 'AIR90L6');
-SET @p_AIR90LА8 := (SELECT id FROM products WHERE article = 'AIR90LА8');
-SET @p_AIR90LВ8 := (SELECT id FROM products WHERE article = 'AIR90LВ8');
+SET @p_AIR90LА8 := (SELECT id FROM products WHERE article = 'AIR90LA8');
+SET @p_AIR90LВ8 := (SELECT id FROM products WHERE article = 'AIR90LB8');
 SET @p_AIR100S2 := (SELECT id FROM products WHERE article = 'AIR100S2');
 SET @p_AIR100S4 := (SELECT id FROM products WHERE article = 'AIR100S4');
 SET @p_AIR100L4 := (SELECT id FROM products WHERE article = 'AIR100L4');
@@ -55,10 +55,10 @@ SET @p_AIR100L6 := (SELECT id FROM products WHERE article = 'AIR100L6');
 SET @p_AIR100L2 := (SELECT id FROM products WHERE article = 'AIR100L2');
 SET @p_AIR112M2 := (SELECT id FROM products WHERE article = 'AIR112M2');
 SET @p_AIR112M4 := (SELECT id FROM products WHERE article = 'AIR112M4');
-SET @p_AIR112MА6 := (SELECT id FROM products WHERE article = 'AIR112MА6');
-SET @p_AIR112MВ6 := (SELECT id FROM products WHERE article = 'AIR112MВ6');
-SET @p_AIR112MА8 := (SELECT id FROM products WHERE article = 'AIR112MА8');
-SET @p_AIR112MВ8 := (SELECT id FROM products WHERE article = 'AIR112MВ8');
+SET @p_AIR112MА6 := (SELECT id FROM products WHERE article = 'AIR112MA6');
+SET @p_AIR112MB6 := (SELECT id FROM products WHERE article = 'AIR112MB6');
+SET @p_AIR112MА8 := (SELECT id FROM products WHERE article = 'AIR112MA8');
+SET @p_AIR112MB8 := (SELECT id FROM products WHERE article = 'AIR112MB8');
 SET @p_2AIR80A2 := (SELECT id FROM products WHERE article = '2AIR80A2');
 SET @p_2AIR80B2 := (SELECT id FROM products WHERE article = '2AIR80B2');
 SET @p_2AIR80A6 := (SELECT id FROM products WHERE article = '2AIR80A6');
@@ -137,7 +137,7 @@ INSERT INTO `order_items` (`order_id`, `product_id`, `quantity`, `price`, `total
 -- Заказ ORD-2025-005 (отгруженный)
 INSERT INTO `order_items` (`order_id`, `product_id`, `quantity`, `price`, `total`, `production_status`) VALUES
 (5, @p_AIR112M2, 15, 989.00, 14835.00, 'packed'),
-(5, @p_AIR112MВ6, 10, 1060.80, 10608.00, 'packed'),
+(5, @p_AIR112MB6, 10, 1060.80, 10608.00, 'packed'),
 (5, @p_AIBP80, 20, 277.75, 5555.00, 'packed'),
 (5, @p_AIBP90L, 15, 277.75, 4166.25, 'packed'),
 (5, @p_2AIR80A2, 20, 284.20, 5684.00, 'packed'),
@@ -216,7 +216,7 @@ INSERT INTO `production_tasks` (`task_number`, `order_id`, `order_item_id`, `pro
 -- Задания для заказа ORD-2025-005
 INSERT INTO `production_tasks` (`task_number`, `order_id`, `order_item_id`, `product_id`, `route_card_id`, `quantity_plan`, `status`, `priority`, `start_date`, `end_date`, `planned_start`, `planned_end`, `responsible_id`, `worker_id`, `notes`) VALUES
 ('TASK-2025-018', 5, 18, @p_AIR112M2, NULL, 15, 'completed', 'urgent', '2024-12-21', '2025-01-10', '2024-12-21 08:00:00', '2025-01-10 17:00:00', 3, 6, 'Oтгружено'),
-('TASK-2025-019', 5, 19, @p_AIR112MВ6, NULL, 10, 'completed', 'high', '2024-12-22', '2025-01-12', '2024-12-22 08:00:00', '2025-01-12 17:00:00', 4, 6, 'Oтгружено'),
+('TASK-2025-019', 5, 19, @p_AIR112MB6, NULL, 10, 'completed', 'high', '2024-12-22', '2025-01-12', '2024-12-22 08:00:00', '2025-01-12 17:00:00', 4, 6, 'Oтгружено'),
 ('TASK-2025-020', 5, 20, @p_AIBP80, NULL, 20, 'completed', 'normal', '2024-12-23', '2025-01-08', '2024-12-23 08:00:00', '2025-01-08 17:00:00', 3, 6, 'Oтгружено'),
 ('TASK-2025-021', 5, 21, @p_AIBP90L, NULL, 15, 'completed', 'normal', '2024-12-24', '2025-01-09', '2024-12-24 08:00:00', '2025-01-09 17:00:00', 4, 6, 'Oтгружено'),
 ('TASK-2025-022', 5, 22, @p_2AIR80A2, NULL, 20, 'completed', 'normal', '2024-12-25', '2025-01-10', '2024-12-25 08:00:00', '2025-01-10 17:00:00', 3, 6, 'Oтгружено'),

@@ -251,60 +251,60 @@ INSERT INTO `production_task_stages` (`task_id`, `stage_id`, `status`, `started_
 -- ============================================
 
 -- Материалы для TASK-2025-001 (AIR80А2, 10 шт)
-INSERT INTO `production_tasks_materials` (`task_id`, `material_id`, `quantity_required`, `quantity_used`, `notes`) VALUES
-(1, (SELECT id FROM materials WHERE code = 'STEEL-SHEET-0.5'), 50.0, 50.0, 'Раскрой выполнен'),
-(1, (SELECT id FROM materials WHERE code = 'COPPER-WIRE-1.2'), 25.0, 20.0, 'В работе'),
-(1, (SELECT id FROM materials WHERE code = 'ALUM-BAR-10'), 15.0, 15.0, 'Литье завершено'),
-(1, (SELECT id FROM materials WHERE code = 'BEARING-6203-2RS'), 20.0, 0, 'Ожидается'),
-(1, (SELECT id FROM materials WHERE code = 'PAINT-POLYMER'), 5.0, 0, 'Ожидается');
+INSERT INTO `production_tasks_materials` (`task_id`, `material_id`, `quantity_required`, `quantity_used`, `status`) VALUES
+(1, (SELECT id FROM materials WHERE code = 'STEEL-SHEET-0.5'), 50.0, 50.0, 'consumed'),
+(1, (SELECT id FROM materials WHERE code = 'COPPER-WIRE-1.2'), 25.0, 20.0, 'issued'),
+(1, (SELECT id FROM materials WHERE code = 'ALUM-BAR-10'), 15.0, 15.0, 'consumed'),
+(1, (SELECT id FROM materials WHERE code = 'BEARING-6203-2RS'), 20.0, 0, 'pending'),
+(1, (SELECT id FROM materials WHERE code = 'PAINT-POLYMER'), 5.0, 0, 'pending');
 
 -- Материалы для TASK-2025-003 (AIR90L2, 8 шт)
-INSERT INTO `production_tasks_materials` (`task_id`, `material_id`, `quantity_required`, `quantity_used`, `notes`) VALUES
-(3, (SELECT id FROM materials WHERE code = 'STEEL-SHEET-0.5'), 40.0, 40.0, 'Израсходовано'),
-(3, (SELECT id FROM materials WHERE code = 'COPPER-WIRE-1.2'), 20.0, 20.0, 'Израсходовано'),
-(3, (SELECT id FROM materials WHERE code = 'ALUM-BAR-10'), 12.0, 12.0, 'Израсходовано'),
-(3, (SELECT id FROM materials WHERE code = 'BEARING-6204-2RS'), 16.0, 16.0, 'Израсходовано'),
-(3, (SELECT id FROM materials WHERE code = 'PAINT-POLYMER'), 4.0, 4.0, 'Израсходовано');
+INSERT INTO `production_tasks_materials` (`task_id`, `material_id`, `quantity_required`, `quantity_used`, `status`) VALUES
+(3, (SELECT id FROM materials WHERE code = 'STEEL-SHEET-0.5'), 40.0, 40.0, 'consumed'),
+(3, (SELECT id FROM materials WHERE code = 'COPPER-WIRE-1.2'), 20.0, 20.0, 'consumed'),
+(3, (SELECT id FROM materials WHERE code = 'ALUM-BAR-10'), 12.0, 12.0, 'consumed'),
+(3, (SELECT id FROM materials WHERE code = 'BEARING-6204-2RS'), 16.0, 16.0, 'consumed'),
+(3, (SELECT id FROM materials WHERE code = 'PAINT-POLYMER'), 4.0, 4.0, 'consumed');
 
 -- Материалы для TASK-2025-009 (AIR90L4, 12 шт)
-INSERT INTO `production_tasks_materials` (`task_id`, `material_id`, `quantity_required`, `quantity_used`, `notes`) VALUES
-(9, (SELECT id FROM materials WHERE code = 'STEEL-SHEET-0.5'), 60.0, 60.0, 'Израсходовано'),
-(9, (SELECT id FROM materials WHERE code = 'COPPER-WIRE-1.2'), 30.0, 25.0, 'В работе'),
-(9, (SELECT id FROM materials WHERE code = 'ALUM-BAR-10'), 18.0, 18.0, 'Израсходовано'),
-(9, (SELECT id FROM materials WHERE code = 'BEARING-6204-2RS'), 24.0, 0, 'Ожидается'),
-(9, (SELECT id FROM materials WHERE code = 'PAINT-POLYMER'), 6.0, 0, 'Ожидается');
+INSERT INTO `production_tasks_materials` (`task_id`, `material_id`, `quantity_required`, `quantity_used`, `status`) VALUES
+(9, (SELECT id FROM materials WHERE code = 'STEEL-SHEET-0.5'), 60.0, 60.0, 'consumed'),
+(9, (SELECT id FROM materials WHERE code = 'COPPER-WIRE-1.2'), 30.0, 25.0, 'issued'),
+(9, (SELECT id FROM materials WHERE code = 'ALUM-BAR-10'), 18.0, 18.0, 'consumed'),
+(9, (SELECT id FROM materials WHERE code = 'BEARING-6204-2RS'), 24.0, 0, 'pending'),
+(9, (SELECT id FROM materials WHERE code = 'PAINT-POLYMER'), 6.0, 0, 'pending');
 
 -- Материалы для TASK-2025-011 (AIR112M4, 6 шт)
-INSERT INTO `production_tasks_materials` (`task_id`, `material_id`, `quantity_required`, `quantity_used`, `notes`) VALUES
-(11, (SELECT id FROM materials WHERE code = 'STEEL-SHEET-0.5'), 36.0, 36.0, 'Израсходовано'),
-(11, (SELECT id FROM materials WHERE code = 'COPPER-WIRE-1.5'), 18.0, 18.0, 'Израсходовано'),
-(11, (SELECT id FROM materials WHERE code = 'ALUM-BAR-10'), 12.0, 12.0, 'Израсходовано'),
-(11, (SELECT id FROM materials WHERE code = 'BEARING-6205-2RS'), 12.0, 12.0, 'Израсходовано'),
-(11, (SELECT id FROM materials WHERE code = 'PAINT-POLYMER'), 3.0, 3.0, 'Израсходовано');
+INSERT INTO `production_tasks_materials` (`task_id`, `material_id`, `quantity_required`, `quantity_used`, `status`) VALUES
+(11, (SELECT id FROM materials WHERE code = 'STEEL-SHEET-0.5'), 36.0, 36.0, 'consumed'),
+(11, (SELECT id FROM materials WHERE code = 'COPPER-WIRE-1.5'), 18.0, 18.0, 'consumed'),
+(11, (SELECT id FROM materials WHERE code = 'ALUM-BAR-10'), 12.0, 12.0, 'consumed'),
+(11, (SELECT id FROM materials WHERE code = 'BEARING-6205-2RS'), 12.0, 12.0, 'consumed'),
+(11, (SELECT id FROM materials WHERE code = 'PAINT-POLYMER'), 3.0, 3.0, 'consumed');
 
 -- Материалы для TASK-2025-041 (AIR90LB2, 10 шт, urgent)
-INSERT INTO `production_tasks_materials` (`task_id`, `material_id`, `quantity_required`, `quantity_used`, `notes`) VALUES
-(41, (SELECT id FROM materials WHERE code = 'STEEL-SHEET-0.5'), 50.0, 50.0, 'Израсходовано'),
-(41, (SELECT id FROM materials WHERE code = 'COPPER-WIRE-1.2'), 25.0, 20.0, 'В работе'),
-(41, (SELECT id FROM materials WHERE code = 'ALUM-BAR-10'), 15.0, 15.0, 'Израсходовано'),
-(41, (SELECT id FROM materials WHERE code = 'BEARING-6204-2RS'), 20.0, 0, 'Требуется закупка'),
-(41, (SELECT id FROM materials WHERE code = 'PAINT-POLYMER'), 5.0, 0, 'Требуется закупка');
+INSERT INTO `production_tasks_materials` (`task_id`, `material_id`, `quantity_required`, `quantity_used`, `status`) VALUES
+(41, (SELECT id FROM materials WHERE code = 'STEEL-SHEET-0.5'), 50.0, 50.0, 'consumed'),
+(41, (SELECT id FROM materials WHERE code = 'COPPER-WIRE-1.2'), 25.0, 20.0, 'issued'),
+(41, (SELECT id FROM materials WHERE code = 'ALUM-BAR-10'), 15.0, 15.0, 'consumed'),
+(41, (SELECT id FROM materials WHERE code = 'BEARING-6204-2RS'), 20.0, 0, 'pending'),
+(41, (SELECT id FROM materials WHERE code = 'PAINT-POLYMER'), 5.0, 0, 'pending');
 
 -- Материалы для TASK-2025-006 (GNOM-10-10, 15 шт, planned)
-INSERT INTO `production_tasks_materials` (`task_id`, `material_id`, `quantity_required`, `quantity_used`, `notes`) VALUES
-(6, (SELECT id FROM materials WHERE code = 'CAST-IRON-SC20'), 150.0, 0, 'Требуется для литья'),
-(6, (SELECT id FROM materials WHERE code = 'STEEL-SHEET-2.0'), 30.0, 0, 'Требуется'),
-(6, (SELECT id FROM materials WHERE code = 'COPPER-WIRE-2.0'), 45.0, 0, 'Требуется'),
-(6, (SELECT id FROM materials WHERE code = 'BEARING-6205-2RS'), 30.0, 0, 'Требуется'),
-(6, (SELECT id FROM materials WHERE code = 'PAINT-EPOXY'), 10.0, 0, 'Требуется');
+INSERT INTO `production_tasks_materials` (`task_id`, `material_id`, `quantity_required`, `quantity_used`, `status`) VALUES
+(6, (SELECT id FROM materials WHERE code = 'CAST-IRON-SC20'), 150.0, 0, 'pending'),
+(6, (SELECT id FROM materials WHERE code = 'STEEL-SHEET-2.0'), 30.0, 0, 'pending'),
+(6, (SELECT id FROM materials WHERE code = 'COPPER-WIRE-2.0'), 45.0, 0, 'pending'),
+(6, (SELECT id FROM materials WHERE code = 'BEARING-6205-2RS'), 30.0, 0, 'pending'),
+(6, (SELECT id FROM materials WHERE code = 'PAINT-EPOXY'), 10.0, 0, 'pending');
 
 -- Материалы для TASK-2025-030 (AIR100L2, 25 шт, крупная партия)
-INSERT INTO `production_tasks_materials` (`task_id`, `material_id`, `quantity_required`, `quantity_used`, `notes`) VALUES
-(30, (SELECT id FROM materials WHERE code = 'STEEL-SHEET-0.5'), 150.0, 0, 'Требуется для крупной партии'),
-(30, (SELECT id FROM materials WHERE code = 'COPPER-WIRE-1.5'), 75.0, 0, 'Требуется закупка'),
-(30, (SELECT id FROM materials WHERE code = 'ALUM-BAR-10'), 50.0, 0, 'Требуется'),
-(30, (SELECT id FROM materials WHERE code = 'BEARING-6205-2RS'), 50.0, 0, 'Требуется'),
-(30, (SELECT id FROM materials WHERE code = 'PAINT-POLYMER'), 15.0, 0, 'Требуется');
+INSERT INTO `production_tasks_materials` (`task_id`, `material_id`, `quantity_required`, `quantity_used`, `status`) VALUES
+(30, (SELECT id FROM materials WHERE code = 'STEEL-SHEET-0.5'), 150.0, 0, 'pending'),
+(30, (SELECT id FROM materials WHERE code = 'COPPER-WIRE-1.5'), 75.0, 0, 'pending'),
+(30, (SELECT id FROM materials WHERE code = 'ALUM-BAR-10'), 50.0, 0, 'pending'),
+(30, (SELECT id FROM materials WHERE code = 'BEARING-6205-2RS'), 50.0, 0, 'pending'),
+(30, (SELECT id FROM materials WHERE code = 'PAINT-POLYMER'), 15.0, 0, 'pending');
 
 -- ============================================
 -- Обновление общей суммы заказов

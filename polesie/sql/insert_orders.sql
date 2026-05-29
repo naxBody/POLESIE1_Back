@@ -29,18 +29,18 @@ ALTER TABLE `product_documents` AUTO_INCREMENT = 1;
 -- ============================================
 -- Iспользуем переменные для надежного получения ID продуктов
 
-SET @p_AIR71A2 := (SELECT id FROM products WHERE article = 'AIR71A2');
-SET @p_AIR71B2 := (SELECT id FROM products WHERE article = 'AIR71B2');
-SET @p_AIR71A4 := (SELECT id FROM products WHERE article = 'AIR71A4');
-SET @p_AIR71B4 := (SELECT id FROM products WHERE article = 'AIR71B4');
-SET @p_AIR71A6 := (SELECT id FROM products WHERE article = 'AIR71A6');
-SET @p_AIR71B6 := (SELECT id FROM products WHERE article = 'AIR71B6');
-SET @p_AIR80A2 := (SELECT id FROM products WHERE article = 'AIR80A2');
-SET @p_AIR80B2 := (SELECT id FROM products WHERE article = 'AIR80B2');
-SET @p_AIR80A4 := (SELECT id FROM products WHERE article = 'AIR80A4');
-SET @p_AIR80B4 := (SELECT id FROM products WHERE article = 'AIR80B4');
-SET @p_AIR80A6 := (SELECT id FROM products WHERE article = 'AIR80A6');
-SET @p_AIR80B6 := (SELECT id FROM products WHERE article = 'AIR80B6');
+SET @p_AIR71A2 := (SELECT id FROM products WHERE article = 'AIR71А2');
+SET @p_AIR71B2 := (SELECT id FROM products WHERE article = 'AIR71В2');
+SET @p_AIR71A4 := (SELECT id FROM products WHERE article = 'AIR71А4');
+SET @p_AIR71B4 := (SELECT id FROM products WHERE article = 'AIR71В4');
+SET @p_AIR71A6 := (SELECT id FROM products WHERE article = 'AIR71А6');
+SET @p_AIR71B6 := (SELECT id FROM products WHERE article = 'AIR71В6');
+SET @p_AIR80A2 := (SELECT id FROM products WHERE article = 'AIR80А2');
+SET @p_AIR80B2 := (SELECT id FROM products WHERE article = 'AIR80В2');
+SET @p_AIR80A4 := (SELECT id FROM products WHERE article = 'AIR80А4');
+SET @p_AIR80B4 := (SELECT id FROM products WHERE article = 'AIR80В4');
+SET @p_AIR80A6 := (SELECT id FROM products WHERE article = 'AIR80А6');
+SET @p_AIR80B6 := (SELECT id FROM products WHERE article = 'AIR80В6');
 SET @p_AIR90L2 := (SELECT id FROM products WHERE article = 'AIR90L2');
 SET @p_AIR90LB2 := (SELECT id FROM products WHERE article = 'AIR90LB2');
 SET @p_AIR90L4 := (SELECT id FROM products WHERE article = 'AIR90L4');
@@ -80,10 +80,10 @@ SET @p_AIRC80A2 := (SELECT id FROM products WHERE article = 'AIRС80А2');
 SET @p_AIRC80B2 := (SELECT id FROM products WHERE article = 'AIRС80В2');
 SET @p_AIRC90L2 := (SELECT id FROM products WHERE article = 'AIRС90L2');
 SET @p_AIRC100S2 := (SELECT id FROM products WHERE article = 'AIRС100S2');
-SET @p_AIR80A2Z := (SELECT id FROM products WHERE article = 'AIR80A2Z');
-SET @p_AIR90L2Z := (SELECT id FROM products WHERE article = 'AIR90L2Z');
-SET @p_AIRE71A2 := (SELECT id FROM products WHERE article = 'AIRE71A2');
-SET @p_AIRE71B2 := (SELECT id FROM products WHERE article = 'AIRE71B2');
+SET @p_AIR80A2Z := (SELECT id FROM products WHERE article = 'AIR80А2Ж');
+SET @p_AIR90L2Z := (SELECT id FROM products WHERE article = 'AIR90L2Ж');
+SET @p_AIRE71A2 := (SELECT id FROM products WHERE article = 'AIRЕ71А2');
+SET @p_AIRE71B2 := (SELECT id FROM products WHERE article = 'AIRЕ71В2');
 
 -- ============================================
 -- 1. ЗAKAЗЫ (orders)

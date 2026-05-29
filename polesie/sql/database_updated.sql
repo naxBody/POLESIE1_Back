@@ -354,6 +354,7 @@ CREATE TABLE `product_passport_materials` (
   `unit_id` INT,
   `weight_kg` DECIMAL(10,3) DEFAULT 0,
   `percentage` DECIMAL(5,2) DEFAULT 0,
+  `sort_order` INT DEFAULT 0,
   `notes` TEXT,
   CONSTRAINT `fk_ppm_passport` FOREIGN KEY (`passport_id`) REFERENCES `product_passports`(`id`) ON DELETE CASCADE,
   CONSTRAINT `fk_ppm_material` FOREIGN KEY (`material_id`) REFERENCES `materials`(`id`) ON DELETE CASCADE,

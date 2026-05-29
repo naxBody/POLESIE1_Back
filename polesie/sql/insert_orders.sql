@@ -29,25 +29,25 @@ ALTER TABLE `product_documents` AUTO_INCREMENT = 1;
 -- ============================================
 -- Iспользуем переменные для надежного получения ID продуктов
 
-SET @p_AIR71A2 := (SELECT id FROM products WHERE article = 'AIR71А2');
-SET @p_AIR71B2 := (SELECT id FROM products WHERE article = 'AIR71В2');
-SET @p_AIR71A4 := (SELECT id FROM products WHERE article = 'AIR71А4');
-SET @p_AIR71B4 := (SELECT id FROM products WHERE article = 'AIR71В4');
-SET @p_AIR71A6 := (SELECT id FROM products WHERE article = 'AIR71А6');
-SET @p_AIR71B6 := (SELECT id FROM products WHERE article = 'AIR71В6');
-SET @p_AIR80A2 := (SELECT id FROM products WHERE article = 'AIR80А2');
-SET @p_AIR80B2 := (SELECT id FROM products WHERE article = 'AIR80В2');
-SET @p_AIR80A4 := (SELECT id FROM products WHERE article = 'AIR80А4');
-SET @p_AIR80B4 := (SELECT id FROM products WHERE article = 'AIR80В4');
-SET @p_AIR80A6 := (SELECT id FROM products WHERE article = 'AIR80А6');
-SET @p_AIR80B6 := (SELECT id FROM products WHERE article = 'AIR80В6');
+SET @p_AIR71А2 := (SELECT id FROM products WHERE article = 'AIR71А2');
+SET @p_AIR71В2 := (SELECT id FROM products WHERE article = 'AIR71В2');
+SET @p_AIR71А4 := (SELECT id FROM products WHERE article = 'AIR71А4');
+SET @p_AIR71В4 := (SELECT id FROM products WHERE article = 'AIR71В4');
+SET @p_AIR71А6 := (SELECT id FROM products WHERE article = 'AIR71А6');
+SET @p_AIR71В6 := (SELECT id FROM products WHERE article = 'AIR71В6');
+SET @p_AIR80А2 := (SELECT id FROM products WHERE article = 'AIR80А2');
+SET @p_AIR80В2 := (SELECT id FROM products WHERE article = 'AIR80В2');
+SET @p_AIR80А4 := (SELECT id FROM products WHERE article = 'AIR80А4');
+SET @p_AIR80В4 := (SELECT id FROM products WHERE article = 'AIR80В4');
+SET @p_AIR80А6 := (SELECT id FROM products WHERE article = 'AIR80А6');
+SET @p_AIR80В6 := (SELECT id FROM products WHERE article = 'AIR80В6');
 SET @p_AIR90L2 := (SELECT id FROM products WHERE article = 'AIR90L2');
-SET @p_AIR90LB2 := (SELECT id FROM products WHERE article = 'AIR90LB2');
+SET @p_AIR90LВ2 := (SELECT id FROM products WHERE article = 'AIR90LВ2');
 SET @p_AIR90L4 := (SELECT id FROM products WHERE article = 'AIR90L4');
-SET @p_AIR90LB4 := (SELECT id FROM products WHERE article = 'AIR90LB4');
+SET @p_AIR90LВ4 := (SELECT id FROM products WHERE article = 'AIR90LВ4');
 SET @p_AIR90L6 := (SELECT id FROM products WHERE article = 'AIR90L6');
-SET @p_AIR90LA8 := (SELECT id FROM products WHERE article = 'AIR90LA8');
-SET @p_AIR90LB8 := (SELECT id FROM products WHERE article = 'AIR90LB8');
+SET @p_AIR90LА8 := (SELECT id FROM products WHERE article = 'AIR90LА8');
+SET @p_AIR90LВ8 := (SELECT id FROM products WHERE article = 'AIR90LВ8');
 SET @p_AIR100S2 := (SELECT id FROM products WHERE article = 'AIR100S2');
 SET @p_AIR100S4 := (SELECT id FROM products WHERE article = 'AIR100S4');
 SET @p_AIR100L4 := (SELECT id FROM products WHERE article = 'AIR100L4');
@@ -55,10 +55,10 @@ SET @p_AIR100L6 := (SELECT id FROM products WHERE article = 'AIR100L6');
 SET @p_AIR100L2 := (SELECT id FROM products WHERE article = 'AIR100L2');
 SET @p_AIR112M2 := (SELECT id FROM products WHERE article = 'AIR112M2');
 SET @p_AIR112M4 := (SELECT id FROM products WHERE article = 'AIR112M4');
-SET @p_AIR112MA6 := (SELECT id FROM products WHERE article = 'AIR112MA6');
-SET @p_AIR112MB6 := (SELECT id FROM products WHERE article = 'AIR112MB6');
-SET @p_AIR112MA8 := (SELECT id FROM products WHERE article = 'AIR112MA8');
-SET @p_AIR112MB8 := (SELECT id FROM products WHERE article = 'AIR112MB8');
+SET @p_AIR112MА6 := (SELECT id FROM products WHERE article = 'AIR112MА6');
+SET @p_AIR112MВ6 := (SELECT id FROM products WHERE article = 'AIR112MВ6');
+SET @p_AIR112MА8 := (SELECT id FROM products WHERE article = 'AIR112MА8');
+SET @p_AIR112MВ8 := (SELECT id FROM products WHERE article = 'AIR112MВ8');
 SET @p_2AIR80A2 := (SELECT id FROM products WHERE article = '2AIR80A2');
 SET @p_2AIR80B2 := (SELECT id FROM products WHERE article = '2AIR80B2');
 SET @p_2AIR80A6 := (SELECT id FROM products WHERE article = '2AIR80A6');
@@ -76,14 +76,14 @@ SET @p_AIBP90L := (SELECT id FROM products WHERE article = 'АИВР90L');
 SET @p_BC := (SELECT id FROM products WHERE article = 'BC-0.5-20-U1.1');
 SET @p_GNOM := (SELECT id FROM products WHERE article = 'GNOM-10-10');
 SET @p_EKCH := (SELECT id FROM products WHERE article = 'EKCH-145');
-SET @p_AIRC80A2 := (SELECT id FROM products WHERE article = 'AIRС80А2');
-SET @p_AIRC80B2 := (SELECT id FROM products WHERE article = 'AIRС80В2');
-SET @p_AIRC90L2 := (SELECT id FROM products WHERE article = 'AIRС90L2');
-SET @p_AIRC100S2 := (SELECT id FROM products WHERE article = 'AIRС100S2');
-SET @p_AIR80A2Z := (SELECT id FROM products WHERE article = 'AIR80А2Ж');
+SET @p_AIRС80А2 := (SELECT id FROM products WHERE article = 'AIRС80А2');
+SET @p_AIRС80В2 := (SELECT id FROM products WHERE article = 'AIRС80В2');
+SET @p_AIRС90L2 := (SELECT id FROM products WHERE article = 'AIRС90L2');
+SET @p_AIRС100S2 := (SELECT id FROM products WHERE article = 'AIRС100S2');
+SET @p_AIR80А2Z := (SELECT id FROM products WHERE article = 'AIR80А2Ж');
 SET @p_AIR90L2Z := (SELECT id FROM products WHERE article = 'AIR90L2Ж');
-SET @p_AIRE71A2 := (SELECT id FROM products WHERE article = 'AIRЕ71А2');
-SET @p_AIRE71B2 := (SELECT id FROM products WHERE article = 'AIRЕ71В2');
+SET @p_AIRЕ71А2 := (SELECT id FROM products WHERE article = 'AIRЕ71А2');
+SET @p_AIRЕ71В2 := (SELECT id FROM products WHERE article = 'AIRЕ71В2');
 
 -- ============================================
 -- 1. ЗAKAЗЫ (orders)
@@ -107,8 +107,8 @@ INSERT INTO `orders` (`order_number`, `customer_id`, `responsible_user_id`, `sta
 
 -- Заказ ORD-2025-001 (двигатели для стройки)
 INSERT INTO `order_items` (`order_id`, `product_id`, `quantity`, `price`, `total`, `production_status`) VALUES
-(1, @p_AIR80A2, 10, 385.70, 3857.00, 'in_progress'),
-(1, @p_AIR80B2, 5, 388.36, 1941.80, 'in_progress'),
+(1, @p_AIR80А2, 10, 385.70, 3857.00, 'in_progress'),
+(1, @p_AIR80В2, 5, 388.36, 1941.80, 'in_progress'),
 (1, @p_AIR90L2, 8, 566.50, 4532.00, 'completed'),
 (1, @p_AIR100S2, 7, 707.20, 4950.40, 'not_started'),
 (1, @p_BC, 10, 185.00, 1850.00, 'packed');
@@ -116,8 +116,8 @@ INSERT INTO `order_items` (`order_id`, `product_id`, `quantity`, `price`, `total
 -- Заказ ORD-2025-002 (насосы для агро)
 INSERT INTO `order_items` (`order_id`, `product_id`, `quantity`, `price`, `total`, `production_status`) VALUES
 (2, @p_GNOM, 15, 420.00, 6300.00, 'not_started'),
-(2, @p_AIR71A4, 10, 276.51, 2765.10, 'not_started'),
-(2, @p_AIR71B4, 5, 277.06, 1385.30, 'not_started');
+(2, @p_AIR71А4, 10, 276.51, 2765.10, 'not_started'),
+(2, @p_AIR71В4, 5, 277.06, 1385.30, 'not_started');
 
 -- Заказ ORD-2025-003 (насосное оборудование)
 INSERT INTO `order_items` (`order_id`, `product_id`, `quantity`, `price`, `total`, `production_status`) VALUES
@@ -129,15 +129,15 @@ INSERT INTO `order_items` (`order_id`, `product_id`, `quantity`, `price`, `total
 
 -- Заказ ORD-2025-004 (готовый заказ)
 INSERT INTO `order_items` (`order_id`, `product_id`, `quantity`, `price`, `total`, `production_status`) VALUES
-(4, @p_AIR80A4, 15, 353.85, 5307.75, 'packed'),
-(4, @p_AIR80B4, 10, 355.25, 3552.50, 'packed'),
+(4, @p_AIR80А4, 15, 353.85, 5307.75, 'packed'),
+(4, @p_AIR80В4, 10, 355.25, 3552.50, 'packed'),
 (4, @p_AIR90L6, 5, 588.70, 2943.50, 'packed'),
 (4, @p_EKCH, 100, 45.00, 4500.00, 'packed');
 
 -- Заказ ORD-2025-005 (отгруженный)
 INSERT INTO `order_items` (`order_id`, `product_id`, `quantity`, `price`, `total`, `production_status`) VALUES
 (5, @p_AIR112M2, 15, 989.00, 14835.00, 'packed'),
-(5, @p_AIR112MB6, 10, 1060.80, 10608.00, 'packed'),
+(5, @p_AIR112MВ6, 10, 1060.80, 10608.00, 'packed'),
 (5, @p_AIBP80, 20, 277.75, 5555.00, 'packed'),
 (5, @p_AIBP90L, 15, 277.75, 4166.25, 'packed'),
 (5, @p_2AIR80A2, 20, 284.20, 5684.00, 'packed'),
@@ -145,11 +145,11 @@ INSERT INTO `order_items` (`order_id`, `product_id`, `quantity`, `price`, `total
 
 -- Заказ ORD-2025-006 (особые требования)
 INSERT INTO `order_items` (`order_id`, `product_id`, `quantity`, `price`, `total`, `production_status`) VALUES
-(6, @p_AIRC80A2, 15, 285.32, 4279.80, 'in_progress'),
-(6, @p_AIRC80B2, 10, 287.00, 2870.00, 'in_progress'),
-(6, @p_AIRC90L2, 8, 289.80, 2318.40, 'not_started'),
-(6, @p_AIRC100S2, 10, 293.44, 2934.40, 'not_started'),
-(6, @p_AIR80A2Z, 20, 284.20, 5684.00, 'not_started'),
+(6, @p_AIRС80А2, 15, 285.32, 4279.80, 'in_progress'),
+(6, @p_AIRС80В2, 10, 287.00, 2870.00, 'in_progress'),
+(6, @p_AIRС90L2, 8, 289.80, 2318.40, 'not_started'),
+(6, @p_AIRС100S2, 10, 293.44, 2934.40, 'not_started'),
+(6, @p_AIR80А2Z, 20, 284.20, 5684.00, 'not_started'),
 (6, @p_AIR90L2Z, 15, 288.40, 4326.00, 'not_started');
 
 -- Заказ ORD-2025-007 (крупный заказ)
@@ -161,21 +161,21 @@ INSERT INTO `order_items` (`order_id`, `product_id`, `quantity`, `price`, `total
 
 -- Заказ ORD-2025-008 (стандартная поставка)
 INSERT INTO `order_items` (`order_id`, `product_id`, `quantity`, `price`, `total`, `production_status`) VALUES
-(8, @p_AIR71A6, 10, 291.07, 2910.70, 'in_progress'),
-(8, @p_AIR71B6, 8, 291.60, 2332.80, 'in_progress'),
-(8, @p_AIR80A6, 6, 392.93, 2357.58, 'completed'),
-(8, @p_AIR80B6, 5, 394.29, 1971.45, 'packed'),
+(8, @p_AIR71А6, 10, 291.07, 2910.70, 'in_progress'),
+(8, @p_AIR71В6, 8, 291.60, 2332.80, 'in_progress'),
+(8, @p_AIR80А6, 6, 392.93, 2357.58, 'completed'),
+(8, @p_AIR80В6, 5, 394.29, 1971.45, 'packed'),
 (8, @p_EKCH, 50, 45.00, 2250.00, 'packed');
 
 -- Заказ ORD-2025-009 (отмененный)
 INSERT INTO `order_items` (`order_id`, `product_id`, `quantity`, `price`, `total`, `production_status`) VALUES
-(9, @p_AIRE71A2, 10, 281.54, 2815.40, 'not_started'),
-(9, @p_AIRE71B2, 10, 282.10, 2821.00, 'not_started');
+(9, @p_AIRЕ71А2, 10, 281.54, 2815.40, 'not_started'),
+(9, @p_AIRЕ71В2, 10, 282.10, 2821.00, 'not_started');
 
 -- Заказ ORD-2025-010 (приоритетный)
 INSERT INTO `order_items` (`order_id`, `product_id`, `quantity`, `price`, `total`, `production_status`) VALUES
-(10, @p_AIR90LB2, 10, 572.00, 5720.00, 'in_progress'),
-(10, @p_AIR90LB4, 8, 535.60, 4284.80, 'in_progress'),
+(10, @p_AIR90LВ2, 10, 572.00, 5720.00, 'in_progress'),
+(10, @p_AIR90LВ4, 8, 535.60, 4284.80, 'in_progress'),
 (10, @p_AIR100S4, 6, 669.50, 4017.00, 'not_started'),
 (10, @p_2AIR80B2, 15, 286.16, 4292.40, 'not_started'),
 (10, @p_2AIR90L4, 10, 281.05, 2810.50, 'not_started');
@@ -186,8 +186,8 @@ INSERT INTO `order_items` (`order_id`, `product_id`, `quantity`, `price`, `total
 
 -- Задания для заказа ORD-2025-001
 INSERT INTO `production_tasks` (`task_number`, `order_id`, `order_item_id`, `product_id`, `route_card_id`, `quantity_plan`, `status`, `priority`, `start_date`, `end_date`, `planned_start`, `planned_end`, `responsible_id`, `worker_id`, `notes`) VALUES
-('TASK-2025-001', 1, 1, @p_AIR80A2, (SELECT id FROM route_cards WHERE product_id = @p_AIR80A2), 10, 'in_progress', 'high', '2025-01-16', '2025-02-01', '2025-01-16 08:00:00', '2025-02-01 17:00:00', 3, 6, 'Cрочное задание'),
-('TASK-2025-002', 1, 2, @p_AIR80B2, NULL, 5, 'in_progress', 'high', '2025-01-17', '2025-02-05', '2025-01-17 08:00:00', '2025-02-05 17:00:00', 3, 6, NULL),
+('TASK-2025-001', 1, 1, @p_AIR80А2, (SELECT id FROM route_cards WHERE product_id = @p_AIR80А2), 10, 'in_progress', 'high', '2025-01-16', '2025-02-01', '2025-01-16 08:00:00', '2025-02-01 17:00:00', 3, 6, 'Cрочное задание'),
+('TASK-2025-002', 1, 2, @p_AIR80В2, NULL, 5, 'in_progress', 'high', '2025-01-17', '2025-02-05', '2025-01-17 08:00:00', '2025-02-05 17:00:00', 3, 6, NULL),
 ('TASK-2025-003', 1, 3, @p_AIR90L2, NULL, 8, 'completed', 'normal', '2025-01-15', '2025-01-28', '2025-01-15 08:00:00', '2025-01-28 17:00:00', 4, 6, 'Bыполнено досрочно'),
 ('TASK-2025-004', 1, 4, @p_AIR100S2, NULL, 7, 'planned', 'normal', NULL, NULL, '2025-02-01 08:00:00', '2025-02-10 17:00:00', 3, NULL, NULL),
 ('TASK-2025-005', 1, 5, @p_BC, NULL, 10, 'completed', 'urgent', '2025-01-16', '2025-01-25', '2025-01-16 08:00:00', '2025-01-25 17:00:00', 4, 6, 'Yпаковано');
@@ -195,8 +195,8 @@ INSERT INTO `production_tasks` (`task_number`, `order_id`, `order_item_id`, `pro
 -- Задания для заказа ORD-2025-002
 INSERT INTO `production_tasks` (`task_number`, `order_id`, `order_item_id`, `product_id`, `route_card_id`, `quantity_plan`, `status`, `priority`, `start_date`, `end_date`, `planned_start`, `planned_end`, `responsible_id`, `worker_id`, `notes`) VALUES
 ('TASK-2025-006', 2, 6, @p_GNOM, NULL, 15, 'planned', 'normal', NULL, NULL, '2025-02-01 08:00:00', '2025-02-20 17:00:00', 3, NULL, NULL),
-('TASK-2025-007', 2, 7, @p_AIR71A4, NULL, 10, 'planned', 'low', NULL, NULL, '2025-02-05 08:00:00', '2025-02-15 17:00:00', 4, NULL, NULL),
-('TASK-2025-008', 2, 8, @p_AIR71B4, NULL, 5, 'planned', 'low', NULL, NULL, '2025-02-10 08:00:00', '2025-02-20 17:00:00', 3, NULL, NULL);
+('TASK-2025-007', 2, 7, @p_AIR71А4, NULL, 10, 'planned', 'low', NULL, NULL, '2025-02-05 08:00:00', '2025-02-15 17:00:00', 4, NULL, NULL),
+('TASK-2025-008', 2, 8, @p_AIR71В4, NULL, 5, 'planned', 'low', NULL, NULL, '2025-02-10 08:00:00', '2025-02-20 17:00:00', 3, NULL, NULL);
 
 -- Задания для заказа ORD-2025-003
 INSERT INTO `production_tasks` (`task_number`, `order_id`, `order_item_id`, `product_id`, `route_card_id`, `quantity_plan`, `status`, `priority`, `start_date`, `end_date`, `planned_start`, `planned_end`, `responsible_id`, `worker_id`, `notes`) VALUES
@@ -208,15 +208,15 @@ INSERT INTO `production_tasks` (`task_number`, `order_id`, `order_item_id`, `pro
 
 -- Задания для заказа ORD-2025-004
 INSERT INTO `production_tasks` (`task_number`, `order_id`, `order_item_id`, `product_id`, `route_card_id`, `quantity_plan`, `status`, `priority`, `start_date`, `end_date`, `planned_start`, `planned_end`, `responsible_id`, `worker_id`, `notes`) VALUES
-('TASK-2025-014', 4, 14, @p_AIR80A4, NULL, 15, 'completed', 'normal', '2025-01-06', '2025-01-20', '2025-01-06 08:00:00', '2025-01-20 17:00:00', 3, 6, 'Yпаковано'),
-('TASK-2025-015', 4, 15, @p_AIR80B4, NULL, 10, 'completed', 'normal', '2025-01-07', '2025-01-22', '2025-01-07 08:00:00', '2025-01-22 17:00:00', 4, 6, 'Yпаковано'),
+('TASK-2025-014', 4, 14, @p_AIR80А4, NULL, 15, 'completed', 'normal', '2025-01-06', '2025-01-20', '2025-01-06 08:00:00', '2025-01-20 17:00:00', 3, 6, 'Yпаковано'),
+('TASK-2025-015', 4, 15, @p_AIR80В4, NULL, 10, 'completed', 'normal', '2025-01-07', '2025-01-22', '2025-01-07 08:00:00', '2025-01-22 17:00:00', 4, 6, 'Yпаковано'),
 ('TASK-2025-016', 4, 16, @p_AIR90L6, NULL, 5, 'completed', 'normal', '2025-01-08', '2025-01-25', '2025-01-08 08:00:00', '2025-01-25 17:00:00', 3, 6, 'Yпаковано'),
 ('TASK-2025-017', 4, 17, @p_EKCH, NULL, 100, 'completed', 'low', '2025-01-06', '2025-01-15', '2025-01-06 08:00:00', '2025-01-15 17:00:00', 4, 6, 'Yпаковано');
 
 -- Задания для заказа ORD-2025-005
 INSERT INTO `production_tasks` (`task_number`, `order_id`, `order_item_id`, `product_id`, `route_card_id`, `quantity_plan`, `status`, `priority`, `start_date`, `end_date`, `planned_start`, `planned_end`, `responsible_id`, `worker_id`, `notes`) VALUES
 ('TASK-2025-018', 5, 18, @p_AIR112M2, NULL, 15, 'completed', 'urgent', '2024-12-21', '2025-01-10', '2024-12-21 08:00:00', '2025-01-10 17:00:00', 3, 6, 'Oтгружено'),
-('TASK-2025-019', 5, 19, @p_AIR112MB6, NULL, 10, 'completed', 'high', '2024-12-22', '2025-01-12', '2024-12-22 08:00:00', '2025-01-12 17:00:00', 4, 6, 'Oтгружено'),
+('TASK-2025-019', 5, 19, @p_AIR112MВ6, NULL, 10, 'completed', 'high', '2024-12-22', '2025-01-12', '2024-12-22 08:00:00', '2025-01-12 17:00:00', 4, 6, 'Oтгружено'),
 ('TASK-2025-020', 5, 20, @p_AIBP80, NULL, 20, 'completed', 'normal', '2024-12-23', '2025-01-08', '2024-12-23 08:00:00', '2025-01-08 17:00:00', 3, 6, 'Oтгружено'),
 ('TASK-2025-021', 5, 21, @p_AIBP90L, NULL, 15, 'completed', 'normal', '2024-12-24', '2025-01-09', '2024-12-24 08:00:00', '2025-01-09 17:00:00', 4, 6, 'Oтгружено'),
 ('TASK-2025-022', 5, 22, @p_2AIR80A2, NULL, 20, 'completed', 'normal', '2024-12-25', '2025-01-10', '2024-12-25 08:00:00', '2025-01-10 17:00:00', 3, 6, 'Oтгружено'),
@@ -224,12 +224,12 @@ INSERT INTO `production_tasks` (`task_number`, `order_id`, `order_item_id`, `pro
 
 -- Задания для заказа ORD-2025-006
 INSERT INTO `production_tasks` (`task_number`, `order_id`, `order_item_id`, `product_id`, `route_card_id`, `quantity_plan`, `status`, `priority`, `start_date`, `end_date`, `planned_start`, `planned_end`, `responsible_id`, `worker_id`, `notes`) VALUES
-('TASK-2025-024', 6, 24, @p_AI\xd0\xa180A2, NULL, 15, 'in_progress', 'high', '2025-01-26', '2025-02-15', '2025-01-26 08:00:00', '2025-02-15 17:00:00', 3, 6, 'Oсобые требования'),
-('TASK-2025-025', 6, 25, @p_AI\xd0\xa180B2, NULL, 10, 'in_progress', 'high', '2025-01-27', '2025-02-16', '2025-01-27 08:00:00', '2025-02-16 17:00:00', 4, 6, NULL),
-('TASK-2025-026', 6, 26, @p_AI\xd0\xa190L2, NULL, 8, 'planned', 'normal', NULL, NULL, '2025-02-10 08:00:00', '2025-02-25 17:00:00', 3, NULL, NULL),
-('TASK-2025-027', 6, 27, @p_AI\xd0\xa1100S2, NULL, 10, 'planned', 'normal', NULL, NULL, '2025-02-12 08:00:00', '2025-02-28 17:00:00', 4, NULL, NULL),
-('TASK-2025-028', 6, 28, @p_AIR80\xd0\x902\xd0\x96, NULL, 20, 'planned', 'normal', NULL, NULL, '2025-02-15 08:00:00', '2025-03-01 17:00:00', 3, NULL, 'Для насосов'),
-('TASK-2025-029', 6, 29, @p_AIR90L2\xd0\x96, NULL, 15, 'planned', 'normal', NULL, NULL, '2025-02-18 08:00:00', '2025-03-05 17:00:00', 4, NULL, 'Для насосов');
+('TASK-2025-024', 6, 24, @p_AIRС80А2, NULL, 15, 'in_progress', 'high', '2025-01-26', '2025-02-15', '2025-01-26 08:00:00', '2025-02-15 17:00:00', 3, 6, 'Oсобые требования'),
+('TASK-2025-025', 6, 25, @p_AIRС80В2, NULL, 10, 'in_progress', 'high', '2025-01-27', '2025-02-16', '2025-01-27 08:00:00', '2025-02-16 17:00:00', 4, 6, NULL),
+('TASK-2025-026', 6, 26, @p_AIRС90L2, NULL, 8, 'planned', 'normal', NULL, NULL, '2025-02-10 08:00:00', '2025-02-25 17:00:00', 3, NULL, NULL),
+('TASK-2025-027', 6, 27, @p_AIRС100S2, NULL, 10, 'planned', 'normal', NULL, NULL, '2025-02-12 08:00:00', '2025-02-28 17:00:00', 4, NULL, NULL),
+('TASK-2025-028', 6, 28, @p_AIR80А2Z, NULL, 20, 'planned', 'normal', NULL, NULL, '2025-02-15 08:00:00', '2025-03-01 17:00:00', 3, NULL, 'Для насосов'),
+('TASK-2025-029', 6, 29, @p_AIR90L2Z, NULL, 15, 'planned', 'normal', NULL, NULL, '2025-02-18 08:00:00', '2025-03-05 17:00:00', 4, NULL, 'Для насосов');
 
 -- Задания для заказа ORD-2025-007
 INSERT INTO `production_tasks` (`task_number`, `order_id`, `order_item_id`, `product_id`, `route_card_id`, `quantity_plan`, `status`, `priority`, `start_date`, `end_date`, `planned_start`, `planned_end`, `responsible_id`, `worker_id`, `notes`) VALUES
@@ -240,21 +240,21 @@ INSERT INTO `production_tasks` (`task_number`, `order_id`, `order_item_id`, `pro
 
 -- Задания для заказа ORD-2025-008
 INSERT INTO `production_tasks` (`task_number`, `order_id`, `order_item_id`, `product_id`, `route_card_id`, `quantity_plan`, `status`, `priority`, `start_date`, `end_date`, `planned_start`, `planned_end`, `responsible_id`, `worker_id`, `notes`) VALUES
-('TASK-2025-034', 8, 34, @p_AIR71A6, NULL, 10, 'in_progress', 'normal', '2025-01-13', '2025-02-01', '2025-01-13 08:00:00', '2025-02-01 17:00:00', 3, 6, NULL),
-('TASK-2025-035', 8, 35, @p_AIR71B6, NULL, 8, 'in_progress', 'normal', '2025-01-14', '2025-02-03', '2025-01-14 08:00:00', '2025-02-03 17:00:00', 4, 6, NULL),
-('TASK-2025-036', 8, 36, @p_AIR80A6, NULL, 6, 'completed', 'normal', '2025-01-13', '2025-01-28', '2025-01-13 08:00:00', '2025-01-28 17:00:00', 3, 6, 'Готово'),
-('TASK-2025-037', 8, 37, @p_AIR80B6, NULL, 5, 'completed', 'normal', '2025-01-14', '2025-01-29', '2025-01-14 08:00:00', '2025-01-29 17:00:00', 4, 6, 'Yпаковано'),
+('TASK-2025-034', 8, 34, @p_AIR71А6, NULL, 10, 'in_progress', 'normal', '2025-01-13', '2025-02-01', '2025-01-13 08:00:00', '2025-02-01 17:00:00', 3, 6, NULL),
+('TASK-2025-035', 8, 35, @p_AIR71В6, NULL, 8, 'in_progress', 'normal', '2025-01-14', '2025-02-03', '2025-01-14 08:00:00', '2025-02-03 17:00:00', 4, 6, NULL),
+('TASK-2025-036', 8, 36, @p_AIR80А6, NULL, 6, 'completed', 'normal', '2025-01-13', '2025-01-28', '2025-01-13 08:00:00', '2025-01-28 17:00:00', 3, 6, 'Готово'),
+('TASK-2025-037', 8, 37, @p_AIR80В6, NULL, 5, 'completed', 'normal', '2025-01-14', '2025-01-29', '2025-01-14 08:00:00', '2025-01-29 17:00:00', 4, 6, 'Yпаковано'),
 ('TASK-2025-038', 8, 38, @p_EKCH, NULL, 50, 'completed', 'low', '2025-01-13', '2025-01-25', '2025-01-13 08:00:00', '2025-01-25 17:00:00', 3, 6, 'Yпаковано');
 
 -- Задания для заказа ORD-2025-009 (отменен)
 INSERT INTO `production_tasks` (`task_number`, `order_id`, `order_item_id`, `product_id`, `route_card_id`, `quantity_plan`, `status`, `priority`, `start_date`, `end_date`, `planned_start`, `planned_end`, `responsible_id`, `worker_id`, `notes`) VALUES
-('TASK-2025-039', 9, 39, @p_AI\xd0\x9571A2, NULL, 10, 'cancelled', 'normal', NULL, NULL, '2025-01-15 08:00:00', '2025-01-30 17:00:00', 3, NULL, 'Oтменено'),
-('TASK-2025-040', 9, 40, @p_AI\xd0\x9571B2, NULL, 10, 'cancelled', 'normal', NULL, NULL, '2025-01-16 08:00:00', '2025-01-31 17:00:00', 4, NULL, 'Oтменено');
+('TASK-2025-039', 9, 39, @p_AIЕ71A2, NULL, 10, 'cancelled', 'normal', NULL, NULL, '2025-01-15 08:00:00', '2025-01-30 17:00:00', 3, NULL, 'Oтменено'),
+('TASK-2025-040', 9, 40, @p_AIЕ71B2, NULL, 10, 'cancelled', 'normal', NULL, NULL, '2025-01-16 08:00:00', '2025-01-31 17:00:00', 4, NULL, 'Oтменено');
 
 -- Задания для заказа ORD-2025-010
 INSERT INTO `production_tasks` (`task_number`, `order_id`, `order_item_id`, `product_id`, `route_card_id`, `quantity_plan`, `status`, `priority`, `start_date`, `end_date`, `planned_start`, `planned_end`, `responsible_id`, `worker_id`, `notes`) VALUES
-('TASK-2025-041', 10, 41, @p_AIR90LB2, NULL, 10, 'in_progress', 'urgent', '2025-01-19', '2025-02-10', '2025-01-19 08:00:00', '2025-02-10 17:00:00', 3, 6, 'Приоритет!'),
-('TASK-2025-042', 10, 42, @p_AIR90LB4, NULL, 8, 'in_progress', 'urgent', '2025-01-20', '2025-02-12', '2025-01-20 08:00:00', '2025-02-12 17:00:00', 4, 6, 'Приоритет!'),
+('TASK-2025-041', 10, 41, @p_AIR90LВ2, NULL, 10, 'in_progress', 'urgent', '2025-01-19', '2025-02-10', '2025-01-19 08:00:00', '2025-02-10 17:00:00', 3, 6, 'Приоритет!'),
+('TASK-2025-042', 10, 42, @p_AIR90LВ4, NULL, 8, 'in_progress', 'urgent', '2025-01-20', '2025-02-12', '2025-01-20 08:00:00', '2025-02-12 17:00:00', 4, 6, 'Приоритет!'),
 ('TASK-2025-043', 10, 43, @p_AIR100S4, NULL, 6, 'planned', 'high', NULL, NULL, '2025-02-05 08:00:00', '2025-02-20 17:00:00', 3, NULL, NULL),
 ('TASK-2025-044', 10, 44, @p_2AIR80B2, NULL, 15, 'planned', 'normal', NULL, NULL, '2025-02-08 08:00:00', '2025-02-22 17:00:00', 4, NULL, NULL),
 ('TASK-2025-045', 10, 45, @p_2AIR90L4, NULL, 10, 'planned', 'normal', NULL, NULL, '2025-02-10 08:00:00', '2025-02-25 17:00:00', 3, NULL, NULL);

@@ -56,7 +56,7 @@ if (!$order) {
 
 // Получение позиций заказа
 $itemsSql = "
-    SELECT oi.*, p.name as product_name, p.article, p.description,
+    SELECT oi.*, p.id as product_id, p.name as product_name, p.article, p.description,
            bu.symbol as unit_name
     FROM order_items oi
     LEFT JOIN products p ON oi.product_id = p.id
@@ -67,6 +67,80 @@ $itemsSql = "
 $stmt = $pdo->prepare($itemsSql);
 $stmt->execute([$orderId]);
 $items = $stmt->fetchAll();
+
+// Получение материалов для каждого товара из паспортов
+$productMaterials = [];
+$totalMaterials = []; // Суммарно по заказу
+
+if (!empty($items)) {
+    $productIds = array_column($items, 'product_id');
+    $placeholders = implode(',', array_fill(0, count($productIds), '?'));
+    
+    $materialsSql = "
+        SELECT 
+            pp.product_id,
+            m.id as material_id,
+            m.name_full as material_name,
+            m.code as material_article,
+            ppm.quantity as quantity_per_unit,
+            COALESCE(m.current_stock, 0) as current_stock,
+            m.base_unit_id,
+            bu.symbol as unit_name
+        FROM product_passport_materials ppm
+        JOIN product_passports pp ON ppm.passport_id = pp.id
+        JOIN materials m ON ppm.material_id = m.id
+        LEFT JOIN base_units bu ON m.base_unit_id = bu.id
+        WHERE pp.product_id IN ($placeholders)
+        ORDER BY pp.product_id, ppm.sort_order
+    ";
+    $stmtMaterials = $pdo->prepare($materialsSql);
+    $stmtMaterials->execute($productIds);
+    $materialsResult = $stmtMaterials->fetchAll();
+    
+    // Группируем материалы по продуктам
+    foreach ($materialsResult as $mat) {
+        $pid = (string)$mat['product_id'];
+        if (!isset($productMaterials[$pid])) {
+            $productMaterials[$pid] = [];
+        }
+        
+        // Находим количество товара в заказе
+        $orderQty = 0;
+        foreach ($items as $item) {
+            if ($item['product_id'] == $mat['product_id']) {
+                $orderQty = $item['quantity'];
+                break;
+            }
+        }
+        
+        $qtyPerUnit = (float)$mat['quantity_per_unit'];
+        $totalNeeded = $qtyPerUnit * $orderQty;
+        
+        $productMaterials[$pid][] = [
+            'material_id' => $mat['material_id'],
+            'material_name' => $mat['material_name'],
+            'material_article' => $mat['material_article'],
+            'quantity_per_unit' => $qtyPerUnit,
+            'total_needed' => $totalNeeded,
+            'current_stock' => (float)$mat['current_stock'],
+            'unit_name' => $mat['unit_name'] ?? 'шт.'
+        ];
+        
+        // Суммируем по заказу
+        $mid = (string)$mat['material_id'];
+        if (!isset($totalMaterials[$mid])) {
+            $totalMaterials[$mid] = [
+                'material_id' => $mat['material_id'],
+                'material_name' => $mat['material_name'],
+                'material_article' => $mat['material_article'],
+                'total_needed' => 0,
+                'current_stock' => (float)$mat['current_stock'],
+                'unit_name' => $mat['unit_name'] ?? 'шт.'
+            ];
+        }
+        $totalMaterials[$mid]['total_needed'] += $totalNeeded;
+    }
+}
 
 // Получение производственных заданий по заказу
 $tasksSql = "
@@ -377,7 +451,10 @@ $pageTitle = 'Заказ №' . e($order['order_number']);
                                         </td>
                                     </tr>
                                     <?php else: ?>
-                                        <?php foreach ($items as $index => $item): ?>
+                                        <?php foreach ($items as $index => $item): 
+                                            $productId = (string)$item['product_id'];
+                                            $hasMaterials = isset($productMaterials[$productId]) && !empty($productMaterials[$productId]);
+                                        ?>
                                         <tr>
                                             <td><?= $index + 1 ?></td>
                                             <td><?= e($item['article'] ?? '—') ?></td>
@@ -407,6 +484,51 @@ $pageTitle = 'Заказ №' . e($order['order_number']);
                                                 </span>
                                             </td>
                                         </tr>
+                                        <?php if ($hasMaterials): ?>
+                                        <tr style="background: #f8f9fa;">
+                                            <td colspan="9" style="padding: 0;">
+                                                <div style="padding: 12px 20px;">
+                                                    <strong style="font-size: 13px; color: var(--primary-color);">📋 Материалы для товара:</strong>
+                                                    <table style="width: 100%; margin-top: 8px; font-size: 13px;">
+                                                        <thead>
+                                                            <tr style="border-bottom: 1px solid #dee2e6;">
+                                                                <th style="text-align: left; padding: 6px;">Материал</th>
+                                                                <th style="text-align: right; padding: 6px;">На 1 ед.</th>
+                                                                <th style="text-align: right; padding: 6px;">Всего нужно</th>
+                                                                <th style="text-align: right; padding: 6px;">На складе</th>
+                                                                <th style="text-align: center; padding: 6px;">Статус</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <?php foreach ($productMaterials[$productId] as $mat): 
+                                                                $isEnough = $mat['current_stock'] >= $mat['total_needed'];
+                                                                $shortage = max(0, $mat['total_needed'] - $mat['current_stock']);
+                                                            ?>
+                                                            <tr>
+                                                                <td style="padding: 6px;">
+                                                                    <?= e($mat['material_name']) ?>
+                                                                    <?php if (!empty($mat['material_article'])): ?>
+                                                                        <span style="color: var(--text-secondary);">(<?= e($mat['material_article']) ?>)</span>
+                                                                    <?php endif; ?>
+                                                                </td>
+                                                                <td style="text-align: right; padding: 6px;"><?= $mat['quantity_per_unit'] ?> <?= e($mat['unit_name']) ?></td>
+                                                                <td style="text-align: right; padding: 6px;"><strong><?= $mat['total_needed'] ?> <?= e($mat['unit_name']) ?></strong></td>
+                                                                <td style="text-align: right; padding: 6px;"><?= $mat['current_stock'] ?> <?= e($mat['unit_name']) ?></td>
+                                                                <td style="text-align: center; padding: 6px;">
+                                                                    <?php if ($isEnough): ?>
+                                                                        <span class="badge" style="background: #27ae6020; color: #27ae60;">✓ Достаточно</span>
+                                                                    <?php else: ?>
+                                                                        <span class="badge" style="background: #e74c3c20; color: #e74c3c;">✗ Не хватает: <?= $shortage ?> <?= e($mat['unit_name']) ?></span>
+                                                                    <?php endif; ?>
+                                                                </td>
+                                                            </tr>
+                                                            <?php endforeach; ?>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <?php endif; ?>
                                         <?php endforeach; ?>
                                     <?php endif; ?>
                                 </tbody>
@@ -414,6 +536,79 @@ $pageTitle = 'Заказ №' . e($order['order_number']);
                         </div>
                     </div>
                 </div>
+                
+                <!-- Суммарные материалы по заказу -->
+                <?php if (!empty($totalMaterials)): ?>
+                <div class="card" style="margin-bottom: 24px;">
+                    <div class="card-body" style="padding: 0;">
+                        <h3 style="padding: 20px 20px 0; margin: 0;" class="section-title">
+                            📊 Суммарно материалов по заказу
+                        </h3>
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>№</th>
+                                        <th>Артикул</th>
+                                        <th>Наименование материала</th>
+                                        <th>Всего нужно</th>
+                                        <th>На складе</th>
+                                        <th>Не хватает</th>
+                                        <th>Статус</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php 
+                                    $totalShortage = 0;
+                                    $totalEnough = 0;
+                                    foreach ($totalMaterials as $index => $mat): 
+                                        $isEnough = $mat['current_stock'] >= $mat['total_needed'];
+                                        $shortage = max(0, $mat['total_needed'] - $mat['current_stock']);
+                                        if ($isEnough) {
+                                            $totalEnough++;
+                                        } else {
+                                            $totalShortage += $shortage;
+                                        }
+                                    ?>
+                                    <tr>
+                                        <td><?= $index + 1 ?></td>
+                                        <td><?= e($mat['material_article'] ?? '—') ?></td>
+                                        <td>
+                                            <strong><?= e($mat['material_name']) ?></strong>
+                                        </td>
+                                        <td><strong><?= round($mat['total_needed'], 3) ?> <?= e($mat['unit_name']) ?></strong></td>
+                                        <td><?= $mat['current_stock'] ?> <?= e($mat['unit_name']) ?></td>
+                                        <td>
+                                            <?php if ($shortage > 0): ?>
+                                                <span style="color: #e74c3c; font-weight: 600;"><?= round($shortage, 3) ?> <?= e($mat['unit_name']) ?></span>
+                                            <?php else: ?>
+                                                <span style="color: var(--text-secondary);">—</span>
+                                            <?php endif; ?>
+                                        </td>
+                                        <td>
+                                            <?php if ($isEnough): ?>
+                                                <span class="badge" style="background: #27ae6020; color: #27ae60;">✓ Достаточно</span>
+                                            <?php else: ?>
+                                                <span class="badge" style="background: #e74c3c20; color: #e74c3c;">✗ Дефицит</span>
+                                            <?php endif; ?>
+                                        </td>
+                                    </tr>
+                                    <?php endforeach; ?>
+                                </tbody>
+                                <tfoot style="background: #f8f9fa; font-weight: 600;">
+                                    <tr>
+                                        <td colspan="3" style="text-align: right; padding: 12px;">Итого:</td>
+                                        <td><?= count($totalMaterials) ?> материалов</td>
+                                        <td style="color: #27ae60;"><?= $totalEnough ?> достаточно</td>
+                                        <td style="color: #e74c3c;"><?= count($totalMaterials) - $totalEnough ?> с дефицитом</td>
+                                        <td></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <?php endif; ?>
                 
                 <!-- Производственные задания -->
                 <?php if (!empty($tasks)): ?>

@@ -932,6 +932,15 @@ foreach ($ordersData as $oid => $data) {
         console.log('Orders data loaded:', Object.keys(ordersData).length, 'orders');
         console.log('Product materials cache loaded:', Object.keys(productMaterialsCache).length, 'products');
         
+        // Отладка: выводим детали первого заказа
+        var firstOrderId = Object.keys(ordersData)[0];
+        if (firstOrderId) {
+            console.log('First order details:', ordersData[firstOrderId]);
+            if (ordersData[firstOrderId].items && ordersData[firstOrderId].items.length > 0) {
+                console.log('First item materials:', ordersData[firstOrderId].items[0].materials);
+            }
+        }
+        
         // Открытие модального окна с деталями заказа (без AJAX, данные уже загружены)
         function openOrderDetailModal(orderId) {
             const modal = document.getElementById('orderDetailModalOverlay');
@@ -1044,6 +1053,8 @@ foreach ($ordersData as $oid => $data) {
                             });
                         }
                     }
+                    
+                    console.log('Item', item.product_id, 'materials:', item.materials);
                 });
                 
                 // Создаем сводную таблицу материалов по всему заказу
@@ -1065,6 +1076,8 @@ foreach ($ordersData as $oid => $data) {
                         });
                     }
                 });
+                
+                console.log('Material summary:', materialSummary);
                 
                 // Считаем итоги по сводной таблице
                 var totalMaterialsNeeded = Object.keys(materialSummary).length;
@@ -1138,7 +1151,7 @@ foreach ($ordersData as $oid => $data) {
                         html += '<span>📋</span><span class="btn-text">Материалы</span>';
                         html += '</button>';
                         html += '</div>';
-                        html += '<div class="item-materials-section" id="item-materials-' + itemIndex + '" style="display: none; padding: 12px 16px; background: white;">';
+                        html += '<div class="item-materials-section" id="item-materials-' + itemIndex + '" style="display: block; padding: 12px 16px; background: white;">';
                         html += '<table class="materials-table" style="font-size: 12px;">';
                         html += '<thead><tr><th>Материал</th><th>Артикул</th><th style="text-align: center;">Норма</th><th style="text-align: center;">Требуется</th><th style="text-align: center;">На складе</th><th style="text-align: right;">Цена</th><th style="text-align: right;">Сумма</th><th>Статус</th></tr></thead>';
                         html += '<tbody>';

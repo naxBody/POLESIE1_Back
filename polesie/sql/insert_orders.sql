@@ -3,6 +3,16 @@
 -- Реалистичные данные для тестирования плана выпуска
 -- ============================================
 
+-- Очистка существующих данных перед вставкой (чтобы избежать дублирования)
+DELETE FROM `production_tasks`;
+DELETE FROM `order_items`;
+DELETE FROM `orders`;
+
+-- Сброс автоинкремента для корректной нумерации
+ALTER TABLE `orders` AUTO_INCREMENT = 1;
+ALTER TABLE `order_items` AUTO_INCREMENT = 1;
+ALTER TABLE `production_tasks` AUTO_INCREMENT = 1;
+
 -- ============================================
 -- 1. ЗАКАЗЫ (orders)
 -- ============================================

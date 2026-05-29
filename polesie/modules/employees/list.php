@@ -337,7 +337,7 @@ require_once BASE_PATH . '/includes/topbar.php';
         </div>
         <div class="page-header-actions">
             <?php if (hasPermission('employees.create')): ?>
-                <a href="create.php" class="btn btn-primary">
+                <a href="add.php" class="btn btn-primary">
                     <span>➕</span> Добавить сотрудника
                 </a>
             <?php endif; ?>

@@ -339,40 +339,49 @@ if (!empty($orders)) {
     $orderIdsPlaceholder = implode(',', array_fill(0, count($orderIds), '?'));
 
     // 0. Загружаем материалы для всех продуктов из паспортов (для кэша)
-    $sqlProductMaterials = "SELECT 
-                                pp.product_id,
-                                m.id as material_id,
-                                m.name_full as material_name,
-                                m.code as material_article,
-                                ppm.quantity as quantity_per_unit,
-                                COALESCE(m.current_stock, 0) as current_stock,
-                                COALESCE(m.last_price, 0) as last_price,
-                                mu.symbol as unit_name
-                            FROM product_passport_materials ppm
-                            JOIN materials m ON ppm.material_id = m.id
-                            JOIN product_passports pp ON ppm.passport_id = pp.id
-                            LEFT JOIN base_units mu ON m.base_unit_id = mu.id
-                            WHERE pp.product_id IN ($orderIdsPlaceholder)
-                            ORDER BY pp.product_id, ppm.sort_order";
-    $stmtProductMaterials = $pdo->prepare($sqlProductMaterials);
-    $stmtProductMaterials->execute($orderIds);
-    $resProductMaterials = $stmtProductMaterials->fetchAll();
+    // Сначала получаем все product_id из order_items для этих заказов
+    $sqlProductIds = "SELECT DISTINCT product_id FROM order_items WHERE order_id IN ($orderIdsPlaceholder)";
+    $stmtProductIds = $pdo->prepare($sqlProductIds);
+    $stmtProductIds->execute($orderIds);
+    $productIds = array_column($stmtProductIds->fetchAll(), 'product_id');
     
-    // Группируем по product_id
-    foreach ($resProductMaterials as $row) {
-        $pid = (string)$row['product_id'];
-        if (!isset($productMaterialsCache[$pid])) {
-            $productMaterialsCache[$pid] = [];
+    if (!empty($productIds)) {
+        $productIdsPlaceholder = implode(',', array_fill(0, count($productIds), '?'));
+        $sqlProductMaterials = "SELECT 
+                                    pp.product_id,
+                                    m.id as material_id,
+                                    m.name_full as material_name,
+                                    m.code as material_article,
+                                    ppm.quantity as quantity_per_unit,
+                                    COALESCE(m.current_stock, 0) as current_stock,
+                                    COALESCE(m.last_price, 0) as last_price,
+                                    mu.symbol as unit_name
+                                FROM product_passport_materials ppm
+                                JOIN materials m ON ppm.material_id = m.id
+                                JOIN product_passports pp ON ppm.passport_id = pp.id
+                                LEFT JOIN base_units mu ON m.base_unit_id = mu.id
+                                WHERE pp.product_id IN ($productIdsPlaceholder)
+                                ORDER BY pp.product_id, ppm.sort_order";
+        $stmtProductMaterials = $pdo->prepare($sqlProductMaterials);
+        $stmtProductMaterials->execute($productIds);
+        $resProductMaterials = $stmtProductMaterials->fetchAll();
+        
+        // Группируем по product_id
+        foreach ($resProductMaterials as $row) {
+            $pid = (string)$row['product_id'];
+            if (!isset($productMaterialsCache[$pid])) {
+                $productMaterialsCache[$pid] = [];
+            }
+            $productMaterialsCache[$pid][] = [
+                'material_id' => $row['material_id'],
+                'material_name' => $row['material_name'],
+                'material_article' => $row['material_article'],
+                'quantity_per_unit' => (float)$row['quantity_per_unit'],
+                'current_stock' => (float)$row['current_stock'],
+                'last_price' => (float)$row['last_price'],
+                'unit_name' => $row['unit_name'] ?? 'шт.'
+            ];
         }
-        $productMaterialsCache[$pid][] = [
-            'material_id' => $row['material_id'],
-            'material_name' => $row['material_name'],
-            'material_article' => $row['material_article'],
-            'quantity_per_unit' => (float)$row['quantity_per_unit'],
-            'current_stock' => (float)$row['current_stock'],
-            'last_price' => (float)$row['last_price'],
-            'unit_name' => $row['unit_name'] ?? 'шт.'
-        ];
     }
 
     // 1. Основная информация о заказах
@@ -931,6 +940,7 @@ foreach ($ordersData as $oid => $data) {
         
         console.log('Orders data loaded:', Object.keys(ordersData).length, 'orders');
         console.log('Product materials cache loaded:', Object.keys(productMaterialsCache).length, 'products');
+        console.log('Product materials cache content:', productMaterialsCache);
         
         // Отладка: выводим детали первого заказа
         var firstOrderId = Object.keys(ordersData)[0];
@@ -938,6 +948,7 @@ foreach ($ordersData as $oid => $data) {
             console.log('First order details:', ordersData[firstOrderId]);
             if (ordersData[firstOrderId].items && ordersData[firstOrderId].items.length > 0) {
                 console.log('First item materials:', ordersData[firstOrderId].items[0].materials);
+                console.log('First item product_id:', ordersData[firstOrderId].items[0].product_id);
             }
         }
         
@@ -1032,10 +1043,15 @@ foreach ($ordersData as $oid => $data) {
                     }
                     
                     // Материалы уже загружены на сервере, используем их
+                    console.log('Checking item', item.product_id, 'for materials. Has materials array:', !!item.materials, 'Length:', item.materials ? item.materials.length : 'N/A');
                     if (!item.materials || item.materials.length === 0) {
+                        console.log('No materials found for item', item.product_id, ', checking cache...');
                         item.materials = [];
-                        if (productMaterialsCache && productMaterialsCache[item.product_id]) {
-                            var norms = productMaterialsCache[item.product_id];
+                        var prodId = String(item.product_id);
+                        console.log('Looking up product ID in cache:', prodId, 'Found:', !!productMaterialsCache[prodId]);
+                        if (productMaterialsCache && productMaterialsCache[prodId]) {
+                            var norms = productMaterialsCache[prodId];
+                            console.log('Found', norms.length, 'materials in cache for product', prodId);
                             norms.forEach(function(norm) {
                                 var requiredTotal = norm.quantity_per_unit * item.quantity;
                                 var cost = requiredTotal * (norm.last_price || 0);
@@ -1051,10 +1067,15 @@ foreach ($ordersData as $oid => $data) {
                                     material_id: norm.material_id
                                 });
                             });
+                            console.log('After loading from cache, item has', item.materials.length, 'materials');
+                        } else {
+                            console.log('No materials in cache for product', prodId);
                         }
+                    } else {
+                        console.log('Item already has', item.materials.length, 'materials from server');
                     }
                     
-                    console.log('Item', item.product_id, 'materials:', item.materials);
+                    console.log('Final item', item.product_id, 'materials:', item.materials);
                 });
                 
                 // Создаем сводную таблицу материалов по всему заказу

@@ -1660,7 +1660,6 @@ if ($filterCategory !== '') {
             html += '<div class="document-list" id="modalDocumentsList">';
             html += '<div style="text-align: center; padding: 30px 20px;">';
             html += '<button onclick="printPassport()" style="background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); border: none; color: white; padding: 14px 28px; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 600; display: inline-flex; align-items: center; gap: 10px; box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3); transition: all 0.3s ease;" onmouseover="this.style.transform=\'translateY(-2px)\'; this.style.boxShadow=\'0 6px 20px rgba(37, 99, 235, 0.4)\'" onmouseout="this.style.transform=\'translateY(0)\'; this.style.boxShadow=\'0 4px 14px rgba(37, 99, 235, 0.3)\'">📄 Сформировать паспорт</button>';
-            html += '<div style="margin-top: 12px; font-size: 13px; color: #9ca3af;">Документы отсутствуют</div>';
             html += '</div>';
             html += '</div>';
             html += '</div>';
@@ -1767,7 +1766,7 @@ if ($filterCategory !== '') {
             } else {
                 var docsList = document.getElementById('modalDocumentsList');
                 if (docsList) {
-                    docsList.innerHTML = '<div style="text-align: center; padding: 30px 20px;"><button onclick="printPassport()" style="background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); border: none; color: white; padding: 14px 28px; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 600; display: inline-flex; align-items: center; gap: 10px; box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3); transition: all 0.3s ease;" onmouseover="this.style.transform=\'translateY(-2px)\'; this.style.boxShadow=\'0 6px 20px rgba(37, 99, 235, 0.4)\'" onmouseout="this.style.transform=\'translateY(0)\'; this.style.boxShadow=\'0 4px 14px rgba(37, 99, 235, 0.3)\'">📄 Сформировать паспорт</button><div style="margin-top: 12px; font-size: 13px; color: #9ca3af;">Документы отсутствуют</div></div>';
+                    docsList.innerHTML = '<div style="text-align: center; padding: 30px 20px;"><button onclick="printPassport()" style="background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); border: none; color: white; padding: 14px 28px; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 600; display: inline-flex; align-items: center; gap: 10px; box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3); transition: all 0.3s ease;" onmouseover="this.style.transform=\'translateY(-2px)\'; this.style.boxShadow=\'0 6px 20px rgba(37, 99, 235, 0.4)\'" onmouseout="this.style.transform=\'translateY(0)\'; this.style.boxShadow=\'0 4px 14px rgba(37, 99, 235, 0.3)\'">📄 Сформировать паспорт</button></div>';
                 }
             }
             

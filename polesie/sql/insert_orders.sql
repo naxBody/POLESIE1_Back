@@ -4,6 +4,12 @@
 -- ============================================
 
 -- Очистка существующих данных перед вставкой (чтобы избежать дублирования)
+-- Очистка в порядке обратном созданию таблиц (с учетом внешних ключей)
+DELETE FROM `product_documents`;
+DELETE FROM `product_serial_numbers`;
+DELETE FROM `quality_checks`;
+DELETE FROM `production_task_stages`;
+DELETE FROM `production_tasks_materials`;
 DELETE FROM `production_tasks`;
 DELETE FROM `order_items`;
 DELETE FROM `orders`;
@@ -12,6 +18,11 @@ DELETE FROM `orders`;
 ALTER TABLE `orders` AUTO_INCREMENT = 1;
 ALTER TABLE `order_items` AUTO_INCREMENT = 1;
 ALTER TABLE `production_tasks` AUTO_INCREMENT = 1;
+ALTER TABLE `production_task_stages` AUTO_INCREMENT = 1;
+ALTER TABLE `production_tasks_materials` AUTO_INCREMENT = 1;
+ALTER TABLE `quality_checks` AUTO_INCREMENT = 1;
+ALTER TABLE `product_serial_numbers` AUTO_INCREMENT = 1;
+ALTER TABLE `product_documents` AUTO_INCREMENT = 1;
 
 -- ============================================
 -- 1. ЗАКАЗЫ (orders)

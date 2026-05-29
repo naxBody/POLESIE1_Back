@@ -636,6 +636,7 @@ foreach ($allTasks as &$task) {
                                 <!-- Вкладка этапы -->
                                 <div class="tab-content active" id="tab-stages">
                                     <h4 style="margin-bottom: 16px;">Этапы производства</h4>
+                                    <?php if (!empty($firstTask['stages'])): ?>
                                     <div class="stages-grid">
                                         <?php foreach ($firstTask['stages'] as $stage): ?>
                                             <div class="stage-card <?= $stage['status'] ?>">
@@ -674,11 +675,15 @@ foreach ($allTasks as &$task) {
                                             </div>
                                         <?php endforeach; ?>
                                     </div>
+                                    <?php else: ?>
+                                        <p style="color: var(--text-secondary);">Этапы не назначены</p>
+                                    <?php endif; ?>
                                 </div>
                                 
                                 <!-- Вкладка материалы -->
                                 <div class="tab-content" id="tab-materials">
                                     <h4 style="margin-bottom: 16px;">Материалы для производства</h4>
+                                    <?php if (!empty($firstTask['materials'])): ?>
                                     <table class="materials-table">
                                         <thead>
                                             <tr>
@@ -715,6 +720,9 @@ foreach ($allTasks as &$task) {
                                                 📦 Списать материалы
                                             </button>
                                         </div>
+                                    <?php endif; ?>
+                                    <?php else: ?>
+                                        <p style="color: var(--text-secondary);">Материалы не назначены</p>
                                     <?php endif; ?>
                                 </div>
                                 

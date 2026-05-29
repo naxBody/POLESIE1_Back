@@ -653,11 +653,11 @@ $pageTitle = 'Заказ №' . e($order['order_number']);
                                         </div>
                                         <div>
                                             <div class="meta-label">Количество</div>
-                                            <div class="meta-value"><?= $task['quantity'] ?> <?= e($task['unit_name'] ?? 'шт.') ?></div>
+                                            <div class="meta-value"><?= $task['quantity'] ?? '—' ?> <?= e($task['unit_name'] ?? 'шт.') ?></div>
                                         </div>
                                         <div>
                                             <div class="meta-label">Срок выполнения</div>
-                                            <div class="meta-value"><?= formatDate($task['due_date']) ?></div>
+                                            <div class="meta-value"><?= e($task['due_date'] ?? '—') ?></div>
                                         </div>
                                         <div>
                                             <div class="meta-label">Цех/Участок</div>

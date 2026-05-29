@@ -1,10 +1,62 @@
 ```
-# SQL files
-*.sql
+# SQL-related build artifacts
+*.sql.bak
+*.sql~
+*.db-shm
+*.db-wal
+*.db-journal
 
-# PHP files
-*.php
+# General build artifacts
+build/
+dist/
+target/
 
-# Project specific
-polesie/
+# Dependencies
+node_modules/
+venv/
+.venv/
+__pycache__/
+*.egg-info/
+
+# Logs and temp files
+*.log
+*.tmp
+*.swp
+
+# Environment
+.env
+.env.local
+*.env.*
+
+# Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Coverage
+coverage/
+htmlcov/
+.coverage
+
+# Python specific
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+
+# Compressed files
+*.zip
+*.gz
+*.tar
+*.tgz
+*.bz2
+*.xz
+*.7z
+*.rar
 ```

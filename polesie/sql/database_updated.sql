@@ -544,7 +544,22 @@ INSERT INTO `materials` (`code`, `name_full`, `name_short`, `category_id`, `base
 ('LUBE-GREASE-LITO', 'Смазка Литол-24', 'Литол-24', 5, 2, '{"тип":"пластичная","температурный_диапазон_ц":"-40..+120","гост":"21150-75"}', 180.00, 35.00, 'Склад №6, Секция Б', 1, 5.50, 'BYN'),
 ('LUBE-GREASE-UNIO', 'Смазка Униол-2М', 'Униол-2М', 5, 2, '{"тип":"пластичная","температурный_диапазон_ц":"-50..+150","гост":"21150-75"}', 150.00, 30.00, 'Склад №6, Секция Б', 1, 8.50, 'BYN'),
 ('LUBE-OIL-IND', 'Масло индустриальное И-20А', 'Масло И-20А', 5, 4, '{"тип":"индустриальное","viscosity_cSt":"20","гост":"20799-88"}', 220.00, 45.00, 'Склад №6, Секция Б', 1, 4.50, 'BYN'),
-('LUBE-OIL-TRANS', 'Масло трансформаторное ТКп', 'Масло ТКп', 5, 4, '{"тип":"трансформаторное","температура_застывания_ц":"-45","гост":"10121-75"}', 280.00, 55.00, 'Склад №6, Секция Б', 1, 5.50, 'BYN');
+('LUBE-OIL-TRANS', 'Масло трансформаторное ТКп', 'Масло ТКп', 5, 4, '{"тип":"трансформаторное","температура_застывания_ц":"-45","гост":"10121-75"}', 280.00, 55.00, 'Склад №6, Секция Б', 1, 5.50, 'BYN'),
+-- Материалы для паспортов продукции
+('STEEL-SHEET-0.5', 'Сталь электротехническая листовая 0.5мм', 'Сталь 0.5мм', 3, 2, '{"толщина_мм":0.5,"марка":"2211","гост":"11036-75"}', 500.00, 100.00, 'Склад №2, Секция А', 1, 45.00, 'BYN'),
+('STEEL-SHEET-1.0', 'Сталь электротехническая листовая 1.0мм', 'Сталь 1.0мм', 3, 2, '{"толщина_мм":1.0,"марка":"2211","гост":"11036-75"}', 450.00, 90.00, 'Склад №2, Секция А', 1, 42.00, 'BYN'),
+('STEEL-SHEET-0.8', 'Сталь листовая 0.8мм', 'Сталь 0.8мм', 3, 2, '{"толщина_мм":0.8,"марка":"Ст3сп","гост":"19903-90"}', 480.00, 95.00, 'Склад №2, Секция А', 1, 38.00, 'BYN'),
+('WIRE-CU-0.6', 'Провод обмоточный медный 0.6мм', 'Провод 0.6', 6, 3, '{"диаметр_мм":0.6,"материал":"медь","изоляция":"ПЭТВ-2","класс":"F"}', 120.00, 25.00, 'Склад №4, Секция Е', 2, 75.00, 'BYN'),
+('WIRE-CU-0.8', 'Провод обмоточный медный 0.8мм', 'Провод 0.8', 6, 3, '{"диаметр_мм":0.8,"материал":"медь","изоляция":"ПЭТВ-2","класс":"F"}', 95.00, 20.00, 'Склад №4, Секция Е', 2, 75.00, 'BYN'),
+('WIRE-CU-1.0', 'Провод обмоточный медный 1.0мм', 'Провод 1.0', 6, 3, '{"диаметр_мм":1.0,"материал":"медь","изоляция":"ПЭТВ-2","класс":"F"}', 75.00, 15.00, 'Склад №4, Секция Е', 2, 75.00, 'BYN'),
+('WIRE-NICHROME-2.0', 'Провод нихромовый 2.0мм', 'Нихром 2.0', 6, 3, '{"диаметр_мм":2.0,"материал":"нихром Х20Н80","сопротивление_ом_м":0.65}', 45.00, 10.00, 'Склад №4, Секция Ж', 2, 185.00, 'BYN'),
+('ALUM-BAR-10', 'Алюминий литейный АД1', 'Алюминий АД1', 4, 2, '{"марка":"АД1","гост":"1583-93"}', 350.00, 70.00, 'Склад №3, Секция А', 1, 12.50, 'BYN'),
+('BEARING-6201-2RS', 'Подшипник 6201-2RS', 'Подшипник 6201', 11, 1, '{"внутренний_диаметр_мм":12,"внешний_диаметр_мм":32,"ширина_мм":10,"тип":"шариковый","уплотнение":"2RS"}', 250.00, 50.00, 'Склад №5, Ящик 4', 2, 8.50, 'BYN'),
+('BEARING-6203-2RS', 'Подшипник 6203-2RS', 'Подшипник 6203', 11, 1, '{"внутренний_диаметр_мм":17,"внешний_диаметр_мм":40,"ширина_мм":12,"тип":"шариковый","уплотнение":"2RS"}', 200.00, 40.00, 'Склад №5, Ящик 4', 2, 9.50, 'BYN'),
+('BEARING-6204-2RS', 'Подшипник 6204-2RS', 'Подшипник 6204', 11, 1, '{"внутренний_диаметр_мм":20,"внешний_диаметр_мм":47,"ширина_мм":14,"тип":"шариковый","уплотнение":"2RS"}', 180.00, 35.00, 'Склад №5, Ящик 4', 2, 11.00, 'BYN'),
+('SEAL-MECH-20', 'Уплотнение торцевое механическое 20мм', 'Уплотнение 20', 12, 1, '{"внутренний_диаметр_мм":20,"материал":"керамика-графит","давление_бар":10}', 85.00, 15.00, 'Склад №5, Ящик 5', 2, 125.00, 'BYN'),
+('INSULATION-PERIKLAZ', 'Наполнитель периклазовый ПЭТ', 'Периклаз', 5, 2, '{"тип":"периклазовый","фракция_мм":"0.1-0.5","чистота_проц":98}', 280.00, 55.00, 'Склад №4, Секция Г', 2, 18.00, 'BYN'),
+('CABLE-POWER-3x1.5', 'Кабель силовой 3х1.5мм²', 'Кабель 3х1.5', 6, 3, '{"сечение_мм2":1.5,"жилы":3,"материал":"медь","изоляция":"ПВХ","напряжение_в":450,"гост":"31996-2012"}', 850.00, 150.00, 'Склад №4, Секция Б', 2, 45.00, 'BYN');
 
 -- ============================================
 -- ПРОДУКЦИЯ ОАО «ПОЛЕСЬЕЭЛЕКТРОМАШ» (АИР)
@@ -666,3 +681,266 @@ INSERT INTO `products` (`article`, `name`, `category_id`, `base_unit_id`, `speci
 ('CAST-A5', 'Отливка из алюминия А5', 19, 2, '{"сплав": "А5", "гост": "11069-2001"}', 'cast_al_a5.jpg', 9.00, 'BYN', TRUE),
 ('CAST-A6', 'Отливка из алюминия А6', 19, 2, '{"сплав": "А6", "гост": "11069-2001"}', 'cast_al_a6.jpg', 8.80, 'BYN', TRUE),
 ('CAST-AV87', 'Отливка из алюминиевого сплава АВ-87', 19, 2, '{"сплав": "АВ-87", "гост": "1583-93"}', 'cast_al_av87.jpg', 9.50, 'BYN', TRUE);
+
+-- ============================================
+-- ЭТАПЫ ПРОИЗВОДСТВА (справочник)
+-- ============================================
+INSERT INTO `production_stages` (`name`, `code`, `description`, `sort_order`, `color`, `is_active`) VALUES
+('Заготовка', 'blank', 'Подготовка заготовок', 1, '#FF6B6B', TRUE),
+('Литье', 'casting', 'Литейное производство', 2, '#4ECDC4', TRUE),
+('Механообработка', 'machining', 'Токарные и фрезерные работы', 3, '#45B7D1', TRUE),
+('Намотка', 'winding', 'Намотка обмоток', 4, '#96CEB4', TRUE),
+('Сборка', 'assembly', 'Сборка узлов', 5, '#FFEAA7', TRUE),
+('Покраска', 'painting', 'Нанесение лакокрасочных покрытий', 6, '#DDA0DD', TRUE),
+('Сушка', 'drying', 'Сушка после покраски', 7, '#98D8C8', TRUE),
+('Балансировка', 'balancing', 'Балансировка ротора', 8, '#F7DC6F', TRUE),
+('Контроль качества', 'qc', 'Проверка качества', 9, '#BB8FCE', TRUE),
+('Упаковка', 'packing', 'Упаковка готовой продукции', 10, '#82E0AA', TRUE);
+
+-- ============================================
+-- ПАСПОРТА ПРОДУКЦИИ И МАТЕРИАЛЫ
+-- ============================================
+
+-- Паспорт для двигателя АИР71А2
+INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`) VALUES
+((SELECT id FROM products WHERE article = 'AIR71А2'), 10.2, 12, TRUE, 
+'Стандартный производственный процесс для двигателей серии АИР71', 
+'Соответствие ГОСТ Р 51689-2000, проверка сопротивления изоляции, испытание на нагрев');
+
+INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`) VALUES
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR71А2')), 
+ (SELECT id FROM materials WHERE code = 'STEEL-SHEET-0.5'), 2.5, 2, 9.8, 45.0, 1, 'Сталь для корпуса статора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR71А2')), 
+ (SELECT id FROM materials WHERE code = 'WIRE-CU-0.8'), 0.15, 4, 1.2, 12.0, 2, 'Обмоточный провод'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR71А2')), 
+ (SELECT id FROM materials WHERE code = 'BEARING-6203-2RS'), 2, 1, 0.34, 3.3, 3, 'Подшипники'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR71А2')), 
+ (SELECT id FROM materials WHERE code = 'ALUM-BAR-10'), 1.8, 2, 4.86, 22.0, 4, 'Алюминий для литья ротора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR71А2')), 
+ (SELECT id FROM materials WHERE code = 'PAINT-POLYMER'), 0.12, 2, 0.24, 2.3, 5, 'Порошковая краска'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR71А2')), 
+ (SELECT id FROM materials WHERE code = 'LUBE-GREASE-LITO'), 0.02, 2, 0.036, 0.35, 6, 'Смазка для подшипников');
+
+-- Маршрутная карта для АИР71А2
+INSERT INTO `route_cards` (`product_id`, `name`, `version`, `description`, `total_time_hours`, `is_active`) VALUES
+((SELECT id FROM products WHERE article = 'AIR71А2'), 'Маршрутная карта АИР71А2', '1.0', 
+'Полный технологический процесс производства двигателя АИР71А2', 8.5, TRUE);
+
+INSERT INTO `route_card_operations` (`route_card_id`, `operation_number`, `stage_id`, `name`, `description`, `work_center`, `equipment`, `time_norm_hours`, `materials_required`, `instructions`, `sort_order`) VALUES
+((SELECT id FROM route_cards WHERE product_id = (SELECT id FROM products WHERE article = 'AIR71А2')), 
+ 10, (SELECT id FROM production_stages WHERE code = 'blank'), 
+ 'Раскрой стали', 'Раскрой электротехнической стали для пластин статора', 'Заготовительный участок', 'Гильотинные ножницы', 0.5, 
+ '{"материалы": ["STEEL-SHEET-0.5"], "количество": 2.5}', 
+'Соблюдать размеры согласно чертежу МЭ-71А2-001', 1),
+((SELECT id FROM route_cards WHERE product_id = (SELECT id FROM products WHERE article = 'AIR71А2')), 
+ 20, (SELECT id FROM production_stages WHERE code = 'machining'), 
+ 'Штамповка пластин', 'Вырубка пластин статора и ротора', 'Прессовый участок', 'Пресс механический 63т', 1.0, 
+ '{"материалы": ["STEEL-SHEET-0.5"]}', 
+'Контролировать качество вырубки, отсутствие заусенцев', 2),
+((SELECT id FROM route_cards WHERE product_id = (SELECT id FROM products WHERE article = 'AIR71А2')), 
+ 30, (SELECT id FROM production_stages WHERE code = 'casting'), 
+ 'Литье ротора', 'Литье алюминиевой клетки ротора под давлением', 'Литейный участок', 'Машина литьевая ДПА-250', 1.5, 
+ '{"материалы": ["ALUM-BAR-10"]}', 
+'Температура литья 680-700°C, давление 250 атм', 3),
+((SELECT id FROM route_cards WHERE product_id = (SELECT id FROM products WHERE article = 'AIR71А2')), 
+ 40, (SELECT id FROM production_stages WHERE code = 'winding'), 
+ 'Намотка статора', 'Намотка обмотки статора', 'Намоточный участок', 'Станок намоточный полуавтоматический', 2.0, 
+ '{"материалы": ["WIRE-CU-0.8"]}', 
+'Количество витков согласно техпроцессу, натяжение провода 2-3 Н', 4),
+((SELECT id FROM route_cards WHERE product_id = (SELECT id FROM products WHERE article = 'AIR71А2')), 
+ 50, (SELECT id FROM production_stages WHERE code = 'assembly'), 
+ 'Сборка двигателя', 'Установка ротора в статор, монтаж подшипников', 'Сборочный участок', 'Пресс гидравлический', 1.5, 
+ '{"материалы": ["BEARING-6203-2RS", "LUBE-GREASE-LITO"]}', 
+'Зазор между ротором и статором 0.3-0.5 мм', 5),
+((SELECT id FROM route_cards WHERE product_id = (SELECT id FROM products WHERE article = 'AIR71А2')), 
+ 60, (SELECT id FROM production_stages WHERE code = 'painting'), 
+ 'Покраска корпуса', 'Нанесение порошкового покрытия', 'Окрасочный участок', 'Камера напыления порошковая', 0.8, 
+ '{"материалы": ["PAINT-POLYMER"]}', 
+'Толщина покрытия 60-80 мкм', 6),
+((SELECT id FROM route_cards WHERE product_id = (SELECT id FROM products WHERE article = 'AIR71А2')), 
+ 70, (SELECT id FROM production_stages WHERE code = 'drying'), 
+ 'Полимеризация покрытия', 'Сушка в печи', 'Участок сушки', 'Печь конвейерная', 0.7, 
+ '{}', 
+'Температура 180-200°C, время 15 минут', 7),
+((SELECT id FROM route_cards WHERE product_id = (SELECT id FROM products WHERE article = 'AIR71А2')), 
+ 80, (SELECT id FROM production_stages WHERE code = 'balancing'), 
+ 'Балансировка ротора', 'Динамическая балансировка', 'Балансировочный участок', 'Станок балансировочный', 0.3, 
+ '{}', 
+'Дисбаланс не более 15 г·мм', 8),
+((SELECT id FROM route_cards WHERE product_id = (SELECT id FROM products WHERE article = 'AIR71А2')), 
+ 90, (SELECT id FROM production_stages WHERE code = 'qc'), 
+ 'Контроль качества', 'Проверка электрических параметров', 'Контрольный участок', 'Стенд испытательный', 0.5, 
+ '{}', 
+'Проверка сопротивления изоляции, тока холостого хода', 9),
+((SELECT id FROM route_cards WHERE product_id = (SELECT id FROM products WHERE article = 'AIR71А2')), 
+ 100, (SELECT id FROM production_stages WHERE code = 'packing'), 
+ 'Упаковка', 'Консервация и упаковка', 'Упаковочный участок', '', 0.2, 
+ '{}', 
+'Упаковка в картонную коробку с инструкцией', 10);
+
+-- Паспорт для двигателя АИР80А2
+INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`) VALUES
+((SELECT id FROM products WHERE article = 'AIR80А2'), 13.3, 12, TRUE, 
+'Производственный процесс для двигателей серии АИР80', 
+'Соответствие ГОСТ Р 51689-2000, расширенные испытания');
+
+INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`) VALUES
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR80А2')), 
+ (SELECT id FROM materials WHERE code = 'STEEL-SHEET-0.5'), 3.2, 2, 12.5, 43.0, 1, 'Сталь для корпуса статора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR80А2')), 
+ (SELECT id FROM materials WHERE code = 'WIRE-CU-1.0'), 0.22, 4, 1.8, 13.5, 2, 'Обмоточный провод увеличенного сечения'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR80А2')), 
+ (SELECT id FROM materials WHERE code = 'BEARING-6204-2RS'), 2, 1, 0.42, 3.2, 3, 'Подшипники большего размера'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR80А2')), 
+ (SELECT id FROM materials WHERE code = 'ALUM-BAR-10'), 2.5, 2, 6.75, 25.0, 4, 'Алюминий для литья ротора'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR80А2')), 
+ (SELECT id FROM materials WHERE code = 'PAINT-POLYMER'), 0.15, 2, 0.3, 2.2, 5, 'Порошковая краска'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'AIR80А2')), 
+ (SELECT id FROM materials WHERE code = 'LUBE-GREASE-LITO'), 0.025, 2, 0.045, 0.34, 6, 'Смазка для подшипников');
+
+-- Маршрутная карта для АИР80А2 (аналогична АИР71А2 с небольшими отличиями)
+INSERT INTO `route_cards` (`product_id`, `name`, `version`, `description`, `total_time_hours`, `is_active`) VALUES
+((SELECT id FROM products WHERE article = 'AIR80А2'), 'Маршрутная карта АИР80А2', '1.0', 
+'Технологический процесс производства двигателя АИР80А2', 9.0, TRUE);
+
+INSERT INTO `route_card_operations` (`route_card_id`, `operation_number`, `stage_id`, `name`, `description`, `work_center`, `equipment`, `time_norm_hours`, `materials_required`, `instructions`, `sort_order`) VALUES
+((SELECT id FROM route_cards WHERE product_id = (SELECT id FROM products WHERE article = 'AIR80А2')), 
+ 10, (SELECT id FROM production_stages WHERE code = 'blank'), 
+ 'Раскрой стали', 'Раскрой электротехнической стали для пластин статора', 'Заготовительный участок', 'Гильотинные ножницы', 0.6, 
+ '{"материалы": ["STEEL-SHEET-0.5"], "количество": 3.2}', 
+'Соблюдать размеры согласно чертежу МЭ-80А2-001', 1),
+((SELECT id FROM route_cards WHERE product_id = (SELECT id FROM products WHERE article = 'AIR80А2')), 
+ 20, (SELECT id FROM production_stages WHERE code = 'machining'), 
+ 'Штамповка пластин', 'Вырубка пластин статора и ротора', 'Прессовый участок', 'Пресс механический 100т', 1.2, 
+ '{"материалы": ["STEEL-SHEET-0.5"]}', 
+'Контролировать качество вырубки', 2),
+((SELECT id FROM route_cards WHERE product_id = (SELECT id FROM products WHERE article = 'AIR80А2')), 
+ 30, (SELECT id FROM production_stages WHERE code = 'casting'), 
+ 'Литье ротора', 'Литье алюминиевой клетки ротора', 'Литейный участок', 'Машина литьевая ДПА-400', 1.8, 
+ '{"материалы": ["ALUM-BAR-10"]}', 
+'Температура литья 680-700°C', 3),
+((SELECT id FROM route_cards WHERE product_id = (SELECT id FROM products WHERE article = 'AIR80А2')), 
+ 40, (SELECT id FROM production_stages WHERE code = 'winding'), 
+ 'Намотка статора', 'Намотка обмотки статора', 'Намоточный участок', 'Станок намоточный автоматический', 2.2, 
+ '{"материалы": ["WIRE-CU-1.0"]}', 
+'Натяжение провода 3-4 Н', 4),
+((SELECT id FROM route_cards WHERE product_id = (SELECT id FROM products WHERE article = 'AIR80А2')), 
+ 50, (SELECT id FROM production_stages WHERE code = 'assembly'), 
+ 'Сборка двигателя', 'Установка ротора в статор', 'Сборочный участок', 'Пресс гидравлический', 1.6, 
+ '{"материалы": ["BEARING-6204-2RS", "LUBE-GREASE-LITO"]}', 
+'Зазор 0.35-0.55 мм', 5),
+((SELECT id FROM route_cards WHERE product_id = (SELECT id FROM products WHERE article = 'AIR80А2')), 
+ 60, (SELECT id FROM production_stages WHERE code = 'painting'), 
+ 'Покраска корпуса', 'Нанесение порошкового покрытия', 'Окрасочный участок', 'Камера напыления', 0.9, 
+ '{"материалы": ["PAINT-POLYMER"]}', 
+'Толщина покрытия 70-90 мкм', 6),
+((SELECT id FROM route_cards WHERE product_id = (SELECT id FROM products WHERE article = 'AIR80А2')), 
+ 70, (SELECT id FROM production_stages WHERE code = 'drying'), 
+ 'Полимеризация покрытия', 'Сушка в печи', 'Участок сушки', 'Печь конвейерная', 0.7, '{}', 'Температура 180-200°C', 7);
+
+-- Паспорт для электронасоса БЦ-0,5-20-У1.1
+INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`) VALUES
+((SELECT id FROM products WHERE article = 'BC-0.5-20-U1.1'), 8.5, 18, TRUE, 
+'Производство бытовых центробежных насосов', 
+'Герметичность, проверка напора и производительности');
+
+INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`) VALUES
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'BC-0.5-20-U1.1')), 
+ (SELECT id FROM materials WHERE code = 'CAST-AK5M2'), 1.2, 2, 3.24, 38.0, 1, 'Корпус насоса из алюминиевого сплава'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'BC-0.5-20-U1.1')), 
+ (SELECT id FROM materials WHERE code = 'STEEL-SHEET-1.0'), 0.8, 2, 6.3, 74.0, 2, 'Стальной кожух двигателя'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'BC-0.5-20-U1.1')), 
+ (SELECT id FROM materials WHERE code = 'WIRE-CU-0.6'), 0.1, 4, 0.7, 8.2, 3, 'Обмоточный провод'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'BC-0.5-20-U1.1')), 
+ (SELECT id FROM materials WHERE code = 'BEARING-6201-2RS'), 2, 1, 0.126, 1.5, 4, 'Подшипники'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'BC-0.5-20-U1.1')), 
+ (SELECT id FROM materials WHERE code = 'SEAL-MECH-20'), 1, 1, 0.05, 0.6, 5, 'Торцевое уплотнение'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'BC-0.5-20-U1.1')), 
+ (SELECT id FROM materials WHERE code = 'PAINT-ENAMEL'), 0.08, 2, 0.15, 1.8, 6, 'Эмаль для наружной покраски');
+
+-- Маршрутная карта для насоса БЦ-0,5-20-У1.1
+INSERT INTO `route_cards` (`product_id`, `name`, `version`, `description`, `total_time_hours`, `is_active`) VALUES
+((SELECT id FROM products WHERE article = 'BC-0.5-20-U1.1'), 'Маршрутная карта БЦ-0,5-20-У1.1', '1.0', 
+'Технологический процесс производства бытового насоса', 5.5, TRUE);
+
+INSERT INTO `route_card_operations` (`route_card_id`, `operation_number`, `stage_id`, `name`, `description`, `work_center`, `equipment`, `time_norm_hours`, `materials_required`, `instructions`, `sort_order`) VALUES
+((SELECT id FROM route_cards WHERE product_id = (SELECT id FROM products WHERE article = 'BC-0.5-20-U1.1')), 
+ 10, (SELECT id FROM production_stages WHERE code = 'casting'), 
+ 'Литье корпуса', 'Литье корпуса насоса из алюминиевого сплава', 'Литейный участок', 'Машина литьевая низкого давления', 1.5, 
+ '{"материалы": ["CAST-AK5M2"]}', 
+'Контроль герметичности отливки', 1),
+((SELECT id FROM route_cards WHERE product_id = (SELECT id FROM products WHERE article = 'BC-0.5-20-U1.1')), 
+ 20, (SELECT id FROM production_stages WHERE code = 'machining'), 
+ 'Механообработка корпуса', 'Токарная обработка посадочных мест', 'Токарный участок', 'Станок токарный ЧПУ', 1.0, 
+ '{}', 
+'Шероховатость Ra 1.6 на посадочных поверхностях', 2),
+((SELECT id FROM route_cards WHERE product_id = (SELECT id FROM products WHERE article = 'BC-0.5-20-U1.1')), 
+ 30, (SELECT id FROM production_stages WHERE code = 'winding'), 
+ 'Намотка двигателя', 'Намотка статора электродвигателя', 'Намоточный участок', 'Станок намоточный', 1.2, 
+ '{"материалы": ["WIRE-CU-0.6"]}', 
+'Пропитка лаком после намотки', 3),
+((SELECT id FROM route_cards WHERE product_id = (SELECT id FROM products WHERE article = 'BC-0.5-20-U1.1')), 
+ 40, (SELECT id FROM production_stages WHERE code = 'assembly'), 
+ 'Сборка насоса', 'Монтаж рабочего колеса, установка уплотнения', 'Сборочный участок', 'Верстак сборочный', 1.0, 
+ '{"материалы": ["BEARING-6201-2RS", "SEAL-MECH-20"]}', 
+'Проверка легкости вращения вала', 4),
+((SELECT id FROM route_cards WHERE product_id = (SELECT id FROM products WHERE article = 'BC-0.5-20-U1.1')), 
+ 50, (SELECT id FROM production_stages WHERE code = 'painting'), 
+ 'Покраска', 'Нанесение эмали на корпус', 'Окрасочный участок', 'Краскораспылитель', 0.5, 
+ '{"материалы": ["PAINT-ENAMEL"]}', 
+'Нанесение в 2 слоя', 5),
+((SELECT id FROM route_cards WHERE product_id = (SELECT id FROM products WHERE article = 'BC-0.5-20-U1.1')), 
+ 60, (SELECT id FROM production_stages WHERE code = 'qc'), 
+ 'Испытания', 'Проверка напора и производительности', 'Испытательный стенд', 'Стенд насосный', 0.3, 
+ '{}', 
+'Напор не менее 20м, производительность не менее 30 л/мин', 6);
+
+-- Паспорт для электроконфорки ЭКЧ-145
+INSERT INTO `product_passports` (`product_id`, `total_weight_kg`, `warranty_months`, `is_serial_tracked`, `production_notes`, `quality_requirements`) VALUES
+((SELECT id FROM products WHERE article = 'EKCH-145'), 2.5, 12, FALSE, 
+'Производство электроконфорок бытовых', 
+'Проверка герметичности ТЭН, электрическая безопасность');
+
+INSERT INTO `product_passport_materials` (`passport_id`, `material_id`, `quantity`, `unit_id`, `weight_kg`, `percentage`, `sort_order`, `notes`) VALUES
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'EKCH-145')), 
+ (SELECT id FROM materials WHERE code = 'CAST-SCH20'), 1.5, 2, 10.8, 43.0, 1, 'Чугунная плита'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'EKCH-145')), 
+ (SELECT id FROM materials WHERE code = 'WIRE-NICHROME-2.0'), 0.025, 4, 0.18, 7.2, 2, 'Нихромовая спираль'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'EKCH-145')), 
+ (SELECT id FROM materials WHERE code = 'INSULATION-PERIKLAZ'), 0.3, 2, 0.6, 24.0, 3, 'Периклазовый наполнитель'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'EKCH-145')), 
+ (SELECT id FROM materials WHERE code = 'STEEL-SHEET-0.8'), 0.4, 2, 3.14, 12.5, 4, 'Стальной кожух'),
+((SELECT id FROM product_passports WHERE product_id = (SELECT id FROM products WHERE article = 'EKCH-145')), 
+ (SELECT id FROM materials WHERE code = 'CABLE-POWER-3x1.5'), 0.5, 3, 0.08, 3.2, 5, 'Силовой кабель');
+
+-- Маршрутная карта для электроконфорки ЭКЧ-145
+INSERT INTO `route_cards` (`product_id`, `name`, `version`, `description`, `total_time_hours`, `is_active`) VALUES
+((SELECT id FROM products WHERE article = 'EKCH-145'), 'Маршрутная карта ЭКЧ-145', '1.0', 
+'Технологический процесс производства электроконфорки', 3.0, TRUE);
+
+INSERT INTO `route_card_operations` (`route_card_id`, `operation_number`, `stage_id`, `name`, `description`, `work_center`, `equipment`, `time_norm_hours`, `materials_required`, `instructions`, `sort_order`) VALUES
+((SELECT id FROM route_cards WHERE product_id = (SELECT id FROM products WHERE article = 'EKCH-145')), 
+ 10, (SELECT id FROM production_stages WHERE code = 'casting'), 
+ 'Литье чугунной плиты', 'Литье корпуса конфорки из серого чугуна', 'Литейный участок', 'Вагранка', 1.0, 
+ '{"материалы": ["CAST-SCH20"]}', 
+'Контроль отсутствия раковин', 1),
+((SELECT id FROM route_cards WHERE product_id = (SELECT id FROM products WHERE article = 'EKCH-145')), 
+ 20, (SELECT id FROM production_stages WHERE code = 'machining'), 
+ 'Фрезеровка пазов', 'Фрезеровка пазов для укладки спирали', 'Фрезерный участок', 'Станок фрезерный', 0.5, 
+ '{}', 
+'Глубина паза 8±0.5 мм', 2),
+((SELECT id FROM route_cards WHERE product_id = (SELECT id FROM products WHERE article = 'EKCH-145')), 
+ 30, (SELECT id FROM production_stages WHERE code = 'assembly'), 
+ 'Укладка нагревательного элемента', 'Монтаж нихромовой спирали с наполнителем', 'Сборочный участок', 'Верстак', 0.8, 
+ '{"материалы": ["WIRE-NICHROME-2.0", "INSULATION-PERIKLAZ"]}', 
+'Равномерное распределение наполнителя', 3),
+((SELECT id FROM route_cards WHERE product_id = (SELECT id FROM products WHERE article = 'EKCH-145')), 
+ 40, (SELECT id FROM production_stages WHERE code = 'assembly'), 
+ 'Монтаж кожуха', 'Установка стального кожуха и клеммной коробки', 'Сборочный участок', 'Верстак', 0.4, 
+ '{"материалы": ["STEEL-SHEET-0.8", "CABLE-POWER-3x1.5"]}', 
+'Надежное крепление кабеля', 4),
+((SELECT id FROM route_cards WHERE product_id = (SELECT id FROM products WHERE article = 'EKCH-145')), 
+ 50, (SELECT id FROM production_stages WHERE code = 'qc'), 
+ 'Контроль и испытания', 'Проверка сопротивления изоляции, включение на нагрев', 'Контрольный участок', 'Стенд испытательный', 0.3, 
+ '{}', 
+'Ток утечки не более 0.5 мА, время нагрева до 300°C не более 5 мин', 5);

@@ -48,6 +48,8 @@ try {
     try {
         $sql = "SELECT m.*, 
                        m.current_stock as warehouse_quantity,
+                       m.last_price as price_per_unit,
+                       m.currency as price_currency,
                        mc.name as category_name, 
                        mc.name_ru as category_name_ru,
                        mc.parent_id as category_parent_id,
@@ -1381,6 +1383,7 @@ $availableCombinationsJson = json_encode($availableCombinations, JSON_UNESCAPED_
                     <th>Стандарт</th>
                     <th>Ед.</th>
                     <th>На складе</th>
+                    <th>Цена за ед.</th>
                     <th>Статус</th>
                 </tr>
             </thead>
@@ -1401,6 +1404,14 @@ $availableCombinationsJson = json_encode($availableCombinations, JSON_UNESCAPED_
                             $qtyClass = 'quantity-badge-high';
                         }
                     }
+                    
+                    // Форматирование цены за единицу
+                    $priceText = '—';
+                    if (isset($material['price_per_unit']) && $material['price_per_unit'] !== null) {
+                        $price = floatval($material['price_per_unit']);
+                        $currency = $material['price_currency'] ?? 'BYN';
+                        $priceText = number_format($price, 2, ',', ' ') . ' ' . $currency;
+                    }
                     ?>
                     <tr onclick="openMaterialModal(<?= htmlspecialchars(json_encode($material), ENT_QUOTES, 'UTF-8') ?>)" style="cursor: pointer;">
                         <td><code><?= e($material['code']) ?></code></td>
@@ -1418,6 +1429,7 @@ $availableCombinationsJson = json_encode($availableCombinations, JSON_UNESCAPED_
                         <td>
                             <span class="quantity-badge <?= $qtyClass ?>" style="font-size: 13px;"><?= $qtyText ?></span>
                         </td>
+                        <td><strong><?= $priceText ?></strong></td>
                         <td>
                             <?php if (!empty($material['is_critical'])): ?>
                                 <span class="badge badge-danger">Ответств.</span>
@@ -2123,6 +2135,16 @@ function openMaterialModal(material) {
                     <span class="spec-item-value">${escapeHtml(material.alt_unit)} (коэф. ${material.conversion_factor})</span>
                 </div>
                 ` : ''}
+                ${material.price_per_unit ? `
+                <div class="spec-item">
+                    <span class="spec-item-label">Цена за единицу</span>
+                    <span class="spec-item-value"><strong>${formatPrice(material.price_per_unit, material.price_currency || 'BYN')}</strong></span>
+                </div>
+                ` : ''}
+                <div class="spec-item">
+                    <span class="spec-item-label">На складе</span>
+                    <span class="spec-item-value">${formatQuantity(material.warehouse_quantity || 0)} ${escapeHtml(material.unit_name || 'шт')}</span>
+                </div>
             </div>
         </div>
         
@@ -2294,6 +2316,30 @@ function escapeHtml(text) {
     const div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
+}
+
+// Функция форматирования цены
+function formatPrice(price, currency = 'BYN') {
+    if (price === null || price === undefined || price === '') {
+        return '—';
+    }
+    const numPrice = parseFloat(price);
+    if (isNaN(numPrice)) {
+        return '—';
+    }
+    return numPrice.toLocaleString('ru-RU', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' ' + currency;
+}
+
+// Функция форматирования количества
+function formatQuantity(quantity) {
+    if (quantity === null || quantity === undefined || quantity === '') {
+        return '0';
+    }
+    const numQty = parseFloat(quantity);
+    if (isNaN(numQty)) {
+        return '0';
+    }
+    return numQty.toLocaleString('ru-RU', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
 // Функция извлечения номера ГОСТ из строки стандарта

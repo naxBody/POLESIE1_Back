@@ -332,9 +332,46 @@ if (count($orders) > 0) {
 // ПОДГОТОВКА ДАННЫХ ДЛЯ МОДАЛЬНЫХ ОКОН (Прямо из БД, без JSON API)
 // ============================================================================
 $ordersData = [];
+$productMaterialsCache = []; // Кэш материалов для продуктов
+
 if (!empty($orders)) {
     $orderIds = array_map(fn($o) => (int)$o['id'], $orders);
     $orderIdsPlaceholder = implode(',', array_fill(0, count($orderIds), '?'));
+
+    // 0. Загружаем материалы для всех продуктов из паспортов (для кэша)
+    $sqlProductMaterials = "SELECT 
+                                ppm.product_id,
+                                m.id as material_id,
+                                m.name_full as material_name,
+                                m.code as material_article,
+                                ppm.quantity as quantity_per_unit,
+                                COALESCE(m.current_stock, 0) as current_stock,
+                                COALESCE(m.last_price, 0) as last_price
+                            FROM product_passport_materials ppm
+                            JOIN materials m ON ppm.material_id = m.id
+                            WHERE ppm.passport_id IN (
+                                SELECT id FROM product_passports WHERE product_id IN ($orderIdsPlaceholder)
+                            )
+                            ORDER BY ppm.product_id, ppm.sort_order";
+    $stmtProductMaterials = $pdo->prepare($sqlProductMaterials);
+    $stmtProductMaterials->execute($orderIds);
+    $resProductMaterials = $stmtProductMaterials->fetchAll();
+    
+    // Группируем по product_id
+    foreach ($resProductMaterials as $row) {
+        $pid = (string)$row['product_id'];
+        if (!isset($productMaterialsCache[$pid])) {
+            $productMaterialsCache[$pid] = [];
+        }
+        $productMaterialsCache[$pid][] = [
+            'material_id' => $row['material_id'],
+            'material_name' => $row['material_name'],
+            'material_article' => $row['material_article'],
+            'quantity_per_unit' => (float)$row['quantity_per_unit'],
+            'current_stock' => (float)$row['current_stock'],
+            'last_price' => (float)$row['last_price']
+        ];
+    }
 
     // 1. Основная информация о заказах
     $sqlOrders = "SELECT o.id, o.order_number, o.status, 
@@ -868,8 +905,10 @@ foreach ($ordersData as $oid => $data) {
         // Данные из базы уже загружены в PHP массив ordersData
         // Преобразуем его в JS объект для использования
         var ordersData = <?php echo json_encode($ordersData, JSON_UNESCAPED_UNICODE); ?>;
+        var productMaterialsCache = <?php echo json_encode($productMaterialsCache, JSON_UNESCAPED_UNICODE); ?>;
         
         console.log('Orders data loaded:', Object.keys(ordersData).length, 'orders');
+        console.log('Product materials cache loaded:', Object.keys(productMaterialsCache).length, 'products');
         
         // Открытие модального окна с деталями заказа (без AJAX, данные уже загружены)
         function openOrderDetailModal(orderId) {
@@ -940,13 +979,14 @@ foreach ($ordersData as $oid => $data) {
             }
             html += '</div></div>';
             
-            // Позиции заказа
+            // Позиции заказа с материалами
             if (data.items && data.items.length > 0) {
                 // Считаем общую сумму и прогресс
                 var totalSum = 0;
                 var totalQty = 0;
                 var completedQty = 0;
                 
+                // Загружаем материалы для каждого товара из паспорта
                 data.items.forEach(function(item) {
                     totalSum += (item.quantity * item.price);
                     totalQty += parseFloat(item.quantity || 0);
@@ -954,13 +994,73 @@ foreach ($ordersData as $oid => $data) {
                     // Ищем выполненное количество из заданий по product_id
                     if (data.tasks) {
                         data.tasks.forEach(function(task) {
-                            // Сопоставляем позицию заказа с заданием по product_id
                             if (task.product_id === item.product_id) {
                                 completedQty += parseFloat(task.done_qty || 0);
                             }
                         });
                     }
+                    
+                    // Загружаем материалы из паспорта продукта для этого товара
+                    item.materials = [];
+                    if (window.productMaterialsCache && window.productMaterialsCache[item.product_id]) {
+                        var norms = window.productMaterialsCache[item.product_id];
+                        norms.forEach(function(norm) {
+                            var requiredTotal = norm.quantity_per_unit * item.quantity;
+                            var cost = requiredTotal * (norm.last_price || 0);
+                            item.materials.push({
+                                name: norm.material_name,
+                                article: norm.material_article,
+                                norm: norm.quantity_per_unit,
+                                required: requiredTotal,
+                                stock: norm.current_stock || 0,
+                                price: norm.last_price || 0,
+                                cost: cost,
+                                unit: 'шт.',
+                                material_id: norm.material_id
+                            });
+                        });
+                    }
                 });
+                
+                // Создаем сводную таблицу материалов по всему заказу
+                var materialSummary = {};
+                data.items.forEach(function(item) {
+                    if (item.materials) {
+                        item.materials.forEach(function(mat) {
+                            if (!materialSummary[mat.material_id]) {
+                                materialSummary[mat.material_id] = {
+                                    name: mat.name,
+                                    article: mat.article,
+                                    required: 0,
+                                    stock: mat.stock,
+                                    price: mat.price,
+                                    unit: mat.unit
+                                };
+                            }
+                            materialSummary[mat.material_id].required += mat.required;
+                        });
+                    }
+                });
+                
+                // Считаем итоги по сводной таблице
+                var totalMaterialsNeeded = Object.keys(materialSummary).length;
+                var materialsOk = 0;
+                var materialsShort = 0;
+                var totalMaterialsCost = 0;
+                
+                for (var mid in materialSummary) {
+                    var ms = materialSummary[mid];
+                    ms.is_enough = (ms.stock >= ms.required);
+                    ms.shortage = Math.max(0, ms.required - ms.stock);
+                    ms.total_cost = ms.required * ms.price;
+                    totalMaterialsCost += ms.total_cost;
+                    
+                    if (ms.is_enough) {
+                        materialsOk++;
+                    } else {
+                        materialsShort++;
+                    }
+                }
                 
                 var orderProgress = totalQty > 0 ? Math.round((completedQty / totalQty) * 100) : 0;
                 if (orderProgress > 100) orderProgress = 100;
@@ -1002,7 +1102,92 @@ foreach ($ordersData as $oid => $data) {
                 html += '<td style="text-align: right; padding: 12px; color: #2c3e50; font-size: 15px;">' + formatMoney(totalSum) + '</td>';
                 html += '</tr>';
                 html += '</tfoot>';
-                html += '</table></div>';
+                html += '</table>';
+                
+                // Детализация материалов по каждому товару
+                data.items.forEach(function(item, itemIndex) {
+                    if (item.materials && item.materials.length > 0) {
+                        html += '<div style="margin-top: 16px; border: 1px solid #e9ecef; border-radius: 6px; overflow: hidden;">';
+                        html += '<div style="background: #f8f9fa; padding: 12px 16px; border-bottom: 1px solid #e9ecef; display: flex; justify-content: space-between; align-items: center;">';
+                        html += '<div style="font-weight: 600; color: #2c3e50;">' + escapeHtml(item.product_name) + ' (' + item.quantity + ' шт.)</div>';
+                        html += '<button class="toggle-details-btn" onclick="toggleItemMaterials(' + itemIndex + ', this)">';
+                        html += '<span>📋</span><span class="btn-text">Материалы</span>';
+                        html += '</button>';
+                        html += '</div>';
+                        html += '<div class="item-materials-section" id="item-materials-' + itemIndex + '" style="display: none; padding: 12px 16px; background: white;">';
+                        html += '<table class="materials-table" style="font-size: 12px;">';
+                        html += '<thead><tr><th>Материал</th><th>Артикул</th><th style="text-align: center;">Норма</th><th style="text-align: center;">Требуется</th><th style="text-align: center;">На складе</th><th style="text-align: right;">Цена</th><th style="text-align: right;">Сумма</th><th>Статус</th></tr></thead>';
+                        html += '<tbody>';
+                        var itemMatCost = 0;
+                        item.materials.forEach(function(mat) {
+                            var isSufficient = mat.stock >= mat.required;
+                            var statusHtml = isSufficient 
+                                ? '<span class="badge badge-success"><span class="material-status-indicator sufficient"></span>Хватает</span>'
+                                : '<span class="badge badge-danger"><span class="material-status-indicator insufficient"></span>Не хватает (' + (mat.required - mat.stock) + ' ' + mat.unit + ')</span>';
+                            itemMatCost += mat.cost;
+                            html += '<tr style="' + (!isSufficient ? 'background: #fff5f5;' : '') + '">';
+                            html += '<td><strong>' + escapeHtml(mat.name) + '</strong></td>';
+                            html += '<td><code style="background: #f8f9fa; padding: 2px 6px; border-radius: 4px; font-size: 10px;">' + escapeHtml(mat.article) + '</code></td>';
+                            html += '<td style="text-align: center;">' + mat.norm + ' ' + mat.unit + '</td>';
+                            html += '<td style="text-align: center; font-weight: 600;">' + mat.required + ' ' + mat.unit + '</td>';
+                            html += '<td style="text-align: center;">' + mat.stock + ' ' + mat.unit + '</td>';
+                            html += '<td style="text-align: right;">' + formatMoney(mat.price) + '</td>';
+                            html += '<td style="text-align: right;"><strong>' + formatMoney(mat.cost) + '</strong></td>';
+                            html += '<td>' + statusHtml + '</td>';
+                            html += '</tr>';
+                        });
+                        html += '</tbody>';
+                        html += '<tfoot>';
+                        html += '<tr style="background: #f8f9fa; font-weight: 700;">';
+                        html += '<td colspan="6" style="text-align: right; padding: 10px;">Итого на позицию:</td>';
+                        html += '<td colspan="2" style="text-align: right; padding: 10px; color: #2c3e50;">' + formatMoney(itemMatCost) + '</td>';
+                        html += '</tr>';
+                        html += '</tfoot>';
+                        html += '</table></div></div>';
+                    }
+                });
+                
+                // Сводная таблица материалов по всему заказу
+                if (Object.keys(materialSummary).length > 0) {
+                    html += '<div style="margin-top: 20px; border: 1px solid #e9ecef; border-radius: 6px; overflow: hidden;">';
+                    html += '<div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 12px 16px; color: white;">';
+                    html += '<div style="display: flex; justify-content: space-between; align-items: center;">';
+                    html += '<div style="font-weight: 600; font-size: 14px;">📊 Сводная потребность в материалах по заказу</div>';
+                    html += '<div style="display: flex; gap: 12px; font-size: 12px;">';
+                    html += '<span style="background: rgba(255,255,255,0.2); padding: 4px 10px; border-radius: 12px;">Всего: <strong>' + totalMaterialsNeeded + '</strong></span>';
+                    html += '<span style="background: rgba(40,167,69,0.3); padding: 4px 10px; border-radius: 12px;">✅ Хватает: <strong>' + materialsOk + '</strong></span>';
+                    html += '<span style="background: rgba(220,53,69,0.3); padding: 4px 10px; border-radius: 12px;">⚠️ Не хватает: <strong>' + materialsShort + '</strong></span>';
+                    html += '</div>';
+                    html += '</div>';
+                    html += '<table class="materials-table">';
+                    html += '<thead><tr><th>Материал</th><th>Артикул</th><th style="text-align: center;">Требуется всего</th><th style="text-align: center;">На складе</th><th style="text-align: right;">Цена</th><th style="text-align: right;">Общая сумма</th><th>Статус</th></tr></thead>';
+                    html += '<tbody>';
+                    for (var mid in materialSummary) {
+                        var ms = materialSummary[mid];
+                        var statusHtml = ms.is_enough 
+                            ? '<span class="badge badge-success"><span class="material-status-indicator sufficient"></span>Хватает</span>'
+                            : '<span class="badge badge-danger"><span class="material-status-indicator insufficient"></span>Не хватает (' + ms.shortage + ' ' + ms.unit + ')</span>';
+                        html += '<tr style="' + (!ms.is_enough ? 'background: #fff5f5;' : '') + '">';
+                        html += '<td><strong>' + escapeHtml(ms.name) + '</strong></td>';
+                        html += '<td><code style="background: #f8f9fa; padding: 2px 6px; border-radius: 4px; font-size: 10px;">' + escapeHtml(ms.article) + '</code></td>';
+                        html += '<td style="text-align: center; font-weight: 600;">' + ms.required + ' ' + ms.unit + '</td>';
+                        html += '<td style="text-align: center;">' + ms.stock + ' ' + ms.unit + '</td>';
+                        html += '<td style="text-align: right;">' + formatMoney(ms.price) + '</td>';
+                        html += '<td style="text-align: right;"><strong>' + formatMoney(ms.total_cost) + '</strong></td>';
+                        html += '<td>' + statusHtml + '</td>';
+                        html += '</tr>';
+                    }
+                    html += '</tbody>';
+                    html += '<tfoot>';
+                    html += '<tr style="background: #f8f9fa; font-weight: 700;">';
+                    html += '<td colspan="5" style="text-align: right; padding: 12px;">Итого стоимость материалов заказа:</td>';
+                    html += '<td colspan="2" style="text-align: right; padding: 12px; color: #2c3e50; font-size: 15px;">' + formatMoney(totalMaterialsCost) + '</td>';
+                    html += '</tr>';
+                    html += '</tfoot>';
+                    html += '</table></div>';
+                }
+                
+                html += '</div>';
             } else {
                 html += '<div class="passport-section fade-in"><div class="passport-section-title">Состав заказа</div><p style="color: #95a5a6;">Нет данных</p></div>';
             }
@@ -1206,6 +1391,23 @@ foreach ($ordersData as $oid => $data) {
                     var btnText = btn.querySelector('.btn-text');
                     if (btnText) {
                         btnText.textContent = isHidden ? 'Свернуть' : 'Подробнее';
+                    }
+                }
+            }
+        }
+        
+        function toggleItemMaterials(itemIndex, btn) {
+            const details = document.getElementById('item-materials-' + itemIndex);
+            if (details) {
+                const isHidden = details.style.display === 'none';
+                details.style.display = isHidden ? 'block' : 'none';
+                
+                // Обновляем кнопку
+                if (btn) {
+                    btn.classList.toggle('active', isHidden);
+                    var btnText = btn.querySelector('.btn-text');
+                    if (btnText) {
+                        btnText.textContent = isHidden ? 'Свернуть' : 'Материалы';
                     }
                 }
             }

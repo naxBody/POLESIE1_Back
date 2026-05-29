@@ -1,1 +1,31 @@
-Nothing should be ignored based on the provided file changes. The modified file 'polesie/modules/warehouse/print_passport.php' is a source code file that should not be added to .gitignore. Since there are no build artifacts, dependencies, or temporary files in the changes, no additional ignore rules are needed.
+```
+# Compiled and build artifacts
+*.sql.bak
+*.sql~
+
+# Dependencies
+node_modules/
+.venv/
+venv/
+__pycache__/
+*.egg-info/
+
+# Logs and temp files
+*.log
+*.tmp
+*.swp
+
+# Environment
+.env
+.env.local
+*.env.*
+
+# Editors
+.vscode/
+.idea/
+
+# Build directories
+dist/
+build/
+target/
+```

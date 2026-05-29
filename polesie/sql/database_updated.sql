@@ -331,6 +331,20 @@ CREATE TABLE `product_documents` (
   CONSTRAINT `fk_pd_user` FOREIGN KEY (`uploaded_by`) REFERENCES `users`(`id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+-- 20. ПАСПОРТА ПРОДУКЦИИ (спецификации и производственные требования)
+CREATE TABLE `product_passports` (
+  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `product_id` INT NOT NULL UNIQUE,
+  `total_weight_kg` DECIMAL(10,3) DEFAULT 0,
+  `warranty_months` INT DEFAULT 12,
+  `is_serial_tracked` BOOLEAN DEFAULT FALSE,
+  `production_notes` TEXT,
+  `quality_requirements` TEXT,
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  CONSTRAINT `fk_pp_product` FOREIGN KEY (`product_id`) REFERENCES `products`(`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 -- ============================================
 -- ЗАПОЛНЕНИЕ ТЕСТОВЫМИ ДАННЫМИ
 -- ============================================

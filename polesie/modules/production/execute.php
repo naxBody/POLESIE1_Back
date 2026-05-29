@@ -569,7 +569,7 @@ foreach ($allTasks as &$task) {
                                             <div class="task-product-name"><?= e($task['product_name']) ?></div>
                                             <div class="task-order-info">
                                                 Заказ: <?= e($task['order_number']) ?> • 
-                                                План: <?= number_format($task['quantity_plan'], 2, ',', ' ') ?> <?= e($task['unit_name']) ?>
+                                                План: <?= number_format($task['quantity_plan'], 0, ',', ' ') ?> <?= e($task['unit_name']) ?>
                                             </div>
                                             
                                             <div class="task-progress">
@@ -589,19 +589,18 @@ foreach ($allTasks as &$task) {
                         
                         <!-- Рабочая область -->
                         <div class="work-area" id="workArea">
-                            <?php if (!empty($tasks)): ?>
-                                <?php $firstTask = $tasks[0]; ?>
+                            <?php if ($selectedTask): ?>
                                 <div class="work-area-header">
                                     <div class="work-area-title">
-                                        <h3><?= e($firstTask['product_name']) ?></h3>
+                                        <h3><?= e($selectedTask['product_name']) ?></h3>
                                         <p class="work-area-subtitle">
-                                            Артикул: <?= e($firstTask['product_article']) ?> • 
-                                            Заказ: <?= e($firstTask['order_number']) ?> • 
-                                            Задание #<?= $firstTask['id'] ?>
+                                            Артикул: <?= e($selectedTask['product_article']) ?> • 
+                                            Заказ: <?= e($selectedTask['order_number']) ?> • 
+                                            Задание #<?= $selectedTask['id'] ?>
                                         </p>
                                     </div>
                                     <div class="work-area-actions">
-                                        <button class="btn btn-primary" onclick="openProductionModal(<?= $firstTask['id'] ?>)">
+                                        <button class="btn btn-primary" onclick="openProductionModal(<?= $selectedTask['id'] ?>)">
                                             ✅ Завершить производство
                                         </button>
                                     </div>
@@ -609,19 +608,19 @@ foreach ($allTasks as &$task) {
                                 
                                 <div class="stats-row">
                                     <div class="stat-card">
-                                        <div class="stat-value"><?= number_format($firstTask['quantity_plan'], 0, ',', ' ') ?></div>
+                                        <div class="stat-value"><?= number_format($selectedTask['quantity_plan'], 0, ',', ' ') ?></div>
                                         <div class="stat-label">План</div>
                                     </div>
                                     <div class="stat-card">
-                                        <div class="stat-value" style="color: var(--info-color);"><?= number_format($firstTask['quantity_fact'], 0, ',', ' ') ?></div>
+                                        <div class="stat-value" style="color: var(--info-color);"><?= number_format($selectedTask['quantity_fact'], 0, ',', ' ') ?></div>
                                         <div class="stat-label">Факт</div>
                                     </div>
                                     <div class="stat-card">
-                                        <div class="stat-value" style="color: var(--success-color);"><?= number_format($firstTask['quantity_good'], 0, ',', ' ') ?></div>
+                                        <div class="stat-value" style="color: var(--success-color);"><?= number_format($selectedTask['quantity_good'], 0, ',', ' ') ?></div>
                                         <div class="stat-label">Годные</div>
                                     </div>
                                     <div class="stat-card">
-                                        <div class="stat-value" style="color: var(--danger-color);"><?= number_format($firstTask['quantity_defect'], 0, ',', ' ') ?></div>
+                                        <div class="stat-value" style="color: var(--danger-color);"><?= number_format($selectedTask['quantity_defect'], 0, ',', ' ') ?></div>
                                         <div class="stat-label">Брак</div>
                                     </div>
                                 </div>
@@ -636,9 +635,9 @@ foreach ($allTasks as &$task) {
                                 <!-- Вкладка этапы -->
                                 <div class="tab-content active" id="tab-stages">
                                     <h4 style="margin-bottom: 16px;">Этапы производства</h4>
-                                    <?php if (!empty($firstTask['stages'])): ?>
+                                    <?php if (!empty($selectedTask['stages'])): ?>
                                     <div class="stages-grid">
-                                        <?php foreach ($firstTask['stages'] as $stage): ?>
+                                        <?php foreach ($selectedTask['stages'] as $stage): ?>
                                             <div class="stage-card <?= $stage['status'] ?>">
                                                 <div class="stage-header">
                                                     <span class="stage-name"><?= e($stage['stage_name']) ?></span>
@@ -655,12 +654,12 @@ foreach ($allTasks as &$task) {
                                                     <div class="stage-actions">
                                                         <?php if ($stage['status'] === 'pending'): ?>
                                                             <button class="btn btn-sm btn-primary" 
-                                                                    onclick="startStage(<?= $stage['id'] ?>, <?= $firstTask['id'] ?>)">
+                                                                    onclick="startStage(<?= $stage['id'] ?>, <?= $selectedTask['id'] ?>)">
                                                                 ▶ Начать
                                                             </button>
                                                         <?php elseif ($stage['status'] === 'in_progress'): ?>
                                                             <button class="btn btn-sm btn-success" 
-                                                                    onclick="completeStage(<?= $stage['id'] ?>, <?= $firstTask['id'] ?>)">
+                                                                    onclick="completeStage(<?= $stage['id'] ?>, <?= $selectedTask['id'] ?>)">
                                                                 ✓ Завершить
                                                             </button>
                                                         <?php endif; ?>
@@ -683,7 +682,7 @@ foreach ($allTasks as &$task) {
                                 <!-- Вкладка материалы -->
                                 <div class="tab-content" id="tab-materials">
                                     <h4 style="margin-bottom: 16px;">Материалы для производства</h4>
-                                    <?php if (!empty($firstTask['materials'])): ?>
+                                    <?php if (!empty($selectedTask['materials'])): ?>
                                     <table class="materials-table">
                                         <thead>
                                             <tr>
@@ -696,13 +695,13 @@ foreach ($allTasks as &$task) {
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <?php foreach ($firstTask['materials'] as $mat): ?>
+                                            <?php foreach ($selectedTask['materials'] as $mat): ?>
                                                 <tr>
                                                     <td><?= e($mat['material_name']) ?></td>
                                                     <td><code><?= e($mat['material_code']) ?></code></td>
-                                                    <td><?= number_format($mat['quantity_required'], 3, ',', ' ') ?> <?= e($mat['unit_symbol']) ?></td>
-                                                    <td><?= number_format($mat['quantity_used'], 3, ',', ' ') ?> <?= e($mat['unit_symbol']) ?></td>
-                                                    <td><?= number_format($mat['current_stock'], 3, ',', ' ') ?> <?= e($mat['unit_symbol']) ?></td>
+                                                    <td><?= number_format($mat['quantity_required'], 0, ',', ' ') ?> <?= e($mat['unit_symbol']) ?></td>
+                                                    <td><?= number_format($mat['quantity_used'], 0, ',', ' ') ?> <?= e($mat['unit_symbol']) ?></td>
+                                                    <td><?= number_format($mat['current_stock'], 0, ',', ' ') ?> <?= e($mat['unit_symbol']) ?></td>
                                                     <td>
                                                         <span class="availability-badge availability-<?= $mat['availability'] ?>">
                                                             <?= $mat['availability'] === 'sufficient' ? '✓ Достаточно' : 
@@ -714,9 +713,9 @@ foreach ($allTasks as &$task) {
                                         </tbody>
                                     </table>
                                     
-                                    <?php if (!empty($firstTask['materials'])): ?>
+                                    <?php if (!empty($selectedTask['materials'])): ?>
                                         <div class="btn-group">
-                                            <button class="btn btn-primary" onclick="consumeMaterials(<?= $firstTask['id'] ?>)">
+                                            <button class="btn btn-primary" onclick="consumeMaterials(<?= $selectedTask['id'] ?>)">
                                                 📦 Списать материалы
                                             </button>
                                         </div>
@@ -730,12 +729,12 @@ foreach ($allTasks as &$task) {
                                 <div class="tab-content" id="tab-serial">
                                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
                                         <h4>Серийные номера</h4>
-                                        <button class="btn btn-primary" onclick="generateSerialNumber(<?= $firstTask['id'] ?>, <?= $firstTask['product_id'] ?>)">
+                                        <button class="btn btn-primary" onclick="generateSerialNumber(<?= $selectedTask['id'] ?>, <?= $selectedTask['product_id'] ?>)">
                                             + Добавить серийный номер
                                         </button>
                                     </div>
                                     
-                                    <?php if (empty($firstTask['serial_numbers'])): ?>
+                                    <?php if (empty($selectedTask['serial_numbers'])): ?>
                                         <div class="empty-state" style="padding: 40px 20px;">
                                             <div class="empty-state-icon">🏷️</div>
                                             <h5>Серийные номера не созданы</h5>
@@ -743,7 +742,7 @@ foreach ($allTasks as &$task) {
                                         </div>
                                     <?php else: ?>
                                         <div class="serial-numbers-list">
-                                            <?php foreach ($firstTask['serial_numbers'] as $sn): ?>
+                                            <?php foreach ($selectedTask['serial_numbers'] as $sn): ?>
                                                 <div class="serial-badge">
                                                     <div class="serial-number"><?= e($sn['serial_number']) ?></div>
                                                     <div class="serial-status">
@@ -762,18 +761,18 @@ foreach ($allTasks as &$task) {
                                     <div class="production-form">
                                         <div class="form-group">
                                             <label class="form-label">Ответственный</label>
-                                            <input type="text" class="form-input" value="<?= e($firstTask['responsible_name'] ?? '—') ?>" disabled>
+                                            <input type="text" class="form-input" value="<?= e($selectedTask['responsible_name'] ?? '—') ?>" disabled>
                                         </div>
                                         
                                         <div class="form-group">
                                             <label class="form-label">Исполнитель</label>
-                                            <select class="form-select" id="workerSelect" onchange="updateWorker(<?= $firstTask['id'] ?>)">
+                                            <select class="form-select" id="workerSelect" onchange="updateWorker(<?= $selectedTask['id'] ?>)">
                                                 <option value="">Не назначен</option>
                                                 <?php
                                                 $workersStmt = $pdo->query("SELECT id, full_name FROM users WHERE is_active = TRUE ORDER BY full_name");
                                                 foreach ($workersStmt->fetchAll() as $worker):
                                                 ?>
-                                                    <option value="<?= $worker['id'] ?>" <?= $firstTask['worker_id'] == $worker['id'] ? 'selected' : '' ?>>
+                                                    <option value="<?= $worker['id'] ?>" <?= $selectedTask['worker_id'] == $worker['id'] ? 'selected' : '' ?>>
                                                         <?= e($worker['full_name']) ?>
                                                     </option>
                                                 <?php endforeach; ?>
@@ -782,28 +781,28 @@ foreach ($allTasks as &$task) {
                                         
                                         <div class="form-group">
                                             <label class="form-label">Плановая дата начала</label>
-                                            <input type="text" class="form-input" value="<?= !empty($firstTask['planned_date']) ? date('d.m.Y H:i', strtotime($firstTask['planned_date'])) : '—' ?>" disabled>
+                                            <input type="text" class="form-input" value="<?= !empty($selectedTask['planned_date']) ? date('d.m.Y H:i', strtotime($selectedTask['planned_date'])) : '—' ?>" disabled>
                                         </div>
                                         
                                         <div class="form-group">
                                             <label class="form-label">Фактическая дата начала</label>
-                                            <input type="text" class="form-input" value="<?= !empty($firstTask['actual_start']) ? date('d.m.Y H:i', strtotime($firstTask['actual_start'])) : '—' ?>" disabled>
+                                            <input type="text" class="form-input" value="<?= !empty($selectedTask['actual_start']) ? date('d.m.Y H:i', strtotime($selectedTask['actual_start'])) : '—' ?>" disabled>
                                         </div>
                                         
                                         <div class="form-group">
                                             <label class="form-label">Приоритет</label>
-                                            <select class="form-select" onchange="updatePriority(<?= $firstTask['id'] ?>, this.value)">
-                                                <option value="low" <?= $firstTask['priority'] === 'low' ? 'selected' : '' ?>>Низкий</option>
-                                                <option value="normal" <?= $firstTask['priority'] === 'normal' ? 'selected' : '' ?>>Нормальный</option>
-                                                <option value="high" <?= $firstTask['priority'] === 'high' ? 'selected' : '' ?>>Высокий</option>
-                                                <option value="urgent" <?= $firstTask['priority'] === 'urgent' ? 'selected' : '' ?>>Срочный</option>
+                                            <select class="form-select" onchange="updatePriority(<?= $selectedTask['id'] ?>, this.value)">
+                                                <option value="low" <?= $selectedTask['priority'] === 'low' ? 'selected' : '' ?>>Низкий</option>
+                                                <option value="normal" <?= $selectedTask['priority'] === 'normal' ? 'selected' : '' ?>>Нормальный</option>
+                                                <option value="high" <?= $selectedTask['priority'] === 'high' ? 'selected' : '' ?>>Высокий</option>
+                                                <option value="urgent" <?= $selectedTask['priority'] === 'urgent' ? 'selected' : '' ?>>Срочный</option>
                                             </select>
                                         </div>
                                         
                                         <div class="form-group">
                                             <label class="form-label">Заметки</label>
-                                            <textarea class="form-textarea" id="taskNotes" placeholder="Добавьте заметки к заданию..."><?= e($firstTask['notes'] ?? '') ?></textarea>
-                                            <button class="btn btn-secondary" style="margin-top: 8px;" onclick="saveNotes(<?= $firstTask['id'] ?>)">
+                                            <textarea class="form-textarea" id="taskNotes" placeholder="Добавьте заметки к заданию..."><?= e($selectedTask['notes'] ?? '') ?></textarea>
+                                            <button class="btn btn-secondary" style="margin-top: 8px;" onclick="saveNotes(<?= $selectedTask['id'] ?>)">
                                                 💾 Сохранить заметки
                                             </button>
                                         </div>
@@ -865,7 +864,7 @@ foreach ($allTasks as &$task) {
     </div>
     
     <script>
-        let currentTaskId = <?= !empty($tasks) ? $tasks[0]['id'] : 0 ?>;
+        let currentTaskId = <?= $selectedTask ? $selectedTask['id'] : 0 ?>;
         
         function selectTask(taskId) {
             currentTaskId = taskId;
@@ -874,7 +873,10 @@ foreach ($allTasks as &$task) {
             document.querySelectorAll('.task-item').forEach(item => {
                 item.classList.remove('active');
             });
-            document.querySelector(`.task-item[data-task-id="${taskId}"]`).classList.add('active');
+            const activeItem = document.querySelector(`.task-item[data-task-id="${taskId}"]`);
+            if (activeItem) {
+                activeItem.classList.add('active');
+            }
             
             // Перезагружаем страницу с выбранным заданием
             window.location.href = '?task=' + taskId;

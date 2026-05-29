@@ -778,6 +778,48 @@ $totalProducts = count($passports);
             }
             html += '</div>';
             
+            // Фактически использованные материалы
+            html += '<div class="passport-section">';
+            html += '<div class="passport-section-title">✅ Фактически использовано в производстве</div>';
+            if (passport.used_materials && passport.used_materials.length > 0) {
+                html += '<div style="margin-bottom: 16px; padding: 12px; background: #e8f5e9; border-radius: 8px; border-left: 4px solid #4caf50;">';
+                html += '<div style="font-size: 13px; color: #2e7d32;">';
+                html += '💡 Данные получены из производственных заданий и показывают реальный расход материалов. ';
+                html += 'При запуске производства материалы автоматически списываются со склада.';
+                html += '</div>';
+                html += '</div>';
+                
+                html += '<table class="materials-table">';
+                html += '<thead><tr><th>Материал</th><th>Код</th><th>План</th><th>Факт</th><th>Отклонение</th><th>Ед.</th><th>Задания</th></tr></thead>';
+                html += '<tbody>';
+                for (var i = 0; i < passport.used_materials.length; i++) {
+                    var um = passport.used_materials[i];
+                    var planQty = Number(um.total_required).toFixed(2).replace('.', ',');
+                    var factQty = Number(um.total_used).toFixed(2).replace('.', ',');
+                    var deviation = um.total_required > 0 ? ((um.total_used - um.total_required) / um.total_required * 100).toFixed(1) : 0;
+                    var deviationClass = Math.abs(deviation) > 10 ? 'color: #f44336; font-weight: 600;' : 'color: #4caf50;';
+                    var deviationSign = deviation > 0 ? '+' : '';
+                    var tasksList = um.tasks.slice(0, 3).join(', ') + (um.tasks.length > 3 ? '...' : '');
+                    
+                    html += '<tr>';
+                    html += '<td><strong>' + escapeHtml(um.material_name) + '</strong></td>';
+                    html += '<td><code>' + escapeHtml(um.material_code) + '</code></td>';
+                    html += '<td>' + planQty + '</td>';
+                    html += '<td style="font-weight: 600; color: #1976d2;">' + factQty + '</td>';
+                    html += '<td style="' + deviationClass + '">' + deviationSign + deviation + '%</td>';
+                    html += '<td>' + escapeHtml(um.unit_name) + '</td>';
+                    html += '<td style="font-size: 12px; color: var(--text-secondary);">' + escapeHtml(tasksList) + ' (всего: ' + um.tasks_count + ')</td>';
+                    html += '</tr>';
+                }
+                html += '</tbody>';
+                html += '</table>';
+            } else {
+                html += '<div style="padding: 20px; text-align: center; color: var(--text-secondary); background: var(--bg-tertiary); border-radius: 8px;">';
+                html += 'ℹ️ Производство еще не запускалось или материалы не были списаны';
+                html += '</div>';
+            }
+            html += '</div>';
+            
             // Примечания к производству
             if (passport.production_notes && passport.production_notes.length > 0) {
                 html += '<div class="passport-section">';

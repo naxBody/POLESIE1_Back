@@ -350,6 +350,19 @@ try {
             <div class="modal-body">
                 <input type="hidden" id="docId">
                 
+                <div style="background: #f0f9ff; padding: 12px; border-radius: 6px; margin-bottom: 16px; border-left: 4px solid #0284c7;">
+                    <h4 style="margin: 0 0 8px 0; color: #0369a1; font-size: 14px;">📋 Описание полей документа</h4>
+                    <ul style="margin: 0; padding-left: 20px; font-size: 13px; color: #0c4a6e; line-height: 1.6;">
+                        <li><strong>№ документа</strong> — номер накладной/ТТН (генерируется автоматически, если не указан)</li>
+                        <li><strong>Тип документа</strong> — вид документа: ТТН, Накладная, Акт, Сертификат и т.д.</li>
+                        <li><strong>Дата документа</strong> — дата оформления документа</li>
+                        <li><strong>Поставщик</strong> — организация-поставщик материалов</li>
+                        <li><strong>Счет-фактура №</strong> — номер счета от поставщика</li>
+                        <li><strong>ТТН №</strong> — номер товарно-транспортной накладной</li>
+                        <li><strong>Комментарий</strong> — дополнительная информация по документу</li>
+                    </ul>
+                </div>
+                
                 <div class="form-grid">
                     <div class="form-group">
                         <label>№ документа *</label>
@@ -430,6 +443,7 @@ try {
     <script>
         let formData = {};
         let currentItems = [];
+        let formInitialized = false;
         
         // Загрузка документов
         function loadDocuments() {
@@ -499,18 +513,19 @@ try {
             document.getElementById('documentModal').classList.add('active');
             
             // Загружаем справочники если еще не загружены
-            if (!formData.document_types) {
-                loadFormData();
-            }
+            loadFormDataIfNeeded();
         }
         
-        // Загрузка данных формы
-        function loadFormData() {
+        // Загрузка данных формы если еще не загружены
+        function loadFormDataIfNeeded() {
+            if (formInitialized) return;
+            
             fetch('api_material_receipt.php?action=form_data')
                 .then(r => r.json())
                 .then(data => {
                     if (data.success) {
                         formData = data.data;
+                        formInitialized = true;
                         
                         // Заполняем селекты
                         const supplierSelect = document.getElementById('supplier');
@@ -518,12 +533,27 @@ try {
                             formData.suppliers.map(s => 
                                 `<option value="${s.id}">${escapeHtml(s.name)}</option>`
                             ).join('');
+                        
+                        // Обновляем таблицу материалов если она открыта
+                        if (currentItems.length > 0) {
+                            renderItemsTable();
+                        }
                     }
+                })
+                .catch(err => {
+                    console.error('Ошибка загрузки данных формы:', err);
                 });
         }
         
         // Добавление строки материала
         function addMaterialRow(material = null) {
+            // Проверяем, загружены ли данные формы
+            if (!formData.materials || formData.materials.length === 0) {
+                alert('Справочник материалов еще не загружен. Пожалуйста, подождите...');
+                loadFormDataIfNeeded();
+                return;
+            }
+            
             currentItems.push({
                 material_id: material ? material.id : '',
                 material_name: material ? material.name_full : '',
@@ -542,6 +572,13 @@ try {
             
             if (currentItems.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="6" class="loading">Добавьте материалы</td></tr>';
+                document.getElementById('itemsTotal').textContent = '0.00';
+                return;
+            }
+            
+            // Проверяем, загружены ли данные формы
+            if (!formData.materials || formData.materials.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="loading">Загрузка справочника материалов...</td></tr>';
                 document.getElementById('itemsTotal').textContent = '0.00';
                 return;
             }
@@ -758,16 +795,17 @@ try {
                     document.getElementById('docNotes').value = doc.notes || '';
                     
                     currentItems = doc.items || [];
-                    renderItemsTable();
                     
                     // Показываем кнопку проведения если черновик
                     document.getElementById('btnPost').style.display = doc.status === 'draft' ? 'inline-block' : 'none';
                     
                     document.getElementById('documentModal').classList.add('active');
                     
-                    if (!formData.document_types) {
-                        loadFormData();
-                    }
+                    // Загружаем данные формы если еще не загружены
+                    loadFormDataIfNeeded();
+                    
+                    // Отрисовываем таблицу после загрузки данных формы
+                    setTimeout(() => renderItemsTable(), 100);
                 });
         }
         
@@ -819,10 +857,28 @@ try {
             return names[status] || status;
         }
         
-        // Закрытие по ESC
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') {
-                closeDocumentModal();
+        // Закрытие по ESC и обработка кликов по модальному окну (после загрузки DOM)
+        document.addEventListener('DOMContentLoaded', function() {
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    closeDocumentModal();
+                }
+            });
+            
+            const modalOverlay = document.getElementById('documentModal');
+            if (modalOverlay) {
+                modalOverlay.addEventListener('click', function(e) {
+                    if (e.target === this) {
+                        closeDocumentModal();
+                    }
+                });
+            }
+            
+            const modalContent = document.querySelector('#documentModal .modal');
+            if (modalContent) {
+                modalContent.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                });
             }
         });
         

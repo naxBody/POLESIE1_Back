@@ -61,6 +61,8 @@ require_once BASE_PATH . '/includes/sidebar.php';
 require_once BASE_PATH . '/includes/topbar.php';
 ?>
 
+<link rel="stylesheet" href="<?= asset('assets/css/style.css') ?>">
+
 <style>
 /* Page Header */
 .page-header {
@@ -69,6 +71,7 @@ require_once BASE_PATH . '/includes/topbar.php';
     justify-content: space-between;
     margin-bottom: 24px;
     gap: 20px;
+    padding: 20px 0;
 }
 
 .page-header-title h2 {
@@ -81,6 +84,11 @@ require_once BASE_PATH . '/includes/topbar.php';
 .page-header-title p {
     font-size: 13px;
     color: var(--text-secondary);
+}
+
+.page-header-actions {
+    display: flex;
+    gap: 12px;
 }
 
 /* Stats Cards */
@@ -205,80 +213,16 @@ require_once BASE_PATH . '/includes/topbar.php';
 }
 
 /* Badges */
-.badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 6px 12px;
-    border-radius: 20px;
-    font-size: 12px;
-    font-weight: 600;
-    white-space: nowrap;
-}
-
 .badge::before {
     content: '';
     width: 6px;
     height: 6px;
     border-radius: 50%;
     background: currentColor;
+    margin-right: 6px;
 }
-
-.badge-info { background: rgba(6, 182, 212, 0.1); color: var(--info-color); }
-.badge-success { background: rgba(16, 185, 129, 0.1); color: var(--success-color); }
-.badge-warning { background: rgba(245, 158, 11, 0.1); color: var(--warning-color); }
-.badge-purple { background: rgba(139, 92, 246, 0.1); color: #8b5cf6; }
-.badge-secondary { background: var(--gray-100); color: var(--text-secondary); }
-.badge-danger { background: rgba(239, 68, 68, 0.1); color: var(--danger-color); }
 
 /* Buttons */
-.btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    padding: 10px 20px;
-    border-radius: var(--border-radius);
-    font-size: 14px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all var(--transition-fast);
-    border: none;
-    outline: none;
-    text-decoration: none;
-}
-
-.btn-primary {
-    background: var(--primary-color);
-    color: white;
-}
-
-.btn-primary:hover {
-    background: var(--primary-dark);
-    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
-}
-
-.btn-secondary {
-    background: var(--gray-100);
-    color: var(--text-primary);
-    border: 1px solid var(--border-color);
-}
-
-.btn-secondary:hover {
-    background: var(--gray-200);
-}
-
-.btn-outline {
-    background: transparent;
-    color: var(--text-secondary);
-    border: 1px solid var(--border-color);
-}
-
-.btn-outline:hover {
-    background: var(--gray-50);
-    color: var(--text-primary);
-}
-
 .btn-icon {
     display: inline-flex;
     align-items: center;
@@ -385,7 +329,7 @@ require_once BASE_PATH . '/includes/topbar.php';
 }
 </style>
 
-<div class="content">
+<div class="main-content">
     <div class="page-header">
         <div class="page-header-title">
             <h2>👥 Сотрудники</h2>

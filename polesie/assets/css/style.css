@@ -79,6 +79,18 @@ a {
 
 a:hover {
     color: var(--primary-dark);
+    text-decoration: underline;
+}
+
+/* Ссылки в телефоне и email без подчеркивания */
+a[href^="tel:"], a[href^="mailto:"] {
+    text-decoration: none;
+    color: var(--text-secondary);
+}
+
+a[href^="tel:"]:hover, a[href^="mailto:"]:hover {
+    color: var(--primary-color);
+    text-decoration: none;
 }
 
 /* ============================================
@@ -474,6 +486,17 @@ a:hover {
 .btn-sm {
     padding: 6px 12px;
     font-size: 13px;
+}
+
+.btn-outline {
+    background: transparent;
+    color: var(--text-secondary);
+    border: 1px solid var(--border-color);
+}
+
+.btn-outline:hover {
+    background: var(--gray-50);
+    color: var(--text-primary);
 }
 
 .btn-lg {

@@ -140,7 +140,7 @@ if ($selectedTask) {
 
 // Получение этапов для всех остальных заданий (для отображения в списке)
 foreach ($allTasks as &$task) {
-    if (!$task['stages']) {
+    if (!isset($task['stages']) || !$task['stages']) {
         $stagesStmt = $pdo->prepare("
             SELECT COUNT(*) as stages_count
             FROM production_task_stages pts

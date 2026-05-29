@@ -78,6 +78,10 @@
                 <span class="sidebar-nav-icon">⚙️</span>
                 <span>Производственные задания</span>
             </a>
+            <a href="<?= pageUrl('modules/production/execute.php') ?>" class="sidebar-nav-item <?= $relativePath === 'modules/production/execute.php' ? 'active' : '' ?>">
+                <span class="sidebar-nav-icon">🏭</span>
+                <span>Исполнение производства</span>
+            </a>
             <a href="<?= pageUrl('modules/production/plan.php') ?>" class="sidebar-nav-item <?= $relativePath === 'modules/production/plan.php' ? 'active' : '' ?>">
                 <span class="sidebar-nav-icon">📋</span>
                 <span>План выпуска</span>

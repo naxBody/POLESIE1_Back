@@ -298,36 +298,69 @@ if ($isAjaxRequest && $selectedTaskId) {
         
         <div id="tab-materials" class="tab-content" data-task-id="<?= $selectedTask['id'] ?>">
             <?php if (!empty($selectedTask['materials'])): ?>
-                <table class="materials-table">
-                    <thead>
-                        <tr>
-                            <th>Материал</th>
-                            <th>Требуется</th>
-                            <th>Использовано</th>
-                            <th>На складе</th>
-                            <th>Статус</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php foreach ($selectedTask['materials'] as $material): ?>
-                            <tr>
-                                <td>
-                                    <strong><?= e($material['material_name']) ?></strong><br>
-                                    <small style="color: var(--text-secondary);"><?= e($material['material_code']) ?></small>
-                                </td>
-                                <td><?= number_format($material['quantity_required'], 2) ?> <?= e($material['unit_symbol']) ?></td>
-                                <td><?= number_format($material['quantity_used'], 2) ?> <?= e($material['unit_symbol']) ?></td>
-                                <td><?= number_format($material['current_stock'], 2) ?> <?= e($material['unit_symbol']) ?></td>
-                                <td>
-                                    <span class="availability-badge availability-<?= e($material['availability']) ?>">
-                                        <?= $material['availability'] === 'sufficient' ? 'Достаточно' : 
-                                            ($material['availability'] === 'partial' ? 'Частично' : 'Недостаточно') ?>
-                                    </span>
-                                </td>
-                            </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                </table>
+                <?php
+                // Группируем материалы по категориям
+                $materialsByCategory = [];
+                foreach ($selectedTask['materials'] as $mat) {
+                    $catName = $mat['material_category'] ?? 'Прочее';
+                    if (!isset($materialsByCategory[$catName])) {
+                        $materialsByCategory[$catName] = [];
+                    }
+                    $materialsByCategory[$catName][] = $mat;
+                }
+                
+                $categoryIcons = [
+                    'Металлы' => '🔩',
+                    'Крепеж' => '🔧',
+                    'Электроника' => '⚡',
+                    'Пластик' => '🧪',
+                    'Резина' => '⭕',
+                    'Упаковка' => '📦',
+                    'Прочее' => '📋'
+                ];
+                ?>
+                
+                <?php foreach ($materialsByCategory as $catName => $materials): ?>
+                    <div class="materials-grouped">
+                        <div class="material-category-header">
+                            <?= $categoryIcons[$catName] ?? '📋' ?> <?= e($catName) ?> (<?= count($materials) ?> поз.)
+                        </div>
+                        <table class="materials-table">
+                            <thead>
+                                <tr>
+                                    <th>№</th>
+                                    <th>Материал</th>
+                                    <th>Код</th>
+                                    <th>Требуется</th>
+                                    <th>Использовано</th>
+                                    <th>На складе</th>
+                                    <th>Статус</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php foreach ($materials as $idx => $material): ?>
+                                    <tr>
+                                        <td><?= $idx + 1 ?></td>
+                                        <td>
+                                            <strong><?= e($material['material_name']) ?></strong><br>
+                                            <small style="color: var(--text-secondary);"><?= e($material['material_code']) ?></small>
+                                        </td>
+                                        <td><code><?= e($material['material_code']) ?></code></td>
+                                        <td><?= number_format($material['quantity_required'], 2) ?> <?= e($material['unit_symbol']) ?></td>
+                                        <td><?= number_format($material['quantity_used'], 2) ?> <?= e($material['unit_symbol']) ?></td>
+                                        <td><?= number_format($material['current_stock'], 2) ?> <?= e($material['unit_symbol']) ?></td>
+                                        <td>
+                                            <span class="availability-badge availability-<?= e($material['availability']) ?>">
+                                                <?= $material['availability'] === 'sufficient' ? 'Достаточно' : 
+                                                    ($material['availability'] === 'partial' ? 'Частично' : 'Недостаточно') ?>
+                                            </span>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                <?php endforeach; ?>
             <?php else: ?>
                 <div class="empty-state">
                     <div class="empty-state-icon">📦</div>

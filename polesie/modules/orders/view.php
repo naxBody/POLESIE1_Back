@@ -286,7 +286,7 @@ $pageTitle = 'Заказ №' . e($order['order_number']);
                         <div class="stat-label">Позиций в заказе</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-value"><?= $totalQuantity ?></div>
+                        <div class="stat-value"><?= number_format($totalQuantity, 3, ',', ' ') ?></div>
                         <div class="stat-label">Общее количество</div>
                     </div>
                     <div class="stat-card">
@@ -402,7 +402,7 @@ $pageTitle = 'Заказ №' . e($order['order_number']);
                                                 <?php endif; ?>
                                             </td>
                                             <td><?= e($item['unit_name'] ?? 'шт.') ?></td>
-                                            <td style="text-align: right;"><strong><?= $item['quantity'] ?></strong></td>
+                                            <td style="text-align: right;"><strong><?= number_format($item['quantity'], 3, ',', ' ') ?></strong></td>
                                             <td style="text-align: right;"><?= formatMoney($item['price']) ?></td>
                                             <td style="text-align: right;"><strong><?= formatMoney($item['total']) ?></strong></td>
                                         </tr>
@@ -412,7 +412,7 @@ $pageTitle = 'Заказ №' . e($order['order_number']);
                                 <tfoot style="background: #f8f9fa; font-weight: 600;">
                                     <tr>
                                         <td colspan="4" style="text-align: right; padding: 12px;">Итого:</td>
-                                        <td style="text-align: right;"><?= $totalQuantity ?></td>
+                                        <td style="text-align: right;"><?= number_format($totalQuantity, 3, ',', ' ') ?></td>
                                         <td></td>
                                         <td style="text-align: right; color: var(--primary-color);"><?= formatMoney($totalAmount) ?></td>
                                     </tr>

@@ -514,24 +514,32 @@ $categories = $pdo->query($catQuery)->fetchAll();
             width: 100%;
             border-collapse: collapse;
             background: white;
-            border-radius: 0 0 8px 8px;
+            border-radius: 8px;
             overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
         .materials-table th {
             text-align: left;
-            padding: 12px;
-            background: var(--bg-secondary);
-            font-size: 13px;
-            font-weight: 600;
+            padding: 10px 12px;
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            font-size: 12px;
+            font-weight: 700;
             color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid var(--primary-color);
         }
         .materials-table td {
-            padding: 12px;
-            border-bottom: 1px solid var(--border-color);
-            font-size: 14px;
+            padding: 10px 12px;
+            border-bottom: 1px solid #f1f3f4;
+            font-size: 13px;
+            vertical-align: middle;
+        }
+        .materials-table tr:last-child td {
+            border-bottom: none;
         }
         .materials-table tr:hover {
-            background: var(--bg-tertiary);
+            background: linear-gradient(135deg, #f8f9fa, #ffffff);
         }
         .notes-list, .requirements-list {
             list-style: none;
@@ -1056,7 +1064,7 @@ $categories = $pdo->query($catQuery)->fetchAll();
                                                         foreach ($previewMaterials as $mat): 
                                                         ?>
                                                             <span class="material-tag">
-                                                                <strong><?= number_format($mat['quantity'], 1) ?></strong> <?= e($mat['unit'] ?? 'шт') ?>
+                                                                <strong><?= number_format($mat['quantity'], 3, ',', ' ') ?></strong> <?= e($mat['unit'] ?? 'шт') ?>
                                                             </span>
                                                         <?php endforeach; ?>
                                                         <?php if (count($materials) > 3): ?>
@@ -1273,7 +1281,7 @@ $categories = $pdo->query($catQuery)->fetchAll();
                             html += '<td>' + (j + 1) + '</td>';
                             html += '<td><strong>' + escapeHtml(mat.material_name) + '</strong></td>';
                             html += '<td><code style="background: #e3f2fd; color: #1976d2; padding: 4px 8px; border-radius: 4px; cursor: pointer;">' + escapeHtml(mat.material_code) + '</code></td>';
-                            html += '<td>' + Number(mat.quantity).toFixed(2).replace('.', ',') + '</td>';
+                            html += '<td>' + Number(mat.quantity).toFixed(3).replace(/\.?0+$/, '').replace('.', ',') + '</td>';
                             html += '<td>' + escapeHtml(mat.unit) + '</td>';
                             html += '</tr>';
                         }
@@ -1305,8 +1313,8 @@ $categories = $pdo->query($catQuery)->fetchAll();
                 html += '<tbody>';
                 for (var i = 0; i < passport.used_materials.length; i++) {
                     var um = passport.used_materials[i];
-                    var planQty = Number(um.total_required).toFixed(2).replace('.', ',');
-                    var factQty = Number(um.total_used).toFixed(2).replace('.', ',');
+                    var planQty = Number(um.total_required).toFixed(3).replace(/\.?0+$/, '').replace('.', ',');
+                    var factQty = Number(um.total_used).toFixed(3).replace(/\.?0+$/, '').replace('.', ',');
                     var deviation = um.total_required > 0 ? ((um.total_used - um.total_required) / um.total_required * 100).toFixed(1) : 0;
                     var deviationClass = Math.abs(deviation) > 10 ? 'color: #f44336; font-weight: 600;' : 'color: #4caf50;';
                     var deviationSign = deviation > 0 ? '+' : '';

@@ -1,4 +1,4 @@
-```
+```php
 # Compiled and build artifacts
 *.pyc
 __pycache__/
@@ -19,6 +19,24 @@ venv/
 .env.local
 .env.*
 
+# Build directories
+dist/
+build/
+target/
+.gradle/
+
+# Python specific
+*.pyc
+__pycache__/
+*.pyo
+*.pyd
+.Python
+*.so
+.PyInstaller/
+.coverage
+coverage/
+htmlcov/
+
 # Logs and temp files
 *.log
 *.tmp
@@ -28,25 +46,12 @@ venv/
 # Editors
 .vscode/
 .idea/
+*.swp
+*.swo
 
 # System files
 .DS_Store
 Thumbs.db
-
-# Coverage
-coverage/
-htmlcov/
-.coverage
-
-# Build directories
-dist/
-build/
-target/
-.gradle/
-
-# Python cache
-.mypy_cache/
-.pytest_cache/
 
 # Compressed files
 *.zip
@@ -71,4 +76,11 @@ target/
 *.tar.bz2
 *.tar.xz
 *.tar.zst
+
+# Cache directories
+.mypy_cache/
+.pytest_cache/
+.nyc_output/
+coverage/
+htmlcov/
 ```

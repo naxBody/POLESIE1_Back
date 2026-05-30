@@ -607,7 +607,6 @@ foreach ($allTasks as &$task) {
             border-radius: var(--border-radius-lg);
             box-shadow: var(--shadow);
             padding: 24px;
-            transition: opacity 0.3s ease;
             opacity: 1;
             pointer-events: auto;
         }
@@ -1241,13 +1240,6 @@ foreach ($allTasks as &$task) {
                 activeItem.classList.add('active');
             }
             
-            // Показываем индикатор загрузки - убираем затемнение
-            const workArea = document.getElementById('workArea');
-            if (workArea) {
-                workArea.style.opacity = '0.5';
-                workArea.style.pointerEvents = 'none';
-            }
-            
             // Загружаем данные задачи через AJAX
             fetch('?task=' + taskId + '&ajax=1', {
                 headers: {
@@ -1257,13 +1249,17 @@ foreach ($allTasks as &$task) {
             .then(response => response.text())
             .then(html => {
                 // Находим контейнер рабочей области и обновляем его содержимое
+                const workArea = document.getElementById('workArea');
                 const parser = new DOMParser();
                 const doc = parser.parseFromString(html, 'text/html');
                 const newWorkAreaContent = doc.querySelector('#work-area-content');
                 
                 if (newWorkAreaContent && workArea) {
-                    // Полностью заменяем содержимое workArea
-                    workArea.innerHTML = newWorkAreaContent.innerHTML;
+                    // Полностью заменяем содержимое workArea - берем все дочерние элементы
+                    workArea.innerHTML = '';
+                    Array.from(newWorkAreaContent.childNodes).forEach(node => {
+                        workArea.appendChild(node.cloneNode(true));
+                    });
                     
                     // Обновляем URL без перезагрузки
                     const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + '?task=' + taskId;
@@ -1271,31 +1267,24 @@ foreach ($allTasks as &$task) {
                     
                     currentTaskId = taskId;
                     
-                    // Возвращаем нормальное состояние блока
-                    workArea.style.opacity = '1';
-                    workArea.style.pointerEvents = 'auto';
-                    
-                    // Инициализируем вкладки заново - удаляем старые обработчики и добавляем новые
-                    initTabs();
-                    
-                    // Активируем первую вкладку по умолчанию
-                    switchTab('stages');
+                    // Инициализируем вкладки заново - даем DOM время на обновление
+                    setTimeout(function() {
+                        initTabs();
+                        // Активируем первую вкладку по умолчанию
+                        switchTab('stages');
+                    }, 50);
                 }
             })
             .catch(error => {
                 console.error('Ошибка загрузки задачи:', error);
                 // Если AJAX не сработал, делаем обычную перезагрузку
-                if (workArea) {
-                    workArea.style.opacity = '1';
-                    workArea.style.pointerEvents = 'auto';
-                }
                 window.location.href = '?task=' + taskId;
             });
         }
         
         // Инициализация вкладок
         function initTabs() {
-            // Удаляем все старые обработчики клонированием элементов
+            // Добавляем обработчики событий на кнопки вкладок (предварительно удаляем старые через clone)
             const tabButtons = document.querySelectorAll('.tab-button');
             tabButtons.forEach(btn => {
                 // Клонируем кнопку, чтобы удалить старые обработчики
@@ -1322,10 +1311,12 @@ foreach ($allTasks as &$task) {
         
         function switchTab(tabName) {
             // Скрываем все вкладки
-            document.querySelectorAll('.tab-content').forEach(tab => {
+            const allTabs = document.querySelectorAll('.tab-content');
+            allTabs.forEach(tab => {
                 tab.classList.remove('active');
             });
-            document.querySelectorAll('.tab-button').forEach(btn => {
+            const allButtons = document.querySelectorAll('.tab-button');
+            allButtons.forEach(btn => {
                 btn.classList.remove('active');
             });
             

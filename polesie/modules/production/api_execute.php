@@ -9,23 +9,17 @@ require_once __DIR__ . '/../../config/config.php';
 require_once __DIR__ . '/../../includes/auth.php';
 
 // Проверяем, это API запрос или обычная страница
-// API запросом считаем только явные запросы с action или api=1
-$isApiRequest = isset($_POST['action']) || 
-                (isset($_GET['api']) && $_GET['api'] == '1') ||
-                (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && 
-                 strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest' &&
-                 (isset($_POST['action']) || isset($_GET['task_id'])));
+$isApiRequest = isset($_SERVER['HTTP_X_REQUESTED_WITH']) && 
+                strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest' ||
+                isset($_POST['action']) ||
+                (isset($_GET['api']) && $_GET['api'] == '1');
 
 if ($isApiRequest) {
     if (session_status() === PHP_SESSION_NONE) {
         session_start();
     }
     
-    // Не устанавливаем заголовок Content-Type для GET запросов с task_id
-    // чтобы можно было использовать этот файл и для обычного рендеринга
-    if ($_SERVER['REQUEST_METHOD'] !== 'GET' || !isset($_GET['task_id'])) {
-        header('Content-Type: application/json');
-    }
+    header('Content-Type: application/json');
     
     if (!isLoggedIn()) {
         http_response_code(401);
@@ -35,62 +29,6 @@ if ($isApiRequest) {
     
     $user = getCurrentUser();
     $pdo = getDbConnection();
-    
-    // Обработка GET запросов для получения данных задания (не требует action)
-    if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['task_id'])) {
-        try {
-            $taskId = (int)$_GET['task_id'];
-            
-            // Получаем информацию о задании
-            $stmt = $pdo->prepare("
-                SELECT pt.*, p.name as product_name, p.article, o.order_number
-                FROM production_tasks pt
-                JOIN orders o ON pt.order_id = o.id
-                JOIN products p ON pt.product_id = p.id
-                WHERE pt.id = ?
-            ");
-            $stmt->execute([$taskId]);
-            $task = $stmt->fetch(PDO::FETCH_ASSOC);
-            
-            if (!$task) {
-                echo json_encode(['error' => 'Задание не найдено']);
-                exit;
-            }
-            
-            // Получаем этапы
-            $stmt = $pdo->prepare("
-                SELECT pts.*, ps.name as stage_name, ps.code as stage_code, ps.color as stage_color, ps.sort_order
-                FROM production_task_stages pts
-                JOIN production_stages ps ON pts.stage_id = ps.id
-                WHERE pts.task_id = ?
-                ORDER BY ps.sort_order
-            ");
-            $stmt->execute([$taskId]);
-            $stages = $stmt->fetchAll(PDO::FETCH_ASSOC);
-            
-            // Получаем материалы
-            $stmt = $pdo->prepare("
-                SELECT ptm.*, m.name_full as material_name, m.current_stock
-                FROM production_tasks_materials ptm
-                JOIN materials m ON ptm.material_id = m.id
-                WHERE ptm.task_id = ?
-                ORDER BY ptm.id
-            ");
-            $stmt->execute([$taskId]);
-            $materials = $stmt->fetchAll(PDO::FETCH_ASSOC);
-            
-            echo json_encode([
-                'task' => $task,
-                'stages' => $stages,
-                'materials' => $materials
-            ]);
-            exit;
-        } catch (Exception $e) {
-            http_response_code(400);
-            echo json_encode(['error' => $e->getMessage()]);
-            exit;
-        }
-    }
     
     try {
         $input = json_decode(file_get_contents('php://input'), true);
@@ -581,6 +519,54 @@ if ($isApiRequest) {
     } else {
         throw new Exception('Неизвестное действие');
     }
+    
+    // Дополнительная обработка GET запросов для получения данных задания
+    if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['task_id'])) {
+        $taskId = (int)$_GET['task_id'];
+        
+        // Получаем информацию о задании
+        $stmt = $pdo->prepare("
+            SELECT pt.*, p.name as product_name, p.article, o.number as order_number
+            FROM production_tasks pt
+            JOIN products p ON pt.product_id = p.id
+            JOIN orders o ON pt.order_id = o.id
+            WHERE pt.id = ?
+        ");
+        $stmt->execute([$taskId]);
+        $task = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        if (!$task) {
+            echo json_encode(['error' => 'Задание не найдено']);
+            exit;
+        }
+        
+        // Получаем этапы
+        $stmt = $pdo->prepare("
+            SELECT * FROM production_task_stages 
+            WHERE task_id = ? 
+            ORDER BY sort_order, id
+        ");
+        $stmt->execute([$taskId]);
+        $stages = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        // Получаем материалы
+        $stmt = $pdo->prepare("
+            SELECT ptm.*, m.name as material_name, m.unit, m.current_stock
+            FROM production_tasks_materials ptm
+            JOIN materials m ON ptm.material_id = m.id
+            WHERE ptm.task_id = ?
+            ORDER BY ptm.id
+        ");
+        $stmt->execute([$taskId]);
+        $materials = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        echo json_encode([
+            'task' => $task,
+            'stages' => $stages,
+            'materials' => $materials
+        ]);
+        exit;
+    }
 
 } catch (Exception $e) {
     http_response_code(400);
@@ -723,4 +709,3 @@ if (isset($pdo) && $_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['task_id'
     }
 }
 }
-exit;

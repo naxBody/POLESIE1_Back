@@ -1255,11 +1255,8 @@ foreach ($allTasks as &$task) {
                 const newWorkAreaContent = doc.querySelector('#work-area-content');
                 
                 if (newWorkAreaContent && workArea) {
-                    // Полностью заменяем содержимое workArea - берем все дочерние элементы
-                    workArea.innerHTML = '';
-                    Array.from(newWorkAreaContent.childNodes).forEach(node => {
-                        workArea.appendChild(node.cloneNode(true));
-                    });
+                    // Полностью заменяем содержимое workArea - используем innerHTML для корректной вставки
+                    workArea.innerHTML = newWorkAreaContent.innerHTML;
                     
                     // Обновляем URL без перезагрузки
                     const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + '?task=' + taskId;
@@ -1272,7 +1269,7 @@ foreach ($allTasks as &$task) {
                         initTabs();
                         // Активируем первую вкладку по умолчанию
                         switchTab('stages');
-                    }, 50);
+                    }, 100);
                 }
             })
             .catch(error => {
@@ -1284,15 +1281,14 @@ foreach ($allTasks as &$task) {
         
         // Инициализация вкладок
         function initTabs() {
-            // Добавляем обработчики событий на кнопки вкладок (предварительно удаляем старые через clone)
+            // Сначала удаляем старые обработчики, клонируя кнопки
             const tabButtons = document.querySelectorAll('.tab-button');
             tabButtons.forEach(btn => {
-                // Клонируем кнопку, чтобы удалить старые обработчики
                 const newBtn = btn.cloneNode(true);
                 btn.parentNode.replaceChild(newBtn, btn);
             });
             
-            // Добавляем новые обработчики событий на кнопки вкладок
+            // Добавляем обработчики событий на кнопки вкладок
             const newTabButtons = document.querySelectorAll('.tab-button');
             newTabButtons.forEach(btn => {
                 btn.addEventListener('click', function() {

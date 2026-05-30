@@ -918,7 +918,7 @@ foreach ($allTasks as &$task) {
         }
         
         .tab-content {
-            display: none !important;
+            display: none;
             animation: fadeIn 0.3s ease-in-out;
             position: relative;
             z-index: 0;
@@ -928,7 +928,7 @@ foreach ($allTasks as &$task) {
         }
         
         .tab-content.active {
-            display: block !important;
+            display: block;
             z-index: 1;
             width: 100%;
             box-sizing: border-box;

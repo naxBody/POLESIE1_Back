@@ -20,11 +20,13 @@ if (isLoggedIn()) {
 }
 
 // Проверяем, это API запрос или обычная страница
-// Важно: не считаем API запросом AJAX-запросы к execute.php за контентом (они имеют ajax=1 но не action)
-$isApiRequest = (isset($_POST['action']) || (isset($_GET['api']) && $_GET['api'] == '1')) ||
+// Важно: не считаем API запросом AJAX-запросы к execute.php за контентом (они имеют ajax=1 или task без action)
+$isApiRequest = isset($_POST['action']) || 
+                (isset($_GET['api']) && $_GET['api'] == '1') ||
                 (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && 
                  strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest' &&
-                 !isset($_GET['ajax']));
+                 !isset($_GET['ajax']) && 
+                 !isset($_GET['task']));
 
 if ($isApiRequest) {
     header('Content-Type: application/json');

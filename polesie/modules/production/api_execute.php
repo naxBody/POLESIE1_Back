@@ -9,10 +9,11 @@ require_once __DIR__ . '/../../config/config.php';
 require_once __DIR__ . '/../../includes/auth.php';
 
 // Проверяем, это API запрос или обычная страница
-$isApiRequest = isset($_SERVER['HTTP_X_REQUESTED_WITH']) && 
-                strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest' ||
-                isset($_POST['action']) ||
-                (isset($_GET['api']) && $_GET['api'] == '1');
+// Важно: не считаем API запросом AJAX-запросы к execute.php за контентом (они имеют ajax=1 но не action)
+$isApiRequest = (isset($_POST['action']) || (isset($_GET['api']) && $_GET['api'] == '1')) ||
+                (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && 
+                 strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest' &&
+                 !isset($_GET['ajax']));
 
 if ($isApiRequest) {
     if (session_status() === PHP_SESSION_NONE) {

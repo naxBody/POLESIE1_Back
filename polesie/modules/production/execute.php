@@ -1027,6 +1027,25 @@ foreach ($allTasks as &$task) {
             margin-bottom: 24px;
         }
         
+        .materials-grouped {
+            margin-bottom: 24px;
+            background: #fff;
+            border-radius: var(--border-radius);
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+        }
+        
+        .material-category-header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+            color: #fff;
+            padding: 12px 16px;
+            font-weight: 600;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
         .materials-table th {
             text-align: left;
             padding: 12px 16px;
@@ -1043,6 +1062,14 @@ foreach ($allTasks as &$task) {
             font-size: 14px;
         }
         
+        .materials-table tbody tr:hover {
+            background: var(--gray-50);
+        }
+        
+        .materials-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+        
         .availability-badge {
             display: inline-block;
             padding: 4px 10px;
@@ -1056,33 +1083,47 @@ foreach ($allTasks as &$task) {
         .availability-insufficient { background: #fee2e2; color: #dc2626; }
         
         .production-form {
-            max-width: 600px;
+            max-width: 700px;
         }
         
         .form-group {
             margin-bottom: 20px;
+            background: var(--bg-secondary);
+            padding: 16px;
+            border-radius: var(--border-radius);
+            border: 1px solid var(--border-color);
         }
         
         .form-label {
             display: block;
-            font-weight: 500;
-            margin-bottom: 8px;
+            font-weight: 600;
+            margin-bottom: 10px;
             color: var(--text-primary);
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
         
         .form-input, .form-select, .form-textarea {
             width: 100%;
-            padding: 10px 14px;
+            padding: 12px 16px;
             border: 1px solid var(--border-color);
             border-radius: var(--border-radius);
             font-size: 14px;
             transition: all var(--transition-fast);
+            background: #fff;
         }
         
         .form-input:focus, .form-select:focus, .form-textarea:focus {
             outline: none;
             border-color: var(--primary-color);
             box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+        
+        .form-input[readonly], .form-input[disabled] {
+            background: var(--gray-50);
+            color: var(--text-secondary);
+            cursor: not-allowed;
         }
         
         .form-textarea {
@@ -1212,16 +1253,44 @@ foreach ($allTasks as &$task) {
         
         .serial-numbers-list {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 12px;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 16px;
+            margin-top: 16px;
         }
         
         .serial-badge {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border-color);
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            border: 2px solid var(--border-color);
             border-radius: var(--border-radius);
-            padding: 12px;
+            padding: 16px;
             text-align: center;
+            transition: all var(--transition-fast);
+        }
+        
+        .serial-badge:hover {
+            border-color: var(--primary-color);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15);
+            transform: translateY(-2px);
+        }
+        
+        .serial-badge strong {
+            display: block;
+            font-family: 'Courier New', monospace;
+            font-weight: 700;
+            font-size: 16px;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+            word-break: break-all;
+        }
+        
+        .serial-badge small {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            background: #d1fae5;
+            color: #059669;
         }
         
         .serial-number {

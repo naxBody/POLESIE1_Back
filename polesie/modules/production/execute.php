@@ -155,7 +155,7 @@ if ($isAjaxRequest && $selectedTaskId) {
         
         // Рендерим только содержимое рабочей области (без полного HTML)
         ?>
-        <div id="work-area-content">
+        <div id="work-area-content" data-task-id="<?= $selectedTask['id'] ?>">
         <div class="work-area-header">
             <div class="work-area-title">
                 <h3><?= e($selectedTask['product_name']) ?></h3>
@@ -200,7 +200,7 @@ if ($isAjaxRequest && $selectedTaskId) {
         </div>
         
         <!-- Содержимое вкладок -->
-        <div id="tab-stages" class="tab-content active">
+        <div id="tab-stages" class="tab-content active" data-task-id="<?= $selectedTask['id'] ?>">
             <?php if (!empty($selectedTask['stages'])): ?>
                 <div class="stages-grid">
                     <?php foreach ($selectedTask['stages'] as $stage): ?>
@@ -243,7 +243,7 @@ if ($isAjaxRequest && $selectedTaskId) {
             <?php endif; ?>
         </div>
         
-        <div id="tab-materials" class="tab-content">
+        <div id="tab-materials" class="tab-content" data-task-id="<?= $selectedTask['id'] ?>">
             <?php if (!empty($selectedTask['materials'])): ?>
                 <table class="materials-table">
                     <thead>
@@ -284,7 +284,7 @@ if ($isAjaxRequest && $selectedTaskId) {
             <?php endif; ?>
         </div>
         
-        <div id="tab-serial" class="tab-content">
+        <div id="tab-serial" class="tab-content" data-task-id="<?= $selectedTask['id'] ?>">
             <?php if (!empty($selectedTask['serial_numbers'])): ?>
                 <div class="serial-numbers-list">
                     <?php foreach ($selectedTask['serial_numbers'] as $sn): ?>
@@ -303,7 +303,7 @@ if ($isAjaxRequest && $selectedTaskId) {
             <?php endif; ?>
         </div>
         
-        <div id="tab-info" class="tab-content">
+        <div id="tab-info" class="tab-content" data-task-id="<?= $selectedTask['id'] ?>">
             <div class="production-form">
                 <div class="form-group">
                     <label class="form-label">Ответственный</label>
@@ -999,7 +999,7 @@ foreach ($allTasks as &$task) {
                                 </div>
                                 
                                 <!-- Вкладка этапы -->
-                                <div class="tab-content active" id="tab-stages">
+                                <div class="tab-content active" id="tab-stages" data-task-id="<?= $selectedTask['id'] ?>">
                                     <h4 style="margin-bottom: 16px;">Этапы производства</h4>
                                     <?php if (!empty($selectedTask['stages'])): ?>
                                     <div class="stages-grid">
@@ -1046,7 +1046,7 @@ foreach ($allTasks as &$task) {
                                 </div>
                                 
                                 <!-- Вкладка материалы -->
-                                <div class="tab-content" id="tab-materials">
+                                <div class="tab-content" id="tab-materials" data-task-id="<?= $selectedTask['id'] ?>">
                                     <h4 style="margin-bottom: 16px;">Материалы для производства</h4>
                                     <?php if (!empty($selectedTask['materials'])): ?>
                                     <table class="materials-table">
@@ -1092,7 +1092,7 @@ foreach ($allTasks as &$task) {
                                 </div>
                                 
                                 <!-- Вкладка серийные номера -->
-                                <div class="tab-content" id="tab-serial">
+                                <div class="tab-content" id="tab-serial" data-task-id="<?= $selectedTask['id'] ?>">
                                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
                                         <h4>Серийные номера</h4>
                                         <button class="btn btn-primary" onclick="generateSerialNumber(<?= $selectedTask['id'] ?>, <?= $selectedTask['product_id'] ?>)">
@@ -1123,7 +1123,7 @@ foreach ($allTasks as &$task) {
                                 </div>
                                 
                                 <!-- Вкладка информация -->
-                                <div class="tab-content" id="tab-info">
+                                <div class="tab-content" id="tab-info" data-task-id="<?= $selectedTask['id'] ?>">
                                     <div class="production-form">
                                         <div class="form-group">
                                             <label class="form-label">Ответственный</label>
@@ -1273,6 +1273,16 @@ foreach ($allTasks as &$task) {
                     // Инициализируем вкладки заново - даем DOM время на обновление
                     setTimeout(function() {
                         initTabs();
+                        // Принудительно переключаем на первую вкладку после загрузки нового контента
+                        // Проверяем, что элементы существуют перед переключением
+                        const tabContent = document.getElementById('tab-stages');
+                        const tabButton = document.querySelector('.tab-button[data-tab="stages"]');
+                        if (tabContent && tabButton) {
+                            switchTab('stages');
+                            console.log('Вкладка "Этапы" активирована для задачи #' + taskId);
+                        } else {
+                            console.error('Элементы вкладок не найдены после загрузки контента');
+                        }
                     }, 100);
                 }
             })

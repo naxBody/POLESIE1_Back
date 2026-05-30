@@ -952,10 +952,10 @@ foreach ($allTasks as &$task) {
                                 </div>
                                 
                                 <div class="tabs-container">
-                                    <button class="tab-button active" onclick="switchTab('stages')">Этапы</button>
-                                    <button class="tab-button" onclick="switchTab('materials')">Материалы</button>
-                                    <button class="tab-button" onclick="switchTab('serial')">Серийные номера</button>
-                                    <button class="tab-button" onclick="switchTab('info')">Информация</button>
+                                    <button class="tab-button active" data-tab="stages">Этапы</button>
+                                    <button class="tab-button" data-tab="materials">Материалы</button>
+                                    <button class="tab-button" data-tab="serial">Серийные номера</button>
+                                    <button class="tab-button" data-tab="info">Информация</button>
                                 </div>
                                 
                                 <!-- Вкладка этапы -->
@@ -1207,7 +1207,7 @@ foreach ($allTasks as &$task) {
             }
             
             // Показываем индикатор загрузки
-            const workArea = document.getElementById('work-area');
+            const workArea = document.getElementById('workArea');
             if (workArea) {
                 workArea.style.opacity = '0.5';
             }
@@ -1223,10 +1223,16 @@ foreach ($allTasks as &$task) {
                 // Находим контейнер рабочей области и обновляем его содержимое
                 const parser = new DOMParser();
                 const doc = parser.parseFromString(html, 'text/html');
-                const newWorkArea = doc.querySelector('#work-area-content');
+                const newWorkAreaContent = doc.querySelector('#work-area-content');
                 
-                if (newWorkArea && workArea) {
-                    workArea.innerHTML = newWorkArea.innerHTML;
+                if (newWorkAreaContent && workArea) {
+                    // Обновляем содержимое work-area-content внутри workArea
+                    const workAreaContent = workArea.querySelector('#work-area-content');
+                    if (workAreaContent) {
+                        workAreaContent.innerHTML = newWorkAreaContent.innerHTML;
+                    } else {
+                        workArea.innerHTML = newWorkAreaContent.innerHTML;
+                    }
                     
                     // Обновляем URL без перезагрузки
                     const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + '?task=' + taskId;
@@ -1259,6 +1265,12 @@ foreach ($allTasks as &$task) {
                     }
                 });
             });
+            
+            // Активируем первую вкладку по умолчанию
+            const firstTabButton = document.querySelector('.tab-button.active');
+            if (!firstTabButton && tabButtons.length > 0) {
+                switchTab('stages');
+            }
         }
         
         // Вызываем после загрузки DOM
@@ -1281,14 +1293,11 @@ foreach ($allTasks as &$task) {
                 tabContent.classList.add('active');
             }
             
-            // Находим кнопку которая вызвала эту функцию и делаем её активной
+            // Находим кнопку которая соответствует этой вкладке и делаем её активной
             const buttons = document.querySelectorAll('.tab-button');
             buttons.forEach(btn => {
-                if (btn.textContent.toLowerCase().includes(
-                    tabName === 'stages' ? 'этапы' : 
-                    tabName === 'materials' ? 'материалы' : 
-                    tabName === 'serial' ? 'серийн' : 'информация'
-                )) {
+                const dataTab = btn.getAttribute('data-tab');
+                if (dataTab === tabName) {
                     btn.classList.add('active');
                 }
             });

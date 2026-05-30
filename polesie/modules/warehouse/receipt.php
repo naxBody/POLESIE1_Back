@@ -612,15 +612,15 @@ try {
             // Ждем завершения загрузки и добавляем материал
             materialsLoadingPromise.then(() => {
                 materialsLoadingPromise = null;
-                if (formInitialized && formData.materials && formData.materials.length > 0) {
+                if (formData.materials && formData.materials.length > 0) {
                     addMaterialRowInternal(material);
                 } else {
-                    alert('Справочник материалов пуст. Добавьте материалы в систему.');
+                    alert('Справочник материалов пуст. Добавьте материалы в систему через меню \"Материалы\".');
                 }
             }).catch(err => {
                 console.error('Ошибка загрузки данных:', err);
                 materialsLoadingPromise = null;
-                alert('Ошибка загрузки справочника материалов. Обновите страницу.');
+                alert('Ошибка загрузки справочника материалов. Проверьте подключение к серверу и обновите страницу.');
             });
         }
         
@@ -658,7 +658,7 @@ try {
             tbody.innerHTML = currentItems.map((item, index) => `
                 <tr>
                     <td>
-                        <select onchange="updateItem(${index}, 'material_id', this.value)" ${item.material_id ? 'disabled' : ''}>
+                        <select onchange="updateItem(${index}, 'material_id', this.value)">
                             <option value="">Выберите материал</option>
                             ${formData.materials.map(m => 
                                 `<option value="${m.id}" ${item.material_id == m.id ? 'selected' : ''}>
@@ -726,16 +726,23 @@ try {
         function saveDocument() {
             const docId = document.getElementById('docId').value;
             
-            if (!document.getElementById('docType').value) {
+            // Проверка типа документа
+            const docTypeValue = document.getElementById('docType').value;
+            if (!docTypeValue) {
                 alert('Выберите тип документа');
                 return;
             }
+            
+            // Проверка даты
             if (!document.getElementById('docDate').value) {
                 alert('Укажите дату документа');
                 return;
             }
-            if (currentItems.length === 0) {
-                alert('Добавьте хотя бы один материал');
+            
+            // Проверка что есть хотя бы один материал с выбранным material_id
+            const validItems = currentItems.filter(item => item.material_id);
+            if (validItems.length === 0) {
+                alert('Добавьте хотя бы один материал и выберите его из справочника');
                 return;
             }
             
@@ -751,10 +758,10 @@ try {
                 ttn_number: document.getElementById('ttnNumber').value || null,
                 notes: document.getElementById('docNotes').value || null,
                 items: currentItems.map(item => ({
-                    material_id: parseInt(item.material_id),
-                    quantity: parseFloat(item.quantity),
-                    unit_price: parseFloat(item.unit_price),
-                    total_price: parseFloat(item.total_price),
+                    material_id: item.material_id ? parseInt(item.material_id) : null,
+                    quantity: parseFloat(item.quantity) || 0,
+                    unit_price: parseFloat(item.unit_price) || 0,
+                    total_price: parseFloat(item.total_price) || 0,
                     batch_number: item.batch_number || null,
                     certificate_number: item.certificate_number || null
                 }))

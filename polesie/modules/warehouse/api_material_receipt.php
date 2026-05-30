@@ -145,36 +145,43 @@ try {
         
         // Данные для формы (справочники)
         elseif ($action === 'form_data') {
-            // Типы документов
-            $docTypesStmt = $pdo->query("SELECT id, name, name_ru, code FROM receipt_document_types WHERE is_active = TRUE ORDER BY sort_order");
-            $docTypes = $docTypesStmt->fetchAll(PDO::FETCH_ASSOC);
-            
-            // Поставщики (без проверки is_active - колонки нет)
-            $suppliersStmt = $pdo->query("SELECT id, name, inn FROM contractors WHERE type IN ('supplier', 'both') ORDER BY name");
-            $suppliers = $suppliersStmt->fetchAll(PDO::FETCH_ASSOC);
-            
-            // Материалы (без проверки is_active - колонки нет)
-            $materialsStmt = $pdo->query("
-                SELECT 
-                    m.id, m.code, m.name_full, m.name_short,
-                    mc.name as category_name,
-                    bu.symbol as unit_symbol,
-                    m.current_stock
-                FROM materials m
-                LEFT JOIN material_categories mc ON m.category_id = mc.id
-                LEFT JOIN base_units bu ON m.base_unit_id = bu.id
-                ORDER BY m.name_full
-            ");
-            $materials = $materialsStmt->fetchAll(PDO::FETCH_ASSOC);
-            
-            echo json_encode([
-                'success' => true,
-                'data' => [
-                    'document_types' => $docTypes,
-                    'suppliers' => $suppliers,
-                    'materials' => $materials
-                ]
-            ]);
+            try {
+                // Типы документов
+                $docTypesStmt = $pdo->query("SELECT id, name, name_ru, code FROM receipt_document_types WHERE is_active = TRUE ORDER BY sort_order");
+                $docTypes = $docTypesStmt->fetchAll(PDO::FETCH_ASSOC);
+                
+                // Поставщики
+                $suppliersStmt = $pdo->query("SELECT id, name, inn FROM contractors WHERE type IN ('supplier', 'both') ORDER BY name");
+                $suppliers = $suppliersStmt->fetchAll(PDO::FETCH_ASSOC);
+                
+                // Материалы
+                $materialsStmt = $pdo->query("
+                    SELECT 
+                        m.id, m.code, m.name_full, m.name_short,
+                        mc.name as category_name,
+                        bu.symbol as unit_symbol,
+                        m.current_stock
+                    FROM materials m
+                    LEFT JOIN material_categories mc ON m.category_id = mc.id
+                    LEFT JOIN base_units bu ON m.base_unit_id = bu.id
+                    ORDER BY m.name_full
+                ");
+                $materials = $materialsStmt->fetchAll(PDO::FETCH_ASSOC);
+                
+                echo json_encode([
+                    'success' => true,
+                    'data' => [
+                        'document_types' => $docTypes,
+                        'suppliers' => $suppliers,
+                        'materials' => $materials
+                    ]
+                ]);
+            } catch (PDOException $e) {
+                echo json_encode([
+                    'success' => false,
+                    'error' => 'Ошибка загрузки справочников: ' . $e->getMessage()
+                ]);
+            }
         }
         
         else {
@@ -293,8 +300,13 @@ try {
                     $itemStmt = $pdo->prepare($itemInsertSql);
                     
                     foreach ($input['items'] as $index => $item) {
+                        // Пропускаем элементы без material_id
+                        if (empty($item['material_id'])) {
+                            continue;
+                        }
+                        
                         $materialId = (int)$item['material_id'];
-                        $quantity = (float)$item['quantity'];
+                        $quantity = (float)($item['quantity'] ?? 0);
                         $unitPrice = isset($item['unit_price']) ? (float)$item['unit_price'] : null;
                         $totalPrice = isset($item['total_price']) ? (float)$item['total_price'] : ($unitPrice * $quantity);
                         

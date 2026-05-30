@@ -80,7 +80,7 @@ try {
     
     $taskId = $pdo->lastInsertId();
     
-    // Если есть маршрутная карта, создаем этапы
+    // Если есть маршрутная карта, создаем этапы и материалы
     if ($routeCardId) {
         require_once __DIR__ . '/api_execute.php';
         
@@ -95,6 +95,49 @@ try {
             $_SERVER['HTTP_X_REQUESTED_WITH'] = $originalRequest;
         } else {
             unset($_SERVER['HTTP_X_REQUESTED_WITH']);
+        }
+    }
+    
+    // Создаем материалы для задания из паспорта продукта
+    $stmt = $pdo->prepare("SELECT pp.id as passport_id FROM product_passports pp WHERE pp.product_id = ? LIMIT 1");
+    $stmt->execute([$productId]);
+    $passport = $stmt->fetch();
+    
+    if ($passport) {
+        // Получаем материалы из паспорта
+        $matStmt = $pdo->prepare("
+            SELECT ppm.material_id, ppm.quantity, ppm.unit_id
+            FROM product_passport_materials ppm
+            WHERE ppm.passport_id = ?
+            ORDER BY ppm.sort_order
+        ");
+        $matStmt->execute([$passport['passport_id']]);
+        $passportMaterials = $matStmt->fetchAll();
+        
+        // Создаем записи в production_tasks_materials
+        if (!empty($passportMaterials)) {
+            $insertMatStmt = $pdo->prepare("
+                INSERT INTO production_tasks_materials 
+                (task_id, material_id, quantity_required, quantity_reserved, quantity_used, unit_cost, total_cost, status, created_at)
+                VALUES (?, ?, ?, 0, 0, 0, 0, 'pending', NOW())
+            ");
+            
+            foreach ($passportMaterials as $pm) {
+                // Получаем стоимость материала
+                $costStmt = $pdo->prepare("SELECT last_price FROM materials WHERE id = ?");
+                $costStmt->execute([$pm['material_id']]);
+                $costResult = $costStmt->fetch();
+                $unitCost = $costResult ? (float)$costResult['last_price'] : 0;
+                $totalCost = $unitCost * $quantity * (float)$pm['quantity'];
+                
+                $insertMatStmt->execute([
+                    $taskId,
+                    $pm['material_id'],
+                    (float)$pm['quantity'] * $quantity,
+                    $unitCost,
+                    $totalCost
+                ]);
+            }
         }
     }
     

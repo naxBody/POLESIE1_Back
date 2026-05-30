@@ -528,12 +528,6 @@ if ($isApiRequest) {
     exit;
 }
 
-} // Конец if ($isApiRequest)
-
-// Если это не API запрос, выходим - функции ниже доступны для execute.php
-if (!$isApiRequest) {
-    return;
-}
 
 /**
  * Создание этапов для задания на основе маршрутной карты
@@ -605,4 +599,9 @@ function reserveMaterialsForTask($pdo, $taskId) {
             $updateStmt->execute([$quantityToReserve, $mat['id']]);
         }
     }
+}
+
+// Если это не API запрос, выходим - функции выше доступны для execute.php
+if (!$isApiRequest) {
+    return;
 }

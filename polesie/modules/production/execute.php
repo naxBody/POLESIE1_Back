@@ -229,19 +229,19 @@ if ($isAjaxRequest && $selectedTaskId) {
         
         <div class="stats-row">
             <div class="stat-card">
-                <div class="stat-value"><?= (int)$selectedTask['quantity_plan'] ?></div>
+                <div class="stat-value"><?= number_format((float)$selectedTask['quantity_plan'], 3, ',', ' ') ?></div>
                 <div class="stat-label">План</div>
             </div>
             <div class="stat-card">
-                <div class="stat-value" style="color: var(--info-color);"><?= (int)$selectedTask['quantity_fact'] ?></div>
+                <div class="stat-value" style="color: var(--info-color);"><?= number_format((float)$selectedTask['quantity_fact'], 3, ',', ' ') ?></div>
                 <div class="stat-label">Факт</div>
             </div>
             <div class="stat-card">
-                <div class="stat-value" style="color: var(--success-color);"><?= (int)$selectedTask['quantity_good'] ?></div>
+                <div class="stat-value" style="color: var(--success-color);"><?= number_format((float)$selectedTask['quantity_good'], 3, ',', ' ') ?></div>
                 <div class="stat-label">Годные</div>
             </div>
             <div class="stat-card">
-                <div class="stat-value" style="color: var(--error-color);"><?= (int)$selectedTask['quantity_defect'] ?></div>
+                <div class="stat-value" style="color: var(--error-color);"><?= number_format((float)$selectedTask['quantity_defect'], 3, ',', ' ') ?></div>
                 <div class="stat-label">Брак</div>
             </div>
         </div>
@@ -1140,19 +1140,19 @@ foreach ($allTasks as &$task) {
                                 
                                 <div class="stats-row">
                                     <div class="stat-card">
-                                        <div class="stat-value"><?= (int)$selectedTask['quantity_plan'] ?></div>
+                                        <div class="stat-value"><?= number_format((float)$selectedTask['quantity_plan'], 3, ',', ' ') ?></div>
                                         <div class="stat-label">План</div>
                                     </div>
                                     <div class="stat-card">
-                                        <div class="stat-value" style="color: var(--info-color);"><?= (int)$selectedTask['quantity_fact'] ?></div>
+                                        <div class="stat-value" style="color: var(--info-color);"><?= number_format((float)$selectedTask['quantity_fact'], 3, ',', ' ') ?></div>
                                         <div class="stat-label">Факт</div>
                                     </div>
                                     <div class="stat-card">
-                                        <div class="stat-value" style="color: var(--success-color);"><?= (int)$selectedTask['quantity_good'] ?></div>
+                                        <div class="stat-value" style="color: var(--success-color);"><?= number_format((float)$selectedTask['quantity_good'], 3, ',', ' ') ?></div>
                                         <div class="stat-label">Годные</div>
                                     </div>
                                     <div class="stat-card">
-                                        <div class="stat-value" style="color: var(--danger-color);"><?= (int)$selectedTask['quantity_defect'] ?></div>
+                                        <div class="stat-value" style="color: var(--danger-color);"><?= number_format((float)$selectedTask['quantity_defect'], 3, ',', ' ') ?></div>
                                         <div class="stat-label">Брак</div>
                                     </div>
                                 </div>
@@ -1477,7 +1477,7 @@ foreach ($allTasks as &$task) {
                                         
                                         <div class="task-progress">
                                             <div style="display: flex; justify-content: space-between; font-size: 12px; color: var(--text-secondary); margin-bottom: 6px;">
-                                                <span>План: ${task.quantity_plan} ${task.unit_name}</span>
+                                                <span>План: ${Number(task.quantity_plan).toFixed(3).replace(/\.?0+$/, '').replace('.', ',')} ${task.unit_name}</span>
                                                 <span>${progressPercent}%</span>
                                             </div>
                                             <div class="progress-bar-container">

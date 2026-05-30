@@ -154,7 +154,7 @@ $tasks = $stmt->fetchAll();
                                         <td><strong>#<?= $t['id'] ?></strong></td>
                                         <td><strong><?= e($t['product_name']) ?></strong></td>
                                         <td><?= e($t['order_number']) ?></td>
-                                        <td><?= e($t['quantity'] ?? '—') ?></td>
+                                        <td><?= !empty($t['quantity']) ? number_format((float)$t['quantity'], 3, ',', ' ') : '—' ?></td>
                                         <td><?= !empty($t['planned_date']) ? date('d.m.Y', strtotime($t['planned_date'])) : '—' ?></td>
                                         <td>
                                             <?php if ($t['status'] === 'planned'): ?>
@@ -231,7 +231,7 @@ $tasks = $stmt->fetchAll();
             html += '<div class="product-specs-grid">';
             html += '<div class="product-spec-item"><div class="product-spec-name">№ задания</div><div class="product-spec-value">#' + (task.id || '—') + '</div></div>';
             html += '<div class="product-spec-item"><div class="product-spec-name">Заказ</div><div class="product-spec-value">' + (task.order_number || '—') + '</div></div>';
-            html += '<div class="product-spec-item"><div class="product-spec-name">Количество</div><div class="product-spec-value">' + (task.quantity || '—') + '</div></div>';
+            html += '<div class="product-spec-item"><div class="product-spec-name">Количество</div><div class="product-spec-value">' + (task.quantity ? Number(task.quantity).toFixed(3).replace(/\.?0+$/, '').replace('.', ',') : '—') + '</div></div>';
             var plannedDateDisplay = task.planned_date && task.planned_date !== '' ? task.planned_date : '—';
             html += '<div class="product-spec-item"><div class="product-spec-name">План. дата</div><div class="product-spec-value">' + plannedDateDisplay + '</div></div>';
             html += '<div class="product-spec-item"><div class="product-spec-name">Статус</div><div class="product-spec-value">' + (task.status || '—') + '</div></div>';

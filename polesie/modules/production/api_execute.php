@@ -9,8 +9,8 @@ require_once __DIR__ . '/../../config/config.php';
 require_once __DIR__ . '/../../includes/auth.php';
 
 // Проверяем, это API запрос или обычная страница
-$isApiRequest = isset($_SERVER['HTTP_X_REQUESTED_WITH']) && 
-                strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest' ||
+$isApiRequest = (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && 
+                strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest') ||
                 isset($_POST['action']) ||
                 (isset($_GET['api']) && $_GET['api'] == '1');
 

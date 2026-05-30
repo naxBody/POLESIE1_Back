@@ -708,3 +708,4 @@ if (isset($pdo) && $_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['task_id'
         exit;
     }
 }
+}

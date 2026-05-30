@@ -117,12 +117,13 @@ if (isset($_GET['api_order_detail'])) {
     $stmt->execute([$orderId]);
     $tasks = $stmt->fetchAll();
     
-    // Материалы по заданиям (что хватает/не хватает)
+    // Материалы по заданиям (что хватает/не хватает) - с категориями как в паспортах
     foreach ($tasks as &$task) {
         $stmt = $pdo->prepare("
             SELECT ptm.id, ptm.task_id, ptm.material_id, ptm.quantity_required, ptm.quantity_used,
                    m.name_full as material_name, m.code as material_article, mu.symbol as unit_name,
                    COALESCE(m.current_stock, 0) as quantity_available,
+                   mc.name as material_category,
                    CASE 
                        WHEN COALESCE(m.current_stock, 0) >= ptm.quantity_required THEN 'sufficient'
                        ELSE 'insufficient'
@@ -130,7 +131,9 @@ if (isset($_GET['api_order_detail'])) {
             FROM production_tasks_materials ptm
             JOIN materials m ON ptm.material_id = m.id
             LEFT JOIN base_units mu ON m.base_unit_id = mu.id
+            LEFT JOIN material_categories mc ON m.category_id = mc.id
             WHERE ptm.task_id = ?
+            ORDER BY mc.name, m.name_full
         ");
         $stmt->execute([$task['id']]);
         $task['materials'] = $stmt->fetchAll();

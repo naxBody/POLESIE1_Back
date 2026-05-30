@@ -1,1 +1,27 @@
-Nothing should be ignored based on the provided file changes. The only modified file is 'polesie/modules/orders/list.php', which is a source code file and should not be added to .gitignore.
+```
+# Build artifacts
+dist/
+build/
+*.min.js
+*.bundle.js
+
+# Dependencies
+node_modules/
+
+# Logs and temp files
+*.log
+*.tmp
+
+# Environment
+.env
+.env.local
+*.env.*
+
+# Editors
+.vscode/
+.idea/
+
+# OS generated files
+.DS_Store
+Thumbs.db
+```

@@ -1404,8 +1404,8 @@ $categories = $pdo->query($catQuery)->fetchAll();
                 console.error('ID материала не указан');
                 return;
             }
-            // Переход на страницу склада с открытием модального окна материала
-            window.open('../warehouse/materials.php?material=' + materialId, '_blank');
+            // Переход на страницу склада с параметром для автооткрытия карточки
+            window.location.href = '../warehouse/materials.php?material=' + materialId;
         }
         
         document.addEventListener('keydown', function(e) {

@@ -106,8 +106,6 @@ if ($isApiRequest) {
         // Завершение этапа производства
         $stageId = (int)($input['stage_id'] ?? 0);
         $taskId = (int)($input['task_id'] ?? 0);
-        $quantityPassed = floatval($input['quantity_passed'] ?? 0);
-        $quantityRejected = floatval($input['quantity_rejected'] ?? 0);
         
         if (!$stageId || !$taskId) {
             throw new Exception('Не указаны ID этапа или задания');
@@ -130,6 +128,10 @@ if ($isApiRequest) {
         if ($stage['status'] !== 'in_progress') {
             throw new Exception('Этап не находится в работе');
         }
+        
+        // Используем плановое количество как прошедшее, если не указано иное
+        $quantityPassed = isset($input['quantity_passed']) ? floatval($input['quantity_passed']) : floatval($stage['quantity_plan']);
+        $quantityRejected = isset($input['quantity_rejected']) ? floatval($input['quantity_rejected']) : 0;
         
         // Обновляем статус этапа
         $updateStmt = $pdo->prepare("

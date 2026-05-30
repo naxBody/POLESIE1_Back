@@ -962,28 +962,28 @@ foreach ($allTasks as &$task) {
         }
         
         function completeStage(stageId, taskId) {
-            const passed = prompt('Количество прошедших этот этап:', '');
-            if (passed === null) return;
-            
-            const rejected = prompt('Количество забракованных:', '0');
-            if (rejected === null) return;
-            
+            // Завершаем этап без запроса количества - используем плановое количество
             fetch('api_execute.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     action: 'complete_stage',
                     stage_id: stageId,
-                    task_id: taskId,
-                    quantity_passed: parseFloat(passed) || 0,
-                    quantity_rejected: parseFloat(rejected) || 0
+                    task_id: taskId
                 })
             })
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    showNotification('Этап завершен', 'success');
-                    setTimeout(() => location.reload(), 1000);
+                    if (data.task_completed) {
+                        // Все этапы завершены - открываем модальное окно завершения производства
+                        showNotification('Все этапы завершены! Укажите количество готовой продукции.', 'success');
+                        // Не перезагружаем сразу, даем пользователю ввести данные
+                        openProductionModal(taskId);
+                    } else {
+                        showNotification('Этап завершен. Переход к следующему этапу...', 'success');
+                        setTimeout(() => location.reload(), 1000);
+                    }
                 } else {
                     showNotification(data.error || 'Ошибка', 'error');
                 }
@@ -1097,8 +1097,8 @@ foreach ($allTasks as &$task) {
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    showNotification('Производство завершено', 'success');
-                    setTimeout(() => location.reload(), 1000);
+                    showNotification('Производство завершено. Продукция добавлена на склад.', 'success');
+                    setTimeout(() => location.reload(), 1500);
                 } else {
                     showNotification(data.error || 'Ошибка', 'error');
                 }

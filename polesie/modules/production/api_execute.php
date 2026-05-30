@@ -662,7 +662,6 @@ function reserveMaterialsForTask($pdo, $taskId) {
 }
 
 // Если это не API запрос, выходим - функции выше доступны для execute.php
-// $pdo и $user теперь доступны глобально для всех типов запросов
 if (!$isApiRequest) {
     return;
 }

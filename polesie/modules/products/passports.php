@@ -1269,10 +1269,10 @@ $categories = $pdo->query($catQuery)->fetchAll();
                         for (var j = 0; j < materialsByCategory[catName].length; j++) {
                             var mat = materialsByCategory[catName][j];
                             var globalIdx = i + j + 1;
-                            html += '<tr>';
+                            html += '<tr style="cursor: pointer;" onclick="openMaterialCard(' + mat.material_id + ')" title="Нажмите для просмотра карточки материала">';
                             html += '<td>' + (j + 1) + '</td>';
                             html += '<td><strong>' + escapeHtml(mat.material_name) + '</strong></td>';
-                            html += '<td><code>' + escapeHtml(mat.material_code) + '</code></td>';
+                            html += '<td><code style="background: #e3f2fd; color: #1976d2; padding: 4px 8px; border-radius: 4px; cursor: pointer;">' + escapeHtml(mat.material_code) + '</code></td>';
                             html += '<td>' + Number(mat.quantity).toFixed(2).replace('.', ',') + '</td>';
                             html += '<td>' + escapeHtml(mat.unit) + '</td>';
                             html += '</tr>';
@@ -1312,9 +1312,9 @@ $categories = $pdo->query($catQuery)->fetchAll();
                     var deviationSign = deviation > 0 ? '+' : '';
                     var tasksList = um.tasks.slice(0, 3).join(', ') + (um.tasks.length > 3 ? '...' : '');
                     
-                    html += '<tr>';
+                    html += '<tr style="cursor: pointer;" onclick="openMaterialCard(' + um.material_id + ')" title="Нажмите для просмотра карточки материала">';
                     html += '<td><strong>' + escapeHtml(um.material_name) + '</strong></td>';
-                    html += '<td><code>' + escapeHtml(um.material_code) + '</code></td>';
+                    html += '<td><code style="background: #e3f2fd; color: #1976d2; padding: 4px 8px; border-radius: 4px; cursor: pointer;">' + escapeHtml(um.material_code) + '</code></td>';
                     html += '<td>' + planQty + '</td>';
                     html += '<td style="font-weight: 600; color: #1976d2;">' + factQty + '</td>';
                     html += '<td style="' + deviationClass + '">' + deviationSign + deviation + '%</td>';
@@ -1396,6 +1396,16 @@ $categories = $pdo->query($catQuery)->fetchAll();
             var div = document.createElement('div');
             div.textContent = text;
             return div.innerHTML.replace(/\n/g, '<br>');
+        }
+        
+        // Функция открытия карточки материала на складе
+        function openMaterialCard(materialId) {
+            if (!materialId) {
+                console.error('ID материала не указан');
+                return;
+            }
+            // Переход на страницу склада с открытием модального окна материала
+            window.open('../warehouse/materials.php?material=' + materialId, '_blank');
         }
         
         document.addEventListener('keydown', function(e) {

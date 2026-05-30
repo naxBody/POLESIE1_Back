@@ -740,6 +740,7 @@ foreach ($allTasks as &$task) {
             padding: 24px;
             opacity: 1;
             pointer-events: auto;
+            min-height: 500px;
         }
         
         .work-area.loading {
@@ -753,18 +754,20 @@ foreach ($allTasks as &$task) {
             align-items: center;
             margin-bottom: 24px;
             padding-bottom: 20px;
-            border-bottom: 1px solid var(--border-color);
+            border-bottom: 2px solid var(--border-color);
         }
         
         .work-area-title h3 {
-            font-size: 20px;
-            font-weight: 600;
-            margin-bottom: 4px;
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 6px;
+            color: var(--text-primary);
         }
         
         .work-area-subtitle {
             font-size: 14px;
             color: var(--text-secondary);
+            line-height: 1.5;
         }
         
         .tabs-container {
@@ -778,11 +781,11 @@ foreach ($allTasks as &$task) {
         }
         
         .tab-button {
-            padding: 12px 20px;
+            padding: 14px 24px;
             background: transparent;
             border: none;
             font-size: 14px;
-            font-weight: 500;
+            font-weight: 600;
             color: var(--text-secondary);
             cursor: pointer;
             position: relative;
@@ -790,16 +793,19 @@ foreach ($allTasks as &$task) {
             border-bottom: 2px solid transparent;
             margin-bottom: -2px;
             z-index: 1;
+            border-radius: 6px 6px 0 0;
         }
         
         .tab-button:hover {
             color: var(--primary-color);
+            background: rgba(37, 99, 235, 0.05);
             z-index: 2;
         }
         
         .tab-button.active {
             color: var(--primary-color);
             border-bottom-color: var(--primary-color);
+            background: rgba(37, 99, 235, 0.08);
             z-index: 2;
         }
         
@@ -816,8 +822,8 @@ foreach ($allTasks as &$task) {
         }
         
         @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         
         .stages-grid {
@@ -830,14 +836,16 @@ foreach ($allTasks as &$task) {
         .stage-card {
             background: var(--bg-secondary);
             border-radius: var(--border-radius);
-            padding: 16px;
+            padding: 20px 16px;
             border: 1px solid var(--border-color);
             transition: all var(--transition-fast);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
         }
         
         .stage-card:hover {
             border-color: var(--primary-color);
             box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
         }
         
         .stage-card.completed {
@@ -953,11 +961,42 @@ foreach ($allTasks as &$task) {
             text-align: center;
             padding: 60px 20px;
             color: var(--text-secondary);
+            min-height: 400px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
         }
         
         .empty-state-icon {
             font-size: 48px;
             margin-bottom: 16px;
+            opacity: 0.5;
+        }
+        
+        .empty-state h3 {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+        
+        .empty-state p {
+            font-size: 14px;
+            max-width: 400px;
+            line-height: 1.5;
+        }
+        
+        /* Стили для рабочей области когда задание не выбрано */
+        .work-area-empty {
+            background: var(--bg-primary);
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow);
+            padding: 24px;
+            min-height: 500px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         
         .btn-group {
@@ -1002,20 +1041,29 @@ foreach ($allTasks as &$task) {
         .stat-card {
             background: var(--bg-secondary);
             border-radius: var(--border-radius);
-            padding: 16px;
+            padding: 20px 16px;
             text-align: center;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+            transition: all var(--transition-fast);
+        }
+        
+        .stat-card:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
         }
         
         .stat-value {
-            font-size: 24px;
+            font-size: 28px;
             font-weight: 700;
             color: var(--primary-color);
         }
         
         .stat-label {
-            font-size: 12px;
+            font-size: 13px;
             color: var(--text-secondary);
-            margin-top: 4px;
+            margin-top: 6px;
+            font-weight: 500;
         }
     </style>
 </head>
@@ -1342,10 +1390,12 @@ foreach ($allTasks as &$task) {
                                 </div>
                                 
                             <?php else: ?>
-                                <div class="empty-state">
-                                    <div class="empty-state-icon">🎯</div>
-                                    <h3>Выберите задание</h3>
-                                    <p>Выберите производственное задание из списка слева для начала работы</p>
+                                <div class="work-area-empty">
+                                    <div class="empty-state">
+                                        <div class="empty-state-icon">🎯</div>
+                                        <h3>Выберите задание</h3>
+                                        <p>Выберите производственное задание из списка слева для начала работы</p>
+                                    </div>
                                 </div>
                             <?php endif; ?>
                         </div>

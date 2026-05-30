@@ -1292,7 +1292,7 @@ foreach ($allTasks as &$task) {
                         } else {
                             console.error('Элементы вкладок не найдены после загрузки контента');
                         }
-                    }, 50);
+                    }, 100);
                 }
             })
             .catch(error => {
@@ -1343,8 +1343,14 @@ foreach ($allTasks as &$task) {
         
         // Вызываем после загрузки DOM
         document.addEventListener('DOMContentLoaded', function() {
-            initTabs();
+            // Небольшая задержка для гарантии полной загрузки DOM
+            setTimeout(initTabs, 10);
         });
+        
+        // Также вызываем сразу при загрузке скрипта (для случаев, когда DOM уже готов)
+        if (document.readyState === 'complete' || document.readyState === 'interactive') {
+            setTimeout(initTabs, 10);
+        }
         
         function switchTab(tabName) {
             console.log('Переключение на вкладку:', tabName);

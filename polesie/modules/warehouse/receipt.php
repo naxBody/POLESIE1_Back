@@ -261,12 +261,32 @@ try {
         }
         .action-buttons {
             display: flex;
-            gap: 8px;
+            gap: 6px;
+            flex-wrap: wrap;
         }
         .loading {
             text-align: center;
             padding: 40px;
             color: #6b7280;
+        }
+        /* Tooltip для кнопок */
+        .action-buttons button {
+            position: relative;
+        }
+        .action-buttons button:hover::after {
+            content: attr(title);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1f2937;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            white-space: nowrap;
+            z-index: 100;
+            margin-bottom: 4px;
         }
     </style>
 </head>
@@ -474,10 +494,11 @@ try {
                             <td>${formatMoney(doc.total_amount)}</td>
                             <td><span class="status-badge status-${doc.status}">${getStatusName(doc.status)}</span></td>
                             <td class="action-buttons">
-                                <button class="btn btn-sm btn-secondary" onclick="viewDocument(${doc.id})">👁</button>
-                                ${doc.status === 'draft' ? `<button class="btn btn-sm btn-primary" onclick="editDocument(${doc.id})">✏</button>` : ''}
-                                ${doc.status === 'draft' ? `<button class="btn btn-sm btn-success" onclick="postDocumentById(${doc.id})">✓</button>` : ''}
-                                ${doc.status === 'posted' ? `<button class="btn btn-sm btn-danger" onclick="unpostDocument(${doc.id})">↩</button>` : ''}
+                                <button class="btn btn-sm btn-secondary" onclick="viewDocument(${doc.id})" title="Просмотр">👁</button>
+                                <button class="btn btn-sm btn-primary" onclick="printDocument(${doc.id})" title="Печать">🖨</button>
+                                ${doc.status === 'draft' ? `<button class="btn btn-sm btn-primary" onclick="editDocument(${doc.id})" title="Редактировать">✏</button>` : ''}
+                                ${doc.status === 'draft' ? `<button class="btn btn-sm btn-success" onclick="postDocumentById(${doc.id})" title="Провести">✓</button>` : ''}
+                                ${doc.status === 'posted' ? `<button class="btn btn-sm btn-danger" onclick="unpostDocument(${doc.id})" title="Отменить проведение">↩</button>` : ''}
                             </td>
                         </tr>
                     `).join('');
@@ -857,6 +878,11 @@ try {
                     alert('Ошибка: ' + data.error);
                 }
             });
+        }
+        
+        // Печать документа
+        function printDocument(id) {
+            window.open('print_receipt.php?id=' + id, '_blank', 'width=1200,height=800');
         }
         
         // Просмотр документа

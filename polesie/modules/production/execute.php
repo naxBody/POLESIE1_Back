@@ -607,8 +607,8 @@ foreach ($allTasks as &$task) {
         }
         
         .work-area.loading {
-            opacity: 0.5;
-            pointer-events: none;
+            opacity: 1;
+            pointer-events: auto;
         }
         
         .work-area-header {
@@ -1238,7 +1238,8 @@ foreach ($allTasks as &$task) {
             // Показываем индикатор загрузки
             const workArea = document.getElementById('workArea');
             if (workArea) {
-                workArea.classList.add('loading');
+                // Не добавляем класс loading, чтобы не затемнять блок
+                // workArea.classList.add('loading');
             }
             
             // Загружаем данные задачи через AJAX
@@ -1255,13 +1256,8 @@ foreach ($allTasks as &$task) {
                 const newWorkAreaContent = doc.querySelector('#work-area-content');
                 
                 if (newWorkAreaContent && workArea) {
-                    // Обновляем содержимое work-area-content внутри workArea
-                    const workAreaContent = workArea.querySelector('#work-area-content');
-                    if (workAreaContent) {
-                        workAreaContent.innerHTML = newWorkAreaContent.innerHTML;
-                    } else {
-                        workArea.innerHTML = newWorkAreaContent.innerHTML;
-                    }
+                    // Полностью заменяем содержимое workArea
+                    workArea.innerHTML = newWorkAreaContent.innerHTML;
                     
                     // Обновляем URL без перезагрузки
                     const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + '?task=' + taskId;
@@ -1269,11 +1265,11 @@ foreach ($allTasks as &$task) {
                     
                     currentTaskId = taskId;
                     
-                    // Восстанавливаем прозрачность
-                    workArea.classList.remove('loading');
-                    
-                    // Инициализируем вкладки и другие скрипты если нужно
+                    // Инициализируем вкладки заново
                     initTabs();
+                    
+                    // Активируем первую вкладку по умолчанию
+                    switchTab('stages');
                 }
             })
             .catch(error => {
@@ -1285,16 +1281,9 @@ foreach ($allTasks as &$task) {
         
         // Инициализация вкладок
         function initTabs() {
-            // Удаляем старые обработчики событий клонированием элементов
+            // Добавляем обработчики событий на кнопки вкладок
             const tabButtons = document.querySelectorAll('.tab-button');
             tabButtons.forEach(btn => {
-                const newBtn = btn.cloneNode(true);
-                btn.parentNode.replaceChild(newBtn, btn);
-            });
-            
-            // Добавляем новые обработчики событий
-            const newTabButtons = document.querySelectorAll('.tab-button');
-            newTabButtons.forEach(btn => {
                 btn.addEventListener('click', function() {
                     const tabName = this.getAttribute('data-tab');
                     if (tabName) {
@@ -1302,12 +1291,6 @@ foreach ($allTasks as &$task) {
                     }
                 });
             });
-            
-            // Активируем первую вкладку по умолчанию
-            const firstTabButton = document.querySelector('.tab-button.active');
-            if (!firstTabButton && newTabButtons.length > 0) {
-                switchTab('stages');
-            }
         }
         
         // Вызываем после загрузки DOM

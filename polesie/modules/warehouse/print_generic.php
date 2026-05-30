@@ -51,8 +51,8 @@ $stmt = $pdo->prepare("
         mi.total_price,
         mi.batch_number,
         mi.certificate_number,
-        m.name as material_name,
-        m.specification,
+        m.name_full as material_name,
+        m.specifications as specification,
         u.symbol as unit_symbol
     FROM material_receipt_items mi
     INNER JOIN materials m ON mi.material_id = m.id

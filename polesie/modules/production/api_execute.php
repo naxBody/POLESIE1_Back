@@ -666,3 +666,4 @@ function reserveMaterialsForTask($pdo, $taskId) {
 if (!$isApiRequest) {
     return;
 }
+}

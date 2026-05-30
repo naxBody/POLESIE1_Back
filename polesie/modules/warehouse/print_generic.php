@@ -8,7 +8,7 @@
 require_once __DIR__ . '/../../config/config.php';
 require_once __DIR__ . '/../../includes/auth.php';
 
-session_start();
+if (session_status() === PHP_SESSION_NONE) { session_start(); }
 
 if (!isLoggedIn()) {
     redirect(pageUrl('login.php'));
@@ -56,7 +56,7 @@ $stmt = $pdo->prepare("
         u.symbol as unit_symbol
     FROM material_receipt_items mi
     INNER JOIN materials m ON mi.material_id = m.id
-    INNER JOIN units u ON m.unit_id = u.id
+    INNER JOIN base_units u ON m.base_unit_id = u.id
     WHERE mi.document_id = ?
     ORDER BY mi.id
 ");

@@ -410,9 +410,7 @@ $pageTitle = 'Заказ №' . e($order['order_number']);
                                 </tbody>
                                 <tfoot style="background: #f8f9fa; font-weight: 600;">
                                     <tr>
-                                        <td colspan="4" style="text-align: right; padding: 12px;">Итого:</td>
-                                        <td style="text-align: right;"><?= number_format($totalQuantity, 0, ',', ' ') ?></td>
-                                        <td></td>
+                                        <td colspan="6" style="text-align: right; padding: 12px;">Итого:</td>
                                         <td style="text-align: right; color: var(--primary-color);"><?= formatMoney($totalAmount) ?></td>
                                     </tr>
                                 </tfoot>

@@ -8,6 +8,17 @@
 require_once __DIR__ . '/../../config/config.php';
 require_once __DIR__ . '/../../includes/auth.php';
 
+// Инициализируем сессию и БД для всех типов запросов
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+$pdo = getDbConnection();
+$user = null;
+if (isLoggedIn()) {
+    $user = getCurrentUser();
+}
+
 // Проверяем, это API запрос или обычная страница
 // Важно: не считаем API запросом AJAX-запросы к execute.php за контентом (они имеют ajax=1 но не action)
 $isApiRequest = (isset($_POST['action']) || (isset($_GET['api']) && $_GET['api'] == '1')) ||
@@ -16,10 +27,6 @@ $isApiRequest = (isset($_POST['action']) || (isset($_GET['api']) && $_GET['api']
                  !isset($_GET['ajax']));
 
 if ($isApiRequest) {
-    if (session_status() === PHP_SESSION_NONE) {
-        session_start();
-    }
-    
     header('Content-Type: application/json');
     
     if (!isLoggedIn()) {
@@ -27,9 +34,6 @@ if ($isApiRequest) {
         echo json_encode(['error' => 'Необходима авторизация']);
         exit;
     }
-    
-    $user = getCurrentUser();
-    $pdo = getDbConnection();
     
     try {
         $input = json_decode(file_get_contents('php://input'), true);
@@ -651,6 +655,7 @@ function reserveMaterialsForTask($pdo, $taskId) {
 }
 
 // Если это не API запрос, выходим - функции выше доступны для execute.php
+// $pdo и $user теперь доступны глобально для всех типов запросов
 if (!$isApiRequest) {
     return;
 }

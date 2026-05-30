@@ -69,83 +69,6 @@ $stmt = $pdo->prepare($itemsSql);
 $stmt->execute([$orderId]);
 $items = $stmt->fetchAll();
 
-// Получение материалов для каждого товара из паспортов
-$productMaterials = [];
-$totalMaterials = []; // Суммарно по заказу
-
-if (!empty($items)) {
-    $productIds = array_column($items, 'product_id');
-    $placeholders = implode(',', array_fill(0, count($productIds), '?'));
-    
-    $materialsSql = "
-        SELECT 
-            pp.product_id,
-            m.id as material_id,
-            m.name_full as material_name,
-            m.code as material_article,
-            ppm.quantity as quantity_per_unit,
-            COALESCE(m.current_stock, 0) as current_stock,
-            COALESCE(m.last_price, 0) as last_price,
-            m.base_unit_id,
-            bu.symbol as unit_name
-        FROM product_passport_materials ppm
-        JOIN product_passports pp ON ppm.passport_id = pp.id
-        JOIN materials m ON ppm.material_id = m.id
-        LEFT JOIN base_units bu ON m.base_unit_id = bu.id
-        WHERE pp.product_id IN ($placeholders)
-        ORDER BY pp.product_id, ppm.sort_order
-    ";
-    $stmtMaterials = $pdo->prepare($materialsSql);
-    $stmtMaterials->execute($productIds);
-    $materialsResult = $stmtMaterials->fetchAll();
-    
-    // Группируем материалы по продуктам
-    foreach ($materialsResult as $mat) {
-        $pid = (string)$mat['product_id'];
-        if (!isset($productMaterials[$pid])) {
-            $productMaterials[$pid] = [];
-        }
-        
-        // Находим количество товара в заказе
-        $orderQty = 0;
-        foreach ($items as $item) {
-            if ($item['product_id'] == $mat['product_id']) {
-                $orderQty = $item['quantity'];
-                break;
-            }
-        }
-        
-        $qtyPerUnit = (float)$mat['quantity_per_unit'];
-        $totalNeeded = $qtyPerUnit * $orderQty;
-        
-        $productMaterials[$pid][] = [
-            'material_id' => $mat['material_id'],
-            'material_name' => $mat['material_name'],
-            'material_article' => $mat['material_article'],
-            'quantity_per_unit' => $qtyPerUnit,
-            'total_needed' => $totalNeeded,
-            'current_stock' => (float)$mat['current_stock'],
-            'last_price' => (float)$mat['last_price'],
-            'unit_name' => $mat['unit_name'] ?? 'шт.'
-        ];
-        
-        // Суммируем по заказу
-        $mid = (string)$mat['material_id'];
-        if (!isset($totalMaterials[$mid])) {
-            $totalMaterials[$mid] = [
-                'material_id' => $mat['material_id'],
-                'material_name' => $mat['material_name'],
-                'material_article' => $mat['material_article'],
-                'total_needed' => 0,
-                'current_stock' => (float)$mat['current_stock'],
-                'last_price' => (float)$mat['last_price'],
-                'unit_name' => $mat['unit_name'] ?? 'шт.'
-            ];
-        }
-        $totalMaterials[$mid]['total_needed'] += $totalNeeded;
-    }
-}
-
 // Получение производственных заданий по заказу
 $tasksSql = "
     SELECT pt.*, 
@@ -427,89 +350,13 @@ $pageTitle = 'Заказ №' . e($order['order_number']);
                     </div>
                 </div>
                 
-                <!-- Список товаров заказа -->
+                <!-- Товары заказа -->
                 <div class="card" style="margin-bottom: 24px;">
                     <div class="card-body" style="padding: 0;">
                         <h3 style="padding: 20px 20px 0; margin: 0;" class="section-title">
-                            📦 Товары в заказе
+                            📦 Товары заказа
                         </h3>
-                        <div style="padding: 20px;">
-                            <?php if (empty($items)): ?>
-                                <p style="text-align: center; color: var(--text-secondary); padding: 40px;">Позиции не найдены</p>
-                            <?php else: ?>
-                                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px;">
-                                    <?php foreach ($items as $index => $item): 
-                                        $productId = (string)$item['product_id'];
-                                        $hasPassport = !empty($productId);
-                                    ?>
-                                        <?php if ($hasPassport): ?>
-                                            <a href="<?= pageUrl('modules/products/passports.php?product=' . $productId) ?>" 
-                                               class="passport-card" 
-                                               style="text-decoration: none; color: inherit; display: block;">
-                                                <div class="passport-card-header">
-                                                    <div style="flex: 1;">
-                                                        <span class="passport-sku"><?= e($item['article'] ?? '—') ?></span>
-                                                        <div class="passport-title"><?= e($item['product_name']) ?></div>
-                                                    </div>
-                                                </div>
-                                                <div class="passport-card-body">
-                                                    <div class="card-info-row">
-                                                        <span style="font-size: 13px; color: var(--text-secondary);">Кол-во:</span>
-                                                        <strong><?= $item['quantity'] ?> <?= e($item['unit_name'] ?? 'шт.') ?></strong>
-                                                    </div>
-                                                    <div class="card-info-row">
-                                                        <span style="font-size: 13px; color: var(--text-secondary);">Цена:</span>
-                                                        <span><?= formatMoney($item['price']) ?></span>
-                                                    </div>
-                                                    <div class="card-info-row">
-                                                        <span style="font-size: 13px; color: var(--text-secondary);">Сумма:</span>
-                                                        <strong><?= formatMoney($item['total']) ?></strong>
-                                                    </div>
-                                                    <?php if (!empty($item['description'])): ?>
-                                                        <div style="font-size: 12px; color: var(--text-secondary); margin-top: 8px; line-height: 1.4;">
-                                                            <?= e($item['description']) ?>
-                                                        </div>
-                                                    <?php endif; ?>
-                                                </div>
-                                            </a>
-                                        <?php else: ?>
-                                            <div class="passport-card" style="opacity: 0.7;">
-                                                <div class="passport-card-header">
-                                                    <div style="flex: 1;">
-                                                        <span class="passport-sku" style="background: #95a5a6;"><?= e($item['article'] ?? '—') ?></span>
-                                                        <div class="passport-title"><?= e($item['product_name']) ?></div>
-                                                    </div>
-                                                </div>
-                                                <div class="passport-card-body">
-                                                    <div class="card-info-row">
-                                                        <span style="font-size: 13px; color: var(--text-secondary);">Кол-во:</span>
-                                                        <strong><?= $item['quantity'] ?> <?= e($item['unit_name'] ?? 'шт.') ?></strong>
-                                                    </div>
-                                                    <div class="card-info-row">
-                                                        <span style="font-size: 13px; color: var(--text-secondary);">Цена:</span>
-                                                        <span><?= formatMoney($item['price']) ?></span>
-                                                    </div>
-                                                    <div class="card-info-row">
-                                                        <span style="font-size: 13px; color: var(--text-secondary);">Сумма:</span>
-                                                        <strong><?= formatMoney($item['total']) ?></strong>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        <?php endif; ?>
-                                    <?php endforeach; ?>
-                                </div>
-                            <?php endif; ?>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Позиции заказа -->
-                <div class="card" style="margin-bottom: 24px;">
-                    <div class="card-body" style="padding: 0;">
                         <div class="table-responsive">
-                            <h3 style="padding: 20px 20px 0; margin: 0;" class="section-title">
-                                📋 Детализация позиций
-                            </h3>
                             <table class="table">
                                 <thead>
                                     <tr>
@@ -517,24 +364,37 @@ $pageTitle = 'Заказ №' . e($order['order_number']);
                                         <th>Артикул</th>
                                         <th>Наименование</th>
                                         <th>Ед. изм.</th>
-                                        <th>Кол-во</th>
-                                        <th>Цена</th>
-                                        <th>Сумма</th>
-                                        <th>Статус производства</th>
+                                        <th style="text-align: right;">Кол-во</th>
+                                        <th style="text-align: right;">Цена</th>
+                                        <th style="text-align: right;">Сумма</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <?php if (empty($items)): ?>
                                     <tr>
-                                        <td colspan="8" style="text-align: center; padding: 40px; color: var(--text-secondary);">
-                                            Позиции не найдены
+                                        <td colspan="7" style="text-align: center; padding: 40px; color: var(--text-secondary);">
+                                            Товары не найдены
                                         </td>
                                     </tr>
                                     <?php else: ?>
-                                        <?php foreach ($items as $index => $item): ?>
-                                        <tr>
+                                        <?php foreach ($items as $index => $item): 
+                                            $hasPassport = !empty($item['product_id']);
+                                        ?>
+                                        <tr style="<?= $hasPassport ? 'cursor: pointer;' : '' ?>" 
+                                            onclick="<?= $hasPassport ? "window.location.href='" . pageUrl('modules/products/passports.php?product=' . $item['product_id']) . "'" : '' ?>">
                                             <td><?= $index + 1 ?></td>
-                                            <td><?= e($item['article'] ?? '—') ?></td>
+                                            <td>
+                                                <?php if ($hasPassport): ?>
+                                                    <a href="<?= pageUrl('modules/products/passports.php?product=' . $item['product_id']) ?>" 
+                                                       style="color: var(--primary-color); text-decoration: none; font-weight: 600;"
+                                                       onmouseover="this.style.textDecoration='underline'" 
+                                                       onmouseout="this.style.textDecoration='none'">
+                                                        <?= e($item['article'] ?? '—') ?>
+                                                    </a>
+                                                <?php else: ?>
+                                                    <?= e($item['article'] ?? '—') ?>
+                                                <?php endif; ?>
+                                            </td>
                                             <td>
                                                 <strong><?= e($item['product_name']) ?></strong>
                                                 <?php if (!empty($item['description'])): ?>
@@ -542,111 +402,25 @@ $pageTitle = 'Заказ №' . e($order['order_number']);
                                                 <?php endif; ?>
                                             </td>
                                             <td><?= e($item['unit_name'] ?? 'шт.') ?></td>
-                                            <td><strong><?= $item['quantity'] ?></strong></td>
-                                            <td><?= formatMoney($item['price']) ?></td>
-                                            <td><strong><?= formatMoney($item['total']) ?></strong></td>
-                                            <td>
-                                                <?php
-                                                $prodStatus = $item['production_status'] ?? 'not_started';
-                                                $statusLabels = [
-                                                    'not_started' => ['Не начато', '#95a5a6'],
-                                                    'in_progress' => ['В работе', '#f39c12'],
-                                                    'completed' => ['Готово', '#27ae60'],
-                                                    'packed' => ['Упаковано', '#9b59b6']
-                                                ];
-                                                $labelData = $statusLabels[$prodStatus] ?? ['Нет данных', '#95a5a6'];
-                                                ?>
-                                                <span class="badge" style="background: <?= e($labelData[1]) ?>20; color: <?= e($labelData[1]) ?>">
-                                                    <?= e($labelData[0]) ?>
-                                                </span>
-                                            </td>
+                                            <td style="text-align: right;"><strong><?= $item['quantity'] ?></strong></td>
+                                            <td style="text-align: right;"><?= formatMoney($item['price']) ?></td>
+                                            <td style="text-align: right;"><strong><?= formatMoney($item['total']) ?></strong></td>
                                         </tr>
                                         <?php endforeach; ?>
                                     <?php endif; ?>
                                 </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Суммарные материалы по заказу -->
-                <?php if (!empty($totalMaterials)): ?>
-                <div class="card" style="margin-bottom: 24px;">
-                    <div class="card-body" style="padding: 0;">
-                        <h3 style="padding: 20px 20px 0; margin: 0;" class="section-title">
-                            📊 Суммарно материалов по заказу
-                        </h3>
-                        <div class="table-responsive">
-                            <table class="table">
-                                <thead>
-                                    <tr>
-                                        <th>№</th>
-                                        <th>Артикул</th>
-                                        <th>Наименование материала</th>
-                                        <th>Всего нужно</th>
-                                        <th>На складе</th>
-                                        <th>Не хватает</th>
-                                        <th style="text-align: right;">Цена</th>
-                                        <th style="text-align: right;">Сумма</th>
-                                        <th>Статус</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <?php 
-                                    $totalShortage = 0;
-                                    $totalEnough = 0;
-                                    $totalMaterialsCost = 0;
-                                    foreach ($totalMaterials as $index => $mat): 
-                                        $isEnough = $mat['current_stock'] >= $mat['total_needed'];
-                                        $shortage = max(0, $mat['total_needed'] - $mat['current_stock']);
-                                        $materialTotalCost = $mat['total_needed'] * $mat['last_price'];
-                                        $totalMaterialsCost += $materialTotalCost;
-                                        if ($isEnough) {
-                                            $totalEnough++;
-                                        } else {
-                                            $totalShortage += $shortage;
-                                        }
-                                    ?>
-                                    <tr>
-                                        <td><?= $index + 1 ?></td>
-                                        <td><?= e($mat['material_article'] ?? '—') ?></td>
-                                        <td>
-                                            <strong><?= e($mat['material_name']) ?></strong>
-                                        </td>
-                                        <td><strong><?= round($mat['total_needed'], 3) ?> <?= e($mat['unit_name']) ?></strong></td>
-                                        <td><?= $mat['current_stock'] ?> <?= e($mat['unit_name']) ?></td>
-                                        <td>
-                                            <?php if ($shortage > 0): ?>
-                                                <span style="color: #e74c3c; font-weight: 600;"><?= round($shortage, 3) ?> <?= e($mat['unit_name']) ?></span>
-                                            <?php else: ?>
-                                                <span style="color: var(--text-secondary);">—</span>
-                                            <?php endif; ?>
-                                        </td>
-                                        <td style="text-align: right;"><?= formatMoney($mat['last_price']) ?></td>
-                                        <td style="text-align: right;"><strong><?= formatMoney($materialTotalCost) ?></strong></td>
-                                        <td>
-                                            <?php if ($isEnough): ?>
-                                                <span class="badge" style="background: #27ae6020; color: #27ae60;">✓ Достаточно</span>
-                                            <?php else: ?>
-                                                <span class="badge" style="background: #e74c3c20; color: #e74c3c;">✗ Дефицит</span>
-                                            <?php endif; ?>
-                                        </td>
-                                    </tr>
-                                    <?php endforeach; ?>
-                                </tbody>
                                 <tfoot style="background: #f8f9fa; font-weight: 600;">
                                     <tr>
-                                        <td colspan="6" style="text-align: right; padding: 12px;">Итого:</td>
-                                        <td><?= count($totalMaterials) ?> материалов</td>
-                                        <td style="text-align: right; color: #2c3e50;"><?= formatMoney($totalMaterialsCost) ?></td>
+                                        <td colspan="4" style="text-align: right; padding: 12px;">Итого:</td>
+                                        <td style="text-align: right;"><?= $totalQuantity ?></td>
                                         <td></td>
+                                        <td style="text-align: right; color: var(--primary-color);"><?= formatMoney($totalAmount) ?></td>
                                     </tr>
                                 </tfoot>
                             </table>
                         </div>
                     </div>
                 </div>
-                <?php endif; ?>
                 
                 <!-- Производственные задания -->
                 <?php if (!empty($tasks)): ?>

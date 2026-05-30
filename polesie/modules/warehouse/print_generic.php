@@ -1,7 +1,7 @@
 <?php
 /**
- * Универсальный файл печати документов поступления материалов
- * Автоматически определяет тип документа и выбирает соответствующий шаблон
+ * Универсальный шаблон печати документов поступления материалов
+ * Для документов, не имеющих специального шаблона
  * ОАО "Полесьеэлектромаш"
  */
 
@@ -22,13 +22,16 @@ if (!isset($_GET['id'])) {
 
 $docId = (int)$_GET['id'];
 
-// Получаем данные документа для определения типа
+// Получаем данные документа
 $stmt = $pdo->prepare("
     SELECT 
         d.*,
-        dt.code as document_type_code
+        dt.code as document_type_code,
+        dt.name as document_type_name,
+        u.fio as created_by_name
     FROM material_receipt_documents d
     LEFT JOIN receipt_document_types dt ON d.document_type_id = dt.id
+    LEFT JOIN users u ON d.created_by = u.id
     WHERE d.id = ?
 ");
 $stmt->execute([$docId]);
@@ -38,37 +41,45 @@ if (!$document) {
     die("Документ не найден");
 }
 
-// Определяем тип документа и перенаправляем на соответствующий шаблон
-$docTypeCode = strtoupper($document['document_type_code'] ?? '');
+// Получаем материалы документа
+$stmt = $pdo->prepare("
+    SELECT 
+        mi.id,
+        mi.material_id,
+        mi.quantity,
+        mi.unit_price,
+        mi.total_price,
+        mi.batch_number,
+        mi.certificate_number,
+        m.name as material_name,
+        m.specification,
+        u.symbol as unit_symbol
+    FROM material_receipt_items mi
+    INNER JOIN materials m ON mi.material_id = m.id
+    INNER JOIN units u ON m.unit_id = u.id
+    WHERE mi.document_id = ?
+    ORDER BY mi.id
+");
+$stmt->execute([$docId]);
+$items = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-switch ($docTypeCode) {
-    case 'TTN':
-        // Товарно-транспортная накладная
-        include __DIR__ . '/print_ttn.php';
-        break;
-    
-    case 'INVOICE_COUNT':
-        // Счет-фактура
-        include __DIR__ . '/print_invoice.php';
-        break;
-    
-    case 'ACT':
-        // Акт приема-передачи
-        include __DIR__ . '/print_act.php';
-        break;
-    
-    case 'CERTIFICATE':
-    case 'QUALITY_PASSPORT':
-        // Сертификат или Паспорт качества
-        include __DIR__ . '/print_certificate.php';
-        break;
-    
-    default:
-        // По умолчанию используем универсальный шаблон (старый print_receipt.php)
-        // Но сначала переименуем текущий файл в print_generic.php
-        include __DIR__ . '/print_generic.php';
-        break;
-}
+// Считаем общую сумму
+$totalAmount = array_sum(array_column($items, 'total_price'));
+
+// Данные организации
+$companyName = "ОАО \"Полесьеэлектромаш\"";
+$companyAddress = "224000, г. Брест, ул. Промышленная, 1";
+$companyPhone = "+375 (162) 12-34-56";
+$companyEmail = "info@polesie.by";
+$companyUNP = "123456789";
+$companyOKPO = "12345678";
+
+// Определяем название документа
+$docTitle = $document['document_type_name'] ?? 'Документ поступления';
+$docSubtitle = '';
+$docDateDisplay = date('d.m.Y', strtotime($document['created_at']));
+
+?>
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -546,52 +557,47 @@ switch ($docTypeCode) {
                         <div class="signature-fio"><?= htmlspecialchars($document['created_by_name'] ?? '_______________') ?></div>
                     </div>
                 </div>
-            </div>
-            
-            <div class="signature-row">
-                <div class="signature-block">
+                
+                <div class="signature-block" style="margin-left: 30px;">
                     <div class="signature-role">Принял:</div>
                     <div class="signature-line">
                         <div class="signature-position">(должность)</div>
                         <div class="signature-space"></div>
-                        <div class="signature-fio">_______________</div>
+                        <div class="signature-fio">(подпись)</div>
                     </div>
                 </div>
             </div>
             
-            <?php if ($document['posted_by_name']): ?>
             <div class="signature-row">
                 <div class="signature-block">
                     <div class="signature-role">Провел:</div>
                     <div class="signature-line">
-                        <div class="signature-position">Ответственное лицо</div>
+                        <div class="signature-position">Главный бухгалтер</div>
                         <div class="signature-space"></div>
-                        <div class="signature-fio"><?= htmlspecialchars($document['posted_by_name']) ?></div>
+                        <div class="signature-fio"><?= htmlspecialchars($document['created_by_name'] ?? '_______________') ?></div>
                     </div>
                 </div>
             </div>
-            <?php endif; ?>
         </div>
         
-        <!-- Печать и дополнительная информация -->
+        <!-- Печать -->
         <div class="stamp-section">
-            <div class="notes-section">
-                <div class="notes-title">Примечание:</div>
-                <div class="notes-content"><?= htmlspecialchars($document['notes'] ?? 'Материалы получены в полном объеме, претензий нет.') ?></div>
-            </div>
-            
-            <div class="stamp-placeholder">
-                М.П.<br>
-                (печать)
-            </div>
+            <div class="stamp-placeholder">М.П.</div>
         </div>
+        
+        <!-- Примечание -->
+        <?php if (!empty($document['notes'])): ?>
+        <div class="notes-section">
+            <div class="notes-title">Примечание:</div>
+            <div class="notes-content"><?= htmlspecialchars($document['notes']) ?></div>
+        </div>
+        <?php endif; ?>
         
         <!-- Футер -->
         <div class="document-footer">
-            Документ создан в системе учета материалов ОАО «Полесьеэлектромаш»<br>
-            Дата создания: <?= $createdDateDisplay ?> | 
-            Статус: <?= $document['status'] === 'posted' ? 'Проведен' : ($document['status'] === 'cancelled' ? 'Отменен' : 'Черновик') ?> |
-            Пользователь: <?= htmlspecialchars($document['created_by_name'] ?? '-') ?>
+            Документ создан: <?= date('d.m.Y H:i', strtotime($document['created_at'])) ?> | 
+            Статус: <?= $document['status'] == 1 ? 'Проведен' : 'Черновик' ?> | 
+            Пользователь: <?= htmlspecialchars($document['created_by_name'] ?? 'Неизвестно') ?>
         </div>
     </div>
 </body>

@@ -535,6 +535,8 @@ if ($isApiRequest) {
     exit;
 }
 
+}
+
 // Дополнительная обработка GET запросов для получения данных задания
 if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['task_id'])) {
     try {
@@ -665,3 +667,4 @@ function reserveMaterialsForTask($pdo, $taskId) {
 if (!$isApiRequest) {
     return;
 }
+

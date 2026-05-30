@@ -38,6 +38,7 @@ if ($isAjaxRequest && $selectedTaskId) {
                p.name as product_name, 
                p.article as product_article,
                p.id as product_id,
+               p.route_card_id,
                c.name as category_name, 
                u.symbol as unit_name,
                u2.full_name as responsible_name, 
@@ -93,6 +94,25 @@ if ($isAjaxRequest && $selectedTaskId) {
             // Повторно получаем этапы
             $stagesStmt->execute([$selectedTask['id']]);
             $selectedTask['stages'] = $stagesStmt->fetchAll();
+        } elseif (!empty($selectedTask['stages']) && count($selectedTask['stages']) === 1) {
+            // Если только один этап "Заготовка", проверяем маршрутную карту на наличие других операций
+            if (!empty($routeCardId)) {
+                $checkOpsStmt = $pdo->prepare("SELECT COUNT(*) as op_count FROM route_card_operations WHERE route_card_id = ?");
+                $checkOpsStmt->execute([$routeCardId]);
+                $opCount = $checkOpsStmt->fetch();
+                
+                if ($opCount && $opCount['op_count'] > 1) {
+                    // В маршрутной карте больше одной операции, но в задании только одна - пересоздаем этапы
+                    $deleteStmt = $pdo->prepare("DELETE FROM production_task_stages WHERE task_id = ?");
+                    $deleteStmt->execute([$selectedTask['id']]);
+                    
+                    createStagesForTask($pdo, $selectedTask['id'], $routeCardId);
+                    
+                    // Повторно получаем этапы
+                    $stagesStmt->execute([$selectedTask['id']]);
+                    $selectedTask['stages'] = $stagesStmt->fetchAll();
+                }
+            }
         }
         
         // Материалы для задания
@@ -130,6 +150,7 @@ if ($isAjaxRequest && $selectedTaskId) {
         
         // Рендерим только содержимое рабочей области (без полного HTML)
         ?>
+        <div id="work-area-content">
         <div class="work-area-header">
             <div class="work-area-title">
                 <h3><?= e($selectedTask['product_name']) ?></h3>
@@ -319,6 +340,7 @@ if ($isAjaxRequest && $selectedTaskId) {
                     </span>
                 </div>
             </div>
+        </div>
         </div>
         <?php
         exit;

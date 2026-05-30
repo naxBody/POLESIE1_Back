@@ -27,6 +27,12 @@ $sortOrder = $_GET['order'] ?? 'asc';
 $page = max(1, (int)($_GET['page'] ?? 1));
 $perPage = 24;
 
+// Проверка параметра product для прямого перехода к конкретному товару
+$productIdFilter = isset($_GET['product']) ? (int)$_GET['product'] : null;
+if ($productIdFilter) {
+    $pageTitle = 'Паспорт продукта';
+}
+
 // Построение основного запроса
 $query = "
     SELECT 
@@ -99,6 +105,12 @@ if ($serialFilter !== '') {
     } elseif ($serialFilter === 'no') {
         $query .= " AND pp.is_serial_tracked = FALSE";
     }
+}
+
+// Фильтр по конкретному продукту (при переходе из заказа)
+if ($productIdFilter) {
+    $query .= " AND p.id = :product_id";
+    $params[':product_id'] = $productIdFilter;
 }
 
 // Сортировка

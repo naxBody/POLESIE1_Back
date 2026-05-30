@@ -2014,39 +2014,34 @@ foreach ($allTasks as &$task) {
         function switchTab(tabName) {
             console.log('Переключение на вкладку:', tabName);
             
-            // Работаем только с вкладками внутри workArea
-            const allTabs = document.querySelectorAll('#workArea .tab-content');
-            console.log('Найдено вкладок:', allTabs.length);
-            
             // Проверяем что элемент существует по ID
             const targetTabContent = document.getElementById('tab-' + tabName);
             console.log('Целевой элемент tab-' + tabName + ':', targetTabContent ? 'найден' : 'не найден');
             
+            if (!targetTabContent) {
+                console.error('Не удалось найти элемент с id="tab-' + tabName + '"');
+                return;
+            }
+            
+            // Скрываем ВСЕ вкладки на странице используя класс tab-content
+            const allTabs = document.querySelectorAll('.tab-content');
             allTabs.forEach(tab => {
                 tab.classList.remove('active');
             });
             
-            const allButtons = document.querySelectorAll('#workArea .tab-button');
-            allButtons.forEach(btn => {
-                btn.classList.remove('active');
-            });
-            
-            // Показываем выбранную - используем getElementById для надежности
-            if (targetTabContent) {
-                targetTabContent.classList.add('active');
-                console.log('Вкладка tab-' + tabName + ' активирована');
-            } else {
-                console.error('Не удалось найти элемент с id="tab-' + tabName + '"');
-            }
-            
             // Находим кнопку которая соответствует этой вкладке и делаем её активной
-            const buttons = document.querySelectorAll('#workArea .tab-button');
+            const buttons = document.querySelectorAll('.tab-button');
             buttons.forEach(btn => {
+                btn.classList.remove('active');
                 const dataTab = btn.getAttribute('data-tab');
                 if (dataTab === tabName) {
                     btn.classList.add('active');
                 }
             });
+            
+            // Показываем выбранную вкладку
+            targetTabContent.classList.add('active');
+            console.log('Вкладка tab-' + tabName + ' активирована');
         }
         
         function startStage(stageId, taskId) {

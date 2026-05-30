@@ -773,16 +773,20 @@ foreach ($allTasks as &$task) {
             font-weight: 700;
             margin-bottom: 8px;
             color: var(--text-primary);
-            word-wrap: break-word;
-            overflow-wrap: break-word;
+            word-wrap: normal;
+            overflow-wrap: normal;
+            word-break: normal;
+            hyphens: none;
         }
         
         .work-area-subtitle {
             font-size: 15px;
             color: var(--text-secondary);
             line-height: 1.6;
-            word-wrap: break-word;
-            overflow-wrap: break-word;
+            word-wrap: normal;
+            overflow-wrap: normal;
+            word-break: normal;
+            hyphens: none;
         }
         
         .work-area-actions {
@@ -1134,8 +1138,10 @@ foreach ($allTasks as &$task) {
             font-weight: 700;
             color: var(--primary-color);
             line-height: 1.2;
-            word-wrap: break-word;
-            overflow-wrap: break-word;
+            word-wrap: normal;
+            overflow-wrap: normal;
+            word-break: normal;
+            hyphens: none;
         }
         
         .stat-label {

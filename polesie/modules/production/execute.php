@@ -737,10 +737,11 @@ foreach ($allTasks as &$task) {
             background: var(--bg-primary);
             border-radius: var(--border-radius-lg);
             box-shadow: var(--shadow);
-            padding: 24px;
+            padding: 28px;
             opacity: 1;
             pointer-events: auto;
-            min-height: 500px;
+            min-height: 650px;
+            transition: all var(--transition-base);
         }
         
         .work-area.loading {
@@ -752,28 +753,28 @@ foreach ($allTasks as &$task) {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 24px;
-            padding-bottom: 20px;
+            margin-bottom: 28px;
+            padding-bottom: 24px;
             border-bottom: 2px solid var(--border-color);
         }
         
         .work-area-title h3 {
-            font-size: 22px;
+            font-size: 24px;
             font-weight: 700;
-            margin-bottom: 6px;
+            margin-bottom: 8px;
             color: var(--text-primary);
         }
         
         .work-area-subtitle {
-            font-size: 14px;
+            font-size: 15px;
             color: var(--text-secondary);
-            line-height: 1.5;
+            line-height: 1.6;
         }
         
         .tabs-container {
             display: flex;
-            gap: 8px;
-            margin-bottom: 24px;
+            gap: 10px;
+            margin-bottom: 28px;
             border-bottom: 2px solid var(--border-color);
             padding-bottom: 0;
             position: relative;
@@ -781,10 +782,10 @@ foreach ($allTasks as &$task) {
         }
         
         .tab-button {
-            padding: 14px 24px;
+            padding: 16px 28px;
             background: transparent;
             border: none;
-            font-size: 14px;
+            font-size: 15px;
             font-weight: 600;
             color: var(--text-secondary);
             cursor: pointer;
@@ -798,20 +799,20 @@ foreach ($allTasks as &$task) {
         
         .tab-button:hover {
             color: var(--primary-color);
-            background: rgba(37, 99, 235, 0.05);
+            background: rgba(37, 99, 235, 0.06);
             z-index: 2;
         }
         
         .tab-button.active {
             color: var(--primary-color);
             border-bottom-color: var(--primary-color);
-            background: rgba(37, 99, 235, 0.08);
+            background: rgba(37, 99, 235, 0.1);
             z-index: 2;
         }
         
         .tab-content {
             display: none !important;
-            animation: fadeIn 0.2s ease-in-out;
+            animation: fadeIn 0.3s ease-in-out;
             position: relative;
             z-index: 0;
         }
@@ -822,30 +823,30 @@ foreach ($allTasks as &$task) {
         }
         
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(5px); }
+            from { opacity: 0; transform: translateY(8px); }
             to { opacity: 1; transform: translateY(0); }
         }
         
         .stages-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 16px;
-            margin-bottom: 24px;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 28px;
         }
         
         .stage-card {
             background: var(--bg-secondary);
             border-radius: var(--border-radius);
-            padding: 20px 16px;
+            padding: 24px 18px;
             border: 1px solid var(--border-color);
             transition: all var(--transition-fast);
-            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
         }
         
         .stage-card:hover {
             border-color: var(--primary-color);
             box-shadow: var(--shadow-md);
-            transform: translateY(-2px);
+            transform: translateY(-3px);
         }
         
         .stage-card.completed {
@@ -862,17 +863,17 @@ foreach ($allTasks as &$task) {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 12px;
+            margin-bottom: 14px;
         }
         
         .stage-name {
             font-weight: 600;
-            font-size: 14px;
+            font-size: 15px;
         }
         
         .stage-status {
-            font-size: 11px;
-            padding: 2px 8px;
+            font-size: 12px;
+            padding: 3px 10px;
             border-radius: 12px;
             font-weight: 500;
         }
@@ -992,11 +993,54 @@ foreach ($allTasks as &$task) {
             background: var(--bg-primary);
             border-radius: var(--border-radius-lg);
             box-shadow: var(--shadow);
-            padding: 24px;
-            min-height: 500px;
+            padding: 40px;
+            min-height: 600px;
             display: flex;
             align-items: center;
             justify-content: center;
+        }
+        
+        .work-area-empty .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-secondary);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        
+        .work-area-empty .empty-state-icon {
+            font-size: 72px;
+            margin-bottom: 24px;
+            opacity: 0.6;
+            filter: grayscale(0.2);
+        }
+        
+        .work-area-empty .empty-state h3 {
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 14px;
+        }
+        
+        .work-area-empty .empty-state p {
+            font-size: 16px;
+            max-width: 500px;
+            line-height: 1.7;
+            color: var(--text-secondary);
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(15px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
         
         .btn-group {
@@ -1034,36 +1078,40 @@ foreach ($allTasks as &$task) {
         .stats-row {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 16px;
-            margin-bottom: 24px;
+            gap: 20px;
+            margin-bottom: 28px;
         }
         
         .stat-card {
             background: var(--bg-secondary);
             border-radius: var(--border-radius);
-            padding: 20px 16px;
+            padding: 24px 18px;
             text-align: center;
             border: 1px solid var(--border-color);
-            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
             transition: all var(--transition-fast);
         }
         
         .stat-card:hover {
             box-shadow: var(--shadow-md);
-            transform: translateY(-2px);
+            transform: translateY(-3px);
+            border-color: var(--primary-color);
         }
         
         .stat-value {
-            font-size: 28px;
+            font-size: 32px;
             font-weight: 700;
             color: var(--primary-color);
+            line-height: 1.2;
         }
         
         .stat-label {
-            font-size: 13px;
+            font-size: 14px;
             color: var(--text-secondary);
-            margin-top: 6px;
+            margin-top: 8px;
             font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
     </style>
 </head>
@@ -1392,9 +1440,9 @@ foreach ($allTasks as &$task) {
                             <?php else: ?>
                                 <div class="work-area-empty">
                                     <div class="empty-state">
-                                        <div class="empty-state-icon">🎯</div>
-                                        <h3>Выберите задание</h3>
-                                        <p>Выберите производственное задание из списка слева для начала работы</p>
+                                        <div class="empty-state-icon">📋</div>
+                                        <h3>Выберите производственное задание</h3>
+                                        <p>Для начала работы выберите задание из списка слева — здесь отобразится информация о продукте, этапах производства, материалах и серийных номерах</p>
                                     </div>
                                 </div>
                             <?php endif; ?>

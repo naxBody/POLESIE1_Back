@@ -635,7 +635,7 @@ foreach ($allTasks as &$task) {
         /* Специфичные стили для страницы исполнения */
         .production-dashboard {
             display: grid;
-            grid-template-columns: 300px 350px 1fr;
+            grid-template-columns: 300px 350px minmax(0, 1fr);
             gap: 24px;
             margin-bottom: 24px;
         }
@@ -742,6 +742,9 @@ foreach ($allTasks as &$task) {
             pointer-events: auto;
             min-height: 650px;
             transition: all var(--transition-base);
+            width: 100%;
+            box-sizing: border-box;
+            overflow-x: auto;
         }
         
         .work-area.loading {
@@ -756,6 +759,13 @@ foreach ($allTasks as &$task) {
             margin-bottom: 28px;
             padding-bottom: 24px;
             border-bottom: 2px solid var(--border-color);
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+        
+        .work-area-title {
+            flex: 1;
+            min-width: 0;
         }
         
         .work-area-title h3 {
@@ -763,12 +773,20 @@ foreach ($allTasks as &$task) {
             font-weight: 700;
             margin-bottom: 8px;
             color: var(--text-primary);
+            word-wrap: break-word;
+            overflow-wrap: break-word;
         }
         
         .work-area-subtitle {
             font-size: 15px;
             color: var(--text-secondary);
             line-height: 1.6;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+        
+        .work-area-actions {
+            flex-shrink: 0;
         }
         
         .tabs-container {
@@ -779,10 +797,11 @@ foreach ($allTasks as &$task) {
             padding-bottom: 0;
             position: relative;
             z-index: 10;
+            flex-wrap: wrap;
         }
         
         .tab-button {
-            padding: 16px 28px;
+            padding: 16px 24px;
             background: transparent;
             border: none;
             font-size: 15px;
@@ -795,6 +814,7 @@ foreach ($allTasks as &$task) {
             margin-bottom: -2px;
             z-index: 1;
             border-radius: 6px 6px 0 0;
+            white-space: nowrap;
         }
         
         .tab-button:hover {
@@ -815,6 +835,8 @@ foreach ($allTasks as &$task) {
             animation: fadeIn 0.3s ease-in-out;
             position: relative;
             z-index: 0;
+            width: 100%;
+            box-sizing: border-box;
         }
         
         .tab-content.active {
@@ -829,9 +851,11 @@ foreach ($allTasks as &$task) {
         
         .stages-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 20px;
-            margin-bottom: 28px;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+            width: 100%;
+            box-sizing: border-box;
         }
         
         .stage-card {
@@ -994,10 +1018,12 @@ foreach ($allTasks as &$task) {
             border-radius: var(--border-radius-lg);
             box-shadow: var(--shadow);
             padding: 40px;
-            min-height: 600px;
+            min-height: 650px;
             display: flex;
             align-items: center;
             justify-content: center;
+            width: 100%;
+            box-sizing: border-box;
         }
         
         .work-area-empty .empty-state {
@@ -1009,6 +1035,7 @@ foreach ($allTasks as &$task) {
             justify-content: center;
             align-items: center;
             animation: fadeIn 0.3s ease-in-out;
+            width: 100%;
         }
         
         .work-area-empty .empty-state-icon {
@@ -1077,19 +1104,23 @@ foreach ($allTasks as &$task) {
         
         .stats-row {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 20px;
-            margin-bottom: 28px;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+            width: 100%;
+            box-sizing: border-box;
         }
         
         .stat-card {
             background: var(--bg-secondary);
             border-radius: var(--border-radius);
-            padding: 24px 18px;
+            padding: 20px 16px;
             text-align: center;
             border: 1px solid var(--border-color);
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
             transition: all var(--transition-fast);
+            min-width: 0;
+            box-sizing: border-box;
         }
         
         .stat-card:hover {
@@ -1099,19 +1130,22 @@ foreach ($allTasks as &$task) {
         }
         
         .stat-value {
-            font-size: 32px;
+            font-size: 28px;
             font-weight: 700;
             color: var(--primary-color);
             line-height: 1.2;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
         }
         
         .stat-label {
-            font-size: 14px;
+            font-size: 13px;
             color: var(--text-secondary);
             margin-top: 8px;
             font-weight: 500;
             text-transform: uppercase;
             letter-spacing: 0.5px;
+            white-space: nowrap;
         }
     </style>
 </head>

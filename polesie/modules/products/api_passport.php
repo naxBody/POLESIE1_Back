@@ -55,6 +55,7 @@ try {
     // Получение материалов для паспорта
     $matStmt = $pdo->prepare("
         SELECT 
+            m.id as material_id,
             ppm.quantity,
             bu.name as unit,
             m.code as material_code,

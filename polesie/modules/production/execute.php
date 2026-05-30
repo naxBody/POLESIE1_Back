@@ -1928,24 +1928,27 @@ foreach ($allTasks as &$task) {
                     // Инициализируем вкладки заново - даем DOM время на обновление
                     setTimeout(function() {
                         // Принудительно скрываем все вкладки перед инициализацией
-                        const allTabs = document.querySelectorAll('#workArea .tab-content');
-                        const allButtons = document.querySelectorAll('#workArea .tab-button');
-                        allTabs.forEach(tab => tab.classList.remove('active'));
+                        const allTabs = workArea.querySelectorAll('.tab-content');
+                        const allButtons = workArea.querySelectorAll('.tab-button');
+                        allTabs.forEach(tab => {
+                            tab.classList.remove('active');
+                            tab.style.display = 'none';
+                        });
                         allButtons.forEach(btn => btn.classList.remove('active'));
-                        
-                        initTabs();
-                        
-                        // Принудительно переключаем на первую вкладку после загрузки нового контента
-                        // Проверяем, что элементы существуют перед переключением
-                        const tabContent = document.getElementById('tab-stages');
-                        const tabButton = document.querySelector('#workArea .tab-button[data-tab="stages"]');
-                        if (tabContent && tabButton) {
-                            switchTab('stages');
-                            console.log('Вкладка "Этапы" активирована для задачи #' + taskId);
-                        } else {
-                            console.error('Элементы вкладок не найдены после загрузки контента');
+
+                        // Активируем первую вкладку (Этапы)
+                        const firstTabButton = workArea.querySelector('.tab-button[data-tab="stages"]');
+                        const firstTabContent = workArea.querySelector('#tab-stages');
+                        if (firstTabButton && firstTabContent) {
+                            firstTabButton.classList.add('active');
+                            firstTabContent.classList.add('active');
+                            firstTabContent.style.display = 'block';
                         }
-                    }, 100);
+
+                        initTabs();
+
+                        console.log('Вкладки инициализированы для задачи #' + taskId);
+                    }, 50);
                 }
             })
             .catch(error => {
@@ -2022,7 +2025,7 @@ foreach ($allTasks as &$task) {
             }
             
             // Проверяем что элемент существует по ID (ищем строго внутри workArea)
-            const targetTabContent = workArea.querySelector('#tab-' + tabName);
+            const targetTabContent = document.getElementById('tab-' + tabName);
             console.log('Целевой элемент tab-' + tabName + ':', targetTabContent ? 'найден' : 'не найден');
             
             if (!targetTabContent) {
@@ -2030,6 +2033,12 @@ foreach ($allTasks as &$task) {
                 return;
             }
             
+            // Проверяем что целевая вкладка находится внутри workArea
+            if (!workArea.contains(targetTabContent)) {
+                console.error('Вкладка tab-' + tabName + ' не находится внутри workArea');
+                return;
+            }
+
             // Скрываем ВСЕ вкладки только в рабочей области
             const allTabs = workArea.querySelectorAll('.tab-content');
             console.log('Найдено вкладок для скрытия:', allTabs.length);
@@ -2051,6 +2060,7 @@ foreach ($allTasks as &$task) {
             
             // Показываем выбранную вкладку
             targetTabContent.classList.add('active');
+            targetTabContent.style.display = 'block';
             console.log('Вкладка tab-' + tabName + ' активирована, классы:', targetTabContent.className);
         }
         

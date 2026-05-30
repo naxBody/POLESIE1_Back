@@ -64,19 +64,6 @@ if ($isAjaxRequest && $selectedTaskId) {
     $selectedTask = $stmt->fetch();
     
     if ($selectedTask) {
-        // Этапы выполнения
-        $stagesStmt = $pdo->prepare("
-            SELECT pts.id, pts.task_id, pts.stage_id, pts.status, pts.started_at, pts.completed_at,
-                   pts.worker_id, pts.time_spent_hours, pts.quantity_passed, pts.quantity_rejected, pts.notes,
-                   ps.name as stage_name, ps.code as stage_code, ps.color as stage_color, ps.sort_order
-            FROM production_task_stages pts
-            JOIN production_stages ps ON pts.stage_id = ps.id
-            WHERE pts.task_id = ?
-            ORDER BY ps.sort_order
-        ");
-        $stagesStmt->execute([$selectedTask['id']]);
-        $selectedTask['stages'] = $stagesStmt->fetchAll();
-        
         // Если этапы не найдены, но есть маршрутная карта у продукта, создаем их автоматически
         $routeCardId = $selectedTask['route_card_id'] ?? null;
         
@@ -89,32 +76,49 @@ if ($isAjaxRequest && $selectedTaskId) {
             }
         }
         
-        if (empty($selectedTask['stages']) && !empty($routeCardId)) {
-            createStagesForTask($pdo, $selectedTask['id'], $routeCardId);
+        // Сначала проверяем, нужно ли пересоздать этапы (если только один этап "Заготовка", но в маршрутной карте больше операций)
+        if (!empty($routeCardId)) {
+            $checkOpsStmt = $pdo->prepare("SELECT COUNT(*) as op_count FROM route_card_operations WHERE route_card_id = ?");
+            $checkOpsStmt->execute([$routeCardId]);
+            $opCount = $checkOpsStmt->fetch();
             
-            // Повторно получаем этапы
+            // Получаем текущие этапы для проверки
+            $stagesStmt = $pdo->prepare("
+                SELECT pts.id, pts.task_id, pts.stage_id, pts.status, pts.started_at, pts.completed_at,
+                       pts.worker_id, pts.time_spent_hours, pts.quantity_passed, pts.quantity_rejected, pts.notes,
+                       ps.name as stage_name, ps.code as stage_code, ps.color as stage_color, ps.sort_order
+                FROM production_task_stages pts
+                JOIN production_stages ps ON pts.stage_id = ps.id
+                WHERE pts.task_id = ?
+                ORDER BY ps.sort_order
+            ");
             $stagesStmt->execute([$selectedTask['id']]);
-            $selectedTask['stages'] = $stagesStmt->fetchAll();
-        } elseif (!empty($selectedTask['stages']) && count($selectedTask['stages']) === 1) {
-            // Если только один этап "Заготовка", проверяем маршрутную карту на наличие других операций
-            if (!empty($routeCardId)) {
-                $checkOpsStmt = $pdo->prepare("SELECT COUNT(*) as op_count FROM route_card_operations WHERE route_card_id = ?");
-                $checkOpsStmt->execute([$routeCardId]);
-                $opCount = $checkOpsStmt->fetch();
-                
-                if ($opCount && $opCount['op_count'] > 1) {
-                    // В маршрутной карте больше одной операции, но в задании только одна - пересоздаем этапы
+            $currentStages = $stagesStmt->fetchAll();
+            
+            // Если этапов нет или только один "Заготовка", но в маршрутной карте больше операций - пересоздаем
+            if (empty($currentStages) || (count($currentStages) === 1 && $opCount && $opCount['op_count'] > 1)) {
+                // Удаляем старые этапы если они есть
+                if (!empty($currentStages)) {
                     $deleteStmt = $pdo->prepare("DELETE FROM production_task_stages WHERE task_id = ?");
                     $deleteStmt->execute([$selectedTask['id']]);
-                    
-                    createStagesForTask($pdo, $selectedTask['id'], $routeCardId);
-                    
-                    // Повторно получаем этапы
-                    $stagesStmt->execute([$selectedTask['id']]);
-                    $selectedTask['stages'] = $stagesStmt->fetchAll();
                 }
+                
+                createStagesForTask($pdo, $selectedTask['id'], $routeCardId);
             }
         }
+        
+        // Этапы выполнения - получаем после возможного пересоздания
+        $stagesStmt = $pdo->prepare("
+            SELECT pts.id, pts.task_id, pts.stage_id, pts.status, pts.started_at, pts.completed_at,
+                   pts.worker_id, pts.time_spent_hours, pts.quantity_passed, pts.quantity_rejected, pts.notes,
+                   ps.name as stage_name, ps.code as stage_code, ps.color as stage_color, ps.sort_order
+            FROM production_task_stages pts
+            JOIN production_stages ps ON pts.stage_id = ps.id
+            WHERE pts.task_id = ?
+            ORDER BY ps.sort_order
+        ");
+        $stagesStmt->execute([$selectedTask['id']]);
+        $selectedTask['stages'] = $stagesStmt->fetchAll();
         
         // Материалы для задания
         $materialsStmt = $pdo->prepare("
@@ -604,11 +608,13 @@ foreach ($allTasks as &$task) {
             box-shadow: var(--shadow);
             padding: 24px;
             transition: opacity 0.3s ease;
+            opacity: 1;
+            pointer-events: auto;
         }
         
         .work-area.loading {
-            opacity: 1;
-            pointer-events: auto;
+            opacity: 0.5;
+            pointer-events: none;
         }
         
         .work-area-header {
@@ -1235,11 +1241,11 @@ foreach ($allTasks as &$task) {
                 activeItem.classList.add('active');
             }
             
-            // Показываем индикатор загрузки
+            // Показываем индикатор загрузки - убираем затемнение
             const workArea = document.getElementById('workArea');
             if (workArea) {
-                // Не добавляем класс loading, чтобы не затемнять блок
-                // workArea.classList.add('loading');
+                workArea.style.opacity = '0.5';
+                workArea.style.pointerEvents = 'none';
             }
             
             // Загружаем данные задачи через AJAX
@@ -1265,7 +1271,11 @@ foreach ($allTasks as &$task) {
                     
                     currentTaskId = taskId;
                     
-                    // Инициализируем вкладки заново
+                    // Возвращаем нормальное состояние блока
+                    workArea.style.opacity = '1';
+                    workArea.style.pointerEvents = 'auto';
+                    
+                    // Инициализируем вкладки заново - удаляем старые обработчики и добавляем новые
                     initTabs();
                     
                     // Активируем первую вкладку по умолчанию
@@ -1275,15 +1285,27 @@ foreach ($allTasks as &$task) {
             .catch(error => {
                 console.error('Ошибка загрузки задачи:', error);
                 // Если AJAX не сработал, делаем обычную перезагрузку
+                if (workArea) {
+                    workArea.style.opacity = '1';
+                    workArea.style.pointerEvents = 'auto';
+                }
                 window.location.href = '?task=' + taskId;
             });
         }
         
         // Инициализация вкладок
         function initTabs() {
-            // Добавляем обработчики событий на кнопки вкладок
+            // Удаляем все старые обработчики клонированием элементов
             const tabButtons = document.querySelectorAll('.tab-button');
             tabButtons.forEach(btn => {
+                // Клонируем кнопку, чтобы удалить старые обработчики
+                const newBtn = btn.cloneNode(true);
+                btn.parentNode.replaceChild(newBtn, btn);
+            });
+            
+            // Добавляем новые обработчики событий на кнопки вкладок
+            const newTabButtons = document.querySelectorAll('.tab-button');
+            newTabButtons.forEach(btn => {
                 btn.addEventListener('click', function() {
                     const tabName = this.getAttribute('data-tab');
                     if (tabName) {

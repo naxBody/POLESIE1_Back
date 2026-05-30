@@ -539,12 +539,15 @@ if (!$isApiRequest) {
  * Создание этапов для задания на основе маршрутной карты
  */
 function createStagesForTask($pdo, $taskId, $routeCardId) {
-    // Получаем операции из маршрутной карты
+    // Получаем операции из маршрутной карты с информацией об этапах
     $operationsStmt = $pdo->prepare("
-        SELECT rco.id as operation_id, rco.stage_id, rco.operation_number, rco.name
+        SELECT rco.id as operation_id, rco.stage_id, rco.operation_number, rco.name,
+               ps.name as stage_name, ps.code as stage_code, ps.color as stage_color, ps.sort_order as stage_sort,
+               rco.sort_order as operation_sort
         FROM route_card_operations rco
+        JOIN production_stages ps ON rco.stage_id = ps.id
         WHERE rco.route_card_id = ?
-        ORDER BY rco.operation_number
+        ORDER BY COALESCE(rco.sort_order, rco.operation_number)
     ");
     $operationsStmt->execute([$routeCardId]);
     $operations = $operationsStmt->fetchAll();

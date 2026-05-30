@@ -671,14 +671,14 @@ foreach ($allTasks as &$task) {
         }
         
         .tab-content {
-            display: none;
+            display: none !important;
             animation: fadeIn 0.2s ease-in-out;
             position: relative;
             z-index: 0;
         }
         
         .tab-content.active {
-            display: block;
+            display: block !important;
             z-index: 1;
         }
         

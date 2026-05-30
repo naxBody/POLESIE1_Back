@@ -24,13 +24,19 @@ if (isLoggedIn()) {
 $contentType = $_SERVER['CONTENT_TYPE'] ?? '';
 $isJsonRequest = strpos($contentType, 'application/json') !== false;
 
-$isApiRequest = isset($_POST['action']) || 
-                (isset($_GET['api']) && $_GET['api'] == '1') ||
-                (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && 
-                 strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest' &&
-                 !isset($_GET['ajax']) && 
-                 !isset($_GET['task'])) ||
-                $isJsonRequest;
+// Явно проверяем наличие action в JSON теле запроса
+$inputData = null;
+if ($isJsonRequest) {
+    $inputData = json_decode(file_get_contents('php://input'), true);
+    if ($inputData && isset($inputData['action'])) {
+        $isApiRequest = true;
+    } else {
+        $isApiRequest = false;
+    }
+} else {
+    $isApiRequest = isset($_POST['action']) || 
+                    (isset($_GET['api']) && $_GET['api'] == '1');
+}
 
 if ($isApiRequest) {
     header('Content-Type: application/json');
@@ -42,7 +48,7 @@ if ($isApiRequest) {
     }
     
     try {
-        $input = json_decode(file_get_contents('php://input'), true);
+        $input = $inputData ?? json_decode(file_get_contents('php://input'), true);
         $action = $input['action'] ?? ($_POST['action'] ?? '');
         
         if (!$action) {

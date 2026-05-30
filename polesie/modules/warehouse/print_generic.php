@@ -57,7 +57,7 @@ $stmt = $pdo->prepare("
     FROM material_receipt_items mi
     INNER JOIN materials m ON mi.material_id = m.id
     INNER JOIN base_units u ON m.base_unit_id = u.id
-    WHERE mi.document_id = ?
+    WHERE mi.receipt_document_id = ?
     ORDER BY mi.id
 ");
 $stmt->execute([$docId]);

@@ -512,12 +512,14 @@ try {
             loadFormData();
         }
         
-        // Загрузка данных формы (справочников)
+        // Загрузка данных формы (справочников) - возвращает Promise
         function loadFormData() {
-            // Если уже загружено, не загружаем повторно
-            if (formInitialized) return;
+            // Если уже загружено, возвращаем resolved promise
+            if (formInitialized) {
+                return Promise.resolve();
+            }
             
-            fetch('api_material_receipt.php?action=form_data')
+            return fetch('api_material_receipt.php?action=form_data')
                 .then(r => r.json())
                 .then(data => {
                     if (data.success) {
@@ -576,6 +578,7 @@ try {
                             supplierSelect.disabled = false;
                             supplierSelect.innerHTML = '<option value="">Ошибка загрузки</option>';
                         }
+                        throw new Error(data.error || 'Ошибка загрузки данных формы');
                     }
                 })
                 .catch(err => {
@@ -585,30 +588,44 @@ try {
                         supplierSelect.disabled = false;
                         supplierSelect.innerHTML = '<option value="">Ошибка загрузки</option>';
                     }
+                    throw err;
                 });
         }
         
         // Добавление строки материала
+        let materialsLoadingPromise = null;
+        
         function addMaterialRow(material = null) {
             // Проверяем, загружены ли данные формы
-            if (!formInitialized || !formData.materials || formData.materials.length === 0) {
-                // Если данные еще не загружены, загружаем их и ждем
-                if (!formInitialized) {
-                    loadFormData();
-                    // Ждем загрузки данных и повторяем попытку через 500мс
-                    setTimeout(() => {
-                        if (formInitialized && formData.materials && formData.materials.length > 0) {
-                            addMaterialRow(material);
-                        } else {
-                            alert('Справочник материалов пуст. Добавьте материалы в систему.');
-                        }
-                    }, 500);
-                } else {
-                    alert('Справочник материалов пуст. Добавьте материалы в систему.');
-                }
+            if (formInitialized && formData.materials && formData.materials.length > 0) {
+                // Данные уже загружены, добавляем материал
+                addMaterialRowInternal(material);
                 return;
             }
             
+            // Если данные еще не загружены, проверяем идет ли уже загрузка
+            if (!materialsLoadingPromise) {
+                // Запускаем загрузку данных
+                materialsLoadingPromise = loadFormData();
+            }
+            
+            // Ждем завершения загрузки и добавляем материал
+            materialsLoadingPromise.then(() => {
+                materialsLoadingPromise = null;
+                if (formInitialized && formData.materials && formData.materials.length > 0) {
+                    addMaterialRowInternal(material);
+                } else {
+                    alert('Справочник материалов пуст. Добавьте материалы в систему.');
+                }
+            }).catch(err => {
+                console.error('Ошибка загрузки данных:', err);
+                materialsLoadingPromise = null;
+                alert('Ошибка загрузки справочника материалов. Обновите страницу.');
+            });
+        }
+        
+        // Внутренняя функция добавления материала (вызывается после загрузки данных)
+        function addMaterialRowInternal(material = null) {
             currentItems.push({
                 material_id: material ? material.id : '',
                 material_name: material ? material.name_full : '',

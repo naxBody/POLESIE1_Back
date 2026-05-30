@@ -91,9 +91,12 @@ $materialsStmt = $pdo->prepare("
         ppm.quantity,
         ppm.unit,
         ppm.sort_order,
+        m.id as material_id,
         m.code as material_code,
         m.name_full as material_name,
         m.name_short as material_short,
+        m.description as material_description,
+        m.specifications as material_specifications,
         mc.name as material_category,
         m.material_type
     FROM product_passport_materials ppm
@@ -384,10 +387,80 @@ $isPrint = isset($_GET['print']);
         }
         .material-code {
             font-family: 'Courier New', monospace;
-            background: var(--bg-secondary);
-            padding: 2px 6px;
+            background: var(--primary-light);
+            color: var(--primary-color);
+            padding: 4px 8px;
             border-radius: 4px;
             font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-block;
+        }
+        .material-code:hover {
+            background: var(--primary-color);
+            color: white;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+        }
+        .material-name-link {
+            color: var(--primary-color);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+        .material-name-link:hover {
+            color: var(--primary-dark);
+            text-decoration: underline;
+        }
+        .material-card-item {
+            background: var(--bg-tertiary);
+            border-radius: var(--border-radius);
+            padding: 16px;
+            margin-bottom: 12px;
+            border-left: 3px solid var(--primary-color);
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        .material-card-item:hover {
+            background: var(--primary-light);
+            transform: translateX(4px);
+        }
+        .material-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+        .material-card-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+        .material-card-code {
+            font-family: 'Courier New', monospace;
+            background: var(--primary-light);
+            color: var(--primary-color);
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .material-card-specs {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 8px;
+            margin-top: 12px;
+        }
+        .material-spec-item {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+        .material-spec-label {
+            font-weight: 500;
+            color: var(--text-primary);
         }
         
         @media print {
@@ -683,30 +756,87 @@ $isPrint = isset($_GET['print']);
         <?php if (!empty($materials)): ?>
         <div class="passport-section">
             <div class="passport-section-title">📦 Материалы для производства (<?= count($materials) ?> поз.)</div>
-            <table class="materials-table">
-                <thead>
-                    <tr>
-                        <th style="width: 50px;">№</th>
-                        <th>Материал</th>
-                        <th>Код</th>
-                        <th style="width: 100px;">Количество</th>
-                        <th style="width: 80px;">Ед.</th>
-                        <th>Категория</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php foreach ($materials as $index => $material): ?>
-                    <tr>
-                        <td><?= $index + 1 ?></td>
-                        <td><strong><?= e($material['material_name']) ?></strong></td>
-                        <td><span class="material-code"><?= e($material['material_code']) ?></span></td>
-                        <td><?= number_format($material['quantity'], 3, ',', ' ') ?></td>
-                        <td><?= e($material['unit']) ?></td>
-                        <td><?= e($material['material_category'] ?? '—') ?></td>
-                    </tr>
-                    <?php endforeach; ?>
-                </tbody>
-            </table>
+            <div style="display: grid; gap: 12px;">
+                <?php foreach ($materials as $index => $material): 
+                    // Декодируем спецификации материала
+                    $materialSpecs = [];
+                    if (!empty($material['material_specifications'])) {
+                        $decodedSpecs = json_decode($material['material_specifications'], true);
+                        if (is_array($decodedSpecs)) {
+                            $materialSpecs = $decodedSpecs;
+                        }
+                    }
+                    
+                    // Основные характеристики для отображения
+                    $displaySpecLabels = [
+                        'grade' => 'Марка',
+                        'type' => 'Стандарт',
+                        'gost' => 'ГОСТ',
+                        'diameter_mm' => 'Диаметр',
+                        'length_m' => 'Длина',
+                        'thickness_mm' => 'Толщина',
+                        'width_mm' => 'Ширина',
+                        'strength_class' => 'Кл. прочности',
+                        'coating' => 'Покрытие',
+                        'material_type' => 'Тип'
+                    ];
+                ?>
+                <div class="material-card-item" onclick="openMaterialModal(<?= htmlspecialchars(json_encode([
+                    'id' => $material['material_id'],
+                    'code' => $material['material_code'],
+                    'name_full' => $material['material_name'],
+                    'name_short' => $material['material_short'] ?? '',
+                    'description' => $material['material_description'] ?? '',
+                    'specifications' => $materialSpecs,
+                    'category' => $material['material_category'] ?? '',
+                    'quantity' => $material['quantity'],
+                    'unit' => $material['unit']
+                ], JSON_UNESCAPED_UNICODE), ENT_QUOTES, 'UTF-8') ?>)">
+                    <div class="material-card-header">
+                        <div style="flex: 1;">
+                            <div class="material-card-title"><?= e($material['material_name']) ?></div>
+                            <div style="font-size: 13px; color: var(--text-secondary); margin-top: 4px;">
+                                <?= e($material['material_category'] ?? '') ?>
+                            </div>
+                        </div>
+                        <span class="material-card-code" title="Нажмите для просмотра информации о материале"><?= e($material['material_code']) ?></span>
+                    </div>
+                    
+                    <div style="display: flex; gap: 20px; align-items: center; margin-top: 12px; flex-wrap: wrap;">
+                        <div style="font-size: 13px; color: var(--text-secondary);">
+                            <span style="font-weight: 500; color: var(--text-primary);">Количество:</span> 
+                            <?= number_format($material['quantity'], 3, ',', ' ') ?> <?= e($material['unit']) ?>
+                        </div>
+                        
+                        <?php if (!empty($material['material_description'])): ?>
+                        <div style="font-size: 13px; color: var(--text-secondary); max-width: 400px;">
+                            <span style="font-weight: 500; color: var(--text-primary);">Описание:</span> 
+                            <?= e(mb_substr($material['material_description'], 0, 80)) ?><?= mb_strlen($material['material_description']) > 80 ? '...' : '' ?>
+                        </div>
+                        <?php endif; ?>
+                    </div>
+                    
+                    <?php if (!empty($materialSpecs)): ?>
+                    <div class="material-card-specs">
+                        <?php 
+                        $shownSpecs = 0;
+                        foreach ($displaySpecLabels as $key => $label): 
+                            if (isset($materialSpecs[$key]) && !empty($materialSpecs[$key]) && $shownSpecs < 4): 
+                                $shownSpecs++;
+                        ?>
+                        <div class="material-spec-item">
+                            <span class="material-spec-label"><?= e($label) ?>:</span>
+                            <span><?= e(is_array($materialSpecs[$key]) ? implode(', ', $materialSpecs[$key]) : $materialSpecs[$key]) ?></span>
+                        </div>
+                        <?php 
+                            endif;
+                        endforeach; 
+                        ?>
+                    </div>
+                    <?php endif; ?>
+                </div>
+                <?php endforeach; ?>
+            </div>
         </div>
         <?php else: ?>
         <div class="passport-section">

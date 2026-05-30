@@ -1,1 +1,1 @@
-Nothing should be ignored based on the provided file changes. The only modified file is 'polesie/modules/orders/view.php', which is a source code file and should not be added to .gitignore.
+Nothing needs to be added to the .gitignore file based on the provided file changes. The modified file 'polesie/modules/production/view_passport.php' is a PHP source code file that should not be ignored. No build artifacts, dependency directories, or temporary files were detected in the changes.

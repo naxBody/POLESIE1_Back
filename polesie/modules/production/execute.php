@@ -2014,6 +2014,13 @@ foreach ($allTasks as &$task) {
         function switchTab(tabName) {
             console.log('Переключение на вкладку:', tabName);
             
+            // Работаем только с элементами внутри #workArea
+            const workArea = document.getElementById('workArea');
+            if (!workArea) {
+                console.error('Рабочая область #workArea не найдена');
+                return;
+            }
+            
             // Проверяем что элемент существует по ID
             const targetTabContent = document.getElementById('tab-' + tabName);
             console.log('Целевой элемент tab-' + tabName + ':', targetTabContent ? 'найден' : 'не найден');
@@ -2023,14 +2030,14 @@ foreach ($allTasks as &$task) {
                 return;
             }
             
-            // Скрываем ВСЕ вкладки на странице используя класс tab-content
-            const allTabs = document.querySelectorAll('.tab-content');
+            // Скрываем ВСЕ вкладки только в рабочей области
+            const allTabs = workArea.querySelectorAll('.tab-content');
             allTabs.forEach(tab => {
                 tab.classList.remove('active');
             });
             
-            // Находим кнопку которая соответствует этой вкладке и делаем её активной
-            const buttons = document.querySelectorAll('.tab-button');
+            // Находим кнопку которая соответствует этой вкладке и делаем её активной (только в workArea)
+            const buttons = workArea.querySelectorAll('.tab-button');
             buttons.forEach(btn => {
                 btn.classList.remove('active');
                 const dataTab = btn.getAttribute('data-tab');

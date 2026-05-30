@@ -642,7 +642,7 @@ foreach ($allTasks as &$task) {
         
         /* Когда заказ не выбран - скрываем панель продуктов и расширяем рабочую область */
         .production-dashboard.no-order-selected {
-            grid-template-columns: 1fr;
+            grid-template-columns: 300px minmax(0, 1fr);
         }
         
         .production-dashboard.no-order-selected #productsPanel {
@@ -650,7 +650,7 @@ foreach ($allTasks as &$task) {
         }
         
         .production-dashboard.no-order-selected #workArea {
-            grid-column: 1 / -1;
+            grid-column: 2 / -1;
             width: 100%;
             max-width: 100%;
         }
@@ -1099,35 +1099,41 @@ foreach ($allTasks as &$task) {
             flex-direction: column;
             justify-content: center;
             align-items: center;
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto;
         }
         
         .empty-state-icon {
-            font-size: 48px;
-            margin-bottom: 16px;
-            opacity: 0.5;
+            font-size: 72px;
+            margin-bottom: 24px;
+            opacity: 0.6;
+            filter: grayscale(0.2);
         }
         
         .empty-state h3 {
-            font-size: 18px;
+            font-size: 22px;
             font-weight: 600;
             color: var(--text-primary);
-            margin-bottom: 8px;
+            margin-bottom: 12px;
             word-wrap: normal;
             overflow-wrap: normal;
             word-break: normal;
             hyphens: none;
             white-space: normal;
+            line-height: 1.3;
         }
         
         .empty-state p {
-            font-size: 14px;
-            max-width: 400px;
-            line-height: 1.5;
+            font-size: 15px;
+            max-width: 450px;
+            line-height: 1.6;
             word-wrap: normal;
             overflow-wrap: normal;
             word-break: normal;
             hyphens: none;
             white-space: normal;
+            color: var(--text-secondary);
         }
         
         /* Стили для рабочей области когда задание не выбрано */
@@ -1602,11 +1608,56 @@ foreach ($allTasks as &$task) {
                                 </div>
                                 
                             <?php else: ?>
-                                <div class="work-area-empty">
+                                <!-- Когда задание не выбрано - показываем красивое пустое состояние с вкладками -->
+                                <div class="work-area-header">
+                                    <div class="work-area-title">
+                                        <h3>Производственное задание не выбрано</h3>
+                                        <p class="work-area-subtitle">
+                                            Выберите задание из списка слева для просмотра информации
+                                        </p>
+                                    </div>
+                                </div>
+                                
+                                <div class="tabs-container">
+                                    <button class="tab-button active" data-tab="stages">Этапы</button>
+                                    <button class="tab-button" data-tab="materials">Материалы</button>
+                                    <button class="tab-button" data-tab="serial">Серийные номера</button>
+                                    <button class="tab-button" data-tab="info">Информация</button>
+                                </div>
+                                
+                                <!-- Пустое состояние для вкладки Этапы -->
+                                <div class="tab-content active" id="tab-stages" data-task-id="">
                                     <div class="empty-state">
                                         <div class="empty-state-icon">📋</div>
-                                        <h3>Выберите производственное задание</h3>
-                                        <p>Для начала работы выберите задание из списка слева — здесь отобразится информация о продукте, этапах производства, материалах и серийных номерах</p>
+                                        <h3>Этапы производства</h3>
+                                        <p>Выберите производственное задание из списка слева чтобы увидеть этапы производства</p>
+                                    </div>
+                                </div>
+                                
+                                <!-- Пустое состояние для вкладки Материалы -->
+                                <div class="tab-content" id="tab-materials" data-task-id="">
+                                    <div class="empty-state">
+                                        <div class="empty-state-icon">📦</div>
+                                        <h3>Материалы</h3>
+                                        <p>Выберите производственное задание из списка слева чтобы увидеть список необходимых материалов</p>
+                                    </div>
+                                </div>
+                                
+                                <!-- Пустое состояние для вкладки Серийные номера -->
+                                <div class="tab-content" id="tab-serial" data-task-id="">
+                                    <div class="empty-state">
+                                        <div class="empty-state-icon">🏷️</div>
+                                        <h3>Серийные номера</h3>
+                                        <p>Выберите производственное задание из списка слева чтобы управлять серийными номерами</p>
+                                    </div>
+                                </div>
+                                
+                                <!-- Пустое состояние для вкладки Информация -->
+                                <div class="tab-content" id="tab-info" data-task-id="">
+                                    <div class="empty-state">
+                                        <div class="empty-state-icon">ℹ️</div>
+                                        <h3>Информация о задании</h3>
+                                        <p>Выберите производственное задание из списка слева чтобы просмотреть подробную информацию</p>
                                     </div>
                                 </div>
                             <?php endif; ?>

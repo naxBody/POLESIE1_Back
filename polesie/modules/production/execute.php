@@ -229,19 +229,19 @@ if ($isAjaxRequest && $selectedTaskId) {
         
         <div class="stats-row">
             <div class="stat-card">
-                <div class="stat-value"><?= number_format((float)$selectedTask['quantity_plan'], 3, ',', ' ') ?></div>
+                <div class="stat-value"><?= number_format((float)$selectedTask['quantity_plan'], 0, '.', ' ') ?></div>
                 <div class="stat-label">План</div>
             </div>
             <div class="stat-card">
-                <div class="stat-value" style="color: var(--info-color);"><?= number_format((float)$selectedTask['quantity_fact'], 3, ',', ' ') ?></div>
+                <div class="stat-value" style="color: var(--info-color);"><?= number_format((float)$selectedTask['quantity_fact'], 0, '.', ' ') ?></div>
                 <div class="stat-label">Факт</div>
             </div>
             <div class="stat-card">
-                <div class="stat-value" style="color: var(--success-color);"><?= number_format((float)$selectedTask['quantity_good'], 3, ',', ' ') ?></div>
+                <div class="stat-value" style="color: var(--success-color);"><?= number_format((float)$selectedTask['quantity_good'], 0, '.', ' ') ?></div>
                 <div class="stat-label">Годные</div>
             </div>
             <div class="stat-card">
-                <div class="stat-value" style="color: var(--error-color);"><?= number_format((float)$selectedTask['quantity_defect'], 3, ',', ' ') ?></div>
+                <div class="stat-value" style="color: var(--error-color);"><?= number_format((float)$selectedTask['quantity_defect'], 0, '.', ' ') ?></div>
                 <div class="stat-label">Брак</div>
             </div>
         </div>
@@ -1140,19 +1140,19 @@ foreach ($allTasks as &$task) {
                                 
                                 <div class="stats-row">
                                     <div class="stat-card">
-                                        <div class="stat-value"><?= number_format((float)$selectedTask['quantity_plan'], 3, ',', ' ') ?></div>
+                                        <div class="stat-value"><?= number_format((float)$selectedTask['quantity_plan'], 0, '.', ' ') ?></div>
                                         <div class="stat-label">План</div>
                                     </div>
                                     <div class="stat-card">
-                                        <div class="stat-value" style="color: var(--info-color);"><?= number_format((float)$selectedTask['quantity_fact'], 3, ',', ' ') ?></div>
+                                        <div class="stat-value" style="color: var(--info-color);"><?= number_format((float)$selectedTask['quantity_fact'], 0, '.', ' ') ?></div>
                                         <div class="stat-label">Факт</div>
                                     </div>
                                     <div class="stat-card">
-                                        <div class="stat-value" style="color: var(--success-color);"><?= number_format((float)$selectedTask['quantity_good'], 3, ',', ' ') ?></div>
+                                        <div class="stat-value" style="color: var(--success-color);"><?= number_format((float)$selectedTask['quantity_good'], 0, '.', ' ') ?></div>
                                         <div class="stat-label">Годные</div>
                                     </div>
                                     <div class="stat-card">
-                                        <div class="stat-value" style="color: var(--danger-color);"><?= number_format((float)$selectedTask['quantity_defect'], 3, ',', ' ') ?></div>
+                                        <div class="stat-value" style="color: var(--danger-color);"><?= number_format((float)$selectedTask['quantity_defect'], 0, '.', ' ') ?></div>
                                         <div class="stat-label">Брак</div>
                                     </div>
                                 </div>

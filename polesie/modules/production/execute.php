@@ -39,7 +39,6 @@ if ($isAjaxRequest && $selectedTaskId) {
                p.name as product_name, 
                p.article as product_article,
                p.id as product_id,
-               p.route_card_id,
                c.name as category_name, 
                u.symbol as unit_name,
                u2.full_name as responsible_name, 
@@ -65,9 +64,10 @@ if ($isAjaxRequest && $selectedTaskId) {
     
     if ($selectedTask) {
         // Если этапы не найдены, но есть маршрутная карта у продукта, создаем их автоматически
-        $routeCardId = $selectedTask['route_card_id'] ?? null;
+        // Получаем route_card_id из таблицы products, если в production_tasks его нет
+        $routeCardId = null;
         
-        if (empty($routeCardId) && !empty($selectedTask['product_id'])) {
+        if (!empty($selectedTask['product_id'])) {
             $prodStmt = $pdo->prepare("SELECT rc.id FROM route_cards rc WHERE rc.product_id = ? AND rc.is_active = 1 ORDER BY rc.created_at DESC LIMIT 1");
             $prodStmt->execute([$selectedTask['product_id']]);
             $prodRoute = $prodStmt->fetch();
@@ -435,10 +435,11 @@ if ($selectedTask) {
     $selectedTask['stages'] = $stagesStmt->fetchAll();
     
     // Если этапы не найдены, но есть маршрутная карта у продукта, создаем их автоматически
-    $routeCardId = $selectedTask['route_card_id'] ?? null;
+    // Получаем route_card_id из таблицы products, если в production_tasks его нет
+    $routeCardId = null;
     
     // Если в задании нет route_card_id, пытаемся найти его через продукт
-    if (empty($routeCardId) && !empty($selectedTask['product_id'])) {
+    if (!empty($selectedTask['product_id'])) {
         $prodStmt = $pdo->prepare("SELECT rc.id FROM route_cards rc WHERE rc.product_id = ? AND rc.is_active = 1 ORDER BY rc.created_at DESC LIMIT 1");
         $prodStmt->execute([$selectedTask['product_id']]);
         $prodRoute = $prodStmt->fetch();

@@ -353,7 +353,7 @@ if ($isAjaxRequest && $selectedTaskId) {
     }
 }
 
-// Получение всех активных заданий с группировкой по заказам
+// Получение всех активных заданий с группировкой по заказам и товарам
 $sql = "SELECT pt.*, 
                o.order_number, 
                o.id as order_id,
@@ -373,7 +373,8 @@ $sql = "SELECT pt.*,
                pt.actual_start as actual_start,
                pt.actual_end as actual_end,
                oi.id as order_item_id,
-               oi.production_status as item_production_status
+               oi.production_status as item_production_status,
+               oi.quantity as order_item_quantity
         FROM production_tasks pt
         JOIN orders o ON pt.order_id = o.id
         LEFT JOIN order_items oi ON pt.order_item_id = oi.id
@@ -385,6 +386,7 @@ $sql = "SELECT pt.*,
         WHERE pt.status IN ('planned', 'in_progress')
         ORDER BY 
             o.order_number ASC,
+            p.name ASC,
             CASE pt.priority 
                 WHEN 'urgent' THEN 1 
                 WHEN 'high' THEN 2 
@@ -397,17 +399,33 @@ $stmt = $pdo->prepare($sql);
 $stmt->execute();
 $allTasks = $stmt->fetchAll();
 
-// Группировка заданий по заказам
+// Группировка заданий по заказам и товарам
 $ordersGrouped = [];
 foreach ($allTasks as $task) {
     $orderNumber = $task['order_number'];
+    $orderId = $task['order_id'];
+    
     if (!isset($ordersGrouped[$orderNumber])) {
         $ordersGrouped[$orderNumber] = [
             'order_number' => $orderNumber,
+            'order_id' => $orderId,
+            'products' => []
+        ];
+    }
+    
+    $productId = $task['product_id'];
+    if (!isset($ordersGrouped[$orderNumber]['products'][$productId])) {
+        $ordersGrouped[$orderNumber]['products'][$productId] = [
+            'product_id' => $productId,
+            'product_name' => $task['product_name'],
+            'product_article' => $task['product_article'],
+            'order_item_quantity' => $task['order_item_quantity'] ?? 0,
+            'unit_name' => $task['unit_name'],
             'tasks' => []
         ];
     }
-    $ordersGrouped[$orderNumber]['tasks'][] = $task;
+    
+    $ordersGrouped[$orderNumber]['products'][$productId]['tasks'][] = $task;
 }
 
 // Если выбрано задание, используем его, иначе первое задание из первого заказа
@@ -920,45 +938,76 @@ foreach ($allTasks as &$task) {
                             <div style="padding: 20px; border-bottom: 1px solid var(--border-color);">
                                 <h3 style="font-size: 16px; font-weight: 600;">Активные задания</h3>
                                 <p style="font-size: 13px; color: var(--text-secondary); margin-top: 4px;">
-                                    <?= count($tasks) ?> заданий в работе
+                                    <?= count($ordersGrouped) ?> заказов, <?= count($tasks) ?> заданий в работе
                                 </p>
                             </div>
                             
                             <div class="tasks-list">
-                                <?php if (empty($tasks)): ?>
+                                <?php if (empty($ordersGrouped)): ?>
                                     <div class="empty-state">
                                         <div class="empty-state-icon">📋</div>
                                         <h4>Нет активных заданий</h4>
                                         <p style="font-size: 13px;">Все задания выполнены или отсутствуют</p>
                                     </div>
                                 <?php else: ?>
-                                    <?php foreach ($tasks as $idx => $task): ?>
-                                        <div class="task-item <?= $selectedTask && $task['id'] == $selectedTask['id'] ? 'active' : '' ?>" 
-                                             data-task-id="<?= $task['id'] ?>"
-                                             onclick="selectTask(<?= $task['id'] ?>)">
-                                            <div class="task-item-header">
-                                                <span class="task-number">#<?= $task['id'] ?></span>
-                                                <span class="task-priority priority-<?= $task['priority'] ?>">
-                                                    <?= $task['priority'] === 'urgent' ? 'Срочно' : 
-                                                        ($task['priority'] === 'high' ? 'Высокий' : 
-                                                        ($task['priority'] === 'low' ? 'Низкий' : 'Нормальный')) ?>
-                                                </span>
+                                    <?php foreach ($ordersGrouped as $orderNumber => $orderData): ?>
+                                        <!-- Заказ -->
+                                        <div class="order-group" style="border-bottom: 2px solid var(--border-color);">
+                                            <div class="order-header" onclick="toggleOrderGroup('order-<?= e($orderNumber) ?>')" style="padding: 16px 20px; background: var(--gray-50); cursor: pointer; display: flex; justify-content: space-between; align-items: center;">
+                                                <div style="display: flex; align-items: center; gap: 12px;">
+                                                    <span style="font-size: 14px;" id="icon-order-<?= e($orderNumber) ?>">▼</span>
+                                                    <strong style="color: var(--primary-color);">Заказ <?= e($orderNumber) ?></strong>
+                                                    <span style="font-size: 12px; color: var(--text-secondary);"><?= count($orderData['products']) ?> товар(ов)</span>
+                                                </div>
+                                                <a href="<?= pageUrl('modules/orders/view.php?id=' . $orderData['order_id']) ?>" 
+                                                   style="font-size: 12px; color: var(--primary-color); text-decoration: underline;" 
+                                                   onclick="event.stopPropagation();">
+                                                    Открыть заказ →
+                                                </a>
                                             </div>
                                             
-                                            <div class="task-product-name"><?= e($task['product_name']) ?></div>
-                                            <div class="task-order-info">
-                                                Заказ: <a href="<?= pageUrl('modules/orders/view.php?id=' . $task['order_id']) ?>" style="color: var(--primary-color); text-decoration: underline;" onclick="event.stopPropagation();"><?= e($task['order_number']) ?></a> • 
-                                                План: <?= (int)$task['quantity_plan'] ?> <?= e($task['unit_name']) ?>
-                                            </div>
-                                            
-                                            <div class="task-progress">
-                                                <div style="display: flex; justify-content: space-between; font-size: 12px; color: var(--text-secondary);">
-                                                    <span>Прогресс</span>
-                                                    <span><?= $task['quantity_fact'] > 0 ? round(($task['quantity_fact'] / $task['quantity_plan']) * 100) : 0 ?>%</span>
-                                                </div>
-                                                <div class="progress-bar-container">
-                                                    <div class="progress-bar-fill" style="width: <?= $task['quantity_fact'] > 0 ? min(100, ($task['quantity_fact'] / $task['quantity_plan']) * 100) : 0 ?>%"></div>
-                                                </div>
+                                            <!-- Товары в заказе -->
+                                            <div id="order-<?= e($orderNumber) ?>" class="order-products" style="display: block;">
+                                                <?php foreach ($orderData['products'] as $productId => $productData): ?>
+                                                    <div class="product-group" style="border-bottom: 1px solid var(--border-color);">
+                                                        <div class="product-header" onclick="toggleProductGroup('product-<?= $orderNumber ?>-<?= $productId ?>')" style="padding: 12px 20px 12px 32px; background: #f9fafb; cursor: pointer; display: flex; justify-content: space-between; align-items: center;">
+                                                            <div style="display: flex; align-items: center; gap: 8px;">
+                                                                <span style="font-size: 12px;" id="icon-product-<?= $orderNumber ?>-<?= $productId ?>">▼</span>
+                                                                <span style="font-weight: 500;"><?= e($productData['product_name']) ?></span>
+                                                                <span style="font-size: 11px; color: var(--text-secondary);">(арт. <?= e($productData['product_article']) ?>)</span>
+                                                                <span style="font-size: 11px; color: var(--text-secondary);">• План: <?= number_format($productData['order_item_quantity'], 2) ?> <?= e($productData['unit_name']) ?></span>
+                                                            </div>
+                                                        </div>
+                                                        
+                                                        <!-- Задания для товара -->
+                                                        <div id="product-<?= $orderNumber ?>-<?= $productId ?>" class="product-tasks" style="display: block;">
+                                                            <?php foreach ($productData['tasks'] as $task): ?>
+                                                                <div class="task-item <?= $selectedTask && $task['id'] == $selectedTask['id'] ? 'active' : '' ?>" 
+                                                                     data-task-id="<?= $task['id'] ?>"
+                                                                     onclick="selectTask(<?= $task['id'] ?>)">
+                                                                    <div class="task-item-header">
+                                                                        <span class="task-number">#<?= $task['id'] ?></span>
+                                                                        <span class="task-priority priority-<?= $task['priority'] ?>">
+                                                                            <?= $task['priority'] === 'urgent' ? 'Срочно' : 
+                                                                                ($task['priority'] === 'high' ? 'Высокий' : 
+                                                                                ($task['priority'] === 'low' ? 'Низкий' : 'Нормальный')) ?>
+                                                                        </span>
+                                                                    </div>
+                                                                    
+                                                                    <div class="task-progress">
+                                                                        <div style="display: flex; justify-content: space-between; font-size: 12px; color: var(--text-secondary);">
+                                                                            <span>План: <?= (int)$task['quantity_plan'] ?> <?= e($task['unit_name']) ?></span>
+                                                                            <span><?= $task['quantity_fact'] > 0 ? round(($task['quantity_fact'] / $task['quantity_plan']) * 100) : 0 ?>%</span>
+                                                                        </div>
+                                                                        <div class="progress-bar-container">
+                                                                            <div class="progress-bar-fill" style="width: <?= $task['quantity_fact'] > 0 ? min(100, ($task['quantity_fact'] / $task['quantity_plan']) * 100) : 0 ?>%"></div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            <?php endforeach; ?>
+                                                        </div>
+                                                    </div>
+                                                <?php endforeach; ?>
                                             </div>
                                         </div>
                                     <?php endforeach; ?>
@@ -1246,6 +1295,36 @@ foreach ($allTasks as &$task) {
         let currentTaskId = <?= $selectedTask ? $selectedTask['id'] : 0 ?>;
         
         // Выбор задачи без перезагрузки страницы (через AJAX)
+        // Сворачивание/разворачивание группы заказа
+        function toggleOrderGroup(orderId) {
+            const group = document.getElementById(orderId);
+            const icon = document.getElementById('icon-' + orderId);
+            if (group && icon) {
+                if (group.style.display === 'none') {
+                    group.style.display = 'block';
+                    icon.textContent = '▼';
+                } else {
+                    group.style.display = 'none';
+                    icon.textContent = '▶';
+                }
+            }
+        }
+
+        // Сворачивание/разворачивание группы товара
+        function toggleProductGroup(productId) {
+            const group = document.getElementById(productId);
+            const icon = document.getElementById('icon-' + productId);
+            if (group && icon) {
+                if (group.style.display === 'none') {
+                    group.style.display = 'block';
+                    icon.textContent = '▼';
+                } else {
+                    group.style.display = 'none';
+                    icon.textContent = '▶';
+                }
+            }
+        }
+
         function selectTask(taskId) {
             if (taskId === currentTaskId) return;
             

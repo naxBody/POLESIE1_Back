@@ -2024,18 +2024,12 @@ foreach ($allTasks as &$task) {
                 return;
             }
             
-            // Проверяем что элемент существует по ID (ищем строго внутри workArea)
-            const targetTabContent = document.getElementById('tab-' + tabName);
+            // Ищем вкладку строго внутри workArea с помощью querySelector
+            const targetTabContent = workArea.querySelector('#tab-' + tabName);
             console.log('Целевой элемент tab-' + tabName + ':', targetTabContent ? 'найден' : 'не найден');
             
             if (!targetTabContent) {
                 console.error('Не удалось найти элемент с id="tab-' + tabName + '" в workArea');
-                return;
-            }
-            
-            // Проверяем что целевая вкладка находится внутри workArea
-            if (!workArea.contains(targetTabContent)) {
-                console.error('Вкладка tab-' + tabName + ' не находится внутри workArea');
                 return;
             }
 

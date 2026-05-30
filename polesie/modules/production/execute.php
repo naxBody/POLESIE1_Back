@@ -640,6 +640,8 @@ foreach ($allTasks as &$task) {
             margin-bottom: 24px;
             border-bottom: 2px solid var(--border-color);
             padding-bottom: 0;
+            position: relative;
+            z-index: 10;
         }
         
         .tab-button {
@@ -654,24 +656,30 @@ foreach ($allTasks as &$task) {
             transition: all var(--transition-fast);
             border-bottom: 2px solid transparent;
             margin-bottom: -2px;
+            z-index: 1;
         }
         
         .tab-button:hover {
             color: var(--primary-color);
+            z-index: 2;
         }
         
         .tab-button.active {
             color: var(--primary-color);
             border-bottom-color: var(--primary-color);
+            z-index: 2;
         }
         
         .tab-content {
             display: none;
             animation: fadeIn 0.2s ease-in-out;
+            position: relative;
+            z-index: 0;
         }
         
         .tab-content.active {
             display: block;
+            z-index: 1;
         }
         
         @keyframes fadeIn {
@@ -1296,20 +1304,28 @@ foreach ($allTasks as &$task) {
         
         // Инициализация вкладок
         function initTabs() {
+            console.log('Инициализация вкладок...');
+            
             // Работаем только с кнопками внутри workArea
             const tabButtons = document.querySelectorAll('#workArea .tab-button');
-            tabButtons.forEach(btn => {
-                // Клонируем кнопку для удаления старых обработчиков
+            console.log('Найдено кнопок вкладок:', tabButtons.length);
+            
+            if (tabButtons.length === 0) {
+                console.warn('Кнопки вкладок не найдены в #workArea');
+                return;
+            }
+            
+            tabButtons.forEach((btn, index) => {
+                // Удаляем старые обработчики, клонируя кнопку
                 const newBtn = btn.cloneNode(true);
                 btn.parentNode.replaceChild(newBtn, btn);
-            });
-            
-            // Добавляем обработчики событий на кнопки вкладок
-            const newTabButtons = document.querySelectorAll('#workArea .tab-button');
-            newTabButtons.forEach(btn => {
-                btn.addEventListener('click', function(e) {
+                
+                // Добавляем новый обработчик
+                newBtn.addEventListener('click', function(e) {
                     e.preventDefault();
+                    e.stopPropagation();
                     const tabName = this.getAttribute('data-tab');
+                    console.log('Клик на вкладку:', tabName, 'индекс:', index);
                     if (tabName) {
                         switchTab(tabName);
                     }
@@ -1320,6 +1336,7 @@ foreach ($allTasks as &$task) {
             const firstTabButton = document.querySelector('#workArea .tab-button[data-tab="stages"]');
             const hasActiveContent = document.querySelector('#workArea .tab-content.active');
             if (firstTabButton && !hasActiveContent) {
+                console.log('Активация вкладки "Этапы" по умолчанию');
                 switchTab('stages');
             }
         }
@@ -1335,19 +1352,26 @@ foreach ($allTasks as &$task) {
             // Работаем только с вкладками внутри workArea
             const allTabs = document.querySelectorAll('#workArea .tab-content');
             console.log('Найдено вкладок:', allTabs.length);
+            
+            // Проверяем что элемент существует по ID
+            const targetTabContent = document.getElementById('tab-' + tabName);
+            console.log('Целевой элемент tab-' + tabName + ':', targetTabContent ? 'найден' : 'не найден');
+            
             allTabs.forEach(tab => {
                 tab.classList.remove('active');
             });
+            
             const allButtons = document.querySelectorAll('#workArea .tab-button');
             allButtons.forEach(btn => {
                 btn.classList.remove('active');
             });
             
-            // Показываем выбранную
-            const tabContent = document.getElementById('tab-' + tabName);
-            console.log('Контент вкладки:', tabContent ? 'найден' : 'не найден');
-            if (tabContent) {
-                tabContent.classList.add('active');
+            // Показываем выбранную - используем getElementById для надежности
+            if (targetTabContent) {
+                targetTabContent.classList.add('active');
+                console.log('Вкладка tab-' + tabName + ' активирована');
+            } else {
+                console.error('Не удалось найти элемент с id="tab-' + tabName + '"');
             }
             
             // Находим кнопку которая соответствует этой вкладке и делаем её активной

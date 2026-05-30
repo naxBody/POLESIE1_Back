@@ -155,7 +155,6 @@ if ($isAjaxRequest && $selectedTaskId) {
         
         // Рендерим только содержимое рабочей области (без полного HTML)
         ?>
-        <div id="work-area-content" data-task-id="<?= $selectedTask['id'] ?>">
         <div class="work-area-header">
             <div class="work-area-title">
                 <h3><?= e($selectedTask['product_name']) ?></h3>
@@ -954,7 +953,6 @@ foreach ($allTasks as &$task) {
                         
                         <!-- Рабочая область -->
                         <div class="work-area" id="workArea">
-                            <div id="work-area-content">
                             <?php if ($selectedTask): ?>
                                 <div class="work-area-header">
                                     <div class="work-area-title">
@@ -1182,7 +1180,6 @@ foreach ($allTasks as &$task) {
                                     <p>Выберите производственное задание из списка слева для начала работы</p>
                                 </div>
                             <?php endif; ?>
-                            </div> <!-- конец work-area-content -->
                         </div>
                     </div>
                 </div>
@@ -1256,13 +1253,11 @@ foreach ($allTasks as &$task) {
             .then(html => {
                 // Находим контейнер рабочей области и обновляем его содержимое
                 const workArea = document.getElementById('workArea');
-                const parser = new DOMParser();
-                const doc = parser.parseFromString(html, 'text/html');
-                const newWorkAreaContent = doc.querySelector('#work-area-content');
                 
-                if (newWorkAreaContent && workArea) {
-                    // Полностью заменяем содержимое workArea
-                    workArea.innerHTML = newWorkAreaContent.innerHTML;
+                if (workArea) {
+                    // Полностью заменяем innerHTML содержимого workArea
+                    // Это гарантирует, что все старые обработчики событий будут удалены
+                    workArea.innerHTML = html;
                     
                     // Обновляем URL без перезагрузки
                     const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + '?task=' + taskId;
@@ -1272,18 +1267,25 @@ foreach ($allTasks as &$task) {
                     
                     // Инициализируем вкладки заново - даем DOM время на обновление
                     setTimeout(function() {
+                        // Принудительно скрываем все вкладки перед инициализацией
+                        const allTabs = document.querySelectorAll('#workArea .tab-content');
+                        const allButtons = document.querySelectorAll('#workArea .tab-button');
+                        allTabs.forEach(tab => tab.classList.remove('active'));
+                        allButtons.forEach(btn => btn.classList.remove('active'));
+                        
                         initTabs();
+                        
                         // Принудительно переключаем на первую вкладку после загрузки нового контента
                         // Проверяем, что элементы существуют перед переключением
                         const tabContent = document.getElementById('tab-stages');
-                        const tabButton = document.querySelector('.tab-button[data-tab="stages"]');
+                        const tabButton = document.querySelector('#workArea .tab-button[data-tab="stages"]');
                         if (tabContent && tabButton) {
                             switchTab('stages');
                             console.log('Вкладка "Этапы" активирована для задачи #' + taskId);
                         } else {
                             console.error('Элементы вкладок не найдены после загрузки контента');
                         }
-                    }, 100);
+                    }, 50);
                 }
             })
             .catch(error => {
@@ -1295,8 +1297,8 @@ foreach ($allTasks as &$task) {
         
         // Инициализация вкладок
         function initTabs() {
-            // Удаляем старые обработчики событий, если они были
-            const tabButtons = document.querySelectorAll('.tab-button');
+            // Работаем только с кнопками внутри workArea
+            const tabButtons = document.querySelectorAll('#workArea .tab-button');
             tabButtons.forEach(btn => {
                 // Клонируем кнопку для удаления старых обработчиков
                 const newBtn = btn.cloneNode(true);
@@ -1304,7 +1306,7 @@ foreach ($allTasks as &$task) {
             });
             
             // Добавляем обработчики событий на кнопки вкладок
-            const newTabButtons = document.querySelectorAll('.tab-button');
+            const newTabButtons = document.querySelectorAll('#workArea .tab-button');
             newTabButtons.forEach(btn => {
                 btn.addEventListener('click', function(e) {
                     e.preventDefault();
@@ -1316,8 +1318,9 @@ foreach ($allTasks as &$task) {
             });
             
             // Активируем первую вкладку (Этапы) по умолчанию при инициализации
-            const firstTabButton = document.querySelector('.tab-button[data-tab="stages"]');
-            if (firstTabButton && !document.querySelector('.tab-content.active')) {
+            const firstTabButton = document.querySelector('#workArea .tab-button[data-tab="stages"]');
+            const hasActiveContent = document.querySelector('#workArea .tab-content.active');
+            if (firstTabButton && !hasActiveContent) {
                 switchTab('stages');
             }
         }
@@ -1330,13 +1333,13 @@ foreach ($allTasks as &$task) {
         function switchTab(tabName) {
             console.log('Переключение на вкладку:', tabName);
             
-            // Скрываем все вкладки
-            const allTabs = document.querySelectorAll('.tab-content');
+            // Работаем только с вкладками внутри workArea
+            const allTabs = document.querySelectorAll('#workArea .tab-content');
             console.log('Найдено вкладок:', allTabs.length);
             allTabs.forEach(tab => {
                 tab.classList.remove('active');
             });
-            const allButtons = document.querySelectorAll('.tab-button');
+            const allButtons = document.querySelectorAll('#workArea .tab-button');
             allButtons.forEach(btn => {
                 btn.classList.remove('active');
             });
@@ -1349,7 +1352,7 @@ foreach ($allTasks as &$task) {
             }
             
             // Находим кнопку которая соответствует этой вкладке и делаем её активной
-            const buttons = document.querySelectorAll('.tab-button');
+            const buttons = document.querySelectorAll('#workArea .tab-button');
             buttons.forEach(btn => {
                 const dataTab = btn.getAttribute('data-tab');
                 if (dataTab === tabName) {

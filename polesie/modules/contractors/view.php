@@ -139,15 +139,15 @@ require_once BASE_PATH . '/includes/topbar.php';
     border-color: white;
 }
 
-/* Info Grid */
-.contractor-info-grid {
+/* Info Cards with Tables */
+.contractor-sections {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-    gap: 20px;
+    grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+    gap: 24px;
     margin-bottom: 24px;
 }
 
-.info-card {
+.detail-card {
     background: var(--bg-primary);
     border-radius: var(--border-radius);
     overflow: hidden;
@@ -156,125 +156,162 @@ require_once BASE_PATH . '/includes/topbar.php';
     transition: all var(--transition-fast);
 }
 
-.info-card:hover {
-    box-shadow: var(--shadow-md);
-    transform: translateY(-2px);
+.detail-card:hover {
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-3px);
 }
 
-.info-card-header {
+.detail-card-header {
     display: flex;
     align-items: center;
     gap: 12px;
-    padding: 16px 20px;
+    padding: 18px 24px;
     background: linear-gradient(180deg, var(--gray-50) 0%, var(--gray-100) 100%);
-    border-bottom: 1px solid var(--border-color);
+    border-bottom: 2px solid var(--border-color);
 }
 
-.info-card-icon {
+.detail-card-icon {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 40px;
-    height: 40px;
-    border-radius: 10px;
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
     background: var(--primary-color);
     color: white;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
 }
 
-.info-card-icon svg {
-    width: 20px;
-    height: 20px;
+.detail-card-icon svg {
+    width: 22px;
+    height: 22px;
 }
 
-.info-card-title {
-    font-size: 16px;
-    font-weight: 600;
+.detail-card-title {
+    font-size: 17px;
+    font-weight: 700;
     color: var(--text-primary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
-.info-card-body {
-    padding: 20px;
+.detail-card-body {
+    padding: 0;
+    overflow-x: auto;
 }
 
-.info-row {
-    display: flex;
-    padding: 12px 0;
+/* Beautiful Data Table */
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.data-table tbody tr {
     border-bottom: 1px solid var(--border-color);
+    transition: background var(--transition-fast);
 }
 
-.info-row:last-child {
+.data-table tbody tr:last-child {
     border-bottom: none;
 }
 
-.info-label {
-    width: 160px;
-    font-size: 13px;
-    color: var(--text-secondary);
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    flex-shrink: 0;
+.data-table tbody tr:hover {
+    background: var(--gray-50);
 }
 
-.info-value {
-    flex: 1;
-    font-size: 14px;
+.data-table td {
+    padding: 16px 24px;
+    vertical-align: top;
+}
+
+.data-table .label-cell {
+    width: 40%;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    background: var(--gray-50);
+    border-right: 1px solid var(--border-color);
+}
+
+.data-table .value-cell {
+    width: 60%;
+    font-size: 15px;
     color: var(--text-primary);
     font-weight: 500;
     word-break: break-word;
+    line-height: 1.6;
 }
 
-.info-value a {
+.data-table .value-cell a {
     color: var(--primary-color);
     text-decoration: none;
     transition: color var(--transition-fast);
+    font-weight: 600;
 }
 
-.info-value a:hover {
+.data-table .value-cell a:hover {
     color: var(--primary-dark);
     text-decoration: underline;
+}
+
+.data-table .empty-value {
+    color: var(--text-secondary);
+    font-style: italic;
+    font-weight: 400;
+}
+
+/* Full Width Card */
+.full-width-card {
+    grid-column: 1 / -1;
 }
 
 /* Notes Section */
 .notes-section {
     background: var(--bg-primary);
     border-radius: var(--border-radius);
-    padding: 24px;
+    padding: 0;
     box-shadow: var(--shadow-sm);
     border: 1px solid var(--border-color);
+    overflow: hidden;
 }
 
 .notes-header {
     display: flex;
     align-items: center;
     gap: 12px;
-    margin-bottom: 16px;
+    padding: 18px 24px;
+    background: linear-gradient(180deg, #fef3c7 0%, #fde68a 100%);
+    border-bottom: 2px solid #fcd34d;
 }
 
 .notes-icon {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 40px;
-    height: 40px;
-    border-radius: 10px;
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
     background: var(--warning-color);
     color: white;
+    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
 }
 
 .notes-title {
-    font-size: 18px;
-    font-weight: 600;
-    color: var(--text-primary);
+    font-size: 17px;
+    font-weight: 700;
+    color: #92400e;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 .notes-content {
-    font-size: 14px;
-    line-height: 1.7;
-    color: var(--text-secondary);
-    background: var(--gray-50);
-    padding: 16px;
-    border-radius: var(--border-radius);
+    font-size: 15px;
+    line-height: 1.8;
+    color: var(--text-primary);
+    background: #fffbeb;
+    padding: 24px;
     border-left: 4px solid var(--warning-color);
 }
 
@@ -290,22 +327,28 @@ require_once BASE_PATH . '/includes/topbar.php';
 }
 
 .badge-customer {
-    background: rgba(59, 130, 246, 0.1);
-    color: var(--info-color);
-    border: 1px solid rgba(59, 130, 246, 0.2);
+    background: rgba(59, 130, 246, 0.15);
+    color: #2563eb;
+    border: 1px solid rgba(59, 130, 246, 0.3);
 }
 
 .badge-supplier {
-    background: rgba(34, 197, 94, 0.1);
-    color: var(--success-color);
-    border: 1px solid rgba(34, 197, 94, 0.2);
+    background: rgba(34, 197, 94, 0.15);
+    color: #16a34a;
+    border: 1px solid rgba(34, 197, 94, 0.3);
 }
 
 .badge-both {
-    background: rgba(168, 85, 247, 0.1);
-    color: #a855f7;
-    border: 1px solid rgba(168, 85, 247, 0.2);
+    background: rgba(168, 85, 247, 0.15);
+    color: #9333ea;
+    border: 1px solid rgba(168, 85, 247, 0.3);
 }
+
+/* Icon colors for different sections */
+.icon-success { background: var(--success-color) !important; box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3) !important; }
+.icon-info { background: var(--info-color) !important; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3) !important; }
+.icon-warning { background: var(--warning-color) !important; box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3) !important; }
+.icon-gray { background: var(--gray-500) !important; box-shadow: 0 4px 12px rgba(107, 114, 128, 0.3) !important; }
 
 /* Responsive */
 @media (max-width: 768px) {
@@ -320,7 +363,7 @@ require_once BASE_PATH . '/includes/topbar.php';
         align-items: center;
     }
     
-    .contractor-info-grid {
+    .contractor-sections {
         grid-template-columns: 1fr;
     }
     
@@ -329,13 +372,21 @@ require_once BASE_PATH . '/includes/topbar.php';
         justify-content: center;
     }
     
-    .info-row {
-        flex-direction: column;
-        gap: 8px;
+    .data-table .label-cell,
+    .data-table .value-cell {
+        display: block;
+        width: 100%;
+        padding: 12px 16px;
     }
     
-    .info-label {
-        width: 100%;
+    .data-table .label-cell {
+        border-right: none;
+        border-bottom: 1px solid var(--border-color);
+        background: var(--gray-100);
+    }
+    
+    .data-table tbody tr {
+        display: block;
     }
 }
 </style>
@@ -391,166 +442,197 @@ require_once BASE_PATH . '/includes/topbar.php';
         </div>
     </div>
 
-    <!-- Info Cards -->
-    <div class="contractor-info-grid">
+    <!-- Info Cards with Tables -->
+    <div class="contractor-sections">
         <!-- Основная информация -->
-        <div class="info-card">
-            <div class="info-card-header">
-                <div class="info-card-icon">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+        <div class="detail-card full-width-card">
+            <div class="detail-card-header">
+                <div class="detail-card-icon">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
                 </div>
-                <div class="info-card-title">Основная информация</div>
+                <div class="detail-card-title">Основная информация</div>
             </div>
-            <div class="info-card-body">
-                <div class="info-row">
-                    <div class="info-label">Название</div>
-                    <div class="info-value"><?= e($contractor['name']) ?></div>
-                </div>
-                <div class="info-row">
-                    <div class="info-label">Тип</div>
-                    <div class="info-value">
-                        <?php if ($contractor['type'] === 'customer'): ?>
-                            Заказчик
-                        <?php elseif ($contractor['type'] === 'supplier'): ?>
-                            Поставщик
-                        <?php else: ?>
-                            Заказчик и поставщик
+            <div class="detail-card-body">
+                <table class="data-table">
+                    <tbody>
+                        <tr>
+                            <td class="label-cell">Название</td>
+                            <td class="value-cell"><?= e($contractor['name']) ?></td>
+                        </tr>
+                        <tr>
+                            <td class="label-cell">Тип</td>
+                            <td class="value-cell">
+                                <?php if ($contractor['type'] === 'customer'): ?>
+                                    👤 Заказчик
+                                <?php elseif ($contractor['type'] === 'supplier'): ?>
+                                    🚚 Поставщик
+                                <?php else: ?>
+                                    🔄 Заказчик и поставщик
+                                <?php endif; ?>
+                            </td>
+                        </tr>
+                        <?php if (!empty($contractor['inn'])): ?>
+                        <tr>
+                            <td class="label-cell">ИНН</td>
+                            <td class="value-cell"><?= e($contractor['inn']) ?></td>
+                        </tr>
                         <?php endif; ?>
-                    </div>
-                </div>
-                <?php if (!empty($contractor['inn'])): ?>
-                <div class="info-row">
-                    <div class="info-label">ИНН</div>
-                    <div class="info-value"><?= e($contractor['inn']) ?></div>
-                </div>
-                <?php endif; ?>
-                <?php if (!empty($contractor['kpp'])): ?>
-                <div class="info-row">
-                    <div class="info-label">КПП</div>
-                    <div class="info-value"><?= e($contractor['kpp']) ?></div>
-                </div>
-                <?php endif; ?>
-                <?php if (!empty($contractor['ogrn'])): ?>
-                <div class="info-row">
-                    <div class="info-label">ОГРН</div>
-                    <div class="info-value"><?= e($contractor['ogrn']) ?></div>
-                </div>
-                <?php endif; ?>
+                        <?php if (!empty($contractor['kpp'])): ?>
+                        <tr>
+                            <td class="label-cell">КПП</td>
+                            <td class="value-cell"><?= e($contractor['kpp']) ?></td>
+                        </tr>
+                        <?php endif; ?>
+                        <?php if (!empty($contractor['ogrn'])): ?>
+                        <tr>
+                            <td class="label-cell">ОГРН</td>
+                            <td class="value-cell"><?= e($contractor['ogrn']) ?></td>
+                        </tr>
+                        <?php endif; ?>
+                    </tbody>
+                </table>
             </div>
         </div>
 
         <!-- Контакты -->
-        <div class="info-card">
-            <div class="info-card-header">
-                <div class="info-card-icon" style="background: var(--success-color);">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+        <div class="detail-card">
+            <div class="detail-card-header">
+                <div class="detail-card-icon icon-success">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
                 </div>
-                <div class="info-card-title">Контактная информация</div>
+                <div class="detail-card-title">Контакты</div>
             </div>
-            <div class="info-card-body">
-                <?php if (!empty($contractor['contact_person'])): ?>
-                <div class="info-row">
-                    <div class="info-label">Контактное лицо</div>
-                    <div class="info-value"><?= e($contractor['contact_person']) ?></div>
-                </div>
-                <?php endif; ?>
-                <?php if (!empty($contractor['phone'])): ?>
-                <div class="info-row">
-                    <div class="info-label">Телефон</div>
-                    <div class="info-value">
-                        <a href="tel:<?= e($contractor['phone']) ?>"><?= e($contractor['phone']) ?></a>
-                    </div>
-                </div>
-                <?php endif; ?>
-                <?php if (!empty($contractor['email'])): ?>
-                <div class="info-row">
-                    <div class="info-label">Email</div>
-                    <div class="info-value">
-                        <a href="mailto:<?= e($contractor['email']) ?>"><?= e($contractor['email']) ?></a>
-                    </div>
-                </div>
-                <?php endif; ?>
-                <?php if (!empty($contractor['website'])): ?>
-                <div class="info-row">
-                    <div class="info-label">Веб-сайт</div>
-                    <div class="info-value">
-                        <a href="<?= e($contractor['website']) ?>" target="_blank"><?= e($contractor['website']) ?></a>
-                    </div>
-                </div>
-                <?php endif; ?>
+            <div class="detail-card-body">
+                <table class="data-table">
+                    <tbody>
+                        <?php if (!empty($contractor['contact_person'])): ?>
+                        <tr>
+                            <td class="label-cell">Контактное лицо</td>
+                            <td class="value-cell"><?= e($contractor['contact_person']) ?></td>
+                        </tr>
+                        <?php endif; ?>
+                        <?php if (!empty($contractor['phone'])): ?>
+                        <tr>
+                            <td class="label-cell">Телефон</td>
+                            <td class="value-cell">
+                                <a href="tel:<?= e($contractor['phone']) ?>">📞 <?= e($contractor['phone']) ?></a>
+                            </td>
+                        </tr>
+                        <?php else: ?>
+                        <tr>
+                            <td class="label-cell">Телефон</td>
+                            <td class="value-cell"><span class="empty-value">Не указан</span></td>
+                        </tr>
+                        <?php endif; ?>
+                        <?php if (!empty($contractor['email'])): ?>
+                        <tr>
+                            <td class="label-cell">Email</td>
+                            <td class="value-cell">
+                                <a href="mailto:<?= e($contractor['email']) ?>">✉️ <?= e($contractor['email']) ?></a>
+                            </td>
+                        </tr>
+                        <?php else: ?>
+                        <tr>
+                            <td class="label-cell">Email</td>
+                            <td class="value-cell"><span class="empty-value">Не указан</span></td>
+                        </tr>
+                        <?php endif; ?>
+                        <?php if (!empty($contractor['website'])): ?>
+                        <tr>
+                            <td class="label-cell">Веб-сайт</td>
+                            <td class="value-cell">
+                                <a href="<?= e($contractor['website']) ?>" target="_blank">🌐 <?= e($contractor['website']) ?></a>
+                            </td>
+                        </tr>
+                        <?php else: ?>
+                        <tr>
+                            <td class="label-cell">Веб-сайт</td>
+                            <td class="value-cell"><span class="empty-value">Не указан</span></td>
+                        </tr>
+                        <?php endif; ?>
+                    </tbody>
+                </table>
             </div>
         </div>
 
         <!-- Адрес -->
-        <div class="info-card">
-            <div class="info-card-header">
-                <div class="info-card-icon" style="background: var(--info-color);">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+        <div class="detail-card">
+            <div class="detail-card-header">
+                <div class="detail-card-icon icon-info">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
                 </div>
-                <div class="info-card-title">Адрес</div>
+                <div class="detail-card-title">Адрес</div>
             </div>
-            <div class="info-card-body">
-                <?php if (!empty($contractor['address'])): ?>
-                <div class="info-row">
-                    <div class="info-label">Юридический адрес</div>
-                    <div class="info-value"><?= nl2br(e($contractor['address'])) ?></div>
-                </div>
-                <?php else: ?>
-                <div class="info-row">
-                    <div class="info-label">Адрес</div>
-                    <div class="info-value" style="color: var(--text-secondary);">Не указан</div>
-                </div>
-                <?php endif; ?>
-                
-                <?php if (!empty($contractor['postal_code'])): ?>
-                <div class="info-row">
-                    <div class="info-label">Почтовый индекс</div>
-                    <div class="info-value"><?= e($contractor['postal_code']) ?></div>
-                </div>
-                <?php endif; ?>
+            <div class="detail-card-body">
+                <table class="data-table">
+                    <tbody>
+                        <?php if (!empty($contractor['address'])): ?>
+                        <tr>
+                            <td class="label-cell">Юридический адрес</td>
+                            <td class="value-cell"><?= nl2br(e($contractor['address'])) ?></td>
+                        </tr>
+                        <?php else: ?>
+                        <tr>
+                            <td class="label-cell">Адрес</td>
+                            <td class="value-cell"><span class="empty-value">Не указан</span></td>
+                        </tr>
+                        <?php endif; ?>
+                        
+                        <?php if (!empty($contractor['postal_code'])): ?>
+                        <tr>
+                            <td class="label-cell">Почтовый индекс</td>
+                            <td class="value-cell"><?= e($contractor['postal_code']) ?></td>
+                        </tr>
+                        <?php endif; ?>
+                    </tbody>
+                </table>
             </div>
         </div>
 
         <!-- Банковские реквизиты -->
-        <div class="info-card">
-            <div class="info-card-header">
-                <div class="info-card-icon" style="background: var(--warning-color);">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
+        <div class="detail-card">
+            <div class="detail-card-header">
+                <div class="detail-card-icon icon-warning">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
                 </div>
-                <div class="info-card-title">Банковские реквизиты</div>
+                <div class="detail-card-title">Банковские реквизиты</div>
             </div>
-            <div class="info-card-body">
-                <?php if (!empty($contractor['bank_name'])): ?>
-                <div class="info-row">
-                    <div class="info-label">Банк</div>
-                    <div class="info-value"><?= e($contractor['bank_name']) ?></div>
-                </div>
-                <?php endif; ?>
-                <?php if (!empty($contractor['bik'])): ?>
-                <div class="info-row">
-                    <div class="info-label">БИК</div>
-                    <div class="info-value"><?= e($contractor['bik']) ?></div>
-                </div>
-                <?php endif; ?>
-                <?php if (!empty($contractor['rs'])): ?>
-                <div class="info-row">
-                    <div class="info-label">Расчетный счет</div>
-                    <div class="info-value"><?= e($contractor['rs']) ?></div>
-                </div>
-                <?php endif; ?>
-                <?php if (!empty($contractor['ks'])): ?>
-                <div class="info-row">
-                    <div class="info-label">Корр. счет</div>
-                    <div class="info-value"><?= e($contractor['ks']) ?></div>
-                </div>
-                <?php endif; ?>
-                
-                <?php if (empty($contractor['bank_name']) && empty($contractor['bik']) && empty($contractor['rs']) && empty($contractor['ks'])): ?>
-                <div class="info-row">
-                    <div class="info-label">Реквизиты</div>
-                    <div class="info-value" style="color: var(--text-secondary);">Не указаны</div>
-                </div>
-                <?php endif; ?>
+            <div class="detail-card-body">
+                <table class="data-table">
+                    <tbody>
+                        <?php if (!empty($contractor['bank_name'])): ?>
+                        <tr>
+                            <td class="label-cell">Банк</td>
+                            <td class="value-cell"><?= e($contractor['bank_name']) ?></td>
+                        </tr>
+                        <?php endif; ?>
+                        <?php if (!empty($contractor['bik'])): ?>
+                        <tr>
+                            <td class="label-cell">БИК</td>
+                            <td class="value-cell"><?= e($contractor['bik']) ?></td>
+                        </tr>
+                        <?php endif; ?>
+                        <?php if (!empty($contractor['rs'])): ?>
+                        <tr>
+                            <td class="label-cell">Расчетный счет</td>
+                            <td class="value-cell"><?= e($contractor['rs']) ?></td>
+                        </tr>
+                        <?php endif; ?>
+                        <?php if (!empty($contractor['ks'])): ?>
+                        <tr>
+                            <td class="label-cell">Корр. счет</td>
+                            <td class="value-cell"><?= e($contractor['ks']) ?></td>
+                        </tr>
+                        <?php endif; ?>
+                        
+                        <?php if (empty($contractor['bank_name']) && empty($contractor['bik']) && empty($contractor['rs']) && empty($contractor['ks'])): ?>
+                        <tr>
+                            <td class="label-cell">Реквизиты</td>
+                            <td class="value-cell"><span class="empty-value">Не указаны</span></td>
+                        </tr>
+                        <?php endif; ?>
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
@@ -571,28 +653,32 @@ require_once BASE_PATH . '/includes/topbar.php';
     <?php endif; ?>
 
     <!-- Мета-информация -->
-    <div class="info-card" style="margin-top: 20px;">
-        <div class="info-card-header">
-            <div class="info-card-icon" style="background: var(--gray-500);">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+    <div class="detail-card full-width-card" style="margin-top: 20px;">
+        <div class="detail-card-header">
+            <div class="detail-card-icon icon-gray">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
             </div>
-            <div class="info-card-title">Системная информация</div>
+            <div class="detail-card-title">Системная информация</div>
         </div>
-        <div class="info-card-body">
-            <div class="info-row">
-                <div class="info-label">ID</div>
-                <div class="info-value">#<?= $contractor['id'] ?></div>
-            </div>
-            <div class="info-row">
-                <div class="info-label">Дата создания</div>
-                <div class="info-value"><?= date('d.m.Y H:i', strtotime($contractor['created_at'])) ?></div>
-            </div>
-            <?php if (!empty($contractor['updated_at']) && $contractor['updated_at'] != $contractor['created_at']): ?>
-            <div class="info-row">
-                <div class="info-label">Дата обновления</div>
-                <div class="info-value"><?= date('d.m.Y H:i', strtotime($contractor['updated_at'])) ?></div>
-            </div>
-            <?php endif; ?>
+        <div class="detail-card-body">
+            <table class="data-table">
+                <tbody>
+                    <tr>
+                        <td class="label-cell">ID</td>
+                        <td class="value-cell">#<?= $contractor['id'] ?></td>
+                    </tr>
+                    <tr>
+                        <td class="label-cell">Дата создания</td>
+                        <td class="value-cell"><?= date('d.m.Y H:i', strtotime($contractor['created_at'])) ?></td>
+                    </tr>
+                    <?php if (!empty($contractor['updated_at']) && $contractor['updated_at'] != $contractor['created_at']): ?>
+                    <tr>
+                        <td class="label-cell">Дата обновления</td>
+                        <td class="value-cell"><?= date('d.m.Y H:i', strtotime($contractor['updated_at'])) ?></td>
+                    </tr>
+                    <?php endif; ?>
+                </tbody>
+            </table>
         </div>
     </div>
 </div>

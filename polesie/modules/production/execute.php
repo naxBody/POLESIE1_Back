@@ -752,6 +752,62 @@ foreach ($allTasks as &$task) {
             pointer-events: none;
         }
         
+        /* Стили для рабочей области когда задание не выбрано */
+        .work-area-empty {
+            background: var(--bg-primary);
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow);
+            padding: 40px;
+            min-height: 650px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        
+        .work-area-empty .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-secondary);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.3s ease-in-out;
+            width: 100%;
+            max-width: 600px;
+        }
+        
+        .work-area-empty .empty-state-icon {
+            font-size: 72px;
+            margin-bottom: 24px;
+            opacity: 0.6;
+            filter: grayscale(0.2);
+        }
+        
+        .work-area-empty .empty-state h3 {
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 14px;
+            word-wrap: normal;
+            overflow-wrap: normal;
+            word-break: normal;
+            hyphens: none;
+        }
+        
+        .work-area-empty .empty-state p {
+            font-size: 16px;
+            max-width: 500px;
+            line-height: 1.7;
+            color: var(--text-secondary);
+            word-wrap: normal;
+            overflow-wrap: normal;
+            word-break: normal;
+            hyphens: none;
+        }
+        
         .work-area-header {
             display: flex;
             justify-content: space-between;
@@ -860,6 +916,7 @@ foreach ($allTasks as &$task) {
             margin-bottom: 24px;
             width: 100%;
             box-sizing: border-box;
+            min-width: 0;
         }
         
         .stage-card {
@@ -869,6 +926,11 @@ foreach ($allTasks as &$task) {
             border: 1px solid var(--border-color);
             transition: all var(--transition-fast);
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+            min-width: 0;
+            word-wrap: normal;
+            overflow-wrap: normal;
+            word-break: normal;
+            hyphens: none;
         }
         
         .stage-card:hover {
@@ -892,11 +954,19 @@ foreach ($allTasks as &$task) {
             justify-content: space-between;
             align-items: center;
             margin-bottom: 14px;
+            gap: 8px;
+            min-width: 0;
         }
         
         .stage-name {
             font-weight: 600;
             font-size: 15px;
+            word-wrap: normal;
+            overflow-wrap: normal;
+            word-break: normal;
+            hyphens: none;
+            flex-shrink: 1;
+            min-width: 0;
         }
         
         .stage-status {
@@ -1008,12 +1078,20 @@ foreach ($allTasks as &$task) {
             font-weight: 600;
             color: var(--text-primary);
             margin-bottom: 8px;
+            word-wrap: normal;
+            overflow-wrap: normal;
+            word-break: normal;
+            hyphens: none;
         }
         
         .empty-state p {
             font-size: 14px;
             max-width: 400px;
             line-height: 1.5;
+            word-wrap: normal;
+            overflow-wrap: normal;
+            word-break: normal;
+            hyphens: none;
         }
         
         /* Стили для рабочей области когда задание не выбрано */
@@ -1054,6 +1132,10 @@ foreach ($allTasks as &$task) {
             font-weight: 600;
             color: var(--text-primary);
             margin-bottom: 14px;
+            word-wrap: normal;
+            overflow-wrap: normal;
+            word-break: normal;
+            hyphens: none;
         }
         
         .work-area-empty .empty-state p {
@@ -1061,6 +1143,10 @@ foreach ($allTasks as &$task) {
             max-width: 500px;
             line-height: 1.7;
             color: var(--text-secondary);
+            word-wrap: normal;
+            overflow-wrap: normal;
+            word-break: normal;
+            hyphens: none;
         }
         
         @keyframes fadeIn {

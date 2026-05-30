@@ -669,10 +669,16 @@ foreach ($allTasks as &$task) {
         
         .tab-content {
             display: none;
+            animation: fadeIn 0.2s ease-in-out;
         }
         
         .tab-content.active {
             display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
         
         .stages-grid {
@@ -1255,7 +1261,7 @@ foreach ($allTasks as &$task) {
                 const newWorkAreaContent = doc.querySelector('#work-area-content');
                 
                 if (newWorkAreaContent && workArea) {
-                    // Полностью заменяем содержимое workArea - используем innerHTML для корректной вставки
+                    // Полностью заменяем содержимое workArea
                     workArea.innerHTML = newWorkAreaContent.innerHTML;
                     
                     // Обновляем URL без перезагрузки
@@ -1267,8 +1273,6 @@ foreach ($allTasks as &$task) {
                     // Инициализируем вкладки заново - даем DOM время на обновление
                     setTimeout(function() {
                         initTabs();
-                        // Активируем первую вкладку по умолчанию
-                        switchTab('stages');
                     }, 100);
                 }
             })
@@ -1281,9 +1285,10 @@ foreach ($allTasks as &$task) {
         
         // Инициализация вкладок
         function initTabs() {
-            // Сначала удаляем старые обработчики, клонируя кнопки
+            // Удаляем старые обработчики событий, если они были
             const tabButtons = document.querySelectorAll('.tab-button');
             tabButtons.forEach(btn => {
+                // Клонируем кнопку для удаления старых обработчиков
                 const newBtn = btn.cloneNode(true);
                 btn.parentNode.replaceChild(newBtn, btn);
             });
@@ -1291,13 +1296,20 @@ foreach ($allTasks as &$task) {
             // Добавляем обработчики событий на кнопки вкладок
             const newTabButtons = document.querySelectorAll('.tab-button');
             newTabButtons.forEach(btn => {
-                btn.addEventListener('click', function() {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
                     const tabName = this.getAttribute('data-tab');
                     if (tabName) {
                         switchTab(tabName);
                     }
                 });
             });
+            
+            // Активируем первую вкладку (Этапы) по умолчанию при инициализации
+            const firstTabButton = document.querySelector('.tab-button[data-tab="stages"]');
+            if (firstTabButton && !document.querySelector('.tab-content.active')) {
+                switchTab('stages');
+            }
         }
         
         // Вызываем после загрузки DOM
@@ -1306,8 +1318,11 @@ foreach ($allTasks as &$task) {
         });
         
         function switchTab(tabName) {
+            console.log('Переключение на вкладку:', tabName);
+            
             // Скрываем все вкладки
             const allTabs = document.querySelectorAll('.tab-content');
+            console.log('Найдено вкладок:', allTabs.length);
             allTabs.forEach(tab => {
                 tab.classList.remove('active');
             });
@@ -1318,6 +1333,7 @@ foreach ($allTasks as &$task) {
             
             // Показываем выбранную
             const tabContent = document.getElementById('tab-' + tabName);
+            console.log('Контент вкладки:', tabContent ? 'найден' : 'не найден');
             if (tabContent) {
                 tabContent.classList.add('active');
             }

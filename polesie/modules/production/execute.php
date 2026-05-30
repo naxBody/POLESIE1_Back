@@ -640,6 +640,19 @@ foreach ($allTasks as &$task) {
             margin-bottom: 24px;
         }
         
+        /* Когда заказ не выбран - скрываем панель продуктов и расширяем рабочую область */
+        .production-dashboard.no-order-selected {
+            grid-template-columns: 300px minmax(0, 1fr);
+        }
+        
+        .production-dashboard.no-order-selected #productsPanel {
+            display: none !important;
+        }
+        
+        .production-dashboard.no-order-selected #workArea {
+            grid-column: 2 / -1;
+        }
+        
         .tasks-panel {
             background: var(--bg-primary);
             border-radius: var(--border-radius-lg);
@@ -795,6 +808,7 @@ foreach ($allTasks as &$task) {
             overflow-wrap: normal;
             word-break: normal;
             hyphens: none;
+            white-space: normal;
         }
         
         .work-area-empty .empty-state p {
@@ -806,6 +820,7 @@ foreach ($allTasks as &$task) {
             overflow-wrap: normal;
             word-break: normal;
             hyphens: none;
+            white-space: normal;
         }
         
         .work-area-header {
@@ -833,6 +848,7 @@ foreach ($allTasks as &$task) {
             overflow-wrap: normal;
             word-break: normal;
             hyphens: none;
+            white-space: normal;
         }
         
         .work-area-subtitle {
@@ -843,6 +859,7 @@ foreach ($allTasks as &$task) {
             overflow-wrap: normal;
             word-break: normal;
             hyphens: none;
+            white-space: normal;
         }
         
         .work-area-actions {
@@ -931,6 +948,7 @@ foreach ($allTasks as &$task) {
             overflow-wrap: normal;
             word-break: normal;
             hyphens: none;
+            white-space: normal;
         }
         
         .stage-card:hover {
@@ -967,6 +985,7 @@ foreach ($allTasks as &$task) {
             hyphens: none;
             flex-shrink: 1;
             min-width: 0;
+            white-space: normal;
         }
         
         .stage-status {
@@ -1082,6 +1101,7 @@ foreach ($allTasks as &$task) {
             overflow-wrap: normal;
             word-break: normal;
             hyphens: none;
+            white-space: normal;
         }
         
         .empty-state p {
@@ -1092,6 +1112,7 @@ foreach ($allTasks as &$task) {
             overflow-wrap: normal;
             word-break: normal;
             hyphens: none;
+            white-space: normal;
         }
         
         /* Стили для рабочей области когда задание не выбрано */
@@ -1136,6 +1157,7 @@ foreach ($allTasks as &$task) {
             overflow-wrap: normal;
             word-break: normal;
             hyphens: none;
+            white-space: normal;
         }
         
         .work-area-empty .empty-state p {
@@ -1147,6 +1169,7 @@ foreach ($allTasks as &$task) {
             overflow-wrap: normal;
             word-break: normal;
             hyphens: none;
+            white-space: normal;
         }
         
         @keyframes fadeIn {
@@ -1261,7 +1284,7 @@ foreach ($allTasks as &$task) {
                         </div>
                     </div>
 
-                    <div class="production-dashboard">
+                    <div class="production-dashboard<?php if (!$selectedTask): ?> no-order-selected<?php endif; ?>">
                         <!-- Панель списка заказов с фильтрами -->
                         <div class="tasks-panel">
                             <!-- Фильтры заказов -->
@@ -1647,6 +1670,12 @@ foreach ($allTasks as &$task) {
         function selectOrder(orderId, orderNumber) {
             currentOrderId = orderId;
             
+            // Убираем класс no-order-selected когда заказ выбран
+            const dashboard = document.querySelector('.production-dashboard');
+            if (dashboard) {
+                dashboard.classList.remove('no-order-selected');
+            }
+            
             // Показываем панель товаров
             document.getElementById('productsPanel').style.display = 'block';
             document.getElementById('selectedOrderTitle').textContent = 'Товары заказа ' + orderNumber;
@@ -1757,6 +1786,12 @@ foreach ($allTasks as &$task) {
         function closeProductsPanel() {
             document.getElementById('productsPanel').style.display = 'none';
             currentOrderId = null;
+            
+            // Добавляем класс no-order-selected когда заказ закрыт
+            const dashboard = document.querySelector('.production-dashboard');
+            if (dashboard) {
+                dashboard.classList.add('no-order-selected');
+            }
         }
         
         // Выбор задачи без перезагрузки страницы (через AJAX)
@@ -1895,6 +1930,12 @@ foreach ($allTasks as &$task) {
         
         // Вызываем после загрузки DOM
         document.addEventListener('DOMContentLoaded', function() {
+            // Добавляем класс no-order-selected при загрузке если заказ не выбран
+            const dashboard = document.querySelector('.production-dashboard');
+            if (dashboard && !currentOrderId) {
+                dashboard.classList.add('no-order-selected');
+            }
+            
             // Небольшая задержка для гарантии полной загрузки DOM
             setTimeout(initTabs, 10);
         });

@@ -19,9 +19,7 @@ if (!isLoggedIn()) {
     redirect(pageUrl('login.php'));
 }
 
-$user = getCurrentUser();
-$pdo = getDbConnection();
-
+// $user и $pdo уже определены в api_execute.php при подключении
 $pageTitle = 'Исполнение производства';
 
 // Проверка AJAX-запроса

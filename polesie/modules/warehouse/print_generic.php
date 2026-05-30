@@ -28,7 +28,7 @@ $stmt = $pdo->prepare("
         d.*,
         dt.code as document_type_code,
         dt.name as document_type_name,
-        u.fio as created_by_name
+        u.full_name as created_by_name
     FROM material_receipt_documents d
     LEFT JOIN receipt_document_types dt ON d.document_type_id = dt.id
     LEFT JOIN users u ON d.created_by = u.id

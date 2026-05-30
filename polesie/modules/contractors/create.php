@@ -19,7 +19,7 @@ $success = false;
 $formData = [
     'name' => '',
     'type' => 'customer',
-    'unp' => '',
+    'inn' => '',
     'contact_person' => '',
     'phone' => '',
     'email' => '',
@@ -32,7 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $formData = [
         'name' => trim($_POST['name'] ?? ''),
         'type' => $_POST['type'] ?? 'customer',
-        'unp' => trim($_POST['unp'] ?? ''),
+        'inn' => trim($_POST['inn'] ?? ''),
         'contact_person' => trim($_POST['contact_person'] ?? ''),
         'phone' => trim($_POST['phone'] ?? ''),
         'email' => trim($_POST['email'] ?? ''),
@@ -65,15 +65,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         try {
             $stmt = $pdo->prepare("
                 INSERT INTO contractors 
-                (name, type, unp, contact_person, phone, email, address, notes, created_at) 
+                (name, type, inn, contact_person, phone, email, address, notes, created_at) 
                 VALUES 
-                (:name, :type, :unp, :contact_person, :phone, :email, :address, :notes, NOW())
+                (:name, :type, :inn, :contact_person, :phone, :email, :address, :notes, NOW())
             ");
             
             $stmt->execute([
                 ':name' => $formData['name'],
                 ':type' => $formData['type'],
-                ':unp' => $formData['unp'] ?: null,
+                ':inn' => $formData['inn'] ?: null,
                 ':contact_person' => $formData['contact_person'] ?: null,
                 ':phone' => $formData['phone'] ?: null,
                 ':email' => $formData['email'] ?: null,
@@ -85,7 +85,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $formData = [
                 'name' => '',
                 'type' => 'customer',
-                'unp' => '',
+                'inn' => '',
                 'contact_person' => '',
                 'phone' => '',
                 'email' => '',
@@ -257,8 +257,8 @@ select.form-control {
                     </div>
 
                     <div class="form-group">
-                        <label class="form-label">УНП</label>
-                        <input type="text" name="unp" class="form-control" value="<?= e($formData['unp']) ?>" placeholder="123456789" maxlength="9" pattern="[0-9]{9}">
+                        <label class="form-label">ИНН</label>
+                        <input type="text" name="inn" class="form-control" value="<?= e($formData['inn']) ?>" placeholder="123456789" maxlength="9" pattern="[0-9]{9}">
                     </div>
 
                     <div class="form-group">

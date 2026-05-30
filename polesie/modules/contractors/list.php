@@ -25,7 +25,7 @@ $sql = "SELECT * FROM contractors WHERE 1=1";
 $params = [];
 
 if ($search) {
-    $sql .= " AND (name LIKE ? OR unp LIKE ? OR contact_person LIKE ? OR phone LIKE ?)";
+    $sql .= " AND (name LIKE ? OR inn LIKE ? OR contact_person LIKE ? OR phone LIKE ?)";
     $params = ["%$search%", "%$search%", "%$search%", "%$search%"];
 }
 
@@ -401,7 +401,7 @@ require_once BASE_PATH . '/includes/topbar.php';
                             <circle cx="11" cy="11" r="8"></circle>
                             <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                         </svg>
-                        <input type="text" name="search" placeholder="Название, УНП, телефон..." value="<?= e($search) ?>" style="padding-left: 40px;">
+                        <input type="text" name="search" placeholder="Название, ИНН, телефон..." value="<?= e($search) ?>" style="padding-left: 40px;">
                     </div>
                     
                     <!-- Тип контрагента -->
@@ -434,14 +434,6 @@ require_once BASE_PATH . '/includes/topbar.php';
                         </svg>
                         Сброс
                     </a>
-                    <a href="export.php?<?= http_build_query($_GET) ?>" class="btn btn-success" title="Выгрузить в Excel/CSV">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px; vertical-align: middle;">
-                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                            <polyline points="7 10 12 15 17 10"></polyline>
-                            <line x1="12" y1="15" x2="12" y2="3"></line>
-                        </svg>
-                        Экспорт
-                    </a>
                 </div>
             </form>
 
@@ -453,7 +445,7 @@ require_once BASE_PATH . '/includes/topbar.php';
                             <th style="width: 40px;"></th>
                             <th>Название</th>
                             <th>Тип</th>
-                            <th>УНП</th>
+                            <th>ИНН</th>
                             <th>Контактное лицо</th>
                             <th>Контакты</th>
                             <th style="width: 120px;">Действия</th>
@@ -483,7 +475,7 @@ require_once BASE_PATH . '/includes/topbar.php';
                                     <span class="badge badge-secondary">Оба</span>
                                 <?php endif; ?>
                             </td>
-                            <td><?= e($c['unp'] ?? '-') ?></td>
+                            <td><?= e($c['inn'] ?? '-') ?></td>
                             <td><?= e($c['contact_person'] ?? '-') ?></td>
                             <td>
                                 <div style="display: flex; flex-direction: column; gap: 4px;">

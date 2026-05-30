@@ -33,7 +33,7 @@ if (!$contractor) {
 $formData = [
     'name' => $contractor['name'],
     'type' => $contractor['type'],
-    'unp' => $contractor['unp'] ?? '',
+    'inn' => $contractor['inn'] ?? '',
     'contact_person' => $contractor['contact_person'] ?? '',
     'phone' => $contractor['phone'] ?? '',
     'email' => $contractor['email'] ?? '',
@@ -45,7 +45,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $formData = [
         'name' => trim($_POST['name'] ?? ''),
         'type' => $_POST['type'] ?? 'customer',
-        'unp' => trim($_POST['unp'] ?? ''),
+        'inn' => trim($_POST['inn'] ?? ''),
         'contact_person' => trim($_POST['contact_person'] ?? ''),
         'phone' => trim($_POST['phone'] ?? ''),
         'email' => trim($_POST['email'] ?? ''),
@@ -76,14 +76,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         try {
             $stmt = $pdo->prepare("
                 UPDATE contractors 
-                SET name=:name, type=:type, unp=:unp, contact_person=:contact_person, 
+                SET name=:name, type=:type, inn=:inn, contact_person=:contact_person, 
                     phone=:phone, email=:email, address=:address, notes=:notes, updated_at=NOW() 
                 WHERE id=:id
             ");
             $stmt->execute([
                 ':name' => $formData['name'],
                 ':type' => $formData['type'],
-                ':unp' => $formData['unp'] ?: null,
+                ':inn' => $formData['inn'] ?: null,
                 ':contact_person' => $formData['contact_person'] ?: null,
                 ':phone' => $formData['phone'] ?: null,
                 ':email' => $formData['email'] ?: null,
@@ -253,8 +253,8 @@ select.form-control {
                     </div>
 
                     <div class="form-group">
-                        <label class="form-label">УНП</label>
-                        <input type="text" name="unp" class="form-control" value="<?= e($formData['unp']) ?>" placeholder="123456789" maxlength="9" pattern="[0-9]{9}">
+                        <label class="form-label">ИНН</label>
+                        <input type="text" name="inn" class="form-control" value="<?= e($formData['inn']) ?>" placeholder="123456789" maxlength="9" pattern="[0-9]{9}">
                     </div>
 
                     <div class="form-group">

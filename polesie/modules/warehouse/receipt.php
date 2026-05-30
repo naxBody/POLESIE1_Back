@@ -299,9 +299,7 @@ try {
                     <label>Тип документа</label>
                     <select id="filterDocType" onchange="loadDocuments()">
                         <option value="">Все типы</option>
-                        <?php foreach ($docTypes as $dt): ?>
-                            <option value="<?= $dt['id'] ?>"><?= htmlspecialchars($dt['name']) ?></option>
-                        <?php endforeach; ?>
+                        <!-- Заполняется через JS -->
                     </select>
                 </div>
                 <div class="filter-field">
@@ -372,9 +370,7 @@ try {
                         <label>Тип документа *</label>
                         <select id="docType">
                             <option value="">Выберите тип</option>
-                            <?php foreach ($docTypes as $dt): ?>
-                                <option value="<?= $dt['id'] ?>"><?= htmlspecialchars($dt['name']) ?></option>
-                            <?php endforeach; ?>
+                            <!-- Заполняется через JS -->
                         </select>
                     </div>
                     <div class="form-group">
@@ -524,7 +520,7 @@ try {
                 .then(r => r.json())
                 .then(data => {
                     if (data.success) {
-                        formData = data.data;
+                        formData = data.data || {};
                         formInitialized = true;
                         
                         // Заполняем селекты поставщиков
@@ -537,6 +533,18 @@ try {
                                 ).join('');
                         } else {
                             supplierSelect.innerHTML = '<option value="">Нет поставщиков (добавьте в справочнике)</option>';
+                        }
+                        
+                        // Заполняем типы документов в фильтре и форме
+                        const filterDocType = document.getElementById('filterDocType');
+                        const docTypeSelect = document.getElementById('docType');
+                        if (formData.document_types && formData.document_types.length > 0) {
+                            const optionsHtml = formData.document_types.map(dt => 
+                                `<option value="${dt.id}">${escapeHtml(dt.name)}</option>`
+                            ).join('');
+                            
+                            filterDocType.innerHTML = '<option value="">Все типы</option>' + optionsHtml;
+                            docTypeSelect.innerHTML = '<option value="">Выберите тип</option>' + optionsHtml;
                         }
                         
                         // Обновляем таблицу материалов если она открыта
@@ -884,6 +892,9 @@ try {
         
         // Закрытие по ESC и обработка кликов по модальному окну (после загрузки DOM)
         document.addEventListener('DOMContentLoaded', function() {
+            // Предзагрузка данных формы для быстрого доступа
+            loadFormDataIfNeeded();
+            
             document.addEventListener('keydown', function(e) {
                 if (e.key === 'Escape') {
                     closeDocumentModal();

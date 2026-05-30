@@ -642,7 +642,7 @@ foreach ($allTasks as &$task) {
         
         /* Когда заказ не выбран - скрываем панель продуктов и расширяем рабочую область */
         .production-dashboard.no-order-selected {
-            grid-template-columns: 300px minmax(0, 1fr);
+            grid-template-columns: 1fr;
         }
         
         .production-dashboard.no-order-selected #productsPanel {
@@ -650,7 +650,9 @@ foreach ($allTasks as &$task) {
         }
         
         .production-dashboard.no-order-selected #workArea {
-            grid-column: 2 / -1;
+            grid-column: 1 / -1;
+            width: 100%;
+            max-width: 100%;
         }
         
         .tasks-panel {
@@ -832,11 +834,14 @@ foreach ($allTasks as &$task) {
             border-bottom: 2px solid var(--border-color);
             flex-wrap: wrap;
             gap: 16px;
+            width: 100%;
+            box-sizing: border-box;
         }
         
         .work-area-title {
             flex: 1;
             min-width: 0;
+            max-width: 100%;
         }
         
         .work-area-title h3 {
@@ -849,6 +854,7 @@ foreach ($allTasks as &$task) {
             word-break: normal;
             hyphens: none;
             white-space: normal;
+            max-width: 100%;
         }
         
         .work-area-subtitle {
@@ -860,6 +866,7 @@ foreach ($allTasks as &$task) {
             word-break: normal;
             hyphens: none;
             white-space: normal;
+            max-width: 100%;
         }
         
         .work-area-actions {
@@ -875,6 +882,8 @@ foreach ($allTasks as &$task) {
             position: relative;
             z-index: 10;
             flex-wrap: wrap;
+            width: 100%;
+            box-sizing: border-box;
         }
         
         .tab-button {
@@ -892,6 +901,7 @@ foreach ($allTasks as &$task) {
             z-index: 1;
             border-radius: 6px 6px 0 0;
             white-space: nowrap;
+            flex-shrink: 0;
         }
         
         .tab-button:hover {
@@ -914,11 +924,14 @@ foreach ($allTasks as &$task) {
             z-index: 0;
             width: 100%;
             box-sizing: border-box;
+            min-width: 0;
         }
         
         .tab-content.active {
             display: block !important;
             z-index: 1;
+            width: 100%;
+            box-sizing: border-box;
         }
         
         @keyframes fadeIn {
@@ -993,6 +1006,8 @@ foreach ($allTasks as &$task) {
             padding: 3px 10px;
             border-radius: 12px;
             font-weight: 500;
+            white-space: nowrap;
+            flex-shrink: 0;
         }
         
         .status-pending { background: #f1f5f9; color: #64748b; }

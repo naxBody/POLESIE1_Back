@@ -1303,7 +1303,9 @@ $availableCombinationsJson = json_encode($availableCombinations, JSON_UNESCAPED_
                     <div class="material-card-header">
                         <div>
                             <div class="material-category">
-                                <?= e($material['parent_category_name_ru'] ?? $material['category_name_ru'] ?? '') ?> → 
+                                <?php if (!empty($material['parent_category_name_ru'])): ?>
+                                    <?= e($material['parent_category_name_ru']) ?> → 
+                                <?php endif; ?>
                                 <?= e($material['category_name_ru'] ?? '') ?>
                             </div>
                             <div class="material-name"><?= e($material['name_full']) ?></div>
@@ -1433,7 +1435,9 @@ $availableCombinationsJson = json_encode($availableCombinations, JSON_UNESCAPED_
                             <small style="color: var(--text-muted);"><?= e($material['name_short']) ?></small>
                         </td>
                         <td>
-                            <small><?= e($material['parent_category_name_ru'] ?? $material['category_name_ru'] ?? '') ?></small><br>
+                            <?php if (!empty($material['parent_category_name_ru'])): ?>
+                                <small><?= e($material['parent_category_name_ru']) ?> → </small>
+                            <?php endif; ?>
                             <strong><?= e($material['category_name_ru'] ?? '') ?></strong>
                         </td>
                         <td><?= e($material['grade'] ?? '—') ?></td>

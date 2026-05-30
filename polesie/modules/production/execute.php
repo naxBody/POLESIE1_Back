@@ -34,6 +34,7 @@ if ($isAjaxRequest && $selectedTaskId) {
     // Находим задание в базе
     $stmt = $pdo->prepare("SELECT pt.*, 
                o.order_number, 
+               o.id as order_id,
                p.name as product_name, 
                p.article as product_article,
                p.id as product_id,
@@ -48,9 +49,12 @@ if ($isAjaxRequest && $selectedTaskId) {
                pt.status as task_status,
                pt.planned_start as planned_date,
                pt.actual_start as actual_start,
-               pt.actual_end as actual_end
+               pt.actual_end as actual_end,
+               oi.id as order_item_id,
+               oi.production_status as item_production_status
         FROM production_tasks pt
         JOIN orders o ON pt.order_id = o.id
+        LEFT JOIN order_items oi ON pt.order_item_id = oi.id
         JOIN products p ON pt.product_id = p.id
         LEFT JOIN product_categories c ON p.category_id = c.id
         LEFT JOIN base_units u ON p.base_unit_id = u.id
@@ -158,7 +162,7 @@ if ($isAjaxRequest && $selectedTaskId) {
                 <h3><?= e($selectedTask['product_name']) ?></h3>
                 <p class="work-area-subtitle">
                     Артикул: <?= e($selectedTask['product_article']) ?> • 
-                    Заказ: <?= e($selectedTask['order_number']) ?> • 
+                    Заказ: <a href="<?= pageUrl('modules/orders/view.php?id=' . $selectedTask['order_id']) ?>" style="color: var(--primary-color); text-decoration: underline;" onclick="event.stopPropagation();"><?= e($selectedTask['order_number']) ?></a> • 
                     Задание #<?= $selectedTask['id'] ?>
                 </p>
             </div>
@@ -352,6 +356,7 @@ if ($isAjaxRequest && $selectedTaskId) {
 // Получение всех активных заданий с группировкой по заказам
 $sql = "SELECT pt.*, 
                o.order_number, 
+               o.id as order_id,
                p.name as product_name, 
                p.article as product_article,
                p.id as product_id,
@@ -366,9 +371,12 @@ $sql = "SELECT pt.*,
                pt.status as task_status,
                pt.planned_start as planned_date,
                pt.actual_start as actual_start,
-               pt.actual_end as actual_end
+               pt.actual_end as actual_end,
+               oi.id as order_item_id,
+               oi.production_status as item_production_status
         FROM production_tasks pt
         JOIN orders o ON pt.order_id = o.id
+        LEFT JOIN order_items oi ON pt.order_item_id = oi.id
         JOIN products p ON pt.product_id = p.id
         LEFT JOIN product_categories c ON p.category_id = c.id
         LEFT JOIN base_units u ON p.base_unit_id = u.id
@@ -939,7 +947,7 @@ foreach ($allTasks as &$task) {
                                             
                                             <div class="task-product-name"><?= e($task['product_name']) ?></div>
                                             <div class="task-order-info">
-                                                Заказ: <?= e($task['order_number']) ?> • 
+                                                Заказ: <a href="<?= pageUrl('modules/orders/view.php?id=' . $task['order_id']) ?>" style="color: var(--primary-color); text-decoration: underline;" onclick="event.stopPropagation();"><?= e($task['order_number']) ?></a> • 
                                                 План: <?= (int)$task['quantity_plan'] ?> <?= e($task['unit_name']) ?>
                                             </div>
                                             
@@ -966,7 +974,7 @@ foreach ($allTasks as &$task) {
                                         <h3><?= e($selectedTask['product_name']) ?></h3>
                                         <p class="work-area-subtitle">
                                             Артикул: <?= e($selectedTask['product_article']) ?> • 
-                                            Заказ: <?= e($selectedTask['order_number']) ?> • 
+                                            Заказ: <a href="<?= pageUrl('modules/orders/view.php?id=' . $selectedTask['order_id']) ?>" style="color: var(--primary-color); text-decoration: underline;"><?= e($selectedTask['order_number']) ?></a> • 
                                             Задание #<?= $selectedTask['id'] ?>
                                         </p>
                                     </div>

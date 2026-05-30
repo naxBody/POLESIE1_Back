@@ -106,16 +106,6 @@ try {
         $stmt = $pdo->query($sql);
         $allMaterials = $stmt->fetchAll(PDO::FETCH_ASSOC);
         
-        // Если запрошен конкретный материал, находим его для автооткрытия
-        if ($autoOpenMaterialId) {
-            foreach ($allMaterials as $mat) {
-                if ((int)$mat['id'] === $autoOpenMaterialId) {
-                    $autoOpenMaterialData = $mat;
-                    break;
-                }
-            }
-        }
-        
         error_log("Загружено материалов из БД: " . count($allMaterials));
         
         // Преобразуем JSON значения в обычные строки/числа И добавляем specifications как массив
@@ -229,6 +219,16 @@ try {
             }
         }
         unset($mat);
+        
+        // Если запрошен конкретный материал, находим его для автооткрытия (после преобразования specifications)
+        if ($autoOpenMaterialId) {
+            foreach ($allMaterials as $mat) {
+                if ((int)$mat['id'] === $autoOpenMaterialId) {
+                    $autoOpenMaterialData = $mat;
+                    break;
+                }
+            }
+        }
         
         error_log("Преобразовано материалов: " . count($allMaterials));
     } catch (Exception $e) {
@@ -1299,7 +1299,7 @@ $availableCombinationsJson = json_encode($availableCombinations, JSON_UNESCAPED_
         <!-- Вид: Карточки -->
         <div class="materials-grid" id="materialsGrid">
             <?php foreach ($filteredMaterials as $material): ?>
-                <div class="material-card" onclick="openMaterialModal(<?= htmlspecialchars(json_encode($material), ENT_QUOTES, 'UTF-8') ?>)">
+                <div class="material-card" onclick="openMaterialModal(<?= htmlspecialchars(json_encode($material, JSON_HEX_APOS | JSON_HEX_QUOT), ENT_QUOTES, 'UTF-8') ?>)">
                     <div class="material-card-header">
                         <div>
                             <div class="material-category">
@@ -1426,7 +1426,7 @@ $availableCombinationsJson = json_encode($availableCombinations, JSON_UNESCAPED_
                         $priceText = number_format($price, 2, ',', ' ');
                     }
                     ?>
-                    <tr onclick="openMaterialModal(<?= htmlspecialchars(json_encode($material), ENT_QUOTES, 'UTF-8') ?>)" style="cursor: pointer;">
+                    <tr onclick="openMaterialModal(<?= htmlspecialchars(json_encode($material, JSON_HEX_APOS | JSON_HEX_QUOT), ENT_QUOTES, 'UTF-8') ?>)" style="cursor: pointer;">
                         <td><code><?= e($material['code']) ?></code></td>
                         <td>
                             <strong><?= e($material['name_full']) ?></strong><br>
@@ -1703,9 +1703,19 @@ document.addEventListener('DOMContentLoaded', function() {
     // Автооткрытие карточки материала если передан параметр material
     <?php if ($autoOpenMaterialData): ?>
     (function() {
-        var materialData = <?= json_encode($autoOpenMaterialData, JSON_UNESCAPED_UNICODE) ?>;
+        var materialData = <?= json_encode($autoOpenMaterialData, JSON_UNESCAPED_UNICODE | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
         // Небольшая задержка чтобы убедиться что DOM полностью готов
         setTimeout(function() {
+            // Убеждаемся, что specifications - это объект, а не строка
+            if (typeof materialData.specifications === 'string') {
+                try {
+                    materialData.specifications = JSON.parse(materialData.specifications);
+                } catch(e) {
+                    materialData.specifications = {};
+                }
+            } else if (!materialData.specifications || typeof materialData.specifications !== 'object') {
+                materialData.specifications = {};
+            }
             openMaterialModal(materialData);
         }, 300);
     })();

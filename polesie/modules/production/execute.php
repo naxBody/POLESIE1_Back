@@ -174,13 +174,14 @@ if ($isAjaxRequest && $selectedTaskId) {
         $stagesStmt->execute([$selectedTask['id']]);
         $selectedTask['stages'] = $stagesStmt->fetchAll();
         
-        // Материалы для задания
+        // Материалы для задания - с категориями для группировки (как в паспортах)
         $materialsStmt = $pdo->prepare("
             SELECT ptm.id, ptm.task_id, ptm.material_id, ptm.quantity_required, 
                    ptm.quantity_reserved, ptm.quantity_used, ptm.unit_cost, ptm.total_cost, ptm.status as material_status,
                    m.name_full as material_name, m.name_short as material_short, m.code as material_code,
                    mu.symbol as unit_symbol,
                    COALESCE(m.current_stock, 0) as current_stock,
+                   mc.name as material_category,
                    CASE 
                        WHEN COALESCE(m.current_stock, 0) >= ptm.quantity_required THEN 'sufficient'
                        WHEN COALESCE(m.current_stock, 0) > 0 THEN 'partial'
@@ -189,8 +190,9 @@ if ($isAjaxRequest && $selectedTaskId) {
             FROM production_tasks_materials ptm
             JOIN materials m ON ptm.material_id = m.id
             LEFT JOIN base_units mu ON m.base_unit_id = mu.id
+            LEFT JOIN material_categories mc ON m.category_id = mc.id
             WHERE ptm.task_id = ?
-            ORDER BY m.name_full
+            ORDER BY mc.name, m.name_full
         ");
         $materialsStmt->execute([$selectedTask['id']]);
         $selectedTask['materials'] = $materialsStmt->fetchAll();

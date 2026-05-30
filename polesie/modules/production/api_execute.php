@@ -9,17 +9,23 @@ require_once __DIR__ . '/../../config/config.php';
 require_once __DIR__ . '/../../includes/auth.php';
 
 // Проверяем, это API запрос или обычная страница
-$isApiRequest = (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && 
-                strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest') ||
-                isset($_POST['action']) ||
-                (isset($_GET['api']) && $_GET['api'] == '1');
+// API запросом считаем только явные запросы с action или api=1
+$isApiRequest = isset($_POST['action']) || 
+                (isset($_GET['api']) && $_GET['api'] == '1') ||
+                (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && 
+                 strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest' &&
+                 (isset($_POST['action']) || isset($_GET['task_id'])));
 
 if ($isApiRequest) {
     if (session_status() === PHP_SESSION_NONE) {
         session_start();
     }
     
-    header('Content-Type: application/json');
+    // Не устанавливаем заголовок Content-Type для GET запросов с task_id
+    // чтобы можно было использовать этот файл и для обычного рендеринга
+    if ($_SERVER['REQUEST_METHOD'] !== 'GET' || !isset($_GET['task_id'])) {
+        header('Content-Type: application/json');
+    }
     
     if (!isLoggedIn()) {
         http_response_code(401);

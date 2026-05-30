@@ -589,11 +589,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['task_id'])) {
     }
 }
 
-// Если это не API запрос, выходим - функции выше доступны для execute.php
-if (!$isApiRequest) {
-    return;
-}
-
 /**
  * Создание этапов для задания на основе маршрутной карты
  */
@@ -669,5 +664,4 @@ function reserveMaterialsForTask($pdo, $taskId) {
 // Если это не API запрос, выходим - функции выше доступны для execute.php
 if (!$isApiRequest) {
     return;
-}
 }

@@ -7,50 +7,58 @@
 
 require_once __DIR__ . '/../../config/config.php';
 require_once __DIR__ . '/../../includes/auth.php';
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
 
-header('Content-Type: application/json');
+// Проверяем, это API запрос или обычная страница
+$isApiRequest = isset($_SERVER['HTTP_X_REQUESTED_WITH']) && 
+                strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest' ||
+                isset($_POST['action']) ||
+                (isset($_GET['api']) && $_GET['api'] == '1');
 
-if (!isLoggedIn()) {
-    http_response_code(401);
-    echo json_encode(['error' => 'Необходима авторизация']);
-    exit;
-}
-
-$user = getCurrentUser();
-$pdo = getDbConnection();
-
-try {
-    $input = json_decode(file_get_contents('php://input'), true);
-    $action = $input['action'] ?? '';
-    
-    if (!$action) {
-        throw new Exception('Не указано действие');
+if ($isApiRequest) {
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
     }
     
-    // Проверка прав
-    if (!hasPermission('production.edit') && !hasPermission('production.execute')) {
-        throw new Exception('Нет прав доступа к исполнению производства');
+    header('Content-Type: application/json');
+    
+    if (!isLoggedIn()) {
+        http_response_code(401);
+        echo json_encode(['error' => 'Необходима авторизация']);
+        exit;
     }
     
-    if ($action === 'start_stage') {
-        // Начало этапа производства
-        $stageId = (int)($input['stage_id'] ?? 0);
-        $taskId = (int)($input['task_id'] ?? 0);
+    $user = getCurrentUser();
+    $pdo = getDbConnection();
+    
+    try {
+        $input = json_decode(file_get_contents('php://input'), true);
+        $action = $input['action'] ?? ($_POST['action'] ?? '');
         
-        if (!$stageId || !$taskId) {
-            throw new Exception('Не указаны ID этапа или задания');
+        if (!$action) {
+            throw new Exception('Не указано действие');
         }
         
-        // Проверяем что этап принадлежит заданию
-        $checkStmt = $pdo->prepare("
-            SELECT pts.*, pt.status as task_status
-            FROM production_task_stages pts
-            JOIN production_tasks pt ON pts.task_id = pt.id
-            WHERE pts.id = ? AND pts.task_id = ?
-        ");
+        // Проверка прав
+        if (!hasPermission('production.edit') && !hasPermission('production.execute')) {
+            throw new Exception('Нет прав доступа к исполнению производства');
+        }
+        
+        if ($action === 'start_stage') {
+            // Начало этапа производства
+            $stageId = (int)($input['stage_id'] ?? 0);
+            $taskId = (int)($input['task_id'] ?? 0);
+            
+            if (!$stageId || !$taskId) {
+                throw new Exception('Не указаны ID этапа или задания');
+            }
+            
+            // Проверяем что этап принадлежит заданию
+            $checkStmt = $pdo->prepare("
+                SELECT pts.*, pt.status as task_status
+                FROM production_task_stages pts
+                JOIN production_tasks pt ON pts.task_id = pt.id
+                WHERE pts.id = ? AND pts.task_id = ?
+            ");
         $checkStmt->execute([$stageId, $taskId]);
         $stage = $checkStmt->fetch();
         
@@ -515,6 +523,12 @@ try {
     echo json_encode([
         'error' => $e->getMessage()
     ]);
+    exit;
+}
+
+// Если это не API запрос, выходим - функции ниже доступны для execute.php
+if (!$isApiRequest) {
+    return;
 }
 
 /**

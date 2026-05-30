@@ -7,10 +7,13 @@
 
 require_once __DIR__ . '/../../config/config.php';
 require_once __DIR__ . '/../../includes/auth.php';
-require_once __DIR__ . '/api_execute.php';
+
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
+
+// Подключаем API файл для доступа к функциям обработки
+require_once __DIR__ . '/api_execute.php';
 
 if (!isLoggedIn()) {
     redirect(pageUrl('login.php'));

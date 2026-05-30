@@ -24,8 +24,306 @@ $pdo = getDbConnection();
 
 $pageTitle = 'Исполнение производства';
 
+// Проверка AJAX-запроса
+$isAjaxRequest = isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
+
 // Получение выбранного задания из GET параметра
 $selectedTaskId = isset($_GET['task']) ? (int)$_GET['task'] : null;
+
+// Если это AJAX-запрос, отдаем только содержимое рабочей области
+if ($isAjaxRequest && $selectedTaskId) {
+    // Находим задание в базе
+    $stmt = $pdo->prepare("SELECT pt.*, 
+               o.order_number, 
+               p.name as product_name, 
+               p.article as product_article,
+               p.id as product_id,
+               c.name as category_name, 
+               u.symbol as unit_name,
+               u2.full_name as responsible_name, 
+               u3.full_name as worker_name,
+               pt.quantity_plan as quantity_plan,
+               pt.quantity_fact as quantity_fact,
+               pt.quantity_good as quantity_good,
+               pt.quantity_defect as quantity_defect,
+               pt.status as task_status,
+               pt.planned_start as planned_date,
+               pt.actual_start as actual_start,
+               pt.actual_end as actual_end
+        FROM production_tasks pt
+        JOIN orders o ON pt.order_id = o.id
+        JOIN products p ON pt.product_id = p.id
+        LEFT JOIN product_categories c ON p.category_id = c.id
+        LEFT JOIN base_units u ON p.base_unit_id = u.id
+        LEFT JOIN users u2 ON pt.responsible_id = u2.id
+        LEFT JOIN users u3 ON pt.worker_id = u3.id
+        WHERE pt.id = ?");
+    $stmt->execute([$selectedTaskId]);
+    $selectedTask = $stmt->fetch();
+    
+    if ($selectedTask) {
+        // Этапы выполнения
+        $stagesStmt = $pdo->prepare("
+            SELECT pts.id, pts.task_id, pts.stage_id, pts.status, pts.started_at, pts.completed_at,
+                   pts.worker_id, pts.time_spent_hours, pts.quantity_passed, pts.quantity_rejected, pts.notes,
+                   ps.name as stage_name, ps.code as stage_code, ps.color as stage_color, ps.sort_order
+            FROM production_task_stages pts
+            JOIN production_stages ps ON pts.stage_id = ps.id
+            WHERE pts.task_id = ?
+            ORDER BY ps.sort_order
+        ");
+        $stagesStmt->execute([$selectedTask['id']]);
+        $selectedTask['stages'] = $stagesStmt->fetchAll();
+        
+        // Если этапы не найдены, но есть маршрутная карта у продукта, создаем их автоматически
+        $routeCardId = $selectedTask['route_card_id'] ?? null;
+        
+        if (empty($routeCardId) && !empty($selectedTask['product_id'])) {
+            $prodStmt = $pdo->prepare("SELECT rc.id FROM route_cards rc WHERE rc.product_id = ? AND rc.is_active = 1 ORDER BY rc.created_at DESC LIMIT 1");
+            $prodStmt->execute([$selectedTask['product_id']]);
+            $prodRoute = $prodStmt->fetch();
+            if ($prodRoute) {
+                $routeCardId = $prodRoute['id'];
+            }
+        }
+        
+        if (empty($selectedTask['stages']) && !empty($routeCardId)) {
+            createStagesForTask($pdo, $selectedTask['id'], $routeCardId);
+            
+            // Повторно получаем этапы
+            $stagesStmt->execute([$selectedTask['id']]);
+            $selectedTask['stages'] = $stagesStmt->fetchAll();
+        }
+        
+        // Материалы для задания
+        $materialsStmt = $pdo->prepare("
+            SELECT ptm.id, ptm.task_id, ptm.material_id, ptm.quantity_required, 
+                   ptm.quantity_reserved, ptm.quantity_used, ptm.unit_cost, ptm.total_cost, ptm.status as material_status,
+                   m.name_full as material_name, m.name_short as material_short, m.code as material_code,
+                   mu.symbol as unit_symbol,
+                   COALESCE(m.current_stock, 0) as current_stock,
+                   CASE 
+                       WHEN COALESCE(m.current_stock, 0) >= ptm.quantity_required THEN 'sufficient'
+                       WHEN COALESCE(m.current_stock, 0) > 0 THEN 'partial'
+                       ELSE 'insufficient'
+                   END as availability
+            FROM production_tasks_materials ptm
+            JOIN materials m ON ptm.material_id = m.id
+            LEFT JOIN base_units mu ON m.base_unit_id = mu.id
+            WHERE ptm.task_id = ?
+            ORDER BY m.name_full
+        ");
+        $materialsStmt->execute([$selectedTask['id']]);
+        $selectedTask['materials'] = $materialsStmt->fetchAll();
+        
+        // Серийные номера для задания
+        $serialStmt = $pdo->prepare("
+            SELECT sn.id, sn.serial_number, sn.status, sn.created_at,
+                   p.name as product_name, p.article as product_article
+            FROM product_serial_numbers sn
+            JOIN products p ON sn.product_id = p.id
+            WHERE sn.task_id = ?
+            ORDER BY sn.created_at DESC
+        ");
+        $serialStmt->execute([$selectedTask['id']]);
+        $selectedTask['serial_numbers'] = $serialStmt->fetchAll();
+        
+        // Рендерим только содержимое рабочей области (без полного HTML)
+        ?>
+        <div class="work-area-header">
+            <div class="work-area-title">
+                <h3><?= e($selectedTask['product_name']) ?></h3>
+                <p class="work-area-subtitle">
+                    Артикул: <?= e($selectedTask['product_article']) ?> • 
+                    Заказ: <?= e($selectedTask['order_number']) ?> • 
+                    Задание #<?= $selectedTask['id'] ?>
+                </p>
+            </div>
+            <div class="work-area-actions">
+                <button class="btn btn-primary" onclick="openProductionModal(<?= $selectedTask['id'] ?>)">
+                    ✅ Завершить производство
+                </button>
+            </div>
+        </div>
+        
+        <div class="stats-row">
+            <div class="stat-card">
+                <div class="stat-value"><?= (int)$selectedTask['quantity_plan'] ?></div>
+                <div class="stat-label">План</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" style="color: var(--info-color);"><?= (int)$selectedTask['quantity_fact'] ?></div>
+                <div class="stat-label">Факт</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" style="color: var(--success-color);"><?= (int)$selectedTask['quantity_good'] ?></div>
+                <div class="stat-label">Годные</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" style="color: var(--error-color);"><?= (int)$selectedTask['quantity_defect'] ?></div>
+                <div class="stat-label">Брак</div>
+            </div>
+        </div>
+        
+        <!-- Вкладки -->
+        <div class="tabs-container">
+            <button class="tab-button active" data-tab="stages">Этапы</button>
+            <button class="tab-button" data-tab="materials">Материалы</button>
+            <button class="tab-button" data-tab="serial">Серийные номера</button>
+            <button class="tab-button" data-tab="info">Информация</button>
+        </div>
+        
+        <!-- Содержимое вкладок -->
+        <div id="tab-stages" class="tab-content active">
+            <?php if (!empty($selectedTask['stages'])): ?>
+                <div class="stages-grid">
+                    <?php foreach ($selectedTask['stages'] as $stage): ?>
+                        <div class="stage-card <?= e($stage['status']) ?>" data-stage-id="<?= $stage['id'] ?>">
+                            <div class="stage-header">
+                                <div class="stage-name"><?= e($stage['stage_name']) ?></div>
+                                <span class="stage-status status-<?= e($stage['status']) ?>">
+                                    <?= $stage['status'] === 'pending' ? 'Ожидает' : 
+                                        ($stage['status'] === 'in_progress' ? 'В работе' : 
+                                        ($stage['status'] === 'completed' ? 'Завершен' : 'Пропущен')) ?>
+                                </span>
+                            </div>
+                            
+                            <?php if ($stage['status'] !== 'completed'): ?>
+                                <div class="stage-actions">
+                                    <?php if ($stage['status'] === 'pending'): ?>
+                                        <button class="btn btn-sm btn-primary" onclick="startStage(<?= $stage['id'] ?>, <?= $selectedTask['id'] ?>)">
+                                            ▶ Начать
+                                        </button>
+                                    <?php elseif ($stage['status'] === 'in_progress'): ?>
+                                        <button class="btn btn-sm btn-success" onclick="completeStage(<?= $stage['id'] ?>, <?= $selectedTask['id'] ?>)">
+                                            ✓ Завершить
+                                        </button>
+                                    <?php endif; ?>
+                                </div>
+                            <?php else: ?>
+                                <div style="font-size: 12px; color: var(--text-secondary); margin-top: 8px;">
+                                    Завершен: <?= date('d.m.Y H:i', strtotime($stage['completed_at'])) ?>
+                                </div>
+                            <?php endif; ?>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            <?php else: ?>
+                <div class="empty-state">
+                    <div class="empty-state-icon">📋</div>
+                    <h3>Этапы не найдены</h3>
+                    <p>Для данного продукта не настроена маршрутная карта</p>
+                </div>
+            <?php endif; ?>
+        </div>
+        
+        <div id="tab-materials" class="tab-content">
+            <?php if (!empty($selectedTask['materials'])): ?>
+                <table class="materials-table">
+                    <thead>
+                        <tr>
+                            <th>Материал</th>
+                            <th>Требуется</th>
+                            <th>Использовано</th>
+                            <th>На складе</th>
+                            <th>Статус</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($selectedTask['materials'] as $material): ?>
+                            <tr>
+                                <td>
+                                    <strong><?= e($material['material_name']) ?></strong><br>
+                                    <small style="color: var(--text-secondary);"><?= e($material['material_code']) ?></small>
+                                </td>
+                                <td><?= number_format($material['quantity_required'], 2) ?> <?= e($material['unit_symbol']) ?></td>
+                                <td><?= number_format($material['quantity_used'], 2) ?> <?= e($material['unit_symbol']) ?></td>
+                                <td><?= number_format($material['current_stock'], 2) ?> <?= e($material['unit_symbol']) ?></td>
+                                <td>
+                                    <span class="availability-badge availability-<?= e($material['availability']) ?>">
+                                        <?= $material['availability'] === 'sufficient' ? 'Достаточно' : 
+                                            ($material['availability'] === 'partial' ? 'Частично' : 'Недостаточно') ?>
+                                    </span>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            <?php else: ?>
+                <div class="empty-state">
+                    <div class="empty-state-icon">📦</div>
+                    <h3>Материалы не найдены</h3>
+                    <p>Для данного задания не указаны материалы</p>
+                </div>
+            <?php endif; ?>
+        </div>
+        
+        <div id="tab-serial" class="tab-content">
+            <?php if (!empty($selectedTask['serial_numbers'])): ?>
+                <div class="serial-numbers-list">
+                    <?php foreach ($selectedTask['serial_numbers'] as $sn): ?>
+                        <div class="serial-badge">
+                            <strong><?= e($sn['serial_number']) ?></strong><br>
+                            <small><?= $sn['status'] === 'active' ? 'Активен' : 'Архив' ?></small>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            <?php else: ?>
+                <div class="empty-state">
+                    <div class="empty-state-icon">🏷️</div>
+                    <h3>Серийные номера не найдены</h3>
+                    <p>Серийные номера будут созданы при завершении производства</p>
+                </div>
+            <?php endif; ?>
+        </div>
+        
+        <div id="tab-info" class="tab-content">
+            <div class="production-form">
+                <div class="form-group">
+                    <label class="form-label">Ответственный</label>
+                    <input type="text" class="form-input" value="<?= e($selectedTask['responsible_name']) ?>" readonly>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Исполнитель</label>
+                    <select class="form-select" id="workerSelect" onchange="updateWorker(<?= $selectedTask['id'] ?>)">
+                        <option value="">Не назначен</option>
+                        <?php
+                        $workersStmt = $pdo->query("SELECT id, full_name FROM users WHERE role IN ('worker', 'engineer', 'admin') ORDER BY full_name");
+                        while ($worker = $workersStmt->fetch()) {
+                            $selected = ($worker['id'] == $selectedTask['worker_id']) ? 'selected' : '';
+                            echo "<option value='{$worker['id']}' $selected>" . e($worker['full_name']) . "</option>";
+                        }
+                        ?>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Плановая дата начала</label>
+                    <input type="text" class="form-input" value="<?= date('d.m.Y', strtotime($selectedTask['planned_date'])) ?>" readonly>
+                </div>
+                
+                <?php if ($selectedTask['actual_start']): ?>
+                <div class="form-group">
+                    <label class="form-label">Фактическая дата начала</label>
+                    <input type="text" class="form-input" value="<?= date('d.m.Y H:i', strtotime($selectedTask['actual_start'])) ?>" readonly>
+                </div>
+                <?php endif; ?>
+                
+                <div class="form-group">
+                    <label class="form-label">Приоритет</label>
+                    <span class="task-priority priority-<?= e($selectedTask['priority']) ?>">
+                        <?= $selectedTask['priority'] === 'urgent' ? 'Срочно' : 
+                            ($selectedTask['priority'] === 'high' ? 'Высокий' : 
+                            ($selectedTask['priority'] === 'normal' ? 'Нормальный' : 'Низкий')) ?>
+                    </span>
+                </div>
+            </div>
+        </div>
+        <?php
+        exit;
+    }
+}
 
 // Получение всех активных заданий с группировкой по заказам
 $sql = "SELECT pt.*, 
@@ -616,6 +914,7 @@ foreach ($allTasks as &$task) {
                         
                         <!-- Рабочая область -->
                         <div class="work-area" id="workArea">
+                            <div id="work-area-content">
                             <?php if ($selectedTask): ?>
                                 <div class="work-area-header">
                                     <div class="work-area-title">
@@ -843,6 +1142,7 @@ foreach ($allTasks as &$task) {
                                     <p>Выберите производственное задание из списка слева для начала работы</p>
                                 </div>
                             <?php endif; ?>
+                            </div> <!-- конец work-area-content -->
                         </div>
                     </div>
                 </div>
@@ -893,42 +1193,77 @@ foreach ($allTasks as &$task) {
     <script>
         let currentTaskId = <?= $selectedTask ? $selectedTask['id'] : 0 ?>;
         
-        // Сохраняем ID выбранной задачи перед перезагрузкой
+        // Выбор задачи без перезагрузки страницы (через AJAX)
         function selectTask(taskId) {
-            // Сохраняем позицию скролла и ID задачи в sessionStorage
-            const tasksList = document.querySelector('.tasks-list');
-            if (tasksList) {
-                sessionStorage.setItem('tasksScrollPosition', tasksList.scrollTop);
-            }
-            sessionStorage.setItem('selectedTaskId', taskId);
+            if (taskId === currentTaskId) return;
             
-            // Перезагружаем страницу с выбранным заданием
-            window.location.href = '?task=' + taskId;
+            // Обновляем визуальное выделение задач
+            document.querySelectorAll('.task-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            const activeItem = document.querySelector(`.task-item[data-task-id="${taskId}"]`);
+            if (activeItem) {
+                activeItem.classList.add('active');
+            }
+            
+            // Показываем индикатор загрузки
+            const workArea = document.getElementById('work-area');
+            if (workArea) {
+                workArea.style.opacity = '0.5';
+            }
+            
+            // Загружаем данные задачи через AJAX
+            fetch('?task=' + taskId + '&ajax=1', {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.text())
+            .then(html => {
+                // Находим контейнер рабочей области и обновляем его содержимое
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                const newWorkArea = doc.querySelector('#work-area-content');
+                
+                if (newWorkArea && workArea) {
+                    workArea.innerHTML = newWorkArea.innerHTML;
+                    
+                    // Обновляем URL без перезагрузки
+                    const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + '?task=' + taskId;
+                    window.history.pushState({taskId: taskId}, '', newUrl);
+                    
+                    currentTaskId = taskId;
+                    
+                    // Восстанавливаем прозрачность
+                    workArea.style.opacity = '1';
+                    
+                    // Инициализируем вкладки и другие скрипты если нужно
+                    initTabs();
+                }
+            })
+            .catch(error => {
+                console.error('Ошибка загрузки задачи:', error);
+                // Если AJAX не сработал, делаем обычную перезагрузку
+                window.location.href = '?task=' + taskId;
+            });
         }
         
-        // Восстанавливаем позицию скролла после загрузки страницы
+        // Инициализация вкладок
+        function initTabs() {
+            const tabButtons = document.querySelectorAll('.tab-button');
+            tabButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const tabName = this.getAttribute('data-tab');
+                    if (tabName) {
+                        switchTab(tabName);
+                    }
+                });
+            });
+        }
+        
+        // Вызываем после загрузки DOM
         document.addEventListener('DOMContentLoaded', function() {
-            const savedTaskId = sessionStorage.getItem('selectedTaskId');
-            const savedScrollPosition = sessionStorage.getItem('tasksScrollPosition');
-            
-            if (savedTaskId && savedScrollPosition !== null) {
-                const tasksList = document.querySelector('.tasks-list');
-                const activeItem = document.querySelector(`.task-item[data-task-id="${savedTaskId}"]`);
-                
-                if (tasksList && activeItem) {
-                    // Небольшая задержка чтобы убедиться что контент загружен
-                    setTimeout(() => {
-                        tasksList.scrollTop = parseInt(savedScrollPosition);
-                        
-                        // Дополнительно: прокручиваем так, чтобы активный элемент был виден
-                        activeItem.scrollIntoView({ behavior: 'auto', block: 'nearest' });
-                        
-                        // Очищаем сохраненные данные
-                        sessionStorage.removeItem('selectedTaskId');
-                        sessionStorage.removeItem('tasksScrollPosition');
-                    }, 100);
-                }
-            }
+            initTabs();
         });
         
         function switchTab(tabName) {

@@ -1887,55 +1887,15 @@ foreach ($allTasks as &$task) {
                         
                         html += `
                             <div class="product-group" style="border-bottom: 1px solid var(--border-color);">
-                                <div class="product-header" onclick="toggleProductTasks('prod-${product.product_id}'); autoSelectTask(${firstTaskId}, ${product.product_id})" 
+                                <div class="product-header" onclick="selectFirstTask(${firstTaskId})" 
                                      style="padding: 16px 20px; background: #f9fafb; cursor: pointer; display: flex; justify-content: space-between; align-items: center;">
                                     <div style="display: flex; align-items: center; gap: 8px;">
-                                        <span style="font-size: 12px;" id="icon-prod-${product.product_id}">▼</span>
                                         <div>
                                             <div style="font-weight: 500; color: var(--text-primary);">${product.product_name}</div>
                                             <div style="font-size: 11px; color: var(--text-secondary);">Арт. ${product.product_article} • План: ${product.order_item_quantity} ${product.unit_name}</div>
                                         </div>
                                     </div>
-                                    <span style="font-size: 11px; color: var(--primary-color); font-weight: 500;">${product.tasks && product.tasks.length > 0 ? '▶ Открыть' : ''}</span>
-                                </div>
-                                
-                                <div id="prod-${product.product_id}" class="product-tasks" style="display: block;">
-                        `;
-                        
-                        if (product.tasks && product.tasks.length > 0) {
-                            product.tasks.forEach(task => {
-                                const progressPercent = task.quantity_fact > 0 ? Math.round((task.quantity_fact / task.quantity_plan) * 100) : 0;
-                                const isActive = task.id == currentTaskId ? 'active' : '';
-                                
-                                html += `
-                                    <div class="task-item ${isActive}" data-task-id="${task.id}" onclick="selectTask(${task.id})"
-                                         style="padding: 14px 20px 14px 36px; border-bottom: 1px solid var(--border-color); cursor: pointer; transition: all var(--transition-fast);">
-                                        <div class="task-item-header" style="margin-bottom: 8px;">
-                                            <span class="task-number">#${task.id}</span>
-                                            <span class="task-priority priority-${task.priority}">
-                                                ${task.priority === 'urgent' ? 'Срочно' : 
-                                                  task.priority === 'high' ? 'Высокий' : 
-                                                  task.priority === 'low' ? 'Низкий' : 'Нормальный'}
-                                            </span>
-                                        </div>
-                                        
-                                        <div class="task-progress">
-                                            <div style="display: flex; justify-content: space-between; font-size: 12px; color: var(--text-secondary); margin-bottom: 6px;">
-                                                <span>План: ${Number(task.quantity_plan).toFixed(3).replace(/\.?0+$/, '').replace('.', ',')} ${task.unit_name}</span>
-                                                <span>${progressPercent}%</span>
-                                            </div>
-                                            <div class="progress-bar-container">
-                                                <div class="progress-bar-fill" style="width: ${Math.min(100, progressPercent)}%"></div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                `;
-                            });
-                        } else {
-                            html += `<div style="padding: 14px 20px 14px 36px; font-size: 13px; color: var(--text-secondary);">Нет заданий для этого товара</div>`;
-                        }
-                        
-                        html += `
+                                    <span style="font-size: 11px; color: var(--primary-color); font-weight: 500;">▶ Открыть</span>
                                 </div>
                             </div>
                         `;
@@ -1958,32 +1918,6 @@ foreach ($allTasks as &$task) {
             });
         }
         
-        // Сворачивание/разворачивание заданий товара
-        function toggleProductTasks(productId) {
-            const group = document.getElementById(productId);
-            const icon = document.getElementById('icon-' + productId);
-            if (group && icon) {
-                if (group.style.display === 'none') {
-                    group.style.display = 'block';
-                    icon.textContent = '▼';
-                } else {
-                    group.style.display = 'none';
-                    icon.textContent = '▶';
-                }
-            }
-        }
-        
-        // Авто-выбор первого задания при клике на товар
-        function autoSelectTask(taskId, productId) {
-            if (!taskId) return;
-            
-            // Проверяем, не выбрано ли уже это задание
-            if (taskId == currentTaskId) return;
-            
-            // Выбираем задание
-            selectTask(taskId);
-        }
-        
         // Закрытие панели товаров
         function closeProductsPanel() {
             document.getElementById('productsPanel').style.display = 'none';
@@ -1994,6 +1928,12 @@ foreach ($allTasks as &$task) {
             if (dashboard) {
                 dashboard.classList.add('no-order-selected');
             }
+        }
+        
+        // Выбор первого задания при клике на товар
+        function selectFirstTask(taskId) {
+            if (!taskId) return;
+            selectTask(taskId);
         }
         
         // Выбор задачи без перезагрузки страницы (через AJAX)

@@ -2016,43 +2016,27 @@ foreach ($allTasks as &$task) {
         
         function switchTab(tabName) {
             console.log('Переключение на вкладку:', tabName);
-            
+
             // Работаем только с элементами внутри #workArea
             const workArea = document.getElementById('workArea');
             if (!workArea) {
                 console.error('Рабочая область #workArea не найдена');
                 return;
             }
-            
-            // Ищем вкладку строго внутри workArea с помощью querySelector
-            let targetTabContent = workArea.querySelector('#tab-' + tabName);
-            console.log('Поиск вкладки #tab-' + tabName + ':', targetTabContent ? 'найдена' : 'не найдена');
-            
-            // Если не нашли по id, пробуем найти по data-tab
-            if (!targetTabContent) {
-                targetTabContent = workArea.querySelector('.tab-content[data-tab="' + tabName + '"]');
-                console.log('Поиск вкладки .tab-content[data-tab="' + tabName + '"]:', targetTabContent ? 'найдена' : 'не найдена');
-            }
-            
-            if (!targetTabContent) {
-                console.error('Не удалось найти вкладку для "' + tabName + '"');
-                const availableTabs = Array.from(workArea.querySelectorAll('.tab-content')).map(t => ({id: t.id, 'data-tab': t.getAttribute('data-tab')}));
-                console.log('Доступные вкладки:', availableTabs);
-                return;
-            }
 
             // Скрываем ВСЕ вкладки только в рабочей области
             const allTabs = workArea.querySelectorAll('.tab-content');
             console.log('Найдено вкладок для скрытия:', allTabs.length);
-            allTabs.forEach(tab => {
+            
+            allTabs.forEach(function(tab) {
                 tab.classList.remove('active');
                 tab.style.display = 'none';
-                console.log('Скрыта вкладка:', tab.id, 'текущий display:', tab.style.display);
+                console.log('Скрыта вкладка:', tab.id);
             });
-            
+
             // Находим кнопку которая соответствует этой вкладке и делаем её активной (только в workArea)
             const buttons = workArea.querySelectorAll('.tab-button');
-            buttons.forEach(btn => {
+            buttons.forEach(function(btn) {
                 btn.classList.remove('active');
                 const dataTab = btn.getAttribute('data-tab');
                 if (dataTab === tabName) {
@@ -2060,12 +2044,17 @@ foreach ($allTasks as &$task) {
                     console.log('Активирована кнопка:', dataTab);
                 }
             });
-            
-            // Показываем выбранную вкладку
-            console.log('Показываем вкладку:', targetTabContent.id);
-            targetTabContent.classList.add('active');
-            targetTabContent.style.display = 'block';
-            console.log('Вкладка ' + targetTabContent.id + ' активирована, классы:', targetTabContent.className, 'display:', targetTabContent.style.display);
+
+            // Показываем выбранную вкладку - ищем по ID
+            const targetTabContent = document.getElementById('tab-' + tabName);
+            if (targetTabContent && workArea.contains(targetTabContent)) {
+                console.log('Показываем вкладку:', targetTabContent.id);
+                targetTabContent.classList.add('active');
+                targetTabContent.style.display = 'block';
+                console.log('Вкладка ' + targetTabContent.id + ' активирована');
+            } else {
+                console.error('Не удалось найти вкладку #tab-' + tabName);
+            }
         }
         
         function startStage(stageId, taskId) {

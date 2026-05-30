@@ -248,10 +248,10 @@ if ($isAjaxRequest && $selectedTaskId) {
         
         <!-- Вкладки -->
         <div class="tabs-container">
-            <button class="tab-button active" data-tab="stages">Этапы</button>
-            <button class="tab-button" data-tab="materials">Материалы</button>
-            <button class="tab-button" data-tab="serial">Серийные номера</button>
-            <button class="tab-button" data-tab="info">Информация</button>
+            <button class="tab-button active" onclick="switchTab('stages')" data-tab="stages">Этапы</button>
+            <button class="tab-button" onclick="switchTab('materials')" data-tab="materials">Материалы</button>
+            <button class="tab-button" onclick="switchTab('serial')" data-tab="serial">Серийные номера</button>
+            <button class="tab-button" onclick="switchTab('info')" data-tab="info">Информация</button>
         </div>
         
         <!-- Содержимое вкладок -->
@@ -1424,10 +1424,10 @@ foreach ($allTasks as &$task) {
                                 </div>
                                 
                                 <div class="tabs-container">
-                                    <button class="tab-button active" data-tab="stages">Этапы</button>
-                                    <button class="tab-button" data-tab="materials">Материалы</button>
-                                    <button class="tab-button" data-tab="serial">Серийные номера</button>
-                                    <button class="tab-button" data-tab="info">Информация</button>
+                                    <button class="tab-button active" onclick="switchTab('stages')" data-tab="stages">Этапы</button>
+                                    <button class="tab-button" onclick="switchTab('materials')" data-tab="materials">Материалы</button>
+                                    <button class="tab-button" onclick="switchTab('serial')" data-tab="serial">Серийные номера</button>
+                                    <button class="tab-button" onclick="switchTab('info')" data-tab="info">Информация</button>
                                 </div>
                                 
                                 <!-- Вкладка этапы -->
@@ -1619,10 +1619,10 @@ foreach ($allTasks as &$task) {
                                 </div>
                                 
                                 <div class="tabs-container">
-                                    <button class="tab-button active" data-tab="stages">Этапы</button>
-                                    <button class="tab-button" data-tab="materials">Материалы</button>
-                                    <button class="tab-button" data-tab="serial">Серийные номера</button>
-                                    <button class="tab-button" data-tab="info">Информация</button>
+                                    <button class="tab-button active" onclick="switchTab('stages')" data-tab="stages">Этапы</button>
+                                    <button class="tab-button" onclick="switchTab('materials')" data-tab="materials">Материалы</button>
+                                    <button class="tab-button" onclick="switchTab('serial')" data-tab="serial">Серийные номера</button>
+                                    <button class="tab-button" onclick="switchTab('info')" data-tab="info">Информация</button>
                                 </div>
                                 
                                 <!-- Пустое состояние для вкладки Этапы -->
@@ -1709,6 +1709,50 @@ foreach ($allTasks as &$task) {
     </div>
     
     <script>
+        // Делаем функцию switchTab глобальной для доступа из onclick
+        window.switchTab = function(tabName) {
+            console.log('Переключение на вкладку:', tabName);
+
+            // Работаем только с элементами внутри #workArea
+            const workArea = document.getElementById('workArea');
+            if (!workArea) {
+                console.error('Рабочая область #workArea не найдена');
+                return;
+            }
+
+            // Скрываем ВСЕ вкладки только в рабочей области
+            const allTabs = workArea.querySelectorAll('.tab-content');
+            console.log('Найдено вкладок для скрытия:', allTabs.length);
+            
+            allTabs.forEach(function(tab) {
+                tab.classList.remove('active');
+                tab.style.display = 'none';
+                console.log('Скрыта вкладка:', tab.id);
+            });
+
+            // Находим кнопку которая соответствует этой вкладке и делаем её активной (только в workArea)
+            const buttons = workArea.querySelectorAll('.tab-button');
+            buttons.forEach(function(btn) {
+                btn.classList.remove('active');
+                const dataTab = btn.getAttribute('data-tab');
+                if (dataTab === tabName) {
+                    btn.classList.add('active');
+                    console.log('Активирована кнопка:', dataTab);
+                }
+            });
+
+            // Показываем выбранную вкладку - ищем по ID
+            const targetTabContent = document.getElementById('tab-' + tabName);
+            if (targetTabContent && workArea.contains(targetTabContent)) {
+                console.log('Показываем вкладку:', targetTabContent.id);
+                targetTabContent.classList.add('active');
+                targetTabContent.style.display = 'block';
+                console.log('Вкладка ' + targetTabContent.id + ' активирована');
+            } else {
+                console.error('Не удалось найти вкладку #tab-' + tabName);
+            }
+        };
+
         let currentTaskId = <?= $selectedTask ? $selectedTask['id'] : 0 ?>;
         let currentOrderId = null;
         
@@ -1972,20 +2016,9 @@ foreach ($allTasks as &$task) {
             }
             
             tabButtons.forEach((btn) => {
-                // Удаляем все существующие обработчики click через cloneNode
+                // Удаляем все существующие обработчики click через cloneNode (если они есть)
                 const newBtn = btn.cloneNode(true);
                 btn.parentNode.replaceChild(newBtn, btn);
-                
-                // Добавляем новый обработчик click
-                newBtn.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    const tabName = this.getAttribute('data-tab');
-                    console.log('Клик на вкладку:', tabName);
-                    if (tabName) {
-                        switchTab(tabName);
-                    }
-                });
             });
             
             // Активируем первую вкладку (Этапы) по умолчанию при инициализации
@@ -2012,49 +2045,6 @@ foreach ($allTasks as &$task) {
         // Также вызываем сразу при загрузке скрипта (для случаев, когда DOM уже готов)
         if (document.readyState === 'complete' || document.readyState === 'interactive') {
             setTimeout(initTabs, 10);
-        }
-        
-        function switchTab(tabName) {
-            console.log('Переключение на вкладку:', tabName);
-
-            // Работаем только с элементами внутри #workArea
-            const workArea = document.getElementById('workArea');
-            if (!workArea) {
-                console.error('Рабочая область #workArea не найдена');
-                return;
-            }
-
-            // Скрываем ВСЕ вкладки только в рабочей области
-            const allTabs = workArea.querySelectorAll('.tab-content');
-            console.log('Найдено вкладок для скрытия:', allTabs.length);
-            
-            allTabs.forEach(function(tab) {
-                tab.classList.remove('active');
-                tab.style.display = 'none';
-                console.log('Скрыта вкладка:', tab.id);
-            });
-
-            // Находим кнопку которая соответствует этой вкладке и делаем её активной (только в workArea)
-            const buttons = workArea.querySelectorAll('.tab-button');
-            buttons.forEach(function(btn) {
-                btn.classList.remove('active');
-                const dataTab = btn.getAttribute('data-tab');
-                if (dataTab === tabName) {
-                    btn.classList.add('active');
-                    console.log('Активирована кнопка:', dataTab);
-                }
-            });
-
-            // Показываем выбранную вкладку - ищем по ID
-            const targetTabContent = document.getElementById('tab-' + tabName);
-            if (targetTabContent && workArea.contains(targetTabContent)) {
-                console.log('Показываем вкладку:', targetTabContent.id);
-                targetTabContent.classList.add('active');
-                targetTabContent.style.display = 'block';
-                console.log('Вкладка ' + targetTabContent.id + ' активирована');
-            } else {
-                console.error('Не удалось найти вкладку #tab-' + tabName);
-            }
         }
         
         function startStage(stageId, taskId) {

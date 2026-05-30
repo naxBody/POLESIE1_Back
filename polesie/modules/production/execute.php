@@ -25,7 +25,8 @@ $pdo = getDbConnection();
 $pageTitle = 'Исполнение производства';
 
 // Проверка AJAX-запроса
-$isAjaxRequest = isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
+$isAjaxRequest = (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest') 
+                 || (isset($_GET['ajax']) && $_GET['ajax'] == '1');
 
 // Получение выбранного задания из GET параметра
 $selectedTaskId = isset($_GET['task']) ? (int)$_GET['task'] : null;
@@ -602,6 +603,12 @@ foreach ($allTasks as &$task) {
             border-radius: var(--border-radius-lg);
             box-shadow: var(--shadow);
             padding: 24px;
+            transition: opacity 0.3s ease;
+        }
+        
+        .work-area.loading {
+            opacity: 0.5;
+            pointer-events: none;
         }
         
         .work-area-header {
@@ -1231,7 +1238,7 @@ foreach ($allTasks as &$task) {
             // Показываем индикатор загрузки
             const workArea = document.getElementById('workArea');
             if (workArea) {
-                workArea.style.opacity = '0.5';
+                workArea.classList.add('loading');
             }
             
             // Загружаем данные задачи через AJAX
@@ -1263,7 +1270,7 @@ foreach ($allTasks as &$task) {
                     currentTaskId = taskId;
                     
                     // Восстанавливаем прозрачность
-                    workArea.style.opacity = '1';
+                    workArea.classList.remove('loading');
                     
                     // Инициализируем вкладки и другие скрипты если нужно
                     initTabs();
@@ -1278,8 +1285,16 @@ foreach ($allTasks as &$task) {
         
         // Инициализация вкладок
         function initTabs() {
+            // Удаляем старые обработчики событий клонированием элементов
             const tabButtons = document.querySelectorAll('.tab-button');
             tabButtons.forEach(btn => {
+                const newBtn = btn.cloneNode(true);
+                btn.parentNode.replaceChild(newBtn, btn);
+            });
+            
+            // Добавляем новые обработчики событий
+            const newTabButtons = document.querySelectorAll('.tab-button');
+            newTabButtons.forEach(btn => {
                 btn.addEventListener('click', function() {
                     const tabName = this.getAttribute('data-tab');
                     if (tabName) {
@@ -1290,7 +1305,7 @@ foreach ($allTasks as &$task) {
             
             // Активируем первую вкладку по умолчанию
             const firstTabButton = document.querySelector('.tab-button.active');
-            if (!firstTabButton && tabButtons.length > 0) {
+            if (!firstTabButton && newTabButtons.length > 0) {
                 switchTab('stages');
             }
         }

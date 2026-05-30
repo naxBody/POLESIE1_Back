@@ -149,11 +149,11 @@ try {
             $docTypesStmt = $pdo->query("SELECT id, name, name_ru, code FROM receipt_document_types WHERE is_active = TRUE ORDER BY sort_order");
             $docTypes = $docTypesStmt->fetchAll(PDO::FETCH_ASSOC);
             
-            // Поставщики
-            $suppliersStmt = $pdo->query("SELECT id, name, inn FROM contractors WHERE type IN ('supplier', 'both') AND is_active = TRUE ORDER BY name");
+            // Поставщики (без проверки is_active - колонки нет)
+            $suppliersStmt = $pdo->query("SELECT id, name, inn FROM contractors WHERE type IN ('supplier', 'both') ORDER BY name");
             $suppliers = $suppliersStmt->fetchAll(PDO::FETCH_ASSOC);
             
-            // Материалы
+            // Материалы (без проверки is_active - колонки нет)
             $materialsStmt = $pdo->query("
                 SELECT 
                     m.id, m.code, m.name_full, m.name_short,
@@ -163,7 +163,6 @@ try {
                 FROM materials m
                 LEFT JOIN material_categories mc ON m.category_id = mc.id
                 LEFT JOIN base_units bu ON m.base_unit_id = bu.id
-                WHERE m.is_active = TRUE OR m.is_active IS NULL
                 ORDER BY m.name_full
             ");
             $materials = $materialsStmt->fetchAll(PDO::FETCH_ASSOC);

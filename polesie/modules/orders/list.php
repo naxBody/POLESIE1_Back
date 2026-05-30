@@ -19,8 +19,25 @@ $pdo = getDbConnection();
 $search = $_GET['search'] ?? '';
 $statusId = $_GET['status'] ?? '';
 $contractorId = $_GET['contractor'] ?? '';
+$responsibleId = $_GET['responsible'] ?? '';
 $dateFrom = $_GET['date_from'] ?? '';
 $dateTo = $_GET['date_to'] ?? '';
+$createdDateFrom = $_GET['created_from'] ?? '';
+$createdDateTo = $_GET['created_to'] ?? '';
+$quickFilter = $_GET['quick_filter'] ?? '';
+
+// Обработка быстрых фильтров
+$today = date('Y-m-d');
+if ($quickFilter === 'today') {
+    $dateFrom = $today;
+    $dateTo = $today;
+} elseif ($quickFilter === 'week') {
+    $dateFrom = date('Y-m-d', strtotime('monday this week'));
+    $dateTo = $today;
+} elseif ($quickFilter === 'month') {
+    $dateFrom = date('Y-m-01');
+    $dateTo = $today;
+}
 
 // Построение запроса
 $sql = "
@@ -68,6 +85,11 @@ if ($contractorId) {
     $params[] = $contractorId;
 }
 
+if ($responsibleId) {
+    $sql .= " AND o.responsible_user_id = ?";
+    $params[] = $responsibleId;
+}
+
 if ($dateFrom) {
     $sql .= " AND o.order_date >= ?";
     $params[] = $dateFrom;
@@ -76,6 +98,16 @@ if ($dateFrom) {
 if ($dateTo) {
     $sql .= " AND o.order_date <= ?";
     $params[] = $dateTo;
+}
+
+if ($createdDateFrom) {
+    $sql .= " AND o.created_at >= ?";
+    $params[] = $createdDateFrom . ' 00:00:00';
+}
+
+if ($createdDateTo) {
+    $sql .= " AND o.created_at <= ?";
+    $params[] = $createdDateTo . ' 23:59:59';
 }
 
 $sql .= " GROUP BY o.id ORDER BY o.created_at DESC";
@@ -92,8 +124,11 @@ $countSql = "SELECT COUNT(DISTINCT o.id) FROM orders o
              ($search ? " AND (o.order_number LIKE ? OR c.name LIKE ?)" : "") .
              ($statusId ? " AND o.status = ?" : "") .
              ($contractorId ? " AND o.customer_id = ?" : "") .
+             ($responsibleId ? " AND o.responsible_user_id = ?" : "") .
              ($dateFrom ? " AND o.order_date >= ?" : "") .
-             ($dateTo ? " AND o.order_date <= ?" : "");
+             ($dateTo ? " AND o.order_date <= ?" : "") .
+             ($createdDateFrom ? " AND o.created_at >= ?" : "") .
+             ($createdDateTo ? " AND o.created_at <= ?" : "");
 
 $stmt = $pdo->prepare($countSql);
 $stmt->execute($params);
@@ -126,6 +161,9 @@ foreach ($statuses as $status) {
 // Получение контрагентов для фильтра
 $contractors = $pdo->query("SELECT id, name FROM contractors WHERE type IN ('customer', 'both') ORDER BY name LIMIT 100")->fetchAll();
 
+// Получение ответственных пользователей для фильтра
+$responsibleUsers = $pdo->query("SELECT id, full_name FROM users WHERE is_active = 1 ORDER BY full_name")->fetchAll();
+
 // Статистика
 $newOrdersCount = $statusCounts['new'] ?? 0;
 $inWorkCount = $statusCounts['processing'] ?? 0;
@@ -153,28 +191,50 @@ $pageTitle = 'Заказы';
             <div class="content-area">
                 <!-- Статистика по заказам -->
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px;">
-                    <div class="stat-card" style="background: linear-gradient(135deg, #3498db, #2980b9); color: white; padding: 24px; border-radius: 12px; text-align: center;">
-                        <div style="font-size: 36px; font-weight: 700; margin-bottom: 8px;"><?= $newOrdersCount ?></div>
-                        <div style="font-size: 14px; opacity: 0.9;">🆕 Новые заказы</div>
-                    </div>
-                    <div class="stat-card" style="background: linear-gradient(135deg, #f39c12, #e67e22); color: white; padding: 24px; border-radius: 12px; text-align: center;">
-                        <div style="font-size: 36px; font-weight: 700; margin-bottom: 8px;"><?= $inWorkCount ?></div>
-                        <div style="font-size: 14px; opacity: 0.9;">⚙️ В работе</div>
-                    </div>
-                    <div class="stat-card" style="background: linear-gradient(135deg, #27ae60, #229954); color: white; padding: 24px; border-radius: 12px; text-align: center;">
-                        <div style="font-size: 36px; font-weight: 700; margin-bottom: 8px;"><?= $readyCount ?></div>
-                        <div style="font-size: 14px; opacity: 0.9;">✅ Готовы к отгрузке</div>
-                    </div>
-                    <div class="stat-card" style="background: linear-gradient(135deg, #9b59b6, #8e44ad); color: white; padding: 24px; border-radius: 12px; text-align: center;">
-                        <div style="font-size: 36px; font-weight: 700; margin-bottom: 8px;"><?= $totalRecords ?></div>
-                        <div style="font-size: 14px; opacity: 0.9;">📋 Всего заказов</div>
-                    </div>
+                    <a href="?status=new" class="stat-card-link" style="text-decoration: none;">
+                        <div class="stat-card" style="background: linear-gradient(135deg, #3498db, #2980b9); color: white; padding: 24px; border-radius: 12px; text-align: center; cursor: pointer;">
+                            <div style="font-size: 36px; font-weight: 700; margin-bottom: 8px;"><?= $newOrdersCount ?></div>
+                            <div style="font-size: 14px; opacity: 0.9;">🆕 Новые заказы</div>
+                        </div>
+                    </a>
+                    <a href="?status=processing" class="stat-card-link" style="text-decoration: none;">
+                        <div class="stat-card" style="background: linear-gradient(135deg, #f39c12, #e67e22); color: white; padding: 24px; border-radius: 12px; text-align: center; cursor: pointer;">
+                            <div style="font-size: 36px; font-weight: 700; margin-bottom: 8px;"><?= $inWorkCount ?></div>
+                            <div style="font-size: 14px; opacity: 0.9;">⚙️ В работе</div>
+                        </div>
+                    </a>
+                    <a href="?status=ready" class="stat-card-link" style="text-decoration: none;">
+                        <div class="stat-card" style="background: linear-gradient(135deg, #27ae60, #229954); color: white; padding: 24px; border-radius: 12px; text-align: center; cursor: pointer;">
+                            <div style="font-size: 36px; font-weight: 700; margin-bottom: 8px;"><?= $readyCount ?></div>
+                            <div style="font-size: 14px; opacity: 0.9;">✅ Готовы к отгрузке</div>
+                        </div>
+                    </a>
+                    <a href="?" class="stat-card-link" style="text-decoration: none;">
+                        <div class="stat-card" style="background: linear-gradient(135deg, #9b59b6, #8e44ad); color: white; padding: 24px; border-radius: 12px; text-align: center; cursor: pointer;">
+                            <div style="font-size: 36px; font-weight: 700; margin-bottom: 8px;"><?= $totalRecords ?></div>
+                            <div style="font-size: 14px; opacity: 0.9;">📋 Всего заказов</div>
+                        </div>
+                    </a>
                 </div>
                 
                 <!-- Фильтры -->
                 <div class="card" style="margin-bottom: 24px;">
                     <div class="card-body">
-                        <form method="GET" action="" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; align-items: end;">
+                        <!-- Быстрые фильтры -->
+                        <div style="display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap;">
+                            <span style="font-size: 13px; color: var(--text-secondary); align-self: center;">Быстрые фильтры:</span>
+                            <a href="?quick_filter=today" class="btn btn-sm <?= $quickFilter === 'today' ? 'btn-primary' : 'btn-secondary' ?>">📅 Сегодня</a>
+                            <a href="?quick_filter=week" class="btn btn-sm <?= $quickFilter === 'week' ? 'btn-primary' : 'btn-secondary' ?>">📆 Эта неделя</a>
+                            <a href="?quick_filter=month" class="btn btn-sm <?= $quickFilter === 'month' ? 'btn-primary' : 'btn-secondary' ?>">📅 Этот месяц</a>
+                            <?php if ($statusId): ?>
+                            <a href="?status=<?= e($statusId) ?>" class="btn btn-sm btn-secondary">🔄 Только этот статус</a>
+                            <?php endif; ?>
+                            <?php if ($responsibleId): ?>
+                            <a href="?responsible=<?= e($responsibleId) ?>" class="btn btn-sm btn-secondary">👤 Мой фильтр</a>
+                            <?php endif; ?>
+                        </div>
+                        
+                        <form method="GET" action="" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; align-items: end;">
                             <div class="form-group" style="margin-bottom: 0;">
                                 <label class="form-label">Поиск</label>
                                 <input type="text" name="search" class="form-control" placeholder="№ заказа или заказчик" value="<?= e($search) ?>">
@@ -201,18 +261,38 @@ $pageTitle = 'Заказы';
                             </div>
                             
                             <div class="form-group" style="margin-bottom: 0;">
-                                <label class="form-label">С даты</label>
+                                <label class="form-label">Ответственный</label>
+                                <select name="responsible" class="form-control">
+                                    <option value="">Все сотрудники</option>
+                                    <?php foreach ($responsibleUsers as $u): ?>
+                                    <option value="<?= $u['id'] ?>" <?= $responsibleId == $u['id'] ? 'selected' : '' ?>><?= e($u['full_name']) ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <label class="form-label">Дата заказа с</label>
                                 <input type="date" name="date_from" class="form-control" value="<?= e($dateFrom) ?>">
                             </div>
                             
                             <div class="form-group" style="margin-bottom: 0;">
-                                <label class="form-label">По дату</label>
+                                <label class="form-label">Дата заказа по</label>
                                 <input type="date" name="date_to" class="form-control" value="<?= e($dateTo) ?>">
                             </div>
                             
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <label class="form-label">Создан с</label>
+                                <input type="date" name="created_from" class="form-control" value="<?= e($createdDateFrom) ?>">
+                            </div>
+                            
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <label class="form-label">Создан по</label>
+                                <input type="date" name="created_to" class="form-control" value="<?= e($createdDateTo) ?>">
+                            </div>
+                            
                             <div style="display: flex; gap: 8px;">
-                                <button type="submit" class="btn btn-primary">Фильтр</button>
-                                <a href="" class="btn btn-secondary">Сброс</a>
+                                <button type="submit" class="btn btn-primary">🔍 Применить</button>
+                                <a href="?" class="btn btn-secondary">✖ Сброс</a>
                             </div>
                         </form>
                     </div>
@@ -289,19 +369,33 @@ $pageTitle = 'Заказы';
                                 Показано <?= $offset + 1 ?> - <?= min($offset + $perPage, $totalRecords) ?> из <?= $totalRecords ?>
                             </span>
                             <div style="display: flex; gap: 4px;">
+                                <?php 
+                                $filterParams = [];
+                                if ($search) $filterParams[] = 'search=' . urlencode($search);
+                                if ($statusId) $filterParams[] = 'status=' . urlencode($statusId);
+                                if ($contractorId) $filterParams[] = 'contractor=' . urlencode($contractorId);
+                                if ($responsibleId) $filterParams[] = 'responsible=' . urlencode($responsibleId);
+                                if ($dateFrom) $filterParams[] = 'date_from=' . urlencode($dateFrom);
+                                if ($dateTo) $filterParams[] = 'date_to=' . urlencode($dateTo);
+                                if ($createdDateFrom) $filterParams[] = 'created_from=' . urlencode($createdDateFrom);
+                                if ($createdDateTo) $filterParams[] = 'created_to=' . urlencode($createdDateTo);
+                                if ($quickFilter) $filterParams[] = 'quick_filter=' . urlencode($quickFilter);
+                                $filterString = !empty($filterParams) ? '&' . implode('&', $filterParams) : '';
+                                ?>
+                                
                                 <?php if ($page > 1): ?>
-                                <a href="?page=<?= $page - 1 ?><?= $search ? '&search=' . urlencode($search) : '' ?>" class="btn btn-sm btn-secondary">← Назад</a>
+                                <a href="?page=<?= $page - 1 ?><?= $filterString ?>" class="btn btn-sm btn-secondary">← Назад</a>
                                 <?php endif; ?>
                                 
                                 <?php for ($i = max(1, $page - 2); $i <= min($totalPages, $page + 2); $i++): ?>
-                                <a href="?page=<?= $i ?><?= $search ? '&search=' . urlencode($search) : '' ?>" 
+                                <a href="?page=<?= $i ?><?= $filterString ?>" 
                                    class="btn btn-sm <?= $i == $page ? 'btn-primary' : 'btn-secondary' ?>">
                                     <?= $i ?>
                                 </a>
                                 <?php endfor; ?>
                                 
                                 <?php if ($page < $totalPages): ?>
-                                <a href="?page=<?= $page + 1 ?><?= $search ? '&search=' . urlencode($search) : '' ?>" class="btn btn-sm btn-secondary">Вперед →</a>
+                                <a href="?page=<?= $page + 1 ?><?= $filterString ?>" class="btn btn-sm btn-secondary">Вперед →</a>
                                 <?php endif; ?>
                             </div>
                         </div>

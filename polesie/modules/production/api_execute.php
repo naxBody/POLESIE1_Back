@@ -665,3 +665,9 @@ function reserveMaterialsForTask($pdo, $taskId) {
         }
     }
 }
+
+// Если это не API запрос, выходим - функции выше доступны для execute.php
+if (!$isApiRequest) {
+    return;
+}
+}

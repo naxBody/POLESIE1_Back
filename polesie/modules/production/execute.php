@@ -452,9 +452,10 @@ $stmt->execute();
 $allTasks = $stmt->fetchAll();
 
 // Получение списка всех заказов для фильтра
-$ordersListStmt = $pdo->query("SELECT DISTINCT o.id, o.order_number, o.customer_name, o.status 
+$ordersListStmt = $pdo->query("SELECT DISTINCT o.id, o.order_number, COALESCE(c.name, 'Не указан') as customer_name, o.status 
                                FROM orders o
                                INNER JOIN production_tasks pt ON o.id = pt.order_id
+                               LEFT JOIN contractors c ON o.customer_id = c.id
                                WHERE pt.status IN ('planned', 'in_progress')
                                ORDER BY o.order_number DESC");
 $ordersList = $ordersListStmt->fetchAll();

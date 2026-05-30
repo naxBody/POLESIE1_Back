@@ -29,7 +29,59 @@ $isAjaxRequest = (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVE
 // Получение выбранного задания из GET параметра
 $selectedTaskId = isset($_GET['task']) ? (int)$_GET['task'] : null;
 
-// Если это AJAX-запрос, отдаем только содержимое рабочей области
+// AJAX запрос для получения товаров заказа
+if ($isAjaxRequest && isset($_GET['order'])) {
+    $orderId = (int)$_GET['order'];
+    
+    // Получаем товары и задания для заказа
+    $sql = "SELECT pt.*,
+                   o.order_number,
+                   o.id as order_id,
+                   p.name as product_name,
+                   p.article as product_article,
+                   p.id as product_id,
+                   u.symbol as unit_name,
+                   oi.quantity as order_item_quantity,
+                   pt.quantity_plan as quantity_plan,
+                   pt.quantity_fact as quantity_fact,
+                   pt.priority
+            FROM production_tasks pt
+            JOIN orders o ON pt.order_id = o.id
+            LEFT JOIN order_items oi ON pt.order_item_id = oi.id
+            JOIN products p ON pt.product_id = p.id
+            LEFT JOIN base_units u ON p.base_unit_id = u.id
+            WHERE o.id = ? AND pt.status IN ('planned', 'in_progress')
+            ORDER BY p.name ASC, pt.planned_start ASC";
+    
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute([$orderId]);
+    $tasks = $stmt->fetchAll();
+    
+    // Группировка по продуктам
+    $products = [];
+    foreach ($tasks as $task) {
+        $productId = $task['product_id'];
+        
+        if (!isset($products[$productId])) {
+            $products[$productId] = [
+                'product_id' => $productId,
+                'product_name' => $task['product_name'],
+                'product_article' => $task['product_article'],
+                'order_item_quantity' => $task['order_item_quantity'] ?? 0,
+                'unit_name' => $task['unit_name'],
+                'tasks' => []
+            ];
+        }
+        
+        $products[$productId]['tasks'][] = $task;
+    }
+    
+    header('Content-Type: application/json');
+    echo json_encode(['products' => array_values($products)]);
+    exit;
+}
+
+// Если это AJAX-запрос на задание, отдаем только содержимое рабочей области
 if ($isAjaxRequest && $selectedTaskId) {
     // Находим задание в базе
     $stmt = $pdo->prepare("SELECT pt.*, 
@@ -399,6 +451,14 @@ $stmt = $pdo->prepare($sql);
 $stmt->execute();
 $allTasks = $stmt->fetchAll();
 
+// Получение списка всех заказов для фильтра
+$ordersListStmt = $pdo->query("SELECT DISTINCT o.id, o.order_number, o.customer_name, o.status 
+                               FROM orders o
+                               INNER JOIN production_tasks pt ON o.id = pt.order_id
+                               WHERE pt.status IN ('planned', 'in_progress')
+                               ORDER BY o.order_number DESC");
+$ordersList = $ordersListStmt->fetchAll();
+
 // Группировка заданий по заказам и товарам
 $ordersGrouped = [];
 foreach ($allTasks as $task) {
@@ -539,7 +599,7 @@ foreach ($allTasks as &$task) {
         /* Специфичные стили для страницы исполнения */
         .production-dashboard {
             display: grid;
-            grid-template-columns: 350px 1fr;
+            grid-template-columns: 300px 350px 1fr;
             gap: 24px;
             margin-bottom: 24px;
         }
@@ -549,6 +609,8 @@ foreach ($allTasks as &$task) {
             border-radius: var(--border-radius-lg);
             box-shadow: var(--shadow);
             overflow: hidden;
+            display: flex;
+            flex-direction: column;
         }
         
         .tasks-list {
@@ -561,6 +623,15 @@ foreach ($allTasks as &$task) {
             border-bottom: 1px solid var(--border-color);
             cursor: pointer;
             transition: all var(--transition-fast);
+        }
+        
+        .order-item:hover {
+            background: var(--gray-50) !important;
+        }
+        
+        .order-item.active {
+            background: linear-gradient(90deg, rgba(37, 99, 235, 0.08) 0%, transparent 100%);
+            border-left: 4px solid var(--primary-color);
         }
         
         .task-item:hover {
@@ -933,85 +1004,82 @@ foreach ($allTasks as &$task) {
                     </div>
 
                     <div class="production-dashboard">
-                        <!-- Панель списка заданий -->
+                        <!-- Панель списка заказов с фильтрами -->
                         <div class="tasks-panel">
-                            <div style="padding: 20px; border-bottom: 1px solid var(--border-color);">
-                                <h3 style="font-size: 16px; font-weight: 600;">Активные задания</h3>
-                                <p style="font-size: 13px; color: var(--text-secondary); margin-top: 4px;">
-                                    <?= count($ordersGrouped) ?> заказов, <?= count($tasks) ?> заданий в работе
-                                </p>
+                            <!-- Фильтры заказов -->
+                            <div style="padding: 20px; border-bottom: 1px solid var(--border-color); background: var(--gray-50);">
+                                <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 12px;">📋 Выбор заказа</h3>
+                                
+                                <!-- Поиск по заказам -->
+                                <div style="margin-bottom: 12px;">
+                                    <input type="text" id="orderSearch" placeholder="Поиск заказа..." 
+                                           style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 14px;"
+                                           onkeyup="filterOrders()">
+                                </div>
+                                
+                                <!-- Фильтр по статусу -->
+                                <div style="margin-bottom: 12px;">
+                                    <select id="orderStatusFilter" 
+                                            style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 14px;"
+                                            onchange="filterOrders()">
+                                        <option value="">Все статусы</option>
+                                        <option value="new">Новый</option>
+                                        <option value="in_progress">В работе</option>
+                                        <option value="completed">Завершен</option>
+                                        <option value="cancelled">Отменен</option>
+                                    </select>
+                                </div>
+                                
+                                <div style="font-size: 13px; color: var(--text-secondary);">
+                                    <strong><?= count($ordersList) ?></strong> заказов с активными заданиями
+                                </div>
                             </div>
                             
-                            <div class="tasks-list">
-                                <?php if (empty($ordersGrouped)): ?>
+                            <!-- Список заказов -->
+                            <div class="tasks-list" id="ordersListContainer">
+                                <?php if (empty($ordersList)): ?>
                                     <div class="empty-state">
                                         <div class="empty-state-icon">📋</div>
-                                        <h4>Нет активных заданий</h4>
-                                        <p style="font-size: 13px;">Все задания выполнены или отсутствуют</p>
+                                        <h4>Нет активных заказов</h4>
+                                        <p style="font-size: 13px;">Все заказы выполнены или отсутствуют</p>
                                     </div>
                                 <?php else: ?>
-                                    <?php foreach ($ordersGrouped as $orderNumber => $orderData): ?>
-                                        <!-- Заказ -->
-                                        <div class="order-group" style="border-bottom: 2px solid var(--border-color);">
-                                            <div class="order-header" onclick="toggleOrderGroup('order-<?= e($orderNumber) ?>')" style="padding: 16px 20px; background: var(--gray-50); cursor: pointer; display: flex; justify-content: space-between; align-items: center;">
-                                                <div style="display: flex; align-items: center; gap: 12px;">
-                                                    <span style="font-size: 14px;" id="icon-order-<?= e($orderNumber) ?>">▼</span>
-                                                    <strong style="color: var(--primary-color);">Заказ <?= e($orderNumber) ?></strong>
-                                                    <span style="font-size: 12px; color: var(--text-secondary);"><?= count($orderData['products']) ?> товар(ов)</span>
-                                                </div>
-                                                <a href="<?= pageUrl('modules/orders/view.php?id=' . $orderData['order_id']) ?>" 
-                                                   style="font-size: 12px; color: var(--primary-color); text-decoration: underline;" 
-                                                   onclick="event.stopPropagation();">
-                                                    Открыть заказ →
-                                                </a>
+                                    <?php foreach ($ordersList as $order): ?>
+                                        <div class="order-item" data-order-id="<?= $order['id'] ?>" data-order-number="<?= e($order['order_number']) ?>" data-order-status="<?= e($order['status']) ?>"
+                                             onclick="selectOrder(<?= $order['id'] ?>, '<?= e($order['order_number']) ?>')"
+                                             style="padding: 16px 20px; border-bottom: 1px solid var(--border-color); cursor: pointer; transition: all var(--transition-fast);"
+                                             onmouseover="this.style.background='var(--gray-50)'" 
+                                             onmouseout="this.style.background='white'">
+                                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                                                <strong style="color: var(--primary-color); font-size: 15px;">Заказ <?= e($order['order_number']) ?></strong>
+                                                <span class="task-priority priority-normal"><?= e($order['status'] ?? 'В работе') ?></span>
                                             </div>
-                                            
-                                            <!-- Товары в заказе -->
-                                            <div id="order-<?= e($orderNumber) ?>" class="order-products" style="display: block;">
-                                                <?php foreach ($orderData['products'] as $productId => $productData): ?>
-                                                    <div class="product-group" style="border-bottom: 1px solid var(--border-color);">
-                                                        <div class="product-header" onclick="toggleProductGroup('product-<?= $orderNumber ?>-<?= $productId ?>')" style="padding: 12px 20px 12px 32px; background: #f9fafb; cursor: pointer; display: flex; justify-content: space-between; align-items: center;">
-                                                            <div style="display: flex; align-items: center; gap: 8px;">
-                                                                <span style="font-size: 12px;" id="icon-product-<?= $orderNumber ?>-<?= $productId ?>">▼</span>
-                                                                <span style="font-weight: 500;"><?= e($productData['product_name']) ?></span>
-                                                                <span style="font-size: 11px; color: var(--text-secondary);">(арт. <?= e($productData['product_article']) ?>)</span>
-                                                                <span style="font-size: 11px; color: var(--text-secondary);">• План: <?= number_format($productData['order_item_quantity'], 2) ?> <?= e($productData['unit_name']) ?></span>
-                                                            </div>
-                                                        </div>
-                                                        
-                                                        <!-- Задания для товара -->
-                                                        <div id="product-<?= $orderNumber ?>-<?= $productId ?>" class="product-tasks" style="display: block;">
-                                                            <?php foreach ($productData['tasks'] as $task): ?>
-                                                                <div class="task-item <?= $selectedTask && $task['id'] == $selectedTask['id'] ? 'active' : '' ?>" 
-                                                                     data-task-id="<?= $task['id'] ?>"
-                                                                     onclick="selectTask(<?= $task['id'] ?>)">
-                                                                    <div class="task-item-header">
-                                                                        <span class="task-number">#<?= $task['id'] ?></span>
-                                                                        <span class="task-priority priority-<?= $task['priority'] ?>">
-                                                                            <?= $task['priority'] === 'urgent' ? 'Срочно' : 
-                                                                                ($task['priority'] === 'high' ? 'Высокий' : 
-                                                                                ($task['priority'] === 'low' ? 'Низкий' : 'Нормальный')) ?>
-                                                                        </span>
-                                                                    </div>
-                                                                    
-                                                                    <div class="task-progress">
-                                                                        <div style="display: flex; justify-content: space-between; font-size: 12px; color: var(--text-secondary);">
-                                                                            <span>План: <?= (int)$task['quantity_plan'] ?> <?= e($task['unit_name']) ?></span>
-                                                                            <span><?= $task['quantity_fact'] > 0 ? round(($task['quantity_fact'] / $task['quantity_plan']) * 100) : 0 ?>%</span>
-                                                                        </div>
-                                                                        <div class="progress-bar-container">
-                                                                            <div class="progress-bar-fill" style="width: <?= $task['quantity_fact'] > 0 ? min(100, ($task['quantity_fact'] / $task['quantity_plan']) * 100) : 0 ?>%"></div>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                            <?php endforeach; ?>
-                                                        </div>
-                                                    </div>
-                                                <?php endforeach; ?>
+                                            <?php if (!empty($order['customer_name'])): ?>
+                                                <div style="font-size: 13px; color: var(--text-secondary); margin-bottom: 4px;">
+                                                    👤 <?= e($order['customer_name']) ?>
+                                                </div>
+                                            <?php endif; ?>
+                                            <div style="font-size: 12px; color: var(--text-secondary);">
+                                                Нажмите для просмотра товаров и заданий
                                             </div>
                                         </div>
                                     <?php endforeach; ?>
                                 <?php endif; ?>
+                            </div>
+                        </div>
+                        
+                        <!-- Панель товаров выбранного заказа -->
+                        <div class="tasks-panel" id="productsPanel" style="display: none;">
+                            <div style="padding: 20px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
+                                <div>
+                                    <h3 style="font-size: 16px; font-weight: 600;" id="selectedOrderTitle">Товары заказа</h3>
+                                    <p style="font-size: 13px; color: var(--text-secondary); margin-top: 4px;" id="selectedOrderSubtitle"></p>
+                                </div>
+                                <button onclick="closeProductsPanel()" style="background: none; border: none; cursor: pointer; font-size: 20px; color: var(--text-secondary);">✕</button>
+                            </div>
+                            
+                            <div class="tasks-list" id="productsListContainer">
+                                <!-- Товары будут загружены здесь через JS -->
                             </div>
                         </div>
                         
@@ -1293,6 +1361,143 @@ foreach ($allTasks as &$task) {
     
     <script>
         let currentTaskId = <?= $selectedTask ? $selectedTask['id'] : 0 ?>;
+        let currentOrderId = null;
+        
+        // Фильтрация заказов
+        function filterOrders() {
+            const searchText = document.getElementById('orderSearch').value.toLowerCase();
+            const statusFilter = document.getElementById('orderStatusFilter').value;
+            
+            document.querySelectorAll('.order-item').forEach(item => {
+                const orderNumber = item.getAttribute('data-order-number').toLowerCase();
+                const orderStatus = item.getAttribute('data-order-status');
+                
+                const matchesSearch = orderNumber.includes(searchText);
+                const matchesStatus = !statusFilter || orderStatus === statusFilter;
+                
+                if (matchesSearch && matchesStatus) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+        
+        // Выбор заказа
+        function selectOrder(orderId, orderNumber) {
+            currentOrderId = orderId;
+            
+            // Показываем панель товаров
+            document.getElementById('productsPanel').style.display = 'block';
+            document.getElementById('selectedOrderTitle').textContent = 'Товары заказа ' + orderNumber;
+            document.getElementById('selectedOrderSubtitle').textContent = 'Заказ #' + orderId;
+            
+            // Загружаем товары заказа через AJAX
+            fetch('?ajax=1&order=' + orderId, {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                const container = document.getElementById('productsListContainer');
+                
+                if (data.products && data.products.length > 0) {
+                    let html = '';
+                    
+                    data.products.forEach(product => {
+                        html += `
+                            <div class="product-group" style="border-bottom: 1px solid var(--border-color);">
+                                <div class="product-header" onclick="toggleProductTasks('prod-${product.product_id}')" 
+                                     style="padding: 16px 20px; background: #f9fafb; cursor: pointer; display: flex; justify-content: space-between; align-items: center;">
+                                    <div style="display: flex; align-items: center; gap: 8px;">
+                                        <span style="font-size: 12px;" id="icon-prod-${product.product_id}">▼</span>
+                                        <div>
+                                            <div style="font-weight: 500; color: var(--text-primary);">${product.product_name}</div>
+                                            <div style="font-size: 11px; color: var(--text-secondary);">Арт. ${product.product_article} • План: ${product.order_item_quantity} ${product.unit_name}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div id="prod-${product.product_id}" class="product-tasks" style="display: block;">
+                        `;
+                        
+                        if (product.tasks && product.tasks.length > 0) {
+                            product.tasks.forEach(task => {
+                                const progressPercent = task.quantity_fact > 0 ? Math.round((task.quantity_fact / task.quantity_plan) * 100) : 0;
+                                const isActive = task.id == currentTaskId ? 'active' : '';
+                                
+                                html += `
+                                    <div class="task-item ${isActive}" data-task-id="${task.id}" onclick="selectTask(${task.id})"
+                                         style="padding: 14px 20px 14px 36px; border-bottom: 1px solid var(--border-color); cursor: pointer; transition: all var(--transition-fast);">
+                                        <div class="task-item-header" style="margin-bottom: 8px;">
+                                            <span class="task-number">#${task.id}</span>
+                                            <span class="task-priority priority-${task.priority}">
+                                                ${task.priority === 'urgent' ? 'Срочно' : 
+                                                  task.priority === 'high' ? 'Высокий' : 
+                                                  task.priority === 'low' ? 'Низкий' : 'Нормальный'}
+                                            </span>
+                                        </div>
+                                        
+                                        <div class="task-progress">
+                                            <div style="display: flex; justify-content: space-between; font-size: 12px; color: var(--text-secondary); margin-bottom: 6px;">
+                                                <span>План: ${task.quantity_plan} ${task.unit_name}</span>
+                                                <span>${progressPercent}%</span>
+                                            </div>
+                                            <div class="progress-bar-container">
+                                                <div class="progress-bar-fill" style="width: ${Math.min(100, progressPercent)}%"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                `;
+                            });
+                        } else {
+                            html += `<div style="padding: 14px 20px 14px 36px; font-size: 13px; color: var(--text-secondary);">Нет заданий для этого товара</div>`;
+                        }
+                        
+                        html += `
+                                </div>
+                            </div>
+                        `;
+                    });
+                    
+                    container.innerHTML = html;
+                } else {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-state-icon">📦</div>
+                            <h4>Товары не найдены</h4>
+                            <p style="font-size: 13px;">В этом заказе нет товаров с производственными заданиями</p>
+                        </div>
+                    `;
+                }
+            })
+            .catch(error => {
+                console.error('Ошибка загрузки товаров:', error);
+                container.innerHTML = '<div style="padding: 20px; color: var(--error-color);">Ошибка загрузки товаров</div>';
+            });
+        }
+        
+        // Сворачивание/разворачивание заданий товара
+        function toggleProductTasks(productId) {
+            const group = document.getElementById(productId);
+            const icon = document.getElementById('icon-' + productId);
+            if (group && icon) {
+                if (group.style.display === 'none') {
+                    group.style.display = 'block';
+                    icon.textContent = '▼';
+                } else {
+                    group.style.display = 'none';
+                    icon.textContent = '▶';
+                }
+            }
+        }
+        
+        // Закрытие панели товаров
+        function closeProductsPanel() {
+            document.getElementById('productsPanel').style.display = 'none';
+            currentOrderId = null;
+        }
         
         // Выбор задачи без перезагрузки страницы (через AJAX)
         // Сворачивание/разворачивание группы заказа

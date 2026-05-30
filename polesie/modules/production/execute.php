@@ -1874,9 +1874,20 @@ foreach ($allTasks as &$task) {
                     let html = '';
                     
                     data.products.forEach(product => {
+                        // Находим первое активное или первое доступное задание для авто-выбора
+                        let firstTaskId = null;
+                        if (product.tasks && product.tasks.length > 0) {
+                            const activeTask = product.tasks.find(t => t.id == currentTaskId);
+                            if (activeTask) {
+                                firstTaskId = activeTask.id;
+                            } else {
+                                firstTaskId = product.tasks[0].id;
+                            }
+                        }
+                        
                         html += `
                             <div class="product-group" style="border-bottom: 1px solid var(--border-color);">
-                                <div class="product-header" onclick="toggleProductTasks('prod-${product.product_id}')" 
+                                <div class="product-header" onclick="toggleProductTasks('prod-${product.product_id}'); autoSelectTask(${firstTaskId}, ${product.product_id})" 
                                      style="padding: 16px 20px; background: #f9fafb; cursor: pointer; display: flex; justify-content: space-between; align-items: center;">
                                     <div style="display: flex; align-items: center; gap: 8px;">
                                         <span style="font-size: 12px;" id="icon-prod-${product.product_id}">▼</span>
@@ -1885,6 +1896,7 @@ foreach ($allTasks as &$task) {
                                             <div style="font-size: 11px; color: var(--text-secondary);">Арт. ${product.product_article} • План: ${product.order_item_quantity} ${product.unit_name}</div>
                                         </div>
                                     </div>
+                                    <span style="font-size: 11px; color: var(--primary-color); font-weight: 500;">${product.tasks && product.tasks.length > 0 ? '▶ Открыть' : ''}</span>
                                 </div>
                                 
                                 <div id="prod-${product.product_id}" class="product-tasks" style="display: block;">
@@ -1959,6 +1971,17 @@ foreach ($allTasks as &$task) {
                     icon.textContent = '▶';
                 }
             }
+        }
+        
+        // Авто-выбор первого задания при клике на товар
+        function autoSelectTask(taskId, productId) {
+            if (!taskId) return;
+            
+            // Проверяем, не выбрано ли уже это задание
+            if (taskId == currentTaskId) return;
+            
+            // Выбираем задание
+            selectTask(taskId);
         }
         
         // Закрытие панели товаров

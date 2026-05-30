@@ -25,6 +25,10 @@ $standards = [];
 $productForms = [];
 $units = [];
 
+// Проверка параметра material для автооткрытия карточки
+$autoOpenMaterialId = isset($_GET['material']) ? (int)$_GET['material'] : null;
+$autoOpenMaterialData = null;
+
 try {
     // Получение категорий материалов - сначала родительские, потом дочерние
     $catStmt = $pdo->query("SELECT * FROM material_categories ORDER BY parent_id IS NOT NULL, id ASC");
@@ -101,6 +105,16 @@ try {
         
         $stmt = $pdo->query($sql);
         $allMaterials = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        // Если запрошен конкретный материал, находим его для автооткрытия
+        if ($autoOpenMaterialId) {
+            foreach ($allMaterials as $mat) {
+                if ((int)$mat['id'] === $autoOpenMaterialId) {
+                    $autoOpenMaterialData = $mat;
+                    break;
+                }
+            }
+        }
         
         error_log("Загружено материалов из БД: " . count($allMaterials));
         
@@ -1681,10 +1695,21 @@ function setView(view) {
     localStorage.setItem('materialsView', view);
 }
 
-// Восстановление вида из localStorage
+// Восстановление вида из localStorage и автооткрытие карточки материала
 document.addEventListener('DOMContentLoaded', function() {
     const savedView = localStorage.getItem('materialsView') || 'grid';
     setView(savedView);
+    
+    // Автооткрытие карточки материала если передан параметр material
+    <?php if ($autoOpenMaterialData): ?>
+    (function() {
+        var materialData = <?= json_encode($autoOpenMaterialData, JSON_UNESCAPED_UNICODE) ?>;
+        // Небольшая задержка чтобы убедиться что DOM полностью готов
+        setTimeout(function() {
+            openMaterialModal(materialData);
+        }, 300);
+    })();
+    <?php endif; ?>
 });
 
 function openMaterialModal(material) {

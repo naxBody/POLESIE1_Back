@@ -171,13 +171,14 @@ require_once BASE_PATH . '/includes/topbar.php';
 }
 
 .contractor-table .section-row td {
-    background: var(--primary-light);
+    background: #fff;
     font-weight: 700;
     font-size: 15px;
-    color: var(--primary-dark);
+    color: var(--text-primary);
     padding-top: 16px;
     padding-bottom: 16px;
     border-bottom: 2px solid var(--border-color);
+    border-top: 2px solid var(--border-color);
 }
 
 .contractor-table .empty-value {
@@ -195,7 +196,7 @@ require_once BASE_PATH . '/includes/topbar.php';
 }
 
 .contractor-table tr.section-row:hover td {
-    background: var(--primary-light);
+    background: #fff;
 }
 
 /* Notes Row */

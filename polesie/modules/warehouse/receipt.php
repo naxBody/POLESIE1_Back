@@ -509,11 +509,12 @@ try {
             document.getElementById('documentModal').classList.add('active');
             
             // Загружаем справочники сразу при открытии окна
-            loadFormDataIfNeeded();
+            loadFormData();
         }
         
-        // Загрузка данных формы если еще не загружены
-        function loadFormDataIfNeeded() {
+        // Загрузка данных формы (справочников)
+        function loadFormData() {
+            // Если уже загружено, не загружаем повторно
             if (formInitialized) return;
             
             fetch('api_material_receipt.php?action=form_data')
@@ -525,14 +526,16 @@ try {
                         
                         // Заполняем селекты поставщиков
                         const supplierSelect = document.getElementById('supplier');
-                        supplierSelect.disabled = false;
-                        if (formData.suppliers && formData.suppliers.length > 0) {
-                            supplierSelect.innerHTML = '<option value="">Выберите поставщика</option>' +
-                                formData.suppliers.map(s => 
-                                    `<option value="${s.id}">${escapeHtml(s.name)}</option>`
-                                ).join('');
-                        } else {
-                            supplierSelect.innerHTML = '<option value="">Нет поставщиков (добавьте в справочнике)</option>';
+                        if (supplierSelect) {
+                            supplierSelect.disabled = false;
+                            if (formData.suppliers && formData.suppliers.length > 0) {
+                                supplierSelect.innerHTML = '<option value="">Выберите поставщика</option>' +
+                                    formData.suppliers.map(s => 
+                                        `<option value="${s.id}">${escapeHtml(s.name)}</option>`
+                                    ).join('');
+                            } else {
+                                supplierSelect.innerHTML = '<option value="">Нет поставщиков (добавьте в справочнике)</option>';
+                            }
                         }
                         
                         // Заполняем типы документов в фильтре и форме
@@ -543,8 +546,23 @@ try {
                                 `<option value="${dt.id}">${escapeHtml(dt.name)}</option>`
                             ).join('');
                             
-                            filterDocType.innerHTML = '<option value="">Все типы</option>' + optionsHtml;
-                            docTypeSelect.innerHTML = '<option value="">Выберите тип</option>' + optionsHtml;
+                            if (filterDocType) {
+                                filterDocType.innerHTML = '<option value="">Все типы</option>' + optionsHtml;
+                            }
+                            if (docTypeSelect) {
+                                docTypeSelect.innerHTML = '<option value="">Выберите тип документа</option>' + optionsHtml;
+                            }
+                        } else {
+                            if (docTypeSelect) {
+                                docTypeSelect.innerHTML = '<option value="">Нет типов документов</option>';
+                            }
+                        }
+                        
+                        // Загружаем материалы для выпадающего списка
+                        if (formData.materials && formData.materials.length > 0) {
+                            console.log('Материалы загружены:', formData.materials.length, 'шт.');
+                        } else {
+                            console.warn('Справочник материалов пуст');
                         }
                         
                         // Обновляем таблицу материалов если она открыта
@@ -554,35 +572,39 @@ try {
                     } else {
                         console.error('Ошибка получения данных формы:', data.error);
                         const supplierSelect = document.getElementById('supplier');
-                        supplierSelect.disabled = false;
-                        supplierSelect.innerHTML = '<option value="">Ошибка загрузки</option>';
+                        if (supplierSelect) {
+                            supplierSelect.disabled = false;
+                            supplierSelect.innerHTML = '<option value="">Ошибка загрузки</option>';
+                        }
                     }
                 })
                 .catch(err => {
                     console.error('Ошибка загрузки данных формы:', err);
                     const supplierSelect = document.getElementById('supplier');
-                    supplierSelect.disabled = false;
-                    supplierSelect.innerHTML = '<option value="">Ошибка загрузки</option>';
+                    if (supplierSelect) {
+                        supplierSelect.disabled = false;
+                        supplierSelect.innerHTML = '<option value="">Ошибка загрузки</option>';
+                    }
                 });
         }
         
         // Добавление строки материала
         function addMaterialRow(material = null) {
             // Проверяем, загружены ли данные формы
-            if (!formData.materials || formData.materials.length === 0) {
-                // Если данные еще не загружены, пробуем загрузить
+            if (!formInitialized || !formData.materials || formData.materials.length === 0) {
+                // Если данные еще не загружены, загружаем их и ждем
                 if (!formInitialized) {
-                    loadFormDataIfNeeded();
-                    // Ждем загрузки и повторяем попытку
+                    loadFormData();
+                    // Ждем загрузки данных и повторяем попытку через 500мс
                     setTimeout(() => {
-                        if (formData.materials && formData.materials.length > 0) {
+                        if (formInitialized && formData.materials && formData.materials.length > 0) {
                             addMaterialRow(material);
                         } else {
-                            alert('Справочник материалов пуст или не загружен. Пожалуйста, добавьте материалы в систему.');
+                            alert('Справочник материалов пуст. Добавьте материалы в систему.');
                         }
-                    }, 1000);
+                    }, 500);
                 } else {
-                    alert('Справочник материалов пуст. Добавьте хотя бы один материал в систему.');
+                    alert('Справочник материалов пуст. Добавьте материалы в систему.');
                 }
                 return;
             }
@@ -610,7 +632,7 @@ try {
             }
             
             // Проверяем, загружены ли данные формы
-            if (!formData.materials || formData.materials.length === 0) {
+            if (!formInitialized || !formData.materials || formData.materials.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="6" class="loading">Загрузка справочника материалов...</td></tr>';
                 document.getElementById('itemsTotal').textContent = '0.00';
                 return;
@@ -623,7 +645,7 @@ try {
                             <option value="">Выберите материал</option>
                             ${formData.materials.map(m => 
                                 `<option value="${m.id}" ${item.material_id == m.id ? 'selected' : ''}>
-                                    ${escapeHtml(m.name_full)} (${escapeHtml(m.code)}) - ост. ${m.current_stock} ${m.unit_symbol || 'шт'}
+                                    ${escapeHtml(m.name_full)} (${escapeHtml(m.code)}) - ост. ${m.current_stock || 0} ${m.unit_symbol || 'шт'}
                                 </option>`
                             ).join('')}
                         </select>
@@ -661,10 +683,15 @@ try {
                 if (material) {
                     item.material_id = material.id;
                     item.material_name = material.name_full;
+                    // Перерисовываем таблицу для обновления отображения
+                    renderItemsTable();
+                    return;
                 }
             } else if (field === 'quantity' || field === 'unit_price') {
                 item[field] = parseFloat(value) || 0;
                 item.total_price = item.quantity * item.unit_price;
+                renderItemsTable();
+                return;
             } else {
                 item[field] = value;
             }
@@ -834,8 +861,8 @@ try {
                     
                     document.getElementById('documentModal').classList.add('active');
                     
-                    // Загружаем данные формы если еще не загружены
-                    loadFormDataIfNeeded();
+                    // Загружаем данные формы (справочники)
+                    loadFormData();
                     
                     // Отрисовываем таблицу после загрузки данных формы
                     setTimeout(() => renderItemsTable(), 100);
@@ -893,7 +920,7 @@ try {
         // Закрытие по ESC и обработка кликов по модальному окну (после загрузки DOM)
         document.addEventListener('DOMContentLoaded', function() {
             // Предзагрузка данных формы для быстрого доступа
-            loadFormDataIfNeeded();
+            loadFormData();
             
             document.addEventListener('keydown', function(e) {
                 if (e.key === 'Escape') {

@@ -223,33 +223,6 @@ function printDocument(elementId) {
 }
 
 /**
- * Экспорт таблицы в CSV
- */
-function exportTableToCSV(tableId, filename = 'export.csv') {
-    const table = document.getElementById(tableId);
-    if (!table) return;
-    
-    let csv = [];
-    const rows = table.querySelectorAll('tr');
-    
-    rows.forEach(row => {
-        const cols = row.querySelectorAll('td, th');
-        const rowData = [];
-        cols.forEach(col => {
-            rowData.push('"' + col.textContent.replace(/"/g, '""') + '"');
-        });
-        csv.push(rowData.join(','));
-    });
-    
-    const csvContent = '\ufeff' + csv.join('\n');
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = filename;
-    link.click();
-}
-
-/**
  * Инициализация при загрузке страницы
  */
 document.addEventListener('DOMContentLoaded', function() {

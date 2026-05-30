@@ -141,13 +141,13 @@ $stmt = $pdo->prepare($sql);
 $stmt->execute($params);
 $orders = $stmt->fetchAll();
 
-// Получение статусов для фильтра и статистики
+// Статусы заказов с современными иконками SVG
 $statuses = [
-    ['status' => 'new', 'name' => 'Новый', 'color' => '#3498db', 'icon' => '🆕'],
-    ['status' => 'processing', 'name' => 'В работе', 'color' => '#f39c12', 'icon' => '⚙️'],
-    ['status' => 'ready', 'name' => 'Готов', 'color' => '#27ae60', 'icon' => '✅'],
-    ['status' => 'shipped', 'name' => 'Отгружен', 'color' => '#9b59b6', 'icon' => '📦'],
-    ['status' => 'cancelled', 'name' => 'Отменен', 'color' => '#e74c3c', 'icon' => '❌']
+    ['status' => 'new', 'name' => 'Новый', 'color' => '#3498db', 'icon' => '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/><path d="M12 6V12L16 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>'],
+    ['status' => 'processing', 'name' => 'В работе', 'color' => '#f39c12', 'icon' => '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/><path d="M12 1V3M12 21V23M23 12H21M3 12H1M20.66 3.34L19.07 4.93M4.93 19.07L3.34 20.66M20.66 20.66L19.07 19.07M4.93 4.93L3.34 3.34" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>'],
+    ['status' => 'ready', 'name' => 'Готов', 'color' => '#27ae60', 'icon' => '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M20 6L9 17L4 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>'],
+    ['status' => 'shipped', 'name' => 'Отгружен', 'color' => '#9b59b6', 'icon' => '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M20 7H4C2.89543 7 2 7.89543 2 9V19C2 20.1046 2.89543 21 4 21H20C21.1046 21 22 20.1046 22 19V9C22 7.89543 21.1046 7 20 7Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M16 21V15C16 13.8954 15.1046 13 14 13H10C8.89543 13 8 13.8954 8 15V21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>'],
+    ['status' => 'cancelled', 'name' => 'Отменен', 'color' => '#e74c3c', 'icon' => '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><line x1="18" y1="6" x2="6" y2="18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="6" y1="6" x2="18" y2="18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>']
 ];
 
 // Подсчет заказов по статусам
@@ -194,25 +194,37 @@ $pageTitle = 'Заказы';
                     <a href="?status=new" class="stat-card-link" style="text-decoration: none;">
                         <div class="stat-card" style="background: linear-gradient(135deg, #3498db, #2980b9); color: white; padding: 24px; border-radius: 12px; text-align: center; cursor: pointer;">
                             <div style="font-size: 36px; font-weight: 700; margin-bottom: 8px;"><?= $newOrdersCount ?></div>
-                            <div style="font-size: 14px; opacity: 0.9;">🆕 Новые заказы</div>
+                            <div style="font-size: 14px; opacity: 0.9; display: flex; align-items: center; justify-content: center; gap: 6px;">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/><path d="M12 6V12L16 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                                Новые заказы
+                            </div>
                         </div>
                     </a>
                     <a href="?status=processing" class="stat-card-link" style="text-decoration: none;">
                         <div class="stat-card" style="background: linear-gradient(135deg, #f39c12, #e67e22); color: white; padding: 24px; border-radius: 12px; text-align: center; cursor: pointer;">
                             <div style="font-size: 36px; font-weight: 700; margin-bottom: 8px;"><?= $inWorkCount ?></div>
-                            <div style="font-size: 14px; opacity: 0.9;">⚙️ В работе</div>
+                            <div style="font-size: 14px; opacity: 0.9; display: flex; align-items: center; justify-content: center; gap: 6px;">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/><path d="M12 1V3M12 21V23M23 12H21M3 12H1M20.66 3.34L19.07 4.93M4.93 19.07L3.34 20.66M20.66 20.66L19.07 19.07M4.93 4.93L3.34 3.34" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                                В работе
+                            </div>
                         </div>
                     </a>
                     <a href="?status=ready" class="stat-card-link" style="text-decoration: none;">
                         <div class="stat-card" style="background: linear-gradient(135deg, #27ae60, #229954); color: white; padding: 24px; border-radius: 12px; text-align: center; cursor: pointer;">
                             <div style="font-size: 36px; font-weight: 700; margin-bottom: 8px;"><?= $readyCount ?></div>
-                            <div style="font-size: 14px; opacity: 0.9;">✅ Готовы к отгрузке</div>
+                            <div style="font-size: 14px; opacity: 0.9; display: flex; align-items: center; justify-content: center; gap: 6px;">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M20 6L9 17L4 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                Готовы к отгрузке
+                            </div>
                         </div>
                     </a>
                     <a href="?" class="stat-card-link" style="text-decoration: none;">
                         <div class="stat-card" style="background: linear-gradient(135deg, #9b59b6, #8e44ad); color: white; padding: 24px; border-radius: 12px; text-align: center; cursor: pointer;">
                             <div style="font-size: 36px; font-weight: 700; margin-bottom: 8px;"><?= $totalRecords ?></div>
-                            <div style="font-size: 14px; opacity: 0.9;">📋 Всего заказов</div>
+                            <div style="font-size: 14px; opacity: 0.9; display: flex; align-items: center; justify-content: center; gap: 6px;">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" stroke-width="2"/><path d="M3 9H21M9 21V9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                                Всего заказов
+                            </div>
                         </div>
                     </a>
                 </div>
@@ -223,14 +235,45 @@ $pageTitle = 'Заказы';
                         <!-- Быстрые фильтры -->
                         <div style="display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap;">
                             <span style="font-size: 13px; color: var(--text-secondary); align-self: center;">Быстрые фильтры:</span>
-                            <a href="?quick_filter=today" class="btn btn-sm <?= $quickFilter === 'today' ? 'btn-primary' : 'btn-secondary' ?>">📅 Сегодня</a>
-                            <a href="?quick_filter=week" class="btn btn-sm <?= $quickFilter === 'week' ? 'btn-primary' : 'btn-secondary' ?>">📆 Эта неделя</a>
-                            <a href="?quick_filter=month" class="btn btn-sm <?= $quickFilter === 'month' ? 'btn-primary' : 'btn-secondary' ?>">📅 Этот месяц</a>
+                            <a href="?quick_filter=today" class="btn btn-sm <?= $quickFilter === 'today' ? 'btn-primary' : 'btn-secondary' ?>">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-right: 4px; vertical-align: middle;">
+                                    <rect x="3" y="4" width="18" height="18" rx="2" stroke="currentColor" stroke-width="2"/>
+                                    <path d="M16 2V6M8 2V6M3 10H21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                </svg>
+                                Сегодня
+                            </a>
+                            <a href="?quick_filter=week" class="btn btn-sm <?= $quickFilter === 'week' ? 'btn-primary' : 'btn-secondary' ?>">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-right: 4px; vertical-align: middle;">
+                                    <rect x="3" y="4" width="18" height="18" rx="2" stroke="currentColor" stroke-width="2"/>
+                                    <path d="M16 2V6M8 2V6M3 10H21M9 16L11 18L15 14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                                Эта неделя
+                            </a>
+                            <a href="?quick_filter=month" class="btn btn-sm <?= $quickFilter === 'month' ? 'btn-primary' : 'btn-secondary' ?>">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-right: 4px; vertical-align: middle;">
+                                    <rect x="3" y="4" width="18" height="18" rx="2" stroke="currentColor" stroke-width="2"/>
+                                    <path d="M16 2V6M8 2V6M3 10H21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                    <circle cx="12" cy="16" r="2" fill="currentColor"/>
+                                </svg>
+                                Этот месяц
+                            </a>
                             <?php if ($statusId): ?>
-                            <a href="?status=<?= e($statusId) ?>" class="btn btn-sm btn-secondary">🔄 Только этот статус</a>
+                            <a href="?status=<?= e($statusId) ?>" class="btn btn-sm btn-secondary">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-right: 4px; vertical-align: middle;">
+                                    <path d="M4 4V20H20" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M20 4L10 14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                                Только этот статус
+                            </a>
                             <?php endif; ?>
                             <?php if ($responsibleId): ?>
-                            <a href="?responsible=<?= e($responsibleId) ?>" class="btn btn-sm btn-secondary">👤 Мой фильтр</a>
+                            <a href="?responsible=<?= e($responsibleId) ?>" class="btn btn-sm btn-secondary">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-right: 4px; vertical-align: middle;">
+                                    <circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="2"/>
+                                    <path d="M6 20C6 17.5 9 15 12 15C15 15 18 17.5 18 20" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                </svg>
+                                Мой фильтр
+                            </a>
                             <?php endif; ?>
                         </div>
                         
@@ -291,8 +334,20 @@ $pageTitle = 'Заказы';
                             </div>
                             
                             <div style="display: flex; gap: 8px;">
-                                <button type="submit" class="btn btn-primary">🔍 Применить</button>
-                                <a href="?" class="btn btn-secondary">✖ Сброс</a>
+                                <button type="submit" class="btn btn-primary">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-right: 4px; vertical-align: middle;">
+                                        <circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="2"/>
+                                        <path d="M21 21L16.65 16.65" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                    </svg>
+                                    Применить
+                                </button>
+                                <a href="?" class="btn btn-secondary">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-right: 4px; vertical-align: middle;">
+                                        <line x1="18" y1="6" x2="6" y2="18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                        <line x1="6" y1="6" x2="18" y2="18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                    </svg>
+                                    Сброс
+                                </a>
                             </div>
                         </form>
                     </div>
@@ -302,10 +357,12 @@ $pageTitle = 'Заказы';
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
                     <h2 style="font-size: 24px; font-weight: 600;">Заказы (<?= $totalRecords ?>)</h2>
                     <div style="display: flex; gap: 12px;">
-                        <button class="btn btn-secondary" onclick="exportTableToCSV('ordersTable', 'orders.csv')">
-                            📥 Экспорт CSV
-                        </button>
-                        <a href="create.php" class="btn btn-primary">➕ Новый заказ</a>
+                        <a href="create.php" class="btn btn-primary">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-right: 6px;">
+                                <path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            Новый заказ
+                        </a>
                     </div>
                 </div>
                 
@@ -350,8 +407,13 @@ $pageTitle = 'Заказы';
                                             </td>
                                             <td><?= e($order['responsible_name'] ?? '—') ?></td>
                                             <td class="table-actions">
-                                                <a href="view.php?id=<?= $order['id'] ?>" class="btn btn-sm btn-primary" title="Просмотр">👁️ Подробнее</a>
-                                                <a href="print.php?id=<?= $order['id'] ?>" class="btn btn-sm btn-secondary" title="Печать" target="_blank">🖨️</a>
+                                                <a href="view.php?id=<?= $order['id'] ?>" class="btn btn-sm btn-primary" title="Просмотр">
+                                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-right: 4px;">
+                                                        <path d="M1 12C1 12 5 4 12 4C19 4 23 12 23 12C23 12 19 20 12 20C5 20 1 12 1 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                        <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                    </svg>
+                                                    Подробнее
+                                                </a>
                                             </td>
                                         </tr>
                                         <?php endforeach; ?>

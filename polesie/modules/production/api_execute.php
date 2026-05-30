@@ -526,6 +526,8 @@ if ($isApiRequest) {
     exit;
 }
 
+} // Конец if ($isApiRequest)
+
 // Если это не API запрос, выходим - функции ниже доступны для execute.php
 if (!$isApiRequest) {
     return;

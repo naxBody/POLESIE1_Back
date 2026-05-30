@@ -1,1 +1,85 @@
-Nothing should be ignored based on the provided file changes, as they only include PHP source files (.php) which are not build artifacts, dependencies, or temporary files.
+```php
+<?php
+include_once 'db_connect.php';
+include_once 'functions.php';
+
+sec_session_start();
+
+if (login_check($mysqli) == true) {
+    $logged = 'in';
+} else {
+    $logged = 'out';
+}
+
+if (isset($_GET['receipt_id'])) {
+    $receipt_id = $_GET['receipt_id'];
+    
+    // Fetch receipt details
+    $stmt = $mysqli->prepare("SELECT r.receipt_id, r.date_created, r.total_amount, u.username as cashier_name, c.name as customer_name FROM receipts r JOIN users u ON r.user_id = u.id LEFT JOIN customers c ON r.customer_id = c.id WHERE r.receipt_id = ?");
+    $stmt->bind_param('i', $receipt_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $receipt = $result->fetch_assoc();
+    $stmt->close();
+    
+    if (!$receipt) {
+        echo "Receipt not found.";
+        exit;
+    }
+    
+    // Fetch receipt items
+    $stmt = $mysqli->prepare("SELECT ri.quantity, p.name as product_name, p.sell_price, (ri.quantity * p.sell_price) as line_total FROM receipt_items ri JOIN products p ON ri.product_id = p.id WHERE ri.receipt_id = ?");
+    $stmt->bind_param('i', $receipt_id);
+    $stmt->execute();
+    $items_result = $stmt->get_result();
+    $stmt->close();
+}
+?>
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Print Receipt</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .receipt { width: 300px; margin: 0 auto; border: 1px solid #ccc; padding: 15px; }
+        .header { text-align: center; margin-bottom: 15px; }
+        .item { display: flex; justify-content: space-between; margin-bottom: 5px; }
+        .total { display: flex; justify-content: space-between; font-weight: bold; margin-top: 10px; border-top: 1px solid #000; padding-top: 5px; }
+        .center { text-align: center; }
+    </style>
+</head>
+<body onload="window.print();">
+    <div class="receipt">
+        <div class="header">
+            <h2>Polesie Warehouse</h2>
+            <p>Receipt #<?php echo htmlspecialchars($receipt['receipt_id']); ?></p>
+            <p>Date: <?php echo htmlspecialchars($receipt['date_created']); ?></p>
+            <p>Cashier: <?php echo htmlspecialchars($receipt['cashier_name']); ?></p>
+            <?php if ($receipt['customer_name']): ?>
+                <p>Customer: <?php echo htmlspecialchars($receipt['customer_name']); ?></p>
+            <?php endif; ?>
+        </div>
+        
+        <div class="items">
+            <?php while ($item = $items_result->fetch_assoc()): ?>
+                <div class="item">
+                    <span><?php echo htmlspecialchars($item['quantity']); ?> x <?php echo htmlspecialchars($item['product_name']); ?></span>
+                    <span>$<?php echo number_format($item['line_total'], 2); ?></span>
+                </div>
+            <?php endwhile; ?>
+        </div>
+        
+        <div class="total">
+            <span>Total:</span>
+            <span>$<?php echo number_format($receipt['total_amount'], 2); ?></span>
+        </div>
+        
+        <div class="center" style="margin-top: 20px;">
+            <p>Thank you for your purchase!</p>
+        </div>
+    </div>
+</body>
+</html>
+
+```

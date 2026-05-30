@@ -56,8 +56,7 @@ $itemsStmt = $pdo->prepare("
         m.name_full as material_name,
         m.name_short as material_short,
         mc.name as category_name,
-        bu.symbol as unit_symbol,
-        m.material_type
+        bu.symbol as unit_symbol
     FROM material_receipt_items i
     JOIN materials m ON i.material_id = m.id
     LEFT JOIN material_categories mc ON m.category_id = mc.id

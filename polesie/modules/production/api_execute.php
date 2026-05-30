@@ -541,10 +541,10 @@ if (!$isApiRequest) {
 function createStagesForTask($pdo, $taskId, $routeCardId) {
     // Получаем операции из маршрутной карты
     $operationsStmt = $pdo->prepare("
-        SELECT rco.stage_id, rco.operation_number, rco.name, rco.sort_order
+        SELECT rco.id as operation_id, rco.stage_id, rco.operation_number, rco.name
         FROM route_card_operations rco
         WHERE rco.route_card_id = ?
-        ORDER BY rco.sort_order, rco.operation_number
+        ORDER BY rco.operation_number
     ");
     $operationsStmt->execute([$routeCardId]);
     $operations = $operationsStmt->fetchAll();
@@ -556,12 +556,12 @@ function createStagesForTask($pdo, $taskId, $routeCardId) {
     // Создаем этапы для задания
     $insertStmt = $pdo->prepare("
         INSERT INTO production_task_stages 
-        (task_id, stage_id, status, sort_order, created_at)
-        VALUES (?, ?, 'pending', ?, NOW())
+        (task_id, stage_id, operation_id, status, created_at)
+        VALUES (?, ?, ?, 'pending', NOW())
     ");
     
     foreach ($operations as $op) {
-        $insertStmt->execute([$taskId, $op['stage_id'], $op['sort_order']]);
+        $insertStmt->execute([$taskId, $op['stage_id'], $op['operation_id']]);
     }
     
     return true;

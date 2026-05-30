@@ -893,19 +893,43 @@ foreach ($allTasks as &$task) {
     <script>
         let currentTaskId = <?= $selectedTask ? $selectedTask['id'] : 0 ?>;
         
+        // Сохраняем ID выбранной задачи перед перезагрузкой
         function selectTask(taskId) {
-            // Обновляем активный класс
-            document.querySelectorAll('.task-item').forEach(item => {
-                item.classList.remove('active');
-            });
-            const activeItem = document.querySelector(`.task-item[data-task-id="${taskId}"]`);
-            if (activeItem) {
-                activeItem.classList.add('active');
+            // Сохраняем позицию скролла и ID задачи в sessionStorage
+            const tasksList = document.querySelector('.tasks-list');
+            if (tasksList) {
+                sessionStorage.setItem('tasksScrollPosition', tasksList.scrollTop);
             }
+            sessionStorage.setItem('selectedTaskId', taskId);
             
             // Перезагружаем страницу с выбранным заданием
             window.location.href = '?task=' + taskId;
         }
+        
+        // Восстанавливаем позицию скролла после загрузки страницы
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedTaskId = sessionStorage.getItem('selectedTaskId');
+            const savedScrollPosition = sessionStorage.getItem('tasksScrollPosition');
+            
+            if (savedTaskId && savedScrollPosition !== null) {
+                const tasksList = document.querySelector('.tasks-list');
+                const activeItem = document.querySelector(`.task-item[data-task-id="${savedTaskId}"]`);
+                
+                if (tasksList && activeItem) {
+                    // Небольшая задержка чтобы убедиться что контент загружен
+                    setTimeout(() => {
+                        tasksList.scrollTop = parseInt(savedScrollPosition);
+                        
+                        // Дополнительно: прокручиваем так, чтобы активный элемент был виден
+                        activeItem.scrollIntoView({ behavior: 'auto', block: 'nearest' });
+                        
+                        // Очищаем сохраненные данные
+                        sessionStorage.removeItem('selectedTaskId');
+                        sessionStorage.removeItem('tasksScrollPosition');
+                    }, 100);
+                }
+            }
+        });
         
         function switchTab(tabName) {
             // Скрываем все вкладки

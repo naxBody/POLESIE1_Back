@@ -1002,28 +1002,6 @@ foreach ($allTasks as &$task) {
             background: rgba(37, 99, 235, 0.08);
         }
         
-        .btn-view-orders {
-            background: var(--primary-color);
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all var(--transition-fast);
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            margin-bottom: 20px;
-        }
-        
-        .btn-view-orders:hover {
-            background: var(--primary-dark);
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-md);
-        }
-        
         /* Стили для блока всех заказов */
         .all-orders-section {
             background: var(--bg-primary);
@@ -1866,11 +1844,6 @@ foreach ($allTasks as &$task) {
                     </div>
 
                     <div class="production-dashboard<?php if (!$selectedTask): ?> no-order-selected<?php endif; ?>">
-                        <!-- Кнопка для открытия полного списка заказов -->
-                        <button class="btn-view-orders" onclick="openOrdersModal()">
-                            📋 Все заказы (<?= count($ordersList) ?>)
-                        </button>
-                        
                         <!-- Модальное окно со списком всех заказов -->
                         <div class="orders-modal-overlay" id="ordersModalOverlay" onclick="if(event.target === this) closeOrdersModal()">
                             <div class="orders-modal">

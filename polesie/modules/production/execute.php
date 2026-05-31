@@ -140,11 +140,14 @@ if ($isAjaxRequest && $selectedTaskId) {
             $stagesStmt = $pdo->prepare("
                 SELECT pts.id, pts.task_id, pts.stage_id, pts.status, pts.started_at, pts.completed_at,
                        pts.worker_id, pts.time_spent_hours, pts.quantity_passed, pts.quantity_rejected, pts.notes,
-                       ps.name as stage_name, ps.code as stage_code, ps.color as stage_color, ps.sort_order
+                       ps.name as stage_name, ps.code as stage_code, ps.color as stage_color, ps.sort_order,
+                       rco.operation_number, rco.name as operation_name, rco.description, rco.time_norm_hours,
+                       rco.work_center, rco.equipment
                 FROM production_task_stages pts
                 JOIN production_stages ps ON pts.stage_id = ps.id
+                LEFT JOIN route_card_operations rco ON pts.operation_id = rco.id
                 WHERE pts.task_id = ?
-                ORDER BY ps.sort_order
+                ORDER BY COALESCE(rco.sort_order, ps.sort_order), COALESCE(rco.operation_number, '0')
             ");
             $stagesStmt->execute([$selectedTask['id']]);
             $currentStages = $stagesStmt->fetchAll();
@@ -165,11 +168,14 @@ if ($isAjaxRequest && $selectedTaskId) {
         $stagesStmt = $pdo->prepare("
             SELECT pts.id, pts.task_id, pts.stage_id, pts.status, pts.started_at, pts.completed_at,
                    pts.worker_id, pts.time_spent_hours, pts.quantity_passed, pts.quantity_rejected, pts.notes,
-                   ps.name as stage_name, ps.code as stage_code, ps.color as stage_color, ps.sort_order
+                   ps.name as stage_name, ps.code as stage_code, ps.color as stage_color, ps.sort_order,
+                   rco.operation_number, rco.name as operation_name, rco.description, rco.time_norm_hours,
+                   rco.work_center, rco.equipment
             FROM production_task_stages pts
             JOIN production_stages ps ON pts.stage_id = ps.id
+            LEFT JOIN route_card_operations rco ON pts.operation_id = rco.id
             WHERE pts.task_id = ?
-            ORDER BY ps.sort_order
+            ORDER BY COALESCE(rco.sort_order, ps.sort_order), COALESCE(rco.operation_number, '0')
         ");
         $stagesStmt->execute([$selectedTask['id']]);
         $selectedTask['stages'] = $stagesStmt->fetchAll();
@@ -577,11 +583,14 @@ if ($selectedTask) {
     $stagesStmt = $pdo->prepare("
         SELECT pts.id, pts.task_id, pts.stage_id, pts.status, pts.started_at, pts.completed_at,
                pts.worker_id, pts.time_spent_hours, pts.quantity_passed, pts.quantity_rejected, pts.notes,
-               ps.name as stage_name, ps.code as stage_code, ps.color as stage_color, ps.sort_order
+               ps.name as stage_name, ps.code as stage_code, ps.color as stage_color, ps.sort_order,
+               rco.operation_number, rco.name as operation_name, rco.description, rco.time_norm_hours,
+               rco.work_center, rco.equipment
         FROM production_task_stages pts
         JOIN production_stages ps ON pts.stage_id = ps.id
+        LEFT JOIN route_card_operations rco ON pts.operation_id = rco.id
         WHERE pts.task_id = ?
-        ORDER BY ps.sort_order
+        ORDER BY COALESCE(rco.sort_order, ps.sort_order), COALESCE(rco.operation_number, '0')
     ");
     $stagesStmt->execute([$selectedTask['id']]);
     $selectedTask['stages'] = $stagesStmt->fetchAll();

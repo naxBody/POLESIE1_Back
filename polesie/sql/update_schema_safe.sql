@@ -66,13 +66,13 @@ DEALLOCATE PREPARE stmt;
 -- ============================================
 
 INSERT IGNORE INTO `user_roles` (`name`, `code`, `description`, `permissions`) VALUES
-(1, 'Администратор', 'admin', 'Полный доступ ко всем модулям системы', '{"all": true}'),
-(2, 'Директор', 'director', 'Руководство предприятием', '{"orders": ["read", "create", "update", "delete"], "production": ["read"], "warehouse": ["read"], "contractors": ["read", "create", "update"], "reports": ["read"]}') ,
-(3, 'Менеджер по продажам', 'sales_manager', 'Работа с заказами и клиентами', '{"orders": ["read", "create", "update"], "products": ["read"], "contractors": ["read", "create"], "production": ["read"]}') ,
-(4, 'Технолог', 'technologist', 'Управление производственными процессами', '{"production": ["read", "create", "update"], "route_cards": ["read", "create", "update"], "materials": ["read"], "tasks": ["read", "create", "update"]}') ,
-(5, 'Кладовщик', 'storekeeper', 'Учет материалов на складе', '{"warehouse": ["read", "create", "update"], "materials": ["read", "update"], "receipts": ["read", "create"], "writeoffs": ["read", "create"]}') ,
-(6, 'Рабочий', 'worker', 'Выполнение производственных заданий', '{"production": ["read"], "tasks": ["read", "update"], "my_tasks": ["read", "update"]}') ,
-(7, 'Контроль качества', 'quality_control', 'Проверка качества продукции', '{"production": ["read"], "quality_checks": ["read", "create"], "tasks": ["read"]}') ;
+('Администратор', 'admin', 'Полный доступ ко всем модулям системы', '{"all": true}'),
+('Директор', 'director', 'Руководство предприятием', '{"orders": ["read", "create", "update", "delete"], "production": ["read"], "warehouse": ["read"], "contractors": ["read", "create", "update"], "reports": ["read"]}'),
+('Менеджер по продажам', 'sales_manager', 'Работа с заказами и клиентами', '{"orders": ["read", "create", "update"], "products": ["read"], "contractors": ["read", "create"], "production": ["read"]}'),
+('Технолог', 'technologist', 'Управление производственными процессами', '{"production": ["read", "create", "update"], "route_cards": ["read", "create", "update"], "materials": ["read"], "tasks": ["read", "create", "update"]}'),
+('Кладовщик', 'storekeeper', 'Учет материалов на складе', '{"warehouse": ["read", "create", "update"], "materials": ["read", "update"], "receipts": ["read", "create"], "writeoffs": ["read", "create"]}'),
+('Рабочий', 'worker', 'Выполнение производственных заданий', '{"production": ["read"], "tasks": ["read", "update"], "my_tasks": ["read", "update"]}'),
+('Контроль качества', 'quality_control', 'Проверка качества продукции', '{"production": ["read"], "quality_checks": ["read", "create"], "tasks": ["read"]}');
 
 -- ============================================
 -- 4. ОБНОВЛЕНИЕ ПОЛЬЗОВАТЕЛЕЙ (привязка к ролям)

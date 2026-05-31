@@ -101,13 +101,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $totalAmount += $total;
                 
                 $itemStmt = $pdo->prepare("
-                    INSERT INTO order_items (order_id, product_id, quantity, price, total, notes)
-                    VALUES (?, ?, ?, ?, ?, ?)
+                    INSERT INTO order_items (order_id, product_id, quantity, price, total)
+                    VALUES (?, ?, ?, ?, ?)
                 ");
                 
                 $itemStmt->execute([
-                    $orderId, $productId, $quantity, $price, $total,
-                    $item['notes'] ?? ''
+                    $orderId, $productId, $quantity, $price, $total
                 ]);
             }
             

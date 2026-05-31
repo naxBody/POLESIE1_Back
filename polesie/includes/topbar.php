@@ -26,16 +26,6 @@
     </div>
     
     <div class="topbar-right">
-        <!-- Поиск -->
-        <div style="position: relative;">
-            <input 
-                type="text" 
-                placeholder="Поиск..." 
-                style="padding: 8px 14px 8px 36px; border: 1px solid var(--border-color); border-radius: var(--border-radius); width: 250px; font-size: 13px;"
-            >
-            <span style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted);">🔍</span>
-        </div>
-        
         <!-- Профиль -->
         <div style="position: relative;">
             <div class="topbar-action" onclick="toggleProfileMenu()" style="width: auto; padding: 8px 12px; gap: 8px;">

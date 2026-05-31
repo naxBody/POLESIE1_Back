@@ -1270,7 +1270,7 @@ $categories = $pdo->query($catQuery)->fetchAll();
                     if (materialsByCategory.hasOwnProperty(catName)) {
                         var icon = categoryIcons[catName] || '📋';
                         html += '<div class="materials-grouped">';
-                        html += '<div class="material-category-header">' + icon + ' ' + escapeHtml(catName) + ' (' + materialsByCategory[catName].length + ' поз.)</div>';
+                        html += '<div class="material-category-header">' + icon + ' ' + escapeHtml(catName) + '</div>';
                         html += '<table class="materials-table">';
                         html += '<thead><tr><th>№</th><th>Материал</th><th>Код</th><th>Количество</th><th>Ед.</th></tr></thead>';
                         html += '<tbody>';

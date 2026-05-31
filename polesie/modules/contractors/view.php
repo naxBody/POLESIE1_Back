@@ -411,47 +411,6 @@ require_once BASE_PATH . '/includes/topbar.php';
             </tr>
             <?php endif; ?>
             
-            <!-- Банковские реквизиты -->
-            <tr class="section-row">
-                <td colspan="2">
-                    <svg class="section-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
-                        <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
-                    </svg>
-                    Банковские реквизиты
-                </td>
-            </tr>
-            <?php if (!empty($contractor['bank_name'])): ?>
-            <tr>
-                <td class="label">Банк</td>
-                <td class="value"><?= e($contractor['bank_name']) ?></td>
-            </tr>
-            <?php endif; ?>
-            <?php if (!empty($contractor['bik'])): ?>
-            <tr>
-                <td class="label">БИК</td>
-                <td class="value"><?= e($contractor['bik']) ?></td>
-            </tr>
-            <?php endif; ?>
-            <?php if (!empty($contractor['rs'])): ?>
-            <tr>
-                <td class="label">Расчетный счет</td>
-                <td class="value"><?= e($contractor['rs']) ?></td>
-            </tr>
-            <?php endif; ?>
-            <?php if (!empty($contractor['ks'])): ?>
-            <tr>
-                <td class="label">Корр. счет</td>
-                <td class="value"><?= e($contractor['ks']) ?></td>
-            </tr>
-            <?php endif; ?>
-            <?php if (empty($contractor['bank_name']) && empty($contractor['bik']) && empty($contractor['rs']) && empty($contractor['ks'])): ?>
-            <tr>
-                <td class="label">Реквизиты</td>
-                <td class="value"><span class="empty-value">Не указаны</span></td>
-            </tr>
-            <?php endif; ?>
-            
             <!-- Примечания -->
             <?php if (!empty($contractor['notes'])): ?>
             <tr class="section-row">

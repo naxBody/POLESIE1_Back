@@ -252,16 +252,55 @@ function canAccessModule($module, $permission = 'can_view') {
         return true;
     }
     
-    $pdo = getDbConnection();
-    $stmt = $pdo->prepare("
-        SELECT $permission as has_permission 
-        FROM role_module_permissions 
-        WHERE role_id = ? AND module = ?
-    ");
-    $stmt->execute([$user['role_id'], $module]);
-    $result = $stmt->fetch();
+    // Проверяем права из JSON поля permissions
+    $permissions = isset($user['permissions']) ? json_decode($user['permissions'], true) : null;
     
-    return $result && $result['has_permission'];
+    if (!$permissions || !is_array($permissions)) {
+        return false;
+    }
+    
+    // Если есть флаг all: true - полный доступ
+    if (isset($permissions['all']) && $permissions['all'] === true) {
+        return true;
+    }
+    
+    // Проверяем наличие модуля в правах
+    $moduleMap = [
+        'dashboard' => 'заказы',
+        'orders' => 'заказы',
+        'contractors' => 'контрагенты',
+        'production' => 'производство',
+        'products' => 'продукция',
+        'warehouse' => 'склад',
+        'materials' => 'материалы',
+        'employees' => 'сотрудники',
+        'quality' => 'контроль_качества',
+        'reports' => 'отчеты',
+        'settings' => 'настройки'
+    ];
+    
+    $moduleName = isset($moduleMap[$module]) ? $moduleMap[$module] : $module;
+    
+    if (!isset($permissions[$moduleName])) {
+        return false;
+    }
+    
+    $moduleRights = $permissions[$moduleName];
+    
+    // Если права заданы как массив разрешений
+    if (is_array($moduleRights)) {
+        $permissionMap = [
+            'can_view' => 'view',
+            'can_create' => 'create',
+            'can_edit' => 'edit',
+            'can_delete' => 'delete'
+        ];
+        
+        $requiredRight = isset($permissionMap[$permission]) ? $permissionMap[$permission] : 'view';
+        return in_array($requiredRight, $moduleRights);
+    }
+    
+    return false;
 }
 
 /**
@@ -299,15 +338,39 @@ function getAvailableModules() {
         return ['dashboard', 'orders', 'contractors', 'production', 'products', 'warehouse', 'materials', 'employees', 'quality', 'reports', 'settings'];
     }
     
-    $pdo = getDbConnection();
-    $stmt = $pdo->prepare("
-        SELECT module FROM role_module_permissions 
-        WHERE role_id = ? AND can_view = TRUE
-        ORDER BY module
-    ");
-    $stmt->execute([$user['role_id']]);
+    // Проверяем права из JSON поля permissions
+    $permissions = isset($user['permissions']) ? json_decode($user['permissions'], true) : null;
     
-    return array_column($stmt->fetchAll(), 'module');
+    if (!$permissions || !is_array($permissions)) {
+        return [];
+    }
+    
+    // Если есть флаг all: true - полный доступ
+    if (isset($permissions['all']) && $permissions['all'] === true) {
+        return ['dashboard', 'orders', 'contractors', 'production', 'products', 'warehouse', 'materials', 'employees', 'quality', 'reports', 'settings'];
+    }
+    
+    $availableModules = [];
+    $reverseModuleMap = [
+        'заказы' => ['dashboard', 'orders'],
+        'контрагенты' => ['contractors'],
+        'производство' => ['production'],
+        'продукция' => ['products'],
+        'склад' => ['warehouse'],
+        'материалы' => ['materials'],
+        'сотрудники' => ['employees'],
+        'контроль_качества' => ['quality'],
+        'отчеты' => ['reports'],
+        'настройки' => ['settings']
+    ];
+    
+    foreach ($permissions as $moduleName => $rights) {
+        if (isset($reverseModuleMap[$moduleName]) && is_array($rights) && in_array('view', $rights)) {
+            $availableModules = array_merge($availableModules, $reverseModuleMap[$moduleName]);
+        }
+    }
+    
+    return array_unique($availableModules);
 }
 
 /**

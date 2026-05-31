@@ -1758,7 +1758,6 @@ foreach ($allTasks as &$task) {
                                         <th style="text-align: left; padding: 12px 16px; background: var(--gray-50); font-weight: 600; color: var(--text-secondary); font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid var(--border-color);">Клиент</th>
                                         <th style="text-align: left; padding: 12px 16px; background: var(--gray-50); font-weight: 600; color: var(--text-secondary); font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid var(--border-color);">Статус</th>
                                         <th style="text-align: center; padding: 12px 16px; background: var(--gray-50); font-weight: 600; color: var(--text-secondary); font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid var(--border-color);">Товаров</th>
-                                        <th style="text-align: center; padding: 12px 16px; background: var(--gray-50); font-weight: 600; color: var(--text-secondary); font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid var(--border-color);">Заданий</th>
                                         <th style="text-align: center; padding: 12px 16px; background: var(--gray-50); font-weight: 600; color: var(--text-secondary); font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid var(--border-color);">В работе</th>
                                         <th style="text-align: right; padding: 12px 16px; background: var(--gray-50); font-weight: 600; color: var(--text-secondary); font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid var(--border-color);">Действие</th>
                                     </tr>
@@ -1825,18 +1824,9 @@ foreach ($allTasks as &$task) {
                                         <td style="padding: 16px; border-bottom: 1px solid var(--border-color); vertical-align: middle; text-align: center;">
                                             <span style="font-size: 16px; font-weight: 700; color: var(--primary-color);"><?= $productsCount ?></span>
                                         </td>
-                                        <td style="padding: 16px; border-bottom: 1px solid var(--border-color); vertical-align: middle; text-align: center;">
-                                            <span style="font-size: 16px; font-weight: 700; color: var(--info-color);"><?= $tasksCount ?></span>
-                                        </td>
-                                        <td style="padding: 16px; border-bottom: 1px solid var(--border-color); vertical-align: middle; text-align: center;">
-                                            <span style="font-size: 16px; font-weight: 700; color: var(--success-color);"><?= $inProgressCount ?></span>
-                                        </td>
                                         <td style="padding: 16px; border-bottom: 1px solid var(--border-color); vertical-align: middle; text-align: right;">
                                             <button class="btn btn-sm btn-outline" onclick="openOrderDetailModal(<?= $order['id'] ?>)" style="padding: 8px 16px; font-size: 13px;">
                                                 ℹ️ Подробнее
-                                            </button>
-                                            <button class="btn btn-sm btn-primary" onclick="selectOrderFromAllOrders(<?= $order['id'] ?>, '<?= e($order['order_number']) ?>')" style="padding: 8px 16px; font-size: 13px; margin-left: 8px;">
-                                                📦 Открыть
                                             </button>
                                         </td>
                                     </tr>
@@ -1879,23 +1869,11 @@ foreach ($allTasks as &$task) {
                                                 <th>Номер заказа</th>
                                                 <th>Клиент</th>
                                                 <th>Статус</th>
-                                                <th>Заданий</th>
                                                 <th>Действие</th>
                                             </tr>
                                         </thead>
                                         <tbody id="modalOrdersTableBody">
-                                            <?php foreach ($ordersList as $order): 
-                                                // Считаем количество заданий для этого заказа
-                                                $tasksCount = 0;
-                                                foreach ($ordersGrouped as $og) {
-                                                    if ($og['order_id'] == $order['id']) {
-                                                        foreach ($og['products'] as $product) {
-                                                            $tasksCount += count($product['tasks']);
-                                                        }
-                                                        break;
-                                                    }
-                                                }
-                                            ?>
+                                            <?php foreach ($ordersList as $order): ?>
                                             <tr data-order-id="<?= $order['id'] ?>" 
                                                 data-order-number="<?= e($order['order_number']) ?>" 
                                                 data-customer="<?= e(strtolower($order['customer_name'])) ?>"
@@ -1908,11 +1886,6 @@ foreach ($allTasks as &$task) {
                                                 <td>
                                                     <span class="order-status-badge status-<?= e($order['status']) ?>" style="background: <?= e($order['status_color']) ?>; color: white;">
                                                         <?= e($order['status_name']) ?>
-                                                    </span>
-                                                </td>
-                                                <td>
-                                                    <span class="order-tasks-count">
-                                                        📦 <?= $tasksCount ?> зад.
                                                     </span>
                                                 </td>
                                                 <td>
@@ -2393,16 +2366,7 @@ foreach ($allTasks as &$task) {
         // Выбор заказа из модального окна
         function selectOrderFromModal(orderId, orderNumber) {
             closeOrdersModal();
-            selectOrder(orderId, orderNumber);
-            
-            // Подсветка выбранного заказа в таблице
-            document.querySelectorAll('#modalOrdersTableBody tr').forEach(row => {
-                row.classList.remove('selected');
-            });
-            const selectedRow = document.querySelector(`#modalOrdersTableBody tr[data-order-id="${orderId}"]`);
-            if (selectedRow) {
-                selectedRow.classList.add('selected');
-            }
+            selectOrderFromAllOrders(orderId, orderNumber);
         }
         
         // Фильтрация заказов в модальном окне

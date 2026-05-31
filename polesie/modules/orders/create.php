@@ -268,7 +268,7 @@ $pageTitle = 'Новый заказ';
                                     
                                     <div class="form-group" style="margin-bottom: 0;">
                                         <label class="form-label">Количество</label>
-                                        <input type="number" name="items[0][quantity]" class="form-control quantity" step="0.001" min="0" required>
+                                        <input type="number" name="items[0][quantity]" class="form-control quantity" step="1" min="1" value="1" required>
                                     </div>
                                     
                                     <div class="form-group" style="margin-bottom: 0;">
@@ -330,7 +330,7 @@ $pageTitle = 'Новый заказ';
                 </div>
                 <div class="form-group" style="margin-bottom: 0;">
                     <label class="form-label">Количество</label>
-                    <input type="number" name="items[${itemCount}][quantity]" class="form-control quantity" step="0.001" min="0" required>
+                    <input type="number" name="items[${itemCount}][quantity]" class="form-control quantity" step="1" min="1" value="1" required>
                 </div>
                 <div class="form-group" style="margin-bottom: 0;">
                     <label class="form-label">Цена (BYN)</label>

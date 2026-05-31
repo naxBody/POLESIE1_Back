@@ -1048,6 +1048,220 @@ foreach ($allTasks as &$task) {
             gap: 20px;
         }
         
+        /* Модальное окно с деталями заказа */
+        .order-detail-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+            z-index: 10000;
+            display: none;
+            animation: fadeIn 0.2s ease-in-out;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .order-detail-modal-overlay.active {
+            display: flex;
+        }
+        
+        .order-detail-modal {
+            background: var(--bg-primary);
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-xl);
+            width: 90%;
+            max-width: 1000px;
+            max-height: 85vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            animation: slideUp 0.3s ease-out;
+        }
+        
+        .order-detail-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 24px 32px;
+            border-bottom: 2px solid var(--border-color);
+            background: linear-gradient(135deg, rgba(37, 99, 235, 0.05) 0%, transparent 100%);
+        }
+        
+        .order-detail-modal-header h2 {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin: 0;
+        }
+        
+        .order-detail-modal-close {
+            background: transparent;
+            border: none;
+            font-size: 32px;
+            cursor: pointer;
+            color: var(--text-secondary);
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all var(--transition-fast);
+        }
+        
+        .order-detail-modal-close:hover {
+            background: var(--gray-100);
+            color: var(--text-primary);
+        }
+        
+        .order-detail-modal-body {
+            padding: 32px;
+            overflow-y: auto;
+            max-height: calc(85vh - 140px);
+        }
+        
+        .order-info-section {
+            margin-bottom: 32px;
+            background: var(--bg-secondary);
+            border-radius: var(--border-radius);
+            padding: 24px;
+            border: 1px solid var(--border-color);
+        }
+        
+        .order-info-section:last-child {
+            margin-bottom: 0;
+        }
+        
+        .order-info-section h3 {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin: 0 0 20px 0;
+            padding-bottom: 12px;
+            border-bottom: 2px solid rgba(37, 99, 235, 0.1);
+        }
+        
+        .order-info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+        }
+        
+        .order-info-item {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        
+        .order-info-label {
+            font-size: 13px;
+            color: var(--text-secondary);
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .order-info-value {
+            font-size: 16px;
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+        
+        .order-items-table,
+        .order-tasks-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--bg-secondary);
+            border-radius: var(--border-radius);
+            overflow: hidden;
+        }
+        
+        .order-items-table th,
+        .order-tasks-table th {
+            background: linear-gradient(135deg, rgba(37, 99, 235, 0.1) 0%, rgba(37, 99, 235, 0.05) 100%);
+            padding: 14px 16px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 13px;
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--primary-color);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .order-items-table td,
+        .order-tasks-table td {
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 14px;
+            color: var(--text-primary);
+        }
+        
+        .order-items-table tr:last-child td,
+        .order-tasks-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .order-items-table tr:hover,
+        .order-tasks-table tr:hover {
+            background: rgba(37, 99, 235, 0.04);
+        }
+        
+        .materials-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        
+        .materials-list li {
+            font-size: 13px;
+            color: var(--text-secondary);
+            padding: 4px 8px;
+            background: var(--gray-50);
+            border-radius: 4px;
+            border-left: 3px solid var(--primary-color);
+        }
+        
+        .task-status-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .task-status-badge.status-planned {
+            background: #dbeafe;
+            color: #2563eb;
+        }
+        
+        .task-status-badge.status-in_progress {
+            background: #fef3c7;
+            color: #d97706;
+        }
+        
+        .task-status-badge.status-completed {
+            background: #d1fae5;
+            color: #059669;
+        }
+        
+        .order-detail-modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            padding: 20px 32px;
+            border-top: 1px solid var(--border-color);
+            background: var(--bg-secondary);
+        }
+
         /* Стили для таблицы заказов */
         #allOrdersTableContainer {
             overflow-x: auto;
@@ -1852,10 +2066,7 @@ foreach ($allTasks as &$task) {
                                             <?php endif; ?>
                                         </td>
                                         <td style="text-align: right;">
-                                            <button class="btn btn-sm btn-primary" onclick="event.stopPropagation(); selectOrder(<?= $order['id'] ?>, '<?= e($order['order_number']) ?>')" style="padding: 8px 16px; font-size: 13px;">
-                                                ▶ Выбрать
-                                            </button>
-                                            <button class="btn btn-sm btn-outline" onclick="event.stopPropagation(); openOrderDetailModal(<?= $order['id'] ?>)" style="padding: 8px 16px; font-size: 13px; margin-left: 8px;">
+                                            <button class="btn btn-sm btn-outline" onclick="event.stopPropagation(); openOrderDetailModal(<?= $order['id'] ?>)" style="padding: 8px 16px; font-size: 13px;">
                                                 ℹ️ Подробнее
                                             </button>
                                         </td>

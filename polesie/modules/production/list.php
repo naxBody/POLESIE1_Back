@@ -32,7 +32,7 @@ $sql = "SELECT pt.*, o.order_number, p.name as product_name, p.article as produc
         LEFT JOIN base_units u ON p.base_unit_id = u.id
         LEFT JOIN users u2 ON pt.responsible_id = u2.id
         LEFT JOIN users u3 ON pt.worker_id = u3.id
-        WHERE 1=1";
+        WHERE pt.status IN ('planned', 'in_progress')";
 $params = [];
 
 if ($status) {

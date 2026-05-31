@@ -251,6 +251,43 @@ if ($isAjaxRequest && $selectedTaskId) {
             </div>
         </div>
         
+        <!-- Прогресс выполнения заказа -->
+        <?php 
+        $planQty = (float)$selectedTask['quantity_plan'];
+        $factQty = (float)$selectedTask['quantity_fact'];
+        $goodQty = (float)$selectedTask['quantity_good'];
+        $defectQty = (float)$selectedTask['quantity_defect'];
+        $progressPercent = $planQty > 0 ? round(($factQty / $planQty) * 100) : 0;
+        $goodPercent = $planQty > 0 ? round(($goodQty / $planQty) * 100) : 0;
+        ?>
+        <div class="order-progress-section" style="margin-bottom: 24px;">
+            <div class="progress-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <span style="font-weight: 600; color: var(--text-primary);">Прогресс выполнения</span>
+                <span style="font-size: 14px; color: var(--text-secondary);"><?= $progressPercent ?>% завершено</span>
+            </div>
+            <div class="progress-bar-container" style="height: 12px; margin-top: 0;">
+                <div class="progress-bar-fill" style="width: <?= $progressPercent ?>%; background: linear-gradient(90deg, var(--success-color), var(--success-light));"></div>
+            </div>
+            <div class="progress-stats" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 12px;">
+                <div class="progress-stat-item">
+                    <div style="font-size: 12px; color: var(--text-secondary);">План</div>
+                    <div style="font-weight: 700; color: var(--text-primary);"><?= number_format($planQty, 0, '.', ' ') ?></div>
+                </div>
+                <div class="progress-stat-item">
+                    <div style="font-size: 12px; color: var(--text-secondary);">Сделано</div>
+                    <div style="font-weight: 700; color: var(--info-color);"><?= number_format($factQty, 0, '.', ' ') ?></div>
+                </div>
+                <div class="progress-stat-item">
+                    <div style="font-size: 12px; color: var(--text-secondary);">Годные</div>
+                    <div style="font-weight: 700; color: var(--success-color);"><?= number_format($goodQty, 0, '.', ' ') ?> (<?= $goodPercent ?>%)</div>
+                </div>
+                <div class="progress-stat-item">
+                    <div style="font-size: 12px; color: var(--text-secondary);">Брак</div>
+                    <div style="font-weight: 700; color: var(--error-color);"><?= number_format($defectQty, 0, '.', ' ') ?></div>
+                </div>
+            </div>
+        </div>
+        
         <div class="stats-row">
             <div class="stat-card">
                 <div class="stat-value"><?= number_format((float)$selectedTask['quantity_plan'], 0, '.', ' ') ?></div>

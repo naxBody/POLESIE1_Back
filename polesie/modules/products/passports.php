@@ -69,16 +69,16 @@ $countParams = [];
 if ($search) {
     $query .= " AND (p.article LIKE :search OR p.name LIKE :search)";
     $countQuery .= " AND (p.article LIKE :search OR p.name LIKE :search)";
-    $params[':search'] = "%{$search}%";
-    $countParams[':search'] = "%{$search}%";
+    $params['search'] = "%{$search}%";
+    $countParams['search'] = "%{$search}%";
 }
 
 // Фильтр по категории
 if ($categoryFilter) {
     $query .= " AND pc.code = :category";
     $countQuery .= " AND pc.code = :category";
-    $params[':category'] = $categoryFilter;
-    $countParams[':category'] = $categoryFilter;
+    $params['category'] = $categoryFilter;
+    $countParams['category'] = $categoryFilter;
 }
 
 // Фильтр по весу
@@ -132,8 +132,8 @@ if ($serialFilter !== '') {
 if ($productIdFilter) {
     $query .= " AND p.id = :product_id";
     $countQuery .= " AND p.id = :product_id";
-    $params[':product_id'] = $productIdFilter;
-    $countParams[':product_id'] = $productIdFilter;
+    $params['product_id'] = $productIdFilter;
+    $countParams['product_id'] = $productIdFilter;
 }
 
 // Сортировка

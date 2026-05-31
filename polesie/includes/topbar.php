@@ -29,28 +29,28 @@
         <!-- Профиль -->
         <div style="position: relative;">
             <div class="topbar-action" onclick="toggleProfileMenu()" style="width: auto; padding: 8px 12px; gap: 8px;">
-                <div style="width: 28px; height: 28px; background: var(--primary-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 13px; font-weight: 600;">
+                <div style="width: 32px; height: 32px; background: linear-gradient(135deg, var(--primary-color), #3b82f6); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 14px; font-weight: 600; box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);">
                     <?= mb_substr($user['full_name'], 0, 1) ?>
                 </div>
                 <span style="font-size: 13px; font-weight: 500;"><?= e($user['full_name']) ?></span>
-                <span style="color: var(--text-muted);">▼</span>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--text-muted);">
+                    <polyline points="6 9 12 15 18 9"></polyline>
+                </svg>
             </div>
             
             <!-- Выпадающее меню профиля -->
-            <div id="profileMenu" style="position: absolute; top: 100%; right: 0; margin-top: 8px; background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: var(--border-radius); box-shadow: var(--shadow-lg); min-width: 200px; display: none; z-index: 1000;">
-                <div style="padding: 12px 16px; border-bottom: 1px solid var(--border-color);">
-                    <div style="font-weight: 600;"><?= e($user['full_name']) ?></div>
-                    <div style="font-size: 12px; color: var(--text-secondary);"><?= e($user['role_name']) ?></div>
+            <div id="profileMenu" style="position: absolute; top: 100%; right: 0; margin-top: 8px; background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 12px; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15); min-width: 180px; display: none; z-index: 1000; overflow: hidden;">
+                <div style="padding: 16px; border-bottom: 1px solid var(--border-color); background: linear-gradient(135deg, rgba(59, 130, 246, 0.05), transparent);">
+                    <div style="font-weight: 600; font-size: 14px;"><?= e($user['full_name']) ?></div>
+                    <div style="font-size: 12px; color: var(--text-secondary); margin-top: 2px;"><?= e($user['role_name']) ?></div>
                 </div>
-                <a href="<?= pageUrl('settings/profile.php') ?>" style="display: block; padding: 10px 16px; color: var(--text-primary); font-size: 13px;">
-                    👤 Профиль
-                </a>
-                <a href="<?= pageUrl('settings/password.php') ?>" style="display: block; padding: 10px 16px; color: var(--text-primary); font-size: 13px;">
-                    🔒 Смена пароля
-                </a>
-                <div style="border-top: 1px solid var(--border-color);"></div>
-                <a href="<?= pageUrl('logout.php') ?>" style="display: block; padding: 10px 16px; color: var(--danger-color); font-size: 13px;" onclick="return confirm('Вы уверены, что хотите выйти?')">
-                    🚪 Выйти
+                <a href="<?= pageUrl('logout.php') ?>" style="display: flex; align-items: center; gap: 12px; padding: 12px 16px; color: #ef4444; font-size: 13px; font-weight: 500; transition: background 0.2s;" onmouseover="this.style.background='rgba(239, 68, 68, 0.05)'" onmouseout="this.style.background='transparent'" onclick="return confirm('Вы уверены, что хотите выйти?')">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                        <polyline points="16 17 21 12 16 7"></polyline>
+                        <line x1="21" y1="12" x2="9" y2="12"></line>
+                    </svg>
+                    Выйти
                 </a>
             </div>
         </div>

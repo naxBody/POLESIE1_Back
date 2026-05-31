@@ -267,7 +267,7 @@ if ($isAjaxRequest && $selectedTaskId) {
                     <?php foreach ($selectedTask['stages'] as $stage): ?>
                         <div class="stage-card <?= e($stage['status']) ?>" data-stage-id="<?= $stage['id'] ?>">
                             <div class="stage-header">
-                                <div class="stage-name"><?= e($stage['stage_name']) ?></div>
+                                <div class="stage-name"><?= e($stage['operation_name'] ?? $stage['stage_name']) ?></div>
                                 <span class="stage-status status-<?= e($stage['status']) ?>">
                                     <?= $stage['status'] === 'pending' ? 'Ожидает' : 
                                         ($stage['status'] === 'in_progress' ? 'В работе' : 
@@ -1548,7 +1548,7 @@ foreach ($allTasks as &$task) {
                                         <?php foreach ($selectedTask['stages'] as $stage): ?>
                                             <div class="stage-card <?= $stage['status'] ?>">
                                                 <div class="stage-header">
-                                                    <span class="stage-name"><?= e($stage['stage_name']) ?></span>
+                                                    <span class="stage-name"><?= e($stage['operation_name'] ?? $stage['stage_name']) ?></span>
                                                     <span class="stage-status status-<?= $stage['status'] ?>">
                                                         <?= $stage['status'] === 'pending' ? 'Ожидает' : 
                                                             ($stage['status'] === 'in_progress' ? 'В работе' : 

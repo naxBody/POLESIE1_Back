@@ -6,13 +6,8 @@
 
 USE `polesie_production`;
 
-
-
-SET FOREIGN_KEY_CHECKS = 0;
 -- Обновление таблицы user_roles с расширенными правами
 DROP TABLE IF EXISTS `user_roles`;
-
-SET FOREIGN_KEY_CHECKS = 1;
 
 CREATE TABLE `user_roles` (
   `id` INT AUTO_INCREMENT PRIMARY KEY,
@@ -193,12 +188,6 @@ CREATE INDEX idx_users_username ON users(username);
 CREATE INDEX idx_users_active ON users(is_active);
 CREATE INDEX idx_rmp_role ON role_module_permissions(role_id);
 CREATE INDEX idx_rmp_module ON role_module_permissions(module);
-
-
-
-
-
-SET FOREIGN_KEY_CHECKS = 1;
 
 -- ============================================
 -- ПРИМЕРЫ ИСПОЛЬЗОВАНИЯ

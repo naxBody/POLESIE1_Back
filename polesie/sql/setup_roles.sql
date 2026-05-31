@@ -6,7 +6,12 @@
 
 USE `polesie_production`;
 
+-- Отключаем проверки внешних ключей для безопасного обновления
+SET FOREIGN_KEY_CHECKS = 0;
+
 -- Обновление таблицы user_roles с расширенными правами
+DROP TABLE IF EXISTS `role_module_permissions`;
+DROP TABLE IF EXISTS `users`;
 DROP TABLE IF EXISTS `user_roles`;
 
 CREATE TABLE `user_roles` (
@@ -188,6 +193,9 @@ CREATE INDEX idx_users_username ON users(username);
 CREATE INDEX idx_users_active ON users(is_active);
 CREATE INDEX idx_rmp_role ON role_module_permissions(role_id);
 CREATE INDEX idx_rmp_module ON role_module_permissions(module);
+
+-- Включаем проверки внешних ключей обратно
+SET FOREIGN_KEY_CHECKS = 1;
 
 -- ============================================
 -- ПРИМЕРЫ ИСПОЛЬЗОВАНИЯ

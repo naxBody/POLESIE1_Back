@@ -74,10 +74,6 @@
         <!-- Производство -->
         <div class="sidebar-nav-section">
             <div class="sidebar-nav-title">Производство</div>
-            <a href="<?= pageUrl('modules/production/list.php') ?>" class="sidebar-nav-item <?= $relativePath === 'modules/production/list.php' ? 'active' : '' ?>">
-                <span class="sidebar-nav-icon">⚙️</span>
-                <span>Производственные задания</span>
-            </a>
             <a href="<?= pageUrl('modules/production/execute.php') ?>" class="sidebar-nav-item <?= $relativePath === 'modules/production/execute.php' ? 'active' : '' ?>">
                 <span class="sidebar-nav-icon">🏭</span>
                 <span>Исполнение производства</span>

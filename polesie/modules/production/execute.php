@@ -1832,7 +1832,10 @@ foreach ($allTasks as &$task) {
                                             <span style="font-size: 16px; font-weight: 700; color: var(--success-color);"><?= $inProgressCount ?></span>
                                         </td>
                                         <td style="padding: 16px; border-bottom: 1px solid var(--border-color); vertical-align: middle; text-align: right;">
-                                            <button class="btn btn-sm btn-primary" onclick="selectOrderFromAllOrders(<?= $order['id'] ?>, '<?= e($order['order_number']) ?>')" style="padding: 8px 16px; font-size: 13px;">
+                                            <button class="btn btn-sm btn-outline" onclick="openOrderDetailModal(<?= $order['id'] ?>)" style="padding: 8px 16px; font-size: 13px;">
+                                                ℹ️ Подробнее
+                                            </button>
+                                            <button class="btn btn-sm btn-primary" onclick="selectOrderFromAllOrders(<?= $order['id'] ?>, '<?= e($order['order_number']) ?>')" style="padding: 8px 16px; font-size: 13px; margin-left: 8px;">
                                                 📦 Открыть
                                             </button>
                                         </td>
@@ -2983,6 +2986,132 @@ foreach ($allTasks as &$task) {
                 closeProductionModalDirect();
             }
         });
+        
+        // Открытие модального окна с подробной информацией о заказе
+        function openOrderDetailModal(orderId) {
+            // Получаем информацию о заказе через AJAX
+            fetch('api_execute.php?action=get_order_details&order_id=' + orderId)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const order = data.order;
+                        const html = `
+                            <div class="order-detail-modal-overlay" id="orderDetailModalOverlay" onclick="if(event.target === this) closeOrderDetailModal()">
+                                <div class="order-detail-modal">
+                                    <div class="order-detail-modal-header">
+                                        <h2>📦 Заказ ${order.order_number}</h2>
+                                        <button class="order-detail-modal-close" onclick="closeOrderDetailModal()">×</button>
+                                    </div>
+                                    <div class="order-detail-modal-body">
+                                        <div class="order-info-section">
+                                            <h3>Основная информация</h3>
+                                            <div class="order-info-grid">
+                                                <div class="order-info-item">
+                                                    <span class="order-info-label">Клиент:</span>
+                                                    <span class="order-info-value">${order.customer_name || '—'}</span>
+                                                </div>
+                                                <div class="order-info-item">
+                                                    <span class="order-info-label">Статус:</span>
+                                                    <span class="order-info-value" style="color: ${order.status_color}; font-weight: 600;">${order.status_name}</span>
+                                                </div>
+                                                <div class="order-info-item">
+                                                    <span class="order-info-label">Дата создания:</span>
+                                                    <span class="order-info-value">${order.created_at || '—'}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="order-info-section">
+                                            <h3>Товары в заказе</h3>
+                                            <table class="order-items-table">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Продукция</th>
+                                                        <th>Артикул</th>
+                                                        <th>Количество</th>
+                                                        <th>Ед. изм.</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    ${order.items.map(item => `
+                                                        <tr>
+                                                            <td>${item.product_name}</td>
+                                                            <td>${item.article || '—'}</td>
+                                                            <td>${item.quantity}</td>
+                                                            <td>${item.unit_name || '—'}</td>
+                                                        </tr>
+                                                    `).join('')}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        
+                                        <div class="order-info-section">
+                                            <h3>Производственные задания</h3>
+                                            <table class="order-tasks-table">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Задание</th>
+                                                        <th>Продукция</th>
+                                                        <th>План</th>
+                                                        <th>Факт</th>
+                                                        <th>Статус</th>
+                                                        <th>Материалы</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    ${order.tasks.map(task => `
+                                                        <tr>
+                                                            <td>#${task.id}</td>
+                                                            <td>${task.product_name}</td>
+                                                            <td>${task.quantity_plan}</td>
+                                                            <td>${task.quantity_fact || 0}</td>
+                                                            <td><span class="task-status-badge status-${task.status}">${task.status_name}</span></td>
+                                                            <td>
+                                                                <ul class="materials-list">
+                                                                    ${task.materials ? task.materials.map(m => `
+                                                                        <li>${m.material_name}: ${m.quantity_required} ${m.unit_symbol}</li>
+                                                                    `).join('') : '<li>—</li>'}
+                                                                </ul>
+                                                            </td>
+                                                        </tr>
+                                                    `).join('')}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                    <div class="order-detail-modal-footer">
+                                        <button class="btn btn-outline" onclick="closeOrderDetailModal()">Закрыть</button>
+                                        <button class="btn btn-primary" onclick="selectOrderFromDetailModal(${order.id}, '${order.order_number}')">Перейти к исполнению</button>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        document.body.insertAdjacentHTML('beforeend', html);
+                        document.getElementById('orderDetailModalOverlay').classList.add('active');
+                        document.body.style.overflow = 'hidden';
+                    } else {
+                        showNotification(data.error || 'Ошибка получения данных', 'error');
+                    }
+                })
+                .catch(err => {
+                    showNotification('Ошибка сети', 'error');
+                });
+        }
+        
+        // Закрытие модального окна с деталями заказа
+        function closeOrderDetailModal() {
+            const overlay = document.getElementById('orderDetailModalOverlay');
+            if (overlay) {
+                overlay.remove();
+                document.body.style.overflow = '';
+            }
+        }
+        
+        // Выбор заказа из модального окна с деталями
+        function selectOrderFromDetailModal(orderId, orderNumber) {
+            closeOrderDetailModal();
+            selectOrderFromAllOrders(orderId, orderNumber);
+        }
     </script>
     <script src="<?= asset('assets/js/main.js') ?>"></script>
 </body>

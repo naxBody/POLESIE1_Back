@@ -1038,6 +1038,17 @@ foreach ($allTasks as &$task) {
             gap: 20px;
         }
         
+        /* Стили для таблицы заказов */
+        #allOrdersTableContainer {
+            overflow-x: auto;
+        }
+        
+        #allOrdersTableContainer table {
+            background: var(--bg-secondary);
+            border-radius: var(--border-radius);
+            overflow: hidden;
+        }
+        
         .order-card-item {
             background: var(--bg-secondary);
             border: 1px solid var(--border-color);
@@ -1755,92 +1766,102 @@ foreach ($allTasks as &$task) {
                     <!-- Полный список всех заказов - большой блок в начале страницы -->
                     <div class="all-orders-section" style="margin-bottom: 32px;">
                         <div class="all-orders-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                            <h3 style="font-size: 20px; font-weight: 700; color: var(--text-primary);">📋 Все активные заказы</h3>
+                            <h3 style="font-size: 20px; font-weight: 700; color: var(--text-primary);">📋 Все активные заказы в производстве</h3>
                             <button class="btn btn-sm btn-outline" onclick="toggleAllOrdersList()" style="padding: 8px 16px; font-size: 14px;">
                                 <span id="toggleAllOrdersText">Свернуть</span>
                             </button>
                         </div>
                         
-                        <div class="all-orders-grid" id="allOrdersGrid">
-                            <?php foreach ($ordersList as $order): 
-                                // Считаем количество заданий для этого заказа
-                                $tasksCount = 0;
-                                $productsCount = 0;
-                                foreach ($ordersGrouped as $og) {
-                                    if ($og['order_id'] == $order['id']) {
-                                        $productsCount = count($og['products']);
-                                        foreach ($og['products'] as $product) {
-                                            $tasksCount += count($product['tasks']);
-                                        }
-                                        break;
-                                    }
-                                }
-                            ?>
-                            <div class="order-card-item" 
-                                 data-order-id="<?= $order['id'] ?>" 
-                                 data-order-number="<?= e($order['order_number']) ?>" 
-                                 data-customer="<?= e(strtolower($order['customer_name'])) ?>"
-                                 data-status="<?= e($order['status']) ?>"
-                                 onclick="selectOrderFromAllOrders(<?= $order['id'] ?>, '<?= e($order['order_number']) ?>')"
-                                 style="<?= ($selectedOrderId == $order['id']) ? 'border-color: var(--primary-color); box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15);' : '' ?>">
-                                
-                                <div class="order-card-header-main">
-                                    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
-                                        <span class="order-number-badge" style="font-size: 18px; padding: 8px 16px;"><?= e($order['order_number']) ?></span>
-                                        <span class="order-status-badge status-<?= e($order['status']) ?>" style="background: <?= e($order['status_color']) ?>; color: white; padding: 6px 14px; font-size: 13px;">
-                                            <?= e($order['status_name']) ?>
-                                        </span>
-                                    </div>
-                                </div>
-                                
-                                <div class="order-card-body">
-                                    <div class="order-customer-info" style="margin-bottom: 12px;">
-                                        <span style="color: var(--text-secondary); font-size: 13px;">👤 Клиент:</span>
-                                        <span style="font-weight: 600; color: var(--text-primary); font-size: 14px;">
-                                            <?= !empty($order['customer_name']) ? e($order['customer_name']) : '<span style="color: var(--text-secondary);">—</span>' ?>
-                                        </span>
-                                    </div>
-                                    
-                                    <div class="order-stats" style="display: flex; gap: 16px; margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border-color);">
-                                        <div class="order-stat-item" style="display: flex; flex-direction: column; gap: 4px;">
-                                            <span style="font-size: 11px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px;">Товаров</span>
-                                            <span style="font-size: 18px; font-weight: 700; color: var(--primary-color);"><?= $productsCount ?></span>
-                                        </div>
-                                        <div class="order-stat-item" style="display: flex; flex-direction: column; gap: 4px;">
-                                            <span style="font-size: 11px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px;">Заданий</span>
-                                            <span style="font-size: 18px; font-weight: 700; color: var(--info-color);"><?= $tasksCount ?></span>
-                                        </div>
-                                        <div class="order-stat-item" style="display: flex; flex-direction: column; gap: 4px;">
-                                            <span style="font-size: 11px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px;">В работе</span>
-                                            <span style="font-size: 18px; font-weight: 700; color: var(--success-color);">
-                                                <?php
-                                                $inProgressCount = 0;
-                                                foreach ($ordersGrouped as $og) {
-                                                    if ($og['order_id'] == $order['id']) {
-                                                        foreach ($og['products'] as $product) {
-                                                            foreach ($product['tasks'] as $task) {
-                                                                if ($task['task_status'] === 'in_progress') {
-                                                                    $inProgressCount++;
-                                                                }
-                                                            }
+                        <div id="allOrdersTableContainer">
+                            <table class="orders-table" style="width: 100%; border-collapse: collapse;">
+                                <thead>
+                                    <tr>
+                                        <th style="text-align: left; padding: 12px 16px; background: var(--gray-50); font-weight: 600; color: var(--text-secondary); font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid var(--border-color);">Номер заказа</th>
+                                        <th style="text-align: left; padding: 12px 16px; background: var(--gray-50); font-weight: 600; color: var(--text-secondary); font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid var(--border-color);">Клиент</th>
+                                        <th style="text-align: left; padding: 12px 16px; background: var(--gray-50); font-weight: 600; color: var(--text-secondary); font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid var(--border-color);">Статус</th>
+                                        <th style="text-align: center; padding: 12px 16px; background: var(--gray-50); font-weight: 600; color: var(--text-secondary); font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid var(--border-color);">Товаров</th>
+                                        <th style="text-align: center; padding: 12px 16px; background: var(--gray-50); font-weight: 600; color: var(--text-secondary); font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid var(--border-color);">Заданий</th>
+                                        <th style="text-align: center; padding: 12px 16px; background: var(--gray-50); font-weight: 600; color: var(--text-secondary); font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid var(--border-color);">В работе</th>
+                                        <th style="text-align: right; padding: 12px 16px; background: var(--gray-50); font-weight: 600; color: var(--text-secondary); font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid var(--border-color);">Действие</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php foreach ($ordersList as $order): 
+                                        // Считаем количество заданий для этого заказа
+                                        $tasksCount = 0;
+                                        $productsCount = 0;
+                                        $inProgressCount = 0;
+                                        foreach ($ordersGrouped as $og) {
+                                            if ($og['order_id'] == $order['id']) {
+                                                $productsCount = count($og['products']);
+                                                foreach ($og['products'] as $product) {
+                                                    foreach ($product['tasks'] as $task) {
+                                                        $tasksCount += count($product['tasks']);
+                                                        if ($task['task_status'] === 'in_progress') {
+                                                            $inProgressCount++;
                                                         }
-                                                        break;
+                                                    }
+                                                    $tasksCount = count($product['tasks']);
+                                                    break;
+                                                }
+                                                break;
+                                            }
+                                        }
+                                        // Пересчитываем правильно
+                                        $tasksCount = 0;
+                                        $productsCount = 0;
+                                        $inProgressCount = 0;
+                                        foreach ($ordersGrouped as $og) {
+                                            if ($og['order_id'] == $order['id']) {
+                                                $productsCount = count($og['products']);
+                                                foreach ($og['products'] as $product) {
+                                                    $tasksCount += count($product['tasks']);
+                                                    foreach ($product['tasks'] as $task) {
+                                                        if ($task['task_status'] === 'in_progress') {
+                                                            $inProgressCount++;
+                                                        }
                                                     }
                                                 }
-                                                echo $inProgressCount;
-                                                ?>
+                                                break;
+                                            }
+                                        }
+                                    ?>
+                                    <tr data-order-id="<?= $order['id'] ?>" 
+                                        data-order-number="<?= e($order['order_number']) ?>" 
+                                        data-customer="<?= e(strtolower($order['customer_name'])) ?>"
+                                        data-status="<?= e($order['status']) ?>"
+                                        style="<?= ($selectedOrderId == $order['id']) ? 'background: rgba(37, 99, 235, 0.08);' : '' ?>"
+                                        onmouseover="this.style.background='var(--gray-50)'"
+                                        onmouseout="this.style.background='<?= ($selectedOrderId == $order['id']) ? 'rgba(37, 99, 235, 0.08)' : 'transparent' ?>'">
+                                        <td style="padding: 16px; border-bottom: 1px solid var(--border-color); vertical-align: middle;">
+                                            <span class="order-number-badge" style="font-size: 15px; padding: 6px 14px;"><?= e($order['order_number']) ?></span>
+                                        </td>
+                                        <td style="padding: 16px; border-bottom: 1px solid var(--border-color); vertical-align: middle;">
+                                            <strong style="color: var(--text-primary);"><?= !empty($order['customer_name']) ? e($order['customer_name']) : '<span style="color: var(--text-secondary);">—</span>' ?></strong>
+                                        </td>
+                                        <td style="padding: 16px; border-bottom: 1px solid var(--border-color); vertical-align: middle;">
+                                            <span class="order-status-badge status-<?= e($order['status']) ?>" style="background: <?= e($order['status_color']) ?>; color: white; padding: 6px 14px; font-size: 12px; border-radius: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">
+                                                <?= e($order['status_name']) ?>
                                             </span>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <div class="order-card-footer" style="margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border-color);">
-                                    <button class="btn btn-sm btn-primary" style="width: 100%; padding: 10px; font-size: 14px;" onclick="event.stopPropagation(); selectOrderFromAllOrders(<?= $order['id'] ?>, '<?= e($order['order_number']) ?>')">
-                                        📦 Открыть задания
-                                    </button>
-                                </div>
-                            </div>
-                            <?php endforeach; ?>
+                                        </td>
+                                        <td style="padding: 16px; border-bottom: 1px solid var(--border-color); vertical-align: middle; text-align: center;">
+                                            <span style="font-size: 16px; font-weight: 700; color: var(--primary-color);"><?= $productsCount ?></span>
+                                        </td>
+                                        <td style="padding: 16px; border-bottom: 1px solid var(--border-color); vertical-align: middle; text-align: center;">
+                                            <span style="font-size: 16px; font-weight: 700; color: var(--info-color);"><?= $tasksCount ?></span>
+                                        </td>
+                                        <td style="padding: 16px; border-bottom: 1px solid var(--border-color); vertical-align: middle; text-align: center;">
+                                            <span style="font-size: 16px; font-weight: 700; color: var(--success-color);"><?= $inProgressCount ?></span>
+                                        </td>
+                                        <td style="padding: 16px; border-bottom: 1px solid var(--border-color); vertical-align: middle; text-align: right;">
+                                            <button class="btn btn-sm btn-primary" onclick="selectOrderFromAllOrders(<?= $order['id'] ?>, '<?= e($order['order_number']) ?>')" style="padding: 8px 16px; font-size: 13px;">
+                                                📦 Открыть
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <?php endforeach; ?>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
 
@@ -2397,6 +2418,15 @@ foreach ($allTasks as &$task) {
         function selectOrderFromModal(orderId, orderNumber) {
             closeOrdersModal();
             selectOrder(orderId, orderNumber);
+            
+            // Подсветка выбранного заказа в таблице
+            document.querySelectorAll('#modalOrdersTableBody tr').forEach(row => {
+                row.classList.remove('selected');
+            });
+            const selectedRow = document.querySelector(`#modalOrdersTableBody tr[data-order-id="${orderId}"]`);
+            if (selectedRow) {
+                selectedRow.classList.add('selected');
+            }
         }
         
         // Фильтрация заказов в модальном окне
@@ -2405,6 +2435,27 @@ foreach ($allTasks as &$task) {
             const statusFilter = document.getElementById('modalOrderStatusFilter').value;
             
             document.querySelectorAll('#modalOrdersTableBody tr').forEach(row => {
+                const orderNumber = row.getAttribute('data-order-number').toLowerCase();
+                const customer = row.getAttribute('data-customer');
+                const status = row.getAttribute('data-status');
+                
+                const matchesSearch = orderNumber.includes(searchText) || (customer && customer.includes(searchText));
+                const matchesStatus = !statusFilter || status === statusFilter;
+                
+                if (matchesSearch && matchesStatus) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
+        
+        // Фильтрация заказов в таблице в начале страницы
+        function filterAllOrdersTable() {
+            const searchText = document.getElementById('allOrdersSearch').value.toLowerCase();
+            const statusFilter = document.getElementById('allOrdersStatusFilter').value;
+            
+            document.querySelectorAll('#allOrdersTableContainer tbody tr').forEach(row => {
                 const orderNumber = row.getAttribute('data-order-number').toLowerCase();
                 const customer = row.getAttribute('data-customer');
                 const status = row.getAttribute('data-status');
@@ -2445,6 +2496,15 @@ foreach ($allTasks as &$task) {
             // Прокрутка к панели управления и выбор заказа
             selectOrder(orderId, orderNumber);
             
+            // Подсветка выбранного заказа в таблице
+            document.querySelectorAll('#allOrdersTableContainer tbody tr').forEach(row => {
+                row.style.background = '';
+            });
+            const selectedRow = document.querySelector(`#allOrdersTableContainer tbody tr[data-order-id="${orderId}"]`);
+            if (selectedRow) {
+                selectedRow.style.background = 'rgba(37, 99, 235, 0.08)';
+            }
+            
             // Плавная прокрутка к рабочей области
             setTimeout(() => {
                 const workArea = document.getElementById('workArea');
@@ -2456,14 +2516,14 @@ foreach ($allTasks as &$task) {
         
         // Сворачивание/разворачивание списка всех заказов
         function toggleAllOrdersList() {
-            const grid = document.getElementById('allOrdersGrid');
+            const container = document.getElementById('allOrdersTableContainer');
             const toggleText = document.getElementById('toggleAllOrdersText');
             
-            if (grid && grid.style.display === 'none') {
-                grid.style.display = 'grid';
+            if (container && container.style.display === 'none') {
+                container.style.display = 'block';
                 toggleText.textContent = 'Свернуть';
-            } else if (grid) {
-                grid.style.display = 'none';
+            } else if (container) {
+                container.style.display = 'none';
                 toggleText.textContent = 'Развернуть';
             }
         }

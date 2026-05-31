@@ -139,7 +139,7 @@ switch ($sortBy) {
         break;
 }
 
-// Получение общего количества для пагинации
+// Получение общего количества для пагинации (до добавления LIMIT/OFFSET)
 $countQuery = "SELECT COUNT(*) as total FROM ({$query}) as count_query";
 $countStmt = $pdo->prepare($countQuery);
 $countStmt->execute($params);
@@ -147,7 +147,7 @@ $totalProducts = (int)$countStmt->fetch()['total'];
 $totalPages = ceil($totalProducts / $perPage);
 $page = min($page, $totalPages ?: 1);
 
-// Добавление лимита и оффсета
+// Добавление лимита и оффсета к основному запросу
 $query .= " LIMIT :limit OFFSET :offset";
 $stmt = $pdo->prepare($query);
 foreach ($params as $key => $value) {

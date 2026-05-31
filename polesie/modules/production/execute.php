@@ -226,28 +226,29 @@ if ($isAjaxRequest && $selectedTaskId) {
                     Задание #<?= $selectedTask['id'] ?>
                 </p>
             </div>
-            <div class="work-area-stats">
-                <div class="stat-item">
-                    <span class="stat-label-small">План</span>
-                    <span class="stat-value-small"><?= number_format((float)$selectedTask['quantity_plan'], 0, '.', ' ') ?></span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-label-small">Факт</span>
-                    <span class="stat-value-small" style="color: var(--info-color);"><?= number_format((float)$selectedTask['quantity_fact'], 0, '.', ' ') ?></span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-label-small">Годные</span>
-                    <span class="stat-value-small" style="color: var(--success-color);"><?= number_format((float)$selectedTask['quantity_good'], 0, '.', ' ') ?></span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-label-small">Брак</span>
-                    <span class="stat-value-small" style="color: var(--error-color);"><?= number_format((float)$selectedTask['quantity_defect'], 0, '.', ' ') ?></span>
-                </div>
-            </div>
             <div class="work-area-actions">
                 <button class="btn btn-primary" onclick="openProductionModal(<?= $selectedTask['id'] ?>)">
                     ✅ Завершить производство
                 </button>
+            </div>
+        </div>
+        
+        <div class="stats-row">
+            <div class="stat-card">
+                <div class="stat-value"><?= number_format((float)$selectedTask['quantity_plan'], 0, '.', ' ') ?></div>
+                <div class="stat-label">План</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" style="color: var(--info-color);"><?= number_format((float)$selectedTask['quantity_fact'], 0, '.', ' ') ?></div>
+                <div class="stat-label">Факт</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" style="color: var(--success-color);"><?= number_format((float)$selectedTask['quantity_good'], 0, '.', ' ') ?></div>
+                <div class="stat-label">Годные</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" style="color: var(--error-color);"><?= number_format((float)$selectedTask['quantity_defect'], 0, '.', ' ') ?></div>
+                <div class="stat-label">Брак</div>
             </div>
         </div>
         
@@ -872,131 +873,51 @@ foreach ($allTasks as &$task) {
             margin-bottom: 28px;
             padding-bottom: 24px;
             border-bottom: 2px solid var(--border-color);
-            gap: 20px;
+            flex-wrap: wrap;
+            gap: 16px;
             width: 100%;
             box-sizing: border-box;
-            flex-wrap: nowrap;
         }
         
         .work-area-title {
             flex: 1;
             min-width: 0;
-            max-width: 40%;
+            max-width: 100%;
         }
         
         .work-area-title h3 {
-            font-size: 22px;
+            font-size: 24px;
             font-weight: 700;
-            margin-bottom: 6px;
+            margin-bottom: 8px;
             color: var(--text-primary);
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            word-wrap: normal;
+            overflow-wrap: normal;
+            word-break: normal;
+            hyphens: none;
+            white-space: normal;
+            max-width: 100%;
         }
         
         .work-area-subtitle {
-            font-size: 13px;
+            font-size: 15px;
             color: var(--text-secondary);
-            line-height: 1.5;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        
-        .work-area-stats {
-            display: flex;
-            gap: 16px;
-            align-items: center;
-            flex-shrink: 0;
-        }
-        
-        .stat-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 4px;
-            padding: 8px 14px;
-            background: var(--bg-secondary);
-            border-radius: 8px;
-            border: 1px solid var(--border-color);
-            min-width: 70px;
-        }
-        
-        .stat-label-small {
-            font-size: 10px;
-            color: var(--text-secondary);
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            white-space: nowrap;
-        }
-        
-        .stat-value-small {
-            font-size: 18px;
-            font-weight: 700;
-            color: var(--primary-color);
-            line-height: 1;
-            white-space: nowrap;
+            line-height: 1.6;
+            word-wrap: normal;
+            overflow-wrap: normal;
+            word-break: normal;
+            hyphens: none;
+            white-space: normal;
+            max-width: 100%;
         }
         
         .work-area-actions {
             flex-shrink: 0;
         }
         
-        @media (max-width: 1400px) {
-            .work-area-header {
-                flex-wrap: wrap;
-            }
-            
-            .work-area-title {
-                width: 100%;
-                max-width: none;
-                order: 1;
-            }
-            
-            .work-area-stats {
-                order: 3;
-                width: 100%;
-                justify-content: center;
-                margin-top: 8px;
-            }
-            
-            .work-area-actions {
-                order: 2;
-            }
-        }
-        
-        @media (max-width: 768px) {
-            .work-area-stats {
-                gap: 10px;
-            }
-            
-            .stat-item {
-                padding: 6px 10px;
-                min-width: 60px;
-            }
-            
-            .stat-value-small {
-                font-size: 16px;
-            }
-            
-            .stat-label-small {
-                font-size: 9px;
-            }
-            
-            .work-area-title h3 {
-                font-size: 18px;
-            }
-            
-            .work-area-subtitle {
-                font-size: 12px;
-            }
-        }
-        
         .tabs-container {
             display: flex;
-            gap: 8px;
-            margin-bottom: 24px;
+            gap: 10px;
+            margin-bottom: 28px;
             border-bottom: 2px solid var(--border-color);
             padding-bottom: 0;
             position: relative;
@@ -1007,10 +928,10 @@ foreach ($allTasks as &$task) {
         }
         
         .tab-button {
-            padding: 12px 20px;
+            padding: 16px 24px;
             background: transparent;
             border: none;
-            font-size: 14px;
+            font-size: 15px;
             font-weight: 600;
             color: var(--text-secondary);
             cursor: pointer;
@@ -1061,8 +982,8 @@ foreach ($allTasks as &$task) {
         
         .stages-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-            gap: 14px;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 16px;
             margin-bottom: 24px;
             width: 100%;
             box-sizing: border-box;
@@ -1072,7 +993,7 @@ foreach ($allTasks as &$task) {
         .stage-card {
             background: var(--bg-secondary);
             border-radius: var(--border-radius);
-            padding: 18px 16px;
+            padding: 24px 18px;
             border: 1px solid var(--border-color);
             transition: all var(--transition-fast);
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
@@ -1586,28 +1507,29 @@ foreach ($allTasks as &$task) {
                                             Задание #<?= $selectedTask['id'] ?>
                                         </p>
                                     </div>
-                                    <div class="work-area-stats">
-                                        <div class="stat-item">
-                                            <span class="stat-label-small">План</span>
-                                            <span class="stat-value-small"><?= number_format((float)$selectedTask['quantity_plan'], 0, '.', ' ') ?></span>
-                                        </div>
-                                        <div class="stat-item">
-                                            <span class="stat-label-small">Факт</span>
-                                            <span class="stat-value-small" style="color: var(--info-color);"><?= number_format((float)$selectedTask['quantity_fact'], 0, '.', ' ') ?></span>
-                                        </div>
-                                        <div class="stat-item">
-                                            <span class="stat-label-small">Годные</span>
-                                            <span class="stat-value-small" style="color: var(--success-color);"><?= number_format((float)$selectedTask['quantity_good'], 0, '.', ' ') ?></span>
-                                        </div>
-                                        <div class="stat-item">
-                                            <span class="stat-label-small">Брак</span>
-                                            <span class="stat-value-small" style="color: var(--error-color);"><?= number_format((float)$selectedTask['quantity_defect'], 0, '.', ' ') ?></span>
-                                        </div>
-                                    </div>
                                     <div class="work-area-actions">
                                         <button class="btn btn-primary" onclick="openProductionModal(<?= $selectedTask['id'] ?>)">
                                             ✅ Завершить производство
                                         </button>
+                                    </div>
+                                </div>
+                                
+                                <div class="stats-row">
+                                    <div class="stat-card">
+                                        <div class="stat-value"><?= number_format((float)$selectedTask['quantity_plan'], 0, '.', ' ') ?></div>
+                                        <div class="stat-label">План</div>
+                                    </div>
+                                    <div class="stat-card">
+                                        <div class="stat-value" style="color: var(--info-color);"><?= number_format((float)$selectedTask['quantity_fact'], 0, '.', ' ') ?></div>
+                                        <div class="stat-label">Факт</div>
+                                    </div>
+                                    <div class="stat-card">
+                                        <div class="stat-value" style="color: var(--success-color);"><?= number_format((float)$selectedTask['quantity_good'], 0, '.', ' ') ?></div>
+                                        <div class="stat-label">Годные</div>
+                                    </div>
+                                    <div class="stat-card">
+                                        <div class="stat-value" style="color: var(--danger-color);"><?= number_format((float)$selectedTask['quantity_defect'], 0, '.', ' ') ?></div>
+                                        <div class="stat-label">Брак</div>
                                     </div>
                                 </div>
                                 

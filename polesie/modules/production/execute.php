@@ -1024,6 +1024,37 @@ foreach ($allTasks as &$task) {
             box-shadow: var(--shadow-md);
         }
         
+        /* Стили для блока всех заказов */
+        .all-orders-section {
+            background: var(--bg-primary);
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow);
+            padding: 28px;
+        }
+        
+        .all-orders-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 20px;
+        }
+        
+        .order-card-item {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+        }
+        
+        .order-card-item:hover {
+            border-color: var(--primary-color);
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+            background: linear-gradient(135deg, rgba(37, 99, 235, 0.03) 0%, var(--bg-secondary) 100%);
+        }
+        
         .task-item:hover {
             background: var(--gray-50);
         }
@@ -1721,6 +1752,98 @@ foreach ($allTasks as &$task) {
                         </div>
                     </div>
 
+                    <!-- Полный список всех заказов - большой блок в начале страницы -->
+                    <div class="all-orders-section" style="margin-bottom: 32px;">
+                        <div class="all-orders-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                            <h3 style="font-size: 20px; font-weight: 700; color: var(--text-primary);">📋 Все активные заказы</h3>
+                            <button class="btn btn-sm btn-outline" onclick="toggleAllOrdersList()" style="padding: 8px 16px; font-size: 14px;">
+                                <span id="toggleAllOrdersText">Свернуть</span>
+                            </button>
+                        </div>
+                        
+                        <div class="all-orders-grid" id="allOrdersGrid">
+                            <?php foreach ($ordersList as $order): 
+                                // Считаем количество заданий для этого заказа
+                                $tasksCount = 0;
+                                $productsCount = 0;
+                                foreach ($ordersGrouped as $og) {
+                                    if ($og['order_id'] == $order['id']) {
+                                        $productsCount = count($og['products']);
+                                        foreach ($og['products'] as $product) {
+                                            $tasksCount += count($product['tasks']);
+                                        }
+                                        break;
+                                    }
+                                }
+                            ?>
+                            <div class="order-card-item" 
+                                 data-order-id="<?= $order['id'] ?>" 
+                                 data-order-number="<?= e($order['order_number']) ?>" 
+                                 data-customer="<?= e(strtolower($order['customer_name'])) ?>"
+                                 data-status="<?= e($order['status']) ?>"
+                                 onclick="selectOrderFromAllOrders(<?= $order['id'] ?>, '<?= e($order['order_number']) ?>')"
+                                 style="<?= ($selectedOrderId == $order['id']) ? 'border-color: var(--primary-color); box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15);' : '' ?>">
+                                
+                                <div class="order-card-header-main">
+                                    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+                                        <span class="order-number-badge" style="font-size: 18px; padding: 8px 16px;"><?= e($order['order_number']) ?></span>
+                                        <span class="order-status-badge status-<?= e($order['status']) ?>" style="background: <?= e($order['status_color']) ?>; color: white; padding: 6px 14px; font-size: 13px;">
+                                            <?= e($order['status_name']) ?>
+                                        </span>
+                                    </div>
+                                </div>
+                                
+                                <div class="order-card-body">
+                                    <div class="order-customer-info" style="margin-bottom: 12px;">
+                                        <span style="color: var(--text-secondary); font-size: 13px;">👤 Клиент:</span>
+                                        <span style="font-weight: 600; color: var(--text-primary); font-size: 14px;">
+                                            <?= !empty($order['customer_name']) ? e($order['customer_name']) : '<span style="color: var(--text-secondary);">—</span>' ?>
+                                        </span>
+                                    </div>
+                                    
+                                    <div class="order-stats" style="display: flex; gap: 16px; margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border-color);">
+                                        <div class="order-stat-item" style="display: flex; flex-direction: column; gap: 4px;">
+                                            <span style="font-size: 11px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px;">Товаров</span>
+                                            <span style="font-size: 18px; font-weight: 700; color: var(--primary-color);"><?= $productsCount ?></span>
+                                        </div>
+                                        <div class="order-stat-item" style="display: flex; flex-direction: column; gap: 4px;">
+                                            <span style="font-size: 11px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px;">Заданий</span>
+                                            <span style="font-size: 18px; font-weight: 700; color: var(--info-color);"><?= $tasksCount ?></span>
+                                        </div>
+                                        <div class="order-stat-item" style="display: flex; flex-direction: column; gap: 4px;">
+                                            <span style="font-size: 11px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px;">В работе</span>
+                                            <span style="font-size: 18px; font-weight: 700; color: var(--success-color);">
+                                                <?php
+                                                $inProgressCount = 0;
+                                                foreach ($ordersGrouped as $og) {
+                                                    if ($og['order_id'] == $order['id']) {
+                                                        foreach ($og['products'] as $product) {
+                                                            foreach ($product['tasks'] as $task) {
+                                                                if ($task['task_status'] === 'in_progress') {
+                                                                    $inProgressCount++;
+                                                                }
+                                                            }
+                                                        }
+                                                        break;
+                                                    }
+                                                }
+                                                echo $inProgressCount;
+                                                ?>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="order-card-footer" style="margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border-color);">
+                                    <button class="btn btn-sm btn-primary" style="width: 100%; padding: 10px; font-size: 14px;" onclick="event.stopPropagation(); selectOrderFromAllOrders(<?= $order['id'] ?>, '<?= e($order['order_number']) ?>')">
+                                        📦 Открыть задания
+                                    </button>
+                                </div>
+                            </div>
+                            <?php endforeach; ?>
+                        </div>
+                    </div>
+
                     <div class="production-dashboard<?php if (!$selectedTask): ?> no-order-selected<?php endif; ?>">
                         <!-- Кнопка для открытия полного списка заказов -->
                         <button class="btn-view-orders" onclick="openOrdersModal()">
@@ -2315,6 +2438,34 @@ foreach ($allTasks as &$task) {
                     item.style.display = 'none';
                 }
             });
+        }
+        
+        // Выбор заказа из блока всех заказов в начале страницы
+        function selectOrderFromAllOrders(orderId, orderNumber) {
+            // Прокрутка к панели управления и выбор заказа
+            selectOrder(orderId, orderNumber);
+            
+            // Плавная прокрутка к рабочей области
+            setTimeout(() => {
+                const workArea = document.getElementById('workArea');
+                if (workArea) {
+                    workArea.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            }, 300);
+        }
+        
+        // Сворачивание/разворачивание списка всех заказов
+        function toggleAllOrdersList() {
+            const grid = document.getElementById('allOrdersGrid');
+            const toggleText = document.getElementById('toggleAllOrdersText');
+            
+            if (grid && grid.style.display === 'none') {
+                grid.style.display = 'grid';
+                toggleText.textContent = 'Свернуть';
+            } else if (grid) {
+                grid.style.display = 'none';
+                toggleText.textContent = 'Развернуть';
+            }
         }
         
         // Выбор заказа

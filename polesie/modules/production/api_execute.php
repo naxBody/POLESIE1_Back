@@ -547,6 +547,99 @@ if ($isApiRequest) {
 
 }
 
+// Обработка GET запроса для получения детальной информации о заказе
+if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['action']) && $_GET['action'] === 'get_order_details' && isset($_GET['order_id'])) {
+    try {
+        $orderId = (int)$_GET['order_id'];
+        
+        // Получаем основную информацию о заказе
+        $orderStmt = $pdo->prepare("
+            SELECT o.id, o.order_number, o.status, o.created_at,
+                   c.name as customer_name,
+                   CASE 
+                       WHEN o.status = 'new' THEN '#6B7280'
+                       WHEN o.status = 'in_production' THEN '#3B82F6'
+                       WHEN o.status = 'ready' THEN '#10B981'
+                       WHEN o.status = 'shipped' THEN '#8B5CF6'
+                       WHEN o.status = 'cancelled' THEN '#EF4444'
+                       ELSE '#6B7280'
+                   END as status_color,
+                   CASE 
+                       WHEN o.status = 'new' THEN 'Новый'
+                       WHEN o.status = 'in_production' THEN 'В производстве'
+                       WHEN o.status = 'ready' THEN 'Готов'
+                       WHEN o.status = 'shipped' THEN 'Отгружен'
+                       WHEN o.status = 'cancelled' THEN 'Отменен'
+                       ELSE 'Неизвестно'
+                   END as status_name
+            FROM orders o
+            LEFT JOIN customers c ON o.customer_id = c.id
+            WHERE o.id = ?
+        ");
+        $orderStmt->execute([$orderId]);
+        $order = $orderStmt->fetch();
+        
+        if (!$order) {
+            throw new Exception('Заказ не найден');
+        }
+        
+        // Получаем товары заказа
+        $itemsStmt = $pdo->prepare("
+            SELECT oi.id, oi.quantity, p.name as product_name, p.article, bu.symbol as unit_name
+            FROM order_items oi
+            JOIN products p ON oi.product_id = p.id
+            LEFT JOIN base_units bu ON p.base_unit_id = bu.id
+            WHERE oi.order_id = ?
+        ");
+        $itemsStmt->execute([$orderId]);
+        $order['items'] = $itemsStmt->fetchAll();
+        
+        // Получаем производственные задания
+        $tasksStmt = $pdo->prepare("
+            SELECT pt.id, pt.product_id, pt.quantity_plan, pt.quantity_fact, pt.status as task_status,
+                   p.name as product_name,
+                   CASE 
+                       WHEN pt.status = 'planned' THEN 'Запланировано'
+                       WHEN pt.status = 'in_progress' THEN 'В работе'
+                       WHEN pt.status = 'completed' THEN 'Завершено'
+                       ELSE 'Неизвестно'
+                   END as status_name
+            FROM production_tasks pt
+            JOIN products p ON pt.product_id = p.id
+            WHERE pt.order_id = ?
+        ");
+        $tasksStmt->execute([$orderId]);
+        $tasks = $tasksStmt->fetchAll();
+        
+        // Для каждого задания получаем материалы
+        foreach ($tasks as &$task) {
+            $materialsStmt = $pdo->prepare("
+                SELECT ptm.quantity_required, m.name_full as material_name, bu.symbol as unit_symbol
+                FROM production_tasks_materials ptm
+                JOIN materials m ON ptm.material_id = m.id
+                LEFT JOIN base_units bu ON m.base_unit_id = bu.id
+                WHERE ptm.task_id = ?
+            ");
+            $materialsStmt->execute([$task['id']]);
+            $task['materials'] = $materialsStmt->fetchAll();
+        }
+        $order['tasks'] = $tasks;
+        
+        echo json_encode([
+            'success' => true,
+            'order' => $order
+        ]);
+        exit;
+    } catch (Exception $e) {
+        http_response_code(400);
+        echo json_encode([
+            'success' => false,
+            'error' => $e->getMessage()
+        ]);
+        exit;
+    }
+}
+
 // Дополнительная обработка GET запросов для получения данных задания
 if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['task_id'])) {
     try {

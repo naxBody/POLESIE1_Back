@@ -7,6 +7,15 @@ USE `polesie_production`;
 
 SET NAMES utf8mb4;
 
+-- Исправляем проблему с collation: приводим все к utf8mb4_unicode_ci
+ALTER DATABASE `polesie_production` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- Приводим таблицу users к единой сортировке
+ALTER TABLE `users` CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- Приводим таблицу user_roles к единой сортировке (если существует)
+ALTER TABLE `user_roles` CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
 -- ============================================
 -- 1. СОЗДАНИЕ ТАБЛИЦЫ РОЛЕЙ (если не существует)
 -- ============================================
@@ -95,10 +104,10 @@ INSERT INTO `temp_user_roles` (`username`, `role_code`) VALUES
 ('sidorov', 'storekeeper'),
 ('worker1', 'worker');
 
--- Обновляем role_id у существующих пользователей
+-- Обновляем role_id у существующих пользователей (с явным указанием collation для избежания конфликтов)
 UPDATE `users` u
-JOIN `temp_user_roles` tur ON u.username = tur.username
-JOIN `user_roles` ur ON tur.role_code = ur.code
+JOIN `temp_user_roles` tur ON u.username COLLATE utf8mb4_unicode_ci = tur.username COLLATE utf8mb4_unicode_ci
+JOIN `user_roles` ur ON tur.role_code COLLATE utf8mb4_unicode_ci = ur.code COLLATE utf8mb4_unicode_ci
 SET u.role_id = ur.id;
 
 -- Удаляем временную таблицу

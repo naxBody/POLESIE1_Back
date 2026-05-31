@@ -26,12 +26,30 @@ $pageTitle = 'Исполнение производства';
 $isAjaxRequest = (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest') 
                  || (isset($_GET['ajax']) && $_GET['ajax'] == '1');
 
+// Получение выбранного заказа из GET параметра (для перехода из заказов)
+$selectedOrderId = isset($_GET['order_id']) ? (int)$_GET['order_id'] : null;
+
 // Получение выбранного задания из GET параметра
 $selectedTaskId = isset($_GET['task']) ? (int)$_GET['task'] : null;
 
+// Если выбран заказ, но не выбрано задание, выбираем первое доступное задание для этого заказа
+if ($selectedOrderId && !$selectedTaskId) {
+    $firstTaskSql = "SELECT pt.id 
+                     FROM production_tasks pt
+                     WHERE pt.order_id = ? AND pt.status IN ('planned', 'in_progress')
+                     ORDER BY pt.planned_start ASC
+                     LIMIT 1";
+    $stmt = $pdo->prepare($firstTaskSql);
+    $stmt->execute([$selectedOrderId]);
+    $firstTask = $stmt->fetch();
+    if ($firstTask) {
+        $selectedTaskId = $firstTask['id'];
+    }
+}
+
 // AJAX запрос для получения товаров заказа
-if ($isAjaxRequest && isset($_GET['order'])) {
-    $orderId = (int)$_GET['order'];
+if ($isAjaxRequest && (isset($_GET['order']) || $selectedOrderId)) {
+    $orderId = (int)($_GET['order'] ?? $selectedOrderId);
     
     // Получаем товары и задания для заказа
     $sql = "SELECT pt.*,
@@ -509,6 +527,7 @@ $sql = "SELECT pt.*,
         LEFT JOIN users u2 ON pt.responsible_id = u2.id
         LEFT JOIN users u3 ON pt.worker_id = u3.id
         WHERE pt.status IN ('planned', 'in_progress')
+        " . ($selectedOrderId ? "AND o.id = " . (int)$selectedOrderId . " " : "") . "
         ORDER BY 
             o.order_number ASC,
             p.name ASC,
@@ -2129,11 +2148,16 @@ foreach ($allTasks as &$task) {
         
         // Вызываем после загрузки DOM
         document.addEventListener('DOMContentLoaded', function() {
+            // Если заказ выбран через GET параметр, автоматически загружаем его
+            <?php if ($selectedOrderId): ?>
+            selectOrder(<?= $selectedOrderId ?>, 'Заказ #<?= $selectedOrderId ?>');
+            <?php else: ?>
             // Добавляем класс no-order-selected при загрузке если заказ не выбран
             const dashboard = document.querySelector('.production-dashboard');
             if (dashboard && !currentOrderId) {
                 dashboard.classList.add('no-order-selected');
             }
+            <?php endif; ?>
             
             // Небольшая задержка для гарантии полной загрузки DOM
             setTimeout(initTabs, 10);

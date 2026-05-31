@@ -752,13 +752,276 @@ foreach ($allTasks as &$task) {
             transition: all var(--transition-fast);
         }
         
+        .order-item {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-color);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            background: white;
+        }
+        
         .order-item:hover {
             background: var(--gray-50) !important;
+            transform: translateX(4px);
         }
         
         .order-item.active {
             background: linear-gradient(90deg, rgba(37, 99, 235, 0.08) 0%, transparent 100%);
             border-left: 4px solid var(--primary-color);
+        }
+        
+        .order-item-card {
+            background: var(--bg-secondary);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            margin-bottom: 16px;
+            border: 1px solid var(--border-color);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+        }
+        
+        .order-item-card:hover {
+            border-color: var(--primary-color);
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+            background: linear-gradient(135deg, rgba(37, 99, 235, 0.03) 0%, var(--bg-secondary) 100%);
+        }
+        
+        .order-item-card.active {
+            border-color: var(--primary-color);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15);
+            background: linear-gradient(135deg, rgba(37, 99, 235, 0.05) 0%, var(--bg-secondary) 100%);
+        }
+        
+        .order-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        
+        .order-number-badge {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--primary-color);
+            background: rgba(37, 99, 235, 0.08);
+            padding: 6px 12px;
+            border-radius: 8px;
+        }
+        
+        .order-status-badge {
+            font-size: 12px;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .order-customer {
+            font-size: 14px;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .order-meta {
+            display: flex;
+            gap: 16px;
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+        
+        .order-tasks-count {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: var(--gray-100);
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-weight: 500;
+        }
+        
+        /* Модальное окно списка заказов */
+        .orders-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            z-index: 9999;
+            display: none;
+            animation: fadeIn 0.2s ease-in-out;
+        }
+        
+        .orders-modal-overlay.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .orders-modal {
+            background: var(--bg-primary);
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-xl);
+            width: 90%;
+            max-width: 1200px;
+            max-height: 85vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            animation: slideUp 0.3s ease-out;
+        }
+        
+        @keyframes slideUp {
+            from { 
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .orders-modal-header {
+            padding: 24px 32px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--gray-50);
+        }
+        
+        .orders-modal-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+        
+        .orders-modal-close {
+            background: none;
+            border: none;
+            font-size: 28px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all var(--transition-fast);
+        }
+        
+        .orders-modal-close:hover {
+            background: var(--gray-200);
+            color: var(--text-primary);
+        }
+        
+        .orders-modal-filters {
+            padding: 20px 32px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            align-items: center;
+            background: var(--bg-secondary);
+        }
+        
+        .orders-search-input {
+            flex: 1;
+            min-width: 250px;
+            padding: 12px 16px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 15px;
+            transition: all var(--transition-fast);
+        }
+        
+        .orders-search-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+        
+        .orders-filter-select {
+            padding: 12px 16px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 14px;
+            background: white;
+            cursor: pointer;
+        }
+        
+        .orders-modal-body {
+            padding: 24px 32px;
+            overflow-y: auto;
+            flex: 1;
+        }
+        
+        .orders-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+        }
+        
+        .orders-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .orders-table th {
+            text-align: left;
+            padding: 12px 16px;
+            background: var(--gray-50);
+            font-weight: 600;
+            color: var(--text-secondary);
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid var(--border-color);
+        }
+        
+        .orders-table td {
+            padding: 16px;
+            border-bottom: 1px solid var(--border-color);
+            vertical-align: middle;
+        }
+        
+        .orders-table tr:hover {
+            background: var(--gray-50);
+        }
+        
+        .orders-table tr.selected {
+            background: rgba(37, 99, 235, 0.08);
+        }
+        
+        .btn-view-orders {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .btn-view-orders:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
         }
         
         .task-item:hover {
@@ -1459,6 +1722,92 @@ foreach ($allTasks as &$task) {
                     </div>
 
                     <div class="production-dashboard<?php if (!$selectedTask): ?> no-order-selected<?php endif; ?>">
+                        <!-- Кнопка для открытия полного списка заказов -->
+                        <button class="btn-view-orders" onclick="openOrdersModal()">
+                            📋 Все заказы (<?= count($ordersList) ?>)
+                        </button>
+                        
+                        <!-- Модальное окно со списком всех заказов -->
+                        <div class="orders-modal-overlay" id="ordersModalOverlay" onclick="if(event.target === this) closeOrdersModal()">
+                            <div class="orders-modal">
+                                <div class="orders-modal-header">
+                                    <h2 class="orders-modal-title">📋 Выбор заказа для исполнения</h2>
+                                    <button class="orders-modal-close" onclick="closeOrdersModal()">×</button>
+                                </div>
+                                
+                                <div class="orders-modal-filters">
+                                    <input type="text" 
+                                           class="orders-search-input" 
+                                           id="modalOrderSearch" 
+                                           placeholder="Поиск по номеру заказа или клиенту..."
+                                           onkeyup="filterModalOrders()">
+                                    
+                                    <select class="orders-filter-select" id="modalOrderStatusFilter" onchange="filterModalOrders()">
+                                        <option value="">Все статусы</option>
+                                        <option value="new">Новый</option>
+                                        <option value="processing">В работе</option>
+                                        <option value="ready">Готов</option>
+                                        <option value="shipped">Отгружен</option>
+                                        <option value="cancelled">Отменен</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="orders-modal-body">
+                                    <table class="orders-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Номер заказа</th>
+                                                <th>Клиент</th>
+                                                <th>Статус</th>
+                                                <th>Заданий</th>
+                                                <th>Действие</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="modalOrdersTableBody">
+                                            <?php foreach ($ordersList as $order): 
+                                                // Считаем количество заданий для этого заказа
+                                                $tasksCount = 0;
+                                                foreach ($ordersGrouped as $og) {
+                                                    if ($og['order_id'] == $order['id']) {
+                                                        foreach ($og['products'] as $product) {
+                                                            $tasksCount += count($product['tasks']);
+                                                        }
+                                                        break;
+                                                    }
+                                                }
+                                            ?>
+                                            <tr data-order-id="<?= $order['id'] ?>" 
+                                                data-order-number="<?= e($order['order_number']) ?>" 
+                                                data-customer="<?= e(strtolower($order['customer_name'])) ?>"
+                                                data-status="<?= e($order['status']) ?>"
+                                                class="<?= ($selectedOrderId == $order['id']) ? 'selected' : '' ?>">
+                                                <td>
+                                                    <span class="order-number-badge"><?= e($order['order_number']) ?></span>
+                                                </td>
+                                                <td><?= !empty($order['customer_name']) ? e($order['customer_name']) : '<span style="color: var(--text-secondary);">—</span>' ?></td>
+                                                <td>
+                                                    <span class="order-status-badge status-<?= e($order['status']) ?>" style="background: <?= e($order['status_color']) ?>; color: white;">
+                                                        <?= e($order['status_name']) ?>
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <span class="order-tasks-count">
+                                                        📦 <?= $tasksCount ?> зад.
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-primary" onclick="selectOrderFromModal(<?= $order['id'] ?>, '<?= e($order['order_number']) ?>')">
+                                                        Выбрать
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                            <?php endforeach; ?>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        
                         <!-- Панель списка заказов с фильтрами -->
                         <div class="tasks-panel">
                             <!-- Фильтры заказов -->
@@ -1909,7 +2258,46 @@ foreach ($allTasks as &$task) {
         let currentTaskId = <?= $selectedTask ? $selectedTask['id'] : 0 ?>;
         let currentOrderId = null;
         
-        // Фильтрация заказов
+        // Открытие модального окна заказов
+        function openOrdersModal() {
+            document.getElementById('ordersModalOverlay').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+        
+        // Закрытие модального окна заказов
+        function closeOrdersModal() {
+            document.getElementById('ordersModalOverlay').classList.remove('active');
+            document.body.style.overflow = '';
+        }
+        
+        // Выбор заказа из модального окна
+        function selectOrderFromModal(orderId, orderNumber) {
+            closeOrdersModal();
+            selectOrder(orderId, orderNumber);
+        }
+        
+        // Фильтрация заказов в модальном окне
+        function filterModalOrders() {
+            const searchText = document.getElementById('modalOrderSearch').value.toLowerCase();
+            const statusFilter = document.getElementById('modalOrderStatusFilter').value;
+            
+            document.querySelectorAll('#modalOrdersTableBody tr').forEach(row => {
+                const orderNumber = row.getAttribute('data-order-number').toLowerCase();
+                const customer = row.getAttribute('data-customer');
+                const status = row.getAttribute('data-status');
+                
+                const matchesSearch = orderNumber.includes(searchText) || (customer && customer.includes(searchText));
+                const matchesStatus = !statusFilter || status === statusFilter;
+                
+                if (matchesSearch && matchesStatus) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
+        
+        // Фильтрация заказов в боковой панели
         function filterOrders() {
             const searchText = document.getElementById('orderSearch').value.toLowerCase();
             const statusFilter = document.getElementById('orderStatusFilter').value;

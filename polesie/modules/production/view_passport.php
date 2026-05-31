@@ -462,6 +462,22 @@ $isPrint = isset($_GET['print']);
             font-weight: 500;
             color: var(--text-primary);
         }
+        .material-row-clickable {
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .material-row-clickable:hover {
+            background: var(--primary-light);
+        }
+        .material-spec-badge {
+            display: inline-block;
+            background: var(--bg-secondary);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            margin-right: 4px;
+            margin-bottom: 4px;
+        }
         
         @media print {
             body * {
@@ -756,87 +772,97 @@ $isPrint = isset($_GET['print']);
         <?php if (!empty($materials)): ?>
         <div class="passport-section">
             <div class="passport-section-title">📦 Материалы для производства (<?= count($materials) ?> поз.)</div>
-            <div style="display: grid; gap: 12px;">
-                <?php foreach ($materials as $index => $material): 
-                    // Декодируем спецификации материала
-                    $materialSpecs = [];
-                    if (!empty($material['material_specifications'])) {
-                        $decodedSpecs = json_decode($material['material_specifications'], true);
-                        if (is_array($decodedSpecs)) {
-                            $materialSpecs = $decodedSpecs;
+            <table class="materials-table">
+                <thead>
+                    <tr>
+                        <th style="width: 40px;">#</th>
+                        <th>Артикул</th>
+                        <th>Наименование</th>
+                        <th>Категория</th>
+                        <th>Характеристики</th>
+                        <th style="width: 120px; text-align: right;">Количество</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($materials as $index => $material): 
+                        // Декодируем спецификации материала
+                        $materialSpecs = [];
+                        if (!empty($material['material_specifications'])) {
+                            $decodedSpecs = json_decode($material['material_specifications'], true);
+                            if (is_array($decodedSpecs)) {
+                                $materialSpecs = $decodedSpecs;
+                            }
                         }
-                    }
-                    
-                    // Основные характеристики для отображения
-                    $displaySpecLabels = [
-                        'grade' => 'Марка',
-                        'type' => 'Стандарт',
-                        'gost' => 'ГОСТ',
-                        'diameter_mm' => 'Диаметр',
-                        'length_m' => 'Длина',
-                        'thickness_mm' => 'Толщина',
-                        'width_mm' => 'Ширина',
-                        'strength_class' => 'Кл. прочности',
-                        'coating' => 'Покрытие',
-                        'material_type' => 'Тип'
-                    ];
-                ?>
-                <div class="material-card-item" onclick="openMaterialModal(<?= htmlspecialchars(json_encode([
-                    'id' => $material['material_id'],
-                    'code' => $material['material_code'],
-                    'name_full' => $material['material_name'],
-                    'name_short' => $material['material_short'] ?? '',
-                    'description' => $material['material_description'] ?? '',
-                    'specifications' => $materialSpecs,
-                    'category' => $material['material_category'] ?? '',
-                    'quantity' => $material['quantity'],
-                    'unit' => $material['unit']
-                ], JSON_UNESCAPED_UNICODE), ENT_QUOTES, 'UTF-8') ?>)">
-                    <div class="material-card-header">
-                        <div style="flex: 1;">
-                            <div class="material-card-title"><?= e($material['material_name']) ?></div>
-                            <div style="font-size: 13px; color: var(--text-secondary); margin-top: 4px;">
-                                <?= e($material['material_category'] ?? '') ?>
-                            </div>
-                        </div>
-                        <span class="material-card-code" title="Нажмите для просмотра информации о материале"><?= e($material['material_code']) ?></span>
-                    </div>
-                    
-                    <div style="display: flex; gap: 20px; align-items: center; margin-top: 12px; flex-wrap: wrap;">
-                        <div style="font-size: 13px; color: var(--text-secondary);">
-                            <span style="font-weight: 500; color: var(--text-primary);">Количество:</span> 
-                            <?= number_format($material['quantity'], 3, ',', ' ') ?> <?= e($material['unit']) ?>
-                        </div>
                         
-                        <?php if (!empty($material['material_description'])): ?>
-                        <div style="font-size: 13px; color: var(--text-secondary); max-width: 400px;">
-                            <span style="font-weight: 500; color: var(--text-primary);">Описание:</span> 
-                            <?= e(mb_substr($material['material_description'], 0, 80)) ?><?= mb_strlen($material['material_description']) > 80 ? '...' : '' ?>
-                        </div>
-                        <?php endif; ?>
-                    </div>
-                    
-                    <?php if (!empty($materialSpecs)): ?>
-                    <div class="material-card-specs">
-                        <?php 
-                        $shownSpecs = 0;
-                        foreach ($displaySpecLabels as $key => $label): 
-                            if (isset($materialSpecs[$key]) && !empty($materialSpecs[$key]) && $shownSpecs < 4): 
-                                $shownSpecs++;
-                        ?>
-                        <div class="material-spec-item">
-                            <span class="material-spec-label"><?= e($label) ?>:</span>
-                            <span><?= e(is_array($materialSpecs[$key]) ? implode(', ', $materialSpecs[$key]) : $materialSpecs[$key]) ?></span>
-                        </div>
-                        <?php 
-                            endif;
-                        endforeach; 
-                        ?>
-                    </div>
-                    <?php endif; ?>
-                </div>
-                <?php endforeach; ?>
-            </div>
+                        // Основные характеристики для отображения
+                        $displaySpecLabels = [
+                            'grade' => 'Марка',
+                            'type' => 'Стандарт',
+                            'gost' => 'ГОСТ',
+                            'diameter_mm' => 'Диаметр',
+                            'length_m' => 'Длина',
+                            'thickness_mm' => 'Толщина',
+                            'width_mm' => 'Ширина',
+                            'strength_class' => 'Кл. прочности',
+                            'coating' => 'Покрытие',
+                            'material_type' => 'Тип'
+                        ];
+                    ?>
+                    <tr class="material-row-clickable" onclick="openMaterialModal(<?= htmlspecialchars(json_encode([
+                        'id' => $material['material_id'],
+                        'code' => $material['material_code'],
+                        'name_full' => $material['material_name'],
+                        'name_short' => $material['material_short'] ?? '',
+                        'description' => $material['material_description'] ?? '',
+                        'specifications' => $materialSpecs,
+                        'category' => $material['material_category'] ?? '',
+                        'quantity' => $material['quantity'],
+                        'unit' => $material['unit']
+                    ], JSON_UNESCAPED_UNICODE), ENT_QUOTES, 'UTF-8') ?>)">
+                        <td><?= $index + 1 ?></td>
+                        <td>
+                            <span class="material-code" title="Нажмите для просмотра информации о материале"><?= e($material['material_code']) ?></span>
+                        </td>
+                        <td>
+                            <strong><?= e($material['material_name']) ?></strong>
+                            <?php if (!empty($material['material_description'])): ?>
+                            <div style="font-size: 12px; color: var(--text-secondary); margin-top: 4px;">
+                                <?= e(mb_substr($material['material_description'], 0, 60)) ?><?= mb_strlen($material['material_description']) > 60 ? '...' : '' ?>
+                            </div>
+                            <?php endif; ?>
+                        </td>
+                        <td>
+                            <span style="font-size: 13px; color: var(--text-secondary);">
+                                <?= e($material['material_category'] ?? '—') ?>
+                            </span>
+                        </td>
+                        <td>
+                            <?php if (!empty($materialSpecs)): ?>
+                                <?php 
+                                $shownSpecs = 0;
+                                foreach ($displaySpecLabels as $key => $label): 
+                                    if (isset($materialSpecs[$key]) && !empty($materialSpecs[$key]) && $shownSpecs < 3): 
+                                        $shownSpecs++;
+                                ?>
+                                <span class="material-spec-badge">
+                                    <strong><?= e($label) ?>:</strong> <?= e(is_array($materialSpecs[$key]) ? implode(', ', $materialSpecs[$key]) : $materialSpecs[$key]) ?>
+                                </span>
+                                <?php 
+                                    endif;
+                                endforeach; 
+                                ?>
+                            <?php else: ?>
+                                <span style="color: var(--text-secondary); font-size: 13px;">—</span>
+                            <?php endif; ?>
+                        </td>
+                        <td style="text-align: right;">
+                            <strong><?= number_format($material['quantity'], 3, ',', ' ') ?></strong> 
+                            <span style="color: var(--text-secondary); font-size: 13px;"><?= e($material['unit']) ?></span>
+                        </td>
+                    </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
         </div>
         <?php else: ?>
         <div class="passport-section">
@@ -1025,6 +1051,46 @@ $isPrint = isset($_GET['print']);
         </div>
     </div>
     
+    <!-- Модальное окно информации о материале -->
+    <div id="materialInfoModal" class="product-modal-overlay" onclick="closeMaterialModal(event)" style="display: none;">
+        <div class="product-modal" style="max-width: 700px;" onclick="event.stopPropagation()">
+            <div class="product-modal-header">
+                <h3 class="product-modal-title">📦 Информация о материале</h3>
+                <button class="product-modal-close" onclick="closeMaterialModalDirect()">×</button>
+            </div>
+            <div class="product-modal-body" style="max-height: 70vh; overflow-y: auto;">
+                <div style="margin-bottom: 20px;">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px;">
+                        <div style="flex: 1;">
+                            <h4 id="modalMaterialName" style="margin: 0 0 8px 0; font-size: 18px; color: var(--text-primary);"></h4>
+                            <div style="font-size: 14px; color: var(--text-secondary);">
+                                <span id="modalMaterialCategory"></span>
+                            </div>
+                        </div>
+                        <span class="material-code" id="modalMaterialCode"></span>
+                    </div>
+                    
+                    <div style="background: var(--bg-secondary); padding: 16px; border-radius: var(--border-radius); margin-bottom: 16px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span style="font-weight: 500; color: var(--text-secondary);">Требуемое количество:</span>
+                            <span style="font-size: 18px; font-weight: 700; color: var(--primary-color);" id="modalMaterialQuantity"></span>
+                        </div>
+                    </div>
+                    
+                    <h5 style="margin: 20px 0 12px 0; color: var(--primary-color); font-size: 14px;">📝 Описание</h5>
+                    <p id="modalMaterialDescription" style="color: var(--text-secondary); line-height: 1.6;"></p>
+                    
+                    <h5 style="margin: 20px 0 12px 0; color: var(--primary-color); font-size: 14px;">⚙️ Характеристики</h5>
+                    <div id="modalMaterialSpecs" class="specs-list">
+                    </div>
+                </div>
+            </div>
+            <div class="product-modal-footer" style="display: flex; justify-content: flex-end; gap: 12px;">
+                <button type="button" onclick="closeMaterialModalDirect()" class="btn btn-outline">Закрыть</button>
+            </div>
+        </div>
+    </div>
+    
     <!-- Модальное окно редактирования паспорта -->
     <div id="editPassportModal" class="product-modal-overlay" onclick="closeEditPassportModal(event)" style="display: none;">
         <div class="product-modal" onclick="event.stopPropagation()">
@@ -1176,6 +1242,76 @@ $isPrint = isset($_GET['print']);
     </div>
     
     <script>
+        // Функция для открытия модального окна материала
+        function openMaterialModal(materialData) {
+            const modal = document.getElementById('materialInfoModal');
+            
+            // Заполняем данные в модальном окне
+            document.getElementById('modalMaterialCode').textContent = materialData.code || '—';
+            document.getElementById('modalMaterialName').textContent = materialData.name_full || '—';
+            document.getElementById('modalMaterialCategory').textContent = materialData.category || '—';
+            document.getElementById('modalMaterialQuantity').textContent = 
+                (materialData.quantity ? parseFloat(materialData.quantity).toFixed(3) : '0') + ' ' + (materialData.unit || '');
+            document.getElementById('modalMaterialDescription').textContent = materialData.description || 'Нет описания';
+            
+            // Заполняем спецификации
+            const specsContainer = document.getElementById('modalMaterialSpecs');
+            specsContainer.innerHTML = '';
+            
+            if (materialData.specifications && Object.keys(materialData.specifications).length > 0) {
+                const specLabels = {
+                    'grade': 'Марка',
+                    'type': 'Стандарт',
+                    'gost': 'ГОСТ',
+                    'diameter_mm': 'Диаметр',
+                    'length_m': 'Длина',
+                    'thickness_mm': 'Толщина',
+                    'width_mm': 'Ширина',
+                    'strength_class': 'Кл. прочности',
+                    'coating': 'Покрытие',
+                    'material_type': 'Тип'
+                };
+                
+                for (const [key, value] of Object.entries(materialData.specifications)) {
+                    if (value && value !== '') {
+                        const label = specLabels[key] || key;
+                        const displayValue = Array.isArray(value) ? value.join(', ') : value;
+                        
+                        const specItem = document.createElement('div');
+                        specItem.className = 'spec-row';
+                        specItem.innerHTML = `
+                            <span class="spec-label">${label}:</span>
+                            <span class="spec-value">${displayValue}</span>
+                        `;
+                        specsContainer.appendChild(specItem);
+                    }
+                }
+            } else {
+                specsContainer.innerHTML = '<p style="color: var(--text-secondary); padding: 12px 0;">Спецификации не указаны</p>';
+            }
+            
+            modal.classList.add('active');
+            modal.style.display = 'flex';
+        }
+        
+        function closeMaterialModal(event) {
+            if (event.target === event.currentTarget) {
+                const modal = document.getElementById('materialInfoModal');
+                modal.classList.remove('active');
+                setTimeout(() => {
+                    modal.style.display = 'none';
+                }, 300);
+            }
+        }
+        
+        function closeMaterialModalDirect() {
+            const modal = document.getElementById('materialInfoModal');
+            modal.classList.remove('active');
+            setTimeout(() => {
+                modal.style.display = 'none';
+            }, 300);
+        }
+        
         function openEditPassportModal() {
             const modal = document.getElementById('editPassportModal');
             modal.classList.add('active');

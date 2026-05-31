@@ -1241,55 +1241,25 @@ $categories = $pdo->query($catQuery)->fetchAll();
             }
             html += '</div>';
             
-            // Материалы из БД - сгруппированные по категориям
+            // Материалы из БД - единая таблица без группировки
             html += '<div class="passport-section">';
             html += '<div class="passport-section-title">📦 Материалы для производства</div>';
             if (passport.materials && passport.materials.length > 0) {
-                // Группируем материалы по категориям
-                var materialsByCategory = {};
+                html += '<table class="materials-table">';
+                html += '<thead><tr><th>№</th><th>Материал</th><th>Код</th><th>Количество</th><th>Ед.</th></tr></thead>';
+                html += '<tbody>';
                 for (var i = 0; i < passport.materials.length; i++) {
                     var mat = passport.materials[i];
-                    var catName = mat.material_category || 'Прочее';
-                    if (!materialsByCategory[catName]) {
-                        materialsByCategory[catName] = [];
-                    }
-                    materialsByCategory[catName].push(mat);
+                    html += '<tr style="cursor: pointer;" onclick="openMaterialCard(' + mat.material_id + ')" title="Нажмите для просмотра карточки материала">';
+                    html += '<td>' + (i + 1) + '</td>';
+                    html += '<td><strong>' + escapeHtml(mat.material_name) + '</strong></td>';
+                    html += '<td><code style="background: #e3f2fd; color: #1976d2; padding: 4px 8px; border-radius: 4px; cursor: pointer;">' + escapeHtml(mat.material_code) + '</code></td>';
+                    html += '<td>' + Number(mat.quantity).toFixed(3).replace(/\.?0+$/, '').replace('.', ',') + '</td>';
+                    html += '<td>' + escapeHtml(mat.unit) + '</td>';
+                    html += '</tr>';
                 }
-                
-                var categoryIcons = {
-                    'Металлы': '🔩',
-                    'Крепеж': '🔧',
-                    'Электроника': '⚡',
-                    'Пластик': '🧪',
-                    'Резина': '⭕',
-                    'Упаковка': '📦',
-                    'Прочее': '📋'
-                };
-                
-                for (var catName in materialsByCategory) {
-                    if (materialsByCategory.hasOwnProperty(catName)) {
-                        var icon = categoryIcons[catName] || '📋';
-                        html += '<div class="materials-grouped">';
-                        html += '<div class="material-category-header">' + icon + ' ' + escapeHtml(catName) + '</div>';
-                        html += '<table class="materials-table">';
-                        html += '<thead><tr><th>№</th><th>Материал</th><th>Код</th><th>Количество</th><th>Ед.</th></tr></thead>';
-                        html += '<tbody>';
-                        for (var j = 0; j < materialsByCategory[catName].length; j++) {
-                            var mat = materialsByCategory[catName][j];
-                            var globalIdx = i + j + 1;
-                            html += '<tr style="cursor: pointer;" onclick="openMaterialCard(' + mat.material_id + ')" title="Нажмите для просмотра карточки материала">';
-                            html += '<td>' + (j + 1) + '</td>';
-                            html += '<td><strong>' + escapeHtml(mat.material_name) + '</strong></td>';
-                            html += '<td><code style="background: #e3f2fd; color: #1976d2; padding: 4px 8px; border-radius: 4px; cursor: pointer;">' + escapeHtml(mat.material_code) + '</code></td>';
-                            html += '<td>' + Number(mat.quantity).toFixed(3).replace(/\.?0+$/, '').replace('.', ',') + '</td>';
-                            html += '<td>' + escapeHtml(mat.unit) + '</td>';
-                            html += '</tr>';
-                        }
-                        html += '</tbody>';
-                        html += '</table>';
-                        html += '</div>';
-                    }
-                }
+                html += '</tbody>';
+                html += '</table>';
             } else {
                 html += '<div style="padding: 20px; text-align: center; color: var(--text-secondary); background: var(--bg-tertiary); border-radius: 8px;">';
                 html += 'ℹ️ Материалы не указаны в паспорте';

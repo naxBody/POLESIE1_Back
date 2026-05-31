@@ -54,18 +54,31 @@ $query = "
     WHERE p.is_active = TRUE
 ";
 
+$countQuery = "
+    SELECT COUNT(*) as total
+    FROM products p
+    LEFT JOIN product_passports pp ON pp.product_id = p.id
+    LEFT JOIN product_categories pc ON p.category_id = pc.id
+    WHERE p.is_active = TRUE
+";
+
 $params = [];
+$countParams = [];
 
 // Фильтр по поиску
 if ($search) {
     $query .= " AND (p.article LIKE :search OR p.name LIKE :search)";
+    $countQuery .= " AND (p.article LIKE :search OR p.name LIKE :search)";
     $params[':search'] = "%{$search}%";
+    $countParams[':search'] = "%{$search}%";
 }
 
 // Фильтр по категории
 if ($categoryFilter) {
     $query .= " AND pc.code = :category";
+    $countQuery .= " AND pc.code = :category";
     $params[':category'] = $categoryFilter;
+    $countParams[':category'] = $categoryFilter;
 }
 
 // Фильтр по весу
@@ -73,12 +86,15 @@ if ($weightFilter) {
     switch ($weightFilter) {
         case 'light':
             $query .= " AND pp.total_weight_kg < 5";
+            $countQuery .= " AND pp.total_weight_kg < 5";
             break;
         case 'medium':
             $query .= " AND pp.total_weight_kg >= 5 AND pp.total_weight_kg < 20";
+            $countQuery .= " AND pp.total_weight_kg >= 5 AND pp.total_weight_kg < 20";
             break;
         case 'heavy':
             $query .= " AND pp.total_weight_kg >= 20";
+            $countQuery .= " AND pp.total_weight_kg >= 20";
             break;
     }
 }
@@ -88,12 +104,15 @@ if ($warrantyFilter) {
     switch ($warrantyFilter) {
         case 'short':
             $query .= " AND pp.warranty_months <= 12";
+            $countQuery .= " AND pp.warranty_months <= 12";
             break;
         case 'standard':
             $query .= " AND pp.warranty_months > 12 AND pp.warranty_months <= 36";
+            $countQuery .= " AND pp.warranty_months > 12 AND pp.warranty_months <= 36";
             break;
         case 'long':
             $query .= " AND pp.warranty_months > 36";
+            $countQuery .= " AND pp.warranty_months > 36";
             break;
     }
 }
@@ -102,15 +121,19 @@ if ($warrantyFilter) {
 if ($serialFilter !== '') {
     if ($serialFilter === 'yes') {
         $query .= " AND pp.is_serial_tracked = TRUE";
+        $countQuery .= " AND pp.is_serial_tracked = TRUE";
     } elseif ($serialFilter === 'no') {
         $query .= " AND pp.is_serial_tracked = FALSE";
+        $countQuery .= " AND pp.is_serial_tracked = FALSE";
     }
 }
 
 // Фильтр по конкретному продукту (при переходе из заказа)
 if ($productIdFilter) {
     $query .= " AND p.id = :product_id";
+    $countQuery .= " AND p.id = :product_id";
     $params[':product_id'] = $productIdFilter;
+    $countParams[':product_id'] = $productIdFilter;
 }
 
 // Сортировка
@@ -139,10 +162,9 @@ switch ($sortBy) {
         break;
 }
 
-// Получение общего количества для пагинации (до добавления LIMIT/OFFSET)
-$countQuery = "SELECT COUNT(*) as total FROM ({$query}) as count_query";
+// Получение общего количества для пагинации (без LIMIT/OFFSET)
 $countStmt = $pdo->prepare($countQuery);
-$countStmt->execute($params);
+$countStmt->execute($countParams);
 $totalProducts = (int)$countStmt->fetch()['total'];
 $totalPages = ceil($totalProducts / $perPage);
 $page = min($page, $totalPages ?: 1);

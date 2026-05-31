@@ -67,10 +67,12 @@ $countParams = [];
 
 // Фильтр по поиску
 if ($search) {
-    $query .= " AND (p.article LIKE :search OR p.name LIKE :search)";
-    $countQuery .= " AND (p.article LIKE :search OR p.name LIKE :search)";
-    $params['search'] = "%{$search}%";
-    $countParams['search'] = "%{$search}%";
+    $query .= " AND (p.article LIKE :search1 OR p.name LIKE :search2)";
+    $countQuery .= " AND (p.article LIKE :search1 OR p.name LIKE :search2)";
+    $params['search1'] = "%{$search}%";
+    $params['search2'] = "%{$search}%";
+    $countParams['search1'] = "%{$search}%";
+    $countParams['search2'] = "%{$search}%";
 }
 
 // Фильтр по категории

@@ -1,5 +1,7 @@
-```php
-# Environment and local config
+# Dependencies
+vendor/
+
+# Environment
 .env
 .env.local
 .env.*
@@ -7,41 +9,92 @@
 # Logs
 *.log
 
-# Temporary files
-*.tmp
-*.temp
+# OS generated files
+.DS_Store
+Thumbs.db
 
-# IDE files
+# Editor files
 .vscode/
 .idea/
 *.swp
 *.swo
 
-# OS files
-.DS_Store
-Thumbs.db
-
-# Build artifacts (if any PHP build tools are used)
-vendor/
-composer.lock
-
-# Cache directories
-.cache/
-__pycache__/
+# Build artifacts
 *.pyc
-
-# Coverage reports
-.coverage
-coverage/
-htmlcov/
-
-# Distribution and build directories
+__pycache__/
+*.o
+*.obj
+*.exe
+*.dll
+*.so
+*.a
+*.out
 dist/
 build/
 target/
-*.phar
+coverage/
+htmlcov/
+.coverage
 
-# Compression files
+# Temp files
+*.tmp
+*.temp
+
+# Package managers
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Python
+*.pyc
+__pycache__/
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+ENV/
+.venv/
+.env/
+.pytest_cache/
+.mypy_cache/
+
+# Java
+*.class
+*.jar
+*.war
+*.ear
+.gradle/
+build/
+target/
+
+# C/C++
+*.o
+*.obj
+*.a
+*.lib
+*.so
+*.dylib
+*.dll
+
+# Go
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Ruby
+*.gem
+*.rbc
+.bundle/
+vendor/bundle/
+.ruby-version
+.rbenv-vars
+*.lock
+
+# Compression
 *.zip
 *.gz
 *.tar
@@ -64,4 +117,27 @@ target/
 *.tar.bz2
 *.tar.xz
 *.tar.zst
-```
+
+# Testing
+*.log
+!logs/
+logs/
+
+# Coverage
+coverage/
+htmlcov/
+.coverage
+
+# Database
+*.db
+*.db-journal
+
+# Authentication and security
+polesie/secrets/
+polesie/config/*.key
+polesie/config/*.cert
+polesie/config/*.pem
+*.pem
+*.key
+*.crt
+*.cert

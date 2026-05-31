@@ -25,9 +25,13 @@ function login($username, $password) {
         $_SESSION['role_code'] = $user['role_code'];
         $_SESSION['role_id'] = $user['role_id'];
         
-        // Обновление времени последнего входа
-        $updateStmt = $pdo->prepare("UPDATE users SET last_login_at = NOW() WHERE id = ?");
-        $updateStmt->execute([$user['id']]);
+        // Обновление времени последнего входа (если колонка существует)
+        try {
+            $updateStmt = $pdo->prepare("UPDATE users SET last_login_at = NOW() WHERE id = ?");
+            $updateStmt->execute([$user['id']]);
+        } catch (PDOException $e) {
+            // Игнорируем ошибку, если колонка last_login_at не существует
+        }
         
         logActivity('login', 'user', $user['id']);
         

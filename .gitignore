@@ -1,1 +1,1 @@
-Nothing should be ignored based on the provided file changes. The modification of 'polesie/modules/orders/create.php' is a source code file and does not require any additional ignore rules.
+Nothing should be ignored since the changes only include PHP source files (.php) which are not build artifacts, dependencies, or temporary files.

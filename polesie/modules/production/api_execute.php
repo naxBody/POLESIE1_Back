@@ -573,7 +573,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['action']) && $_GET['act
                        ELSE 'Неизвестно'
                    END as status_name
             FROM orders o
-            LEFT JOIN customers c ON o.customer_id = c.id
+            LEFT JOIN contractors c ON o.customer_id = c.id
             WHERE o.id = ?
         ");
         $orderStmt->execute([$orderId]);

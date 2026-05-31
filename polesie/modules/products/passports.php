@@ -1208,11 +1208,6 @@ $categories = $pdo->query($catQuery)->fetchAll();
                     html += '<div class="stage-item" data-step="' + stepNum + '">';
                     html += '<div class="stage-header">';
                     html += '<div class="stage-name">' + escapeHtml(stage.operation_name || 'Операция ' + stepNum) + '</div>';
-                    if (stage.stage_color) {
-                        html += '<span class="stage-badge" style="background: ' + stage.stage_color + '; color: white;">' + escapeHtml(stage.stage_name || 'Этап') + '</span>';
-                    } else if (stage.stage_name) {
-                        html += '<span class="stage-badge" style="background: #3498db; color: white;">' + escapeHtml(stage.stage_name) + '</span>';
-                    }
                     html += '</div>';
                     if (stage.description) {
                         html += '<div class="stage-description">' + escapeHtml(stage.description) + '</div>';

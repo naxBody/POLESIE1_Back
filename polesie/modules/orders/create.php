@@ -92,19 +92,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 
                 $productId = (int)$item['product_id'];
                 $quantity = (float)$item['quantity'];
-                $unitPrice = (float)($item['unit_price'] ?? 0);
+                $price = (float)($item['unit_price'] ?? 0);
                 $discount = (float)($item['discount'] ?? 0);
                 
-                $totalPrice = $quantity * $unitPrice * (1 - $discount / 100);
-                $totalAmount += $totalPrice;
+                $total = $quantity * $price * (1 - $discount / 100);
+                $totalAmount += $total;
                 
                 $itemStmt = $pdo->prepare("
-                    INSERT INTO order_items (order_id, product_id, quantity, unit_price, discount, total_price, notes)
-                    VALUES (?, ?, ?, ?, ?, ?, ?)
+                    INSERT INTO order_items (order_id, product_id, quantity, price, total, notes)
+                    VALUES (?, ?, ?, ?, ?, ?)
                 ");
                 
                 $itemStmt->execute([
-                    $orderId, $productId, $quantity, $unitPrice, $discount, $totalPrice,
+                    $orderId, $productId, $quantity, $price, $total,
                     $item['notes'] ?? ''
                 ]);
             }

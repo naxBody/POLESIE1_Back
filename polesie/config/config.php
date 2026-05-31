@@ -125,7 +125,7 @@ function getCurrentUser() {
     if ($user === null) {
         $pdo = getDbConnection();
         $stmt = $pdo->prepare("
-            SELECT u.*, r.code as role_code, r.name as role_name 
+            SELECT u.*, r.code as role_code, r.name as role_name, r.permissions
             FROM users u 
             JOIN user_roles r ON u.role_id = r.id 
             WHERE u.id = ? AND u.is_active = TRUE

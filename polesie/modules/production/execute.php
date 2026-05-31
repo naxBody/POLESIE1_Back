@@ -872,82 +872,40 @@ foreach ($allTasks as &$task) {
             margin-bottom: 28px;
             padding-bottom: 24px;
             border-bottom: 2px solid var(--border-color);
-            flex-wrap: nowrap;
             gap: 20px;
             width: 100%;
             box-sizing: border-box;
-        }
-        
-        @media (max-width: 1400px) {
-            .work-area-header {
-                flex-wrap: wrap;
-            }
-            
-            .work-area-stats {
-                order: 3;
-                width: 100%;
-                justify-content: center;
-            }
-            
-            .work-area-title {
-                order: 1;
-                width: 100%;
-            }
-            
-            .work-area-actions {
-                order: 2;
-            }
-        }
-        
-        @media (max-width: 768px) {
-            .work-area-stats {
-                gap: 12px;
-            }
-            
-            .stat-item {
-                padding: 6px 12px;
-            }
-            
-            .stat-value-small {
-                font-size: 16px;
-            }
-            
-            .stat-label-small {
-                font-size: 10px;
-            }
+            flex-wrap: nowrap;
         }
         
         .work-area-title {
             flex: 1;
             min-width: 0;
+            max-width: 40%;
         }
         
         .work-area-title h3 {
-            font-size: 24px;
+            font-size: 22px;
             font-weight: 700;
             margin-bottom: 6px;
             color: var(--text-primary);
-            word-wrap: normal;
-            overflow-wrap: normal;
-            word-break: normal;
-            hyphens: none;
-            white-space: normal;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
         
         .work-area-subtitle {
-            font-size: 14px;
+            font-size: 13px;
             color: var(--text-secondary);
             line-height: 1.5;
-            word-wrap: normal;
-            overflow-wrap: normal;
-            word-break: normal;
-            hyphens: none;
-            white-space: normal;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
         
         .work-area-stats {
             display: flex;
-            gap: 24px;
+            gap: 16px;
             align-items: center;
             flex-shrink: 0;
         }
@@ -957,14 +915,15 @@ foreach ($allTasks as &$task) {
             flex-direction: column;
             align-items: center;
             gap: 4px;
-            padding: 8px 16px;
+            padding: 8px 14px;
             background: var(--bg-secondary);
             border-radius: 8px;
             border: 1px solid var(--border-color);
+            min-width: 70px;
         }
         
         .stat-label-small {
-            font-size: 11px;
+            font-size: 10px;
             color: var(--text-secondary);
             font-weight: 600;
             text-transform: uppercase;
@@ -973,23 +932,71 @@ foreach ($allTasks as &$task) {
         }
         
         .stat-value-small {
-            font-size: 20px;
+            font-size: 18px;
             font-weight: 700;
             color: var(--primary-color);
             line-height: 1;
-            word-wrap: normal;
-            overflow-wrap: normal;
-            word-break: normal;
+            white-space: nowrap;
         }
         
         .work-area-actions {
             flex-shrink: 0;
         }
         
+        @media (max-width: 1400px) {
+            .work-area-header {
+                flex-wrap: wrap;
+            }
+            
+            .work-area-title {
+                width: 100%;
+                max-width: none;
+                order: 1;
+            }
+            
+            .work-area-stats {
+                order: 3;
+                width: 100%;
+                justify-content: center;
+                margin-top: 8px;
+            }
+            
+            .work-area-actions {
+                order: 2;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .work-area-stats {
+                gap: 10px;
+            }
+            
+            .stat-item {
+                padding: 6px 10px;
+                min-width: 60px;
+            }
+            
+            .stat-value-small {
+                font-size: 16px;
+            }
+            
+            .stat-label-small {
+                font-size: 9px;
+            }
+            
+            .work-area-title h3 {
+                font-size: 18px;
+            }
+            
+            .work-area-subtitle {
+                font-size: 12px;
+            }
+        }
+        
         .tabs-container {
             display: flex;
-            gap: 10px;
-            margin-bottom: 28px;
+            gap: 8px;
+            margin-bottom: 24px;
             border-bottom: 2px solid var(--border-color);
             padding-bottom: 0;
             position: relative;
@@ -1000,10 +1007,10 @@ foreach ($allTasks as &$task) {
         }
         
         .tab-button {
-            padding: 16px 24px;
+            padding: 12px 20px;
             background: transparent;
             border: none;
-            font-size: 15px;
+            font-size: 14px;
             font-weight: 600;
             color: var(--text-secondary);
             cursor: pointer;
@@ -1054,8 +1061,8 @@ foreach ($allTasks as &$task) {
         
         .stages-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 16px;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 14px;
             margin-bottom: 24px;
             width: 100%;
             box-sizing: border-box;
@@ -1065,7 +1072,7 @@ foreach ($allTasks as &$task) {
         .stage-card {
             background: var(--bg-secondary);
             border-radius: var(--border-radius);
-            padding: 24px 18px;
+            padding: 18px 16px;
             border: 1px solid var(--border-color);
             transition: all var(--transition-fast);
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);

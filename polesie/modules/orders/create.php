@@ -72,13 +72,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Создание заказа
             $stmt = $pdo->prepare("
                 INSERT INTO orders (order_number, customer_id, status, order_date, delivery_date, 
-                                   notes, responsible_user_id, created_at, total_amount, currency)
-                VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), 0, 'BYN')
+                                   notes, responsible_user_id, created_at, total_amount)
+                VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), ?)
             ");
             
             $stmt->execute([
                 $orderNumber, $contractorId, $status, $orderDate, $deliveryDate,
-                $notes, $responsibleUserId
+                $notes, $responsibleUserId, $totalAmount
             ]);
             
             $orderId = $pdo->lastInsertId();
@@ -282,12 +282,26 @@ $pageTitle = 'Новый заказ';
                                     </div>
                                     
                                     <div style="padding-top: 28px;">
-                                        <button type="button" class="btn btn-danger btn-sm remove-item" disabled>🗑️</button>
+                                        <button type="button" class="btn btn-danger btn-sm remove-item" disabled>
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                <path d="M3 6h18"></path>
+                                                <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
+                                                <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
+                                                <line x1="10" y1="11" x2="10" y2="17"></line>
+                                                <line x1="14" y1="11" x2="14" y2="17"></line>
+                                            </svg>
+                                        </button>
                                     </div>
                                 </div>
                             </div>
                             
-                            <button type="button" class="btn btn-secondary" onclick="addItem()">+ Добавить позицию</button>
+                            <button type="button" class="btn btn-secondary" onclick="addItem()">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px;">
+                                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                                </svg>
+                                Добавить позицию
+                            </button>
                             
                             <div class="form-group" style="margin-top: 24px;">
                                 <label class="form-label">Примечание</label>
@@ -298,7 +312,14 @@ $pageTitle = 'Новый заказ';
                         <div class="card-footer">
                             <div style="display: flex; justify-content: flex-end; gap: 12px;">
                                 <a href="list.php" class="btn btn-secondary">Отмена</a>
-                                <button type="submit" class="btn btn-primary">💾 Создать заказ</button>
+                                <button type="submit" class="btn btn-primary">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px;">
+                                        <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                                        <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                                        <polyline points="7 3 7 8 15 8"></polyline>
+                                    </svg>
+                                    Создать заказ
+                                </button>
                             </div>
                         </div>
                     </form>
@@ -341,7 +362,15 @@ $pageTitle = 'Новый заказ';
                     <input type="number" name="items[${itemCount}][discount]" class="form-control discount" step="0.1" min="0" max="100" value="0">
                 </div>
                 <div style="padding-top: 28px;">
-                    <button type="button" class="btn btn-danger btn-sm remove-item" onclick="this.closest('.order-item').remove()">🗑️</button>
+                    <button type="button" class="btn btn-danger btn-sm remove-item" onclick="this.closest('.order-item').remove()">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M3 6h18"></path>
+                            <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
+                            <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
+                            <line x1="10" y1="11" x2="10" y2="17"></line>
+                            <line x1="14" y1="11" x2="14" y2="17"></line>
+                        </svg>
+                    </button>
                 </div>
             `;
             container.appendChild(newItem);

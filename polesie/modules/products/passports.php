@@ -188,7 +188,7 @@ foreach ($passports as &$passport) {
             INSERT INTO product_passports (product_id, total_weight_kg, warranty_months, is_serial_tracked)
             VALUES (:product_id, 0, 12, FALSE)
         ");
-        $insertStmt->execute([':product_id' => $passport['product_id']]);
+        $insertStmt->execute(['product_id' => $passport['product_id']]);
         
         // Получаем ID созданного паспорта
         $passport['passport_id'] = $pdo->lastInsertId();
@@ -1030,7 +1030,7 @@ $categories = $pdo->query($catQuery)->fetchAll();
                                                 WHERE ppm.passport_id = :passport_id
                                                 ORDER BY ppm.sort_order, m.name_full
                                             ");
-                                            $matStmt->execute([':passport_id' => $passport['passport_id']]);
+                                            $matStmt->execute(['passport_id' => $passport['passport_id']]);
                                             $materials = $matStmt->fetchAll();
                                             
                                             // Получение этапов производства из маршрутной карты
@@ -1051,7 +1051,7 @@ $categories = $pdo->query($catQuery)->fetchAll();
                                                 )
                                                 ORDER BY rco.sort_order, rco.operation_number
                                             ");
-                                            $stageStmt->execute([':product_id' => $passport['product_id']]);
+                                            $stageStmt->execute(['product_id' => $passport['product_id']]);
                                             $stages = $stageStmt->fetchAll();
                                             
                                             // Декодирование JSON полей

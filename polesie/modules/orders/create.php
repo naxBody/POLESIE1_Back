@@ -69,6 +69,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Генерация номера заказа
             $orderNumber = generateUniqueNumber('ORD', 'orders', 'order_number');
             
+            // Инициализация общей суммы
+            $totalAmount = 0;
+            
             // Создание заказа
             $stmt = $pdo->prepare("
                 INSERT INTO orders (order_number, customer_id, status, order_date, delivery_date, 
@@ -82,7 +85,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ]);
             
             $orderId = $pdo->lastInsertId();
-            $totalAmount = 0;
             
             // Добавление позиций
             foreach ($items as $item) {

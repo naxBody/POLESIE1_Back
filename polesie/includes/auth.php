@@ -23,6 +23,11 @@ function login($username, $password) {
         $_SESSION['user_id'] = $user['id'];
         $_SESSION['username'] = $user['username'];
         $_SESSION['role_code'] = $user['role_code'];
+        $_SESSION['role_id'] = $user['role_id'];
+        
+        // Обновление времени последнего входа
+        $updateStmt = $pdo->prepare("UPDATE users SET last_login_at = NOW() WHERE id = ?");
+        $updateStmt->execute([$user['id']]);
         
         logActivity('login', 'user', $user['id']);
         
@@ -231,4 +236,86 @@ function getRolesList() {
     $stmt = $pdo->query("SELECT * FROM user_roles WHERE is_active = TRUE ORDER BY name");
     
     return $stmt->fetchAll();
+}
+
+/**
+ * Проверка доступа пользователя к модулю
+ */
+function canAccessModule($module, $permission = 'can_view') {
+    $user = getCurrentUser();
+    if (!$user) {
+        return false;
+    }
+    
+    // Администратор имеет доступ ко всему
+    if ($user['role_code'] === 'admin') {
+        return true;
+    }
+    
+    $pdo = getDbConnection();
+    $stmt = $pdo->prepare("
+        SELECT $permission as has_permission 
+        FROM role_module_permissions 
+        WHERE role_id = ? AND module = ?
+    ");
+    $stmt->execute([$user['role_id'], $module]);
+    $result = $stmt->fetch();
+    
+    return $result && $result['has_permission'];
+}
+
+/**
+ * Проверка права на создание в модуле
+ */
+function canCreateInModule($module) {
+    return canAccessModule($module, 'can_create');
+}
+
+/**
+ * Проверка права на редактирование в модуле
+ */
+function canEditInModule($module) {
+    return canAccessModule($module, 'can_edit');
+}
+
+/**
+ * Проверка права на удаление в модуле
+ */
+function canDeleteInModule($module) {
+    return canAccessModule($module, 'can_delete');
+}
+
+/**
+ * Получение доступных модулей для текущего пользователя
+ */
+function getAvailableModules() {
+    $user = getCurrentUser();
+    if (!$user) {
+        return [];
+    }
+    
+    // Администратор имеет доступ ко всем модулям
+    if ($user['role_code'] === 'admin') {
+        return ['dashboard', 'orders', 'contractors', 'production', 'products', 'warehouse', 'materials', 'employees', 'quality', 'reports', 'settings'];
+    }
+    
+    $pdo = getDbConnection();
+    $stmt = $pdo->prepare("
+        SELECT module FROM role_module_permissions 
+        WHERE role_id = ? AND can_view = TRUE
+        ORDER BY module
+    ");
+    $stmt->execute([$user['role_id']]);
+    
+    return array_column($stmt->fetchAll(), 'module');
+}
+
+/**
+ * Перенаправление при отсутствии доступа
+ */
+function requireModuleAccess($module) {
+    if (!canAccessModule($module)) {
+        $_SESSION['error'] = 'У вас нет доступа к этому разделу';
+        redirect(pageUrl('index.php'));
+    }
 }

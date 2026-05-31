@@ -16,38 +16,92 @@ if (!isLoggedIn()) {
 $user = getCurrentUser();
 $pdo = getDbConnection();
 
-// Получение статистики
+// Получение доступных модулей для текущего пользователя
+$availableModules = getAvailableModules();
+
+// Получение статистики - адаптировано под роль пользователя
 $stats = [];
 
-// Количество заказов
-$stmt = $pdo->query("SELECT COUNT(*) FROM orders");
-$stats['total_orders'] = $stmt->fetchColumn();
-
-// Заказы в работе
-$stmt = $pdo->query("
-    SELECT COUNT(*) FROM orders 
-    WHERE status IN ('processing', 'ready')
-");
-$stats['orders_in_progress'] = $stmt->fetchColumn();
-
-// Новые заказы
-$stmt = $pdo->query("SELECT COUNT(*) FROM orders WHERE status = 'new'");
-$stats['new_orders'] = $stmt->fetchColumn();
-
-// Производственные задания
-$stmt = $pdo->query("SELECT COUNT(*) FROM production_tasks");
-$stats['production_orders'] = $stmt->fetchColumn();
-
-// Задания в работе
-$stmt = $pdo->query("
-    SELECT COUNT(*) FROM production_tasks 
-    WHERE status = 'in_progress'
-");
-$stats['production_active'] = $stmt->fetchColumn();
-
-// Продукция на складе (сумма по всем продуктам)
-$stmt = $pdo->query("SELECT COUNT(*) FROM product_serial_numbers WHERE status = 'active'");
-$stats['warehouse_products'] = $stmt->fetchColumn() ?? 0;
+// Для кладовщика - только складская статистика
+if ($user['role_code'] === 'storekeeper') {
+    // Количество материалов на складе
+    $stmt = $pdo->query("SELECT COUNT(*) FROM materials WHERE current_stock > 0");
+    $stats['total_orders'] = $stmt->fetchColumn();
+    
+    // Материалы с низким остатком
+    $stmt = $pdo->query("SELECT COUNT(*) FROM materials WHERE current_stock <= min_stock AND current_stock > 0");
+    $stats['orders_in_progress'] = $stmt->fetchColumn();
+    
+    // Последние поступления
+    $stmt = $pdo->query("SELECT COUNT(*) FROM material_receipts WHERE 1=1");
+    $stats['new_orders'] = $stmt->fetchColumn() ?? 0;
+    
+    // Продукция на складе
+    $stmt = $pdo->query("SELECT COUNT(*) FROM products WHERE 1=1");
+    $stats['production_orders'] = $stmt->fetchColumn();
+    
+    $stats['production_active'] = 0;
+    $stats['warehouse_products'] = 0;
+    
+// Для рабочего - только производственные задания
+} elseif ($user['role_code'] === 'worker') {
+    // Мои задания в работе
+    $stmt = $pdo->query("
+        SELECT COUNT(*) FROM production_tasks 
+        WHERE worker_id = {$user['id']} AND status = 'in_progress'
+    ");
+    $stats['total_orders'] = $stmt->fetchColumn();
+    
+    // Задания к выполнению
+    $stmt = $pdo->query("
+        SELECT COUNT(*) FROM production_tasks 
+        WHERE worker_id = {$user['id']} AND status = 'planned'
+    ");
+    $stats['orders_in_progress'] = $stmt->fetchColumn();
+    
+    // Завершенные задания за сегодня
+    $stmt = $pdo->query("
+        SELECT COUNT(*) FROM production_tasks 
+        WHERE worker_id = {$user['id']} AND DATE(actual_end) = CURDATE()
+    ");
+    $stats['new_orders'] = $stmt->fetchColumn() ?? 0;
+    
+    $stats['production_orders'] = 0;
+    $stats['production_active'] = 0;
+    $stats['warehouse_products'] = 0;
+    
+// Для остальных ролей - полная статистика
+} else {
+    // Количество заказов
+    $stmt = $pdo->query("SELECT COUNT(*) FROM orders");
+    $stats['total_orders'] = $stmt->fetchColumn();
+    
+    // Заказы в работе
+    $stmt = $pdo->query("
+        SELECT COUNT(*) FROM orders 
+        WHERE status IN ('processing', 'ready')
+    ");
+    $stats['orders_in_progress'] = $stmt->fetchColumn();
+    
+    // Новые заказы
+    $stmt = $pdo->query("SELECT COUNT(*) FROM orders WHERE status = 'new'");
+    $stats['new_orders'] = $stmt->fetchColumn();
+    
+    // Производственные задания
+    $stmt = $pdo->query("SELECT COUNT(*) FROM production_tasks");
+    $stats['production_orders'] = $stmt->fetchColumn();
+    
+    // Задания в работе
+    $stmt = $pdo->query("
+        SELECT COUNT(*) FROM production_tasks 
+        WHERE status = 'in_progress'
+    ");
+    $stats['production_active'] = $stmt->fetchColumn();
+    
+    // Продукция на складе (сумма по всем продуктам)
+    $stmt = $pdo->query("SELECT COUNT(*) FROM product_serial_numbers WHERE status = 'active'");
+    $stats['warehouse_products'] = $stmt->fetchColumn() ?? 0;
+}
 
 // Заказы с проблемами (просроченные или с нехваткой материалов)
 $problemOrders = $pdo->query("

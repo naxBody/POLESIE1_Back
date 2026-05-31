@@ -524,7 +524,23 @@ $stmt->execute();
 $allTasks = $stmt->fetchAll();
 
 // Получение списка всех заказов для фильтра
-$ordersListStmt = $pdo->query("SELECT DISTINCT o.id, o.order_number, COALESCE(c.name, 'Не указан') as customer_name, o.status 
+$ordersListStmt = $pdo->query("SELECT DISTINCT o.id, o.order_number, COALESCE(c.name, 'Не указан') as customer_name, o.status,
+                               CASE o.status
+                                   WHEN 'new' THEN 'Новый'
+                                   WHEN 'processing' THEN 'В работе'
+                                   WHEN 'ready' THEN 'Готов'
+                                   WHEN 'shipped' THEN 'Отгружен'
+                                   WHEN 'cancelled' THEN 'Отменен'
+                                   ELSE o.status
+                               END as status_name,
+                               CASE o.status
+                                   WHEN 'new' THEN '#3498db'
+                                   WHEN 'processing' THEN '#f39c12'
+                                   WHEN 'ready' THEN '#27ae60'
+                                   WHEN 'shipped' THEN '#9b59b6'
+                                   WHEN 'cancelled' THEN '#e74c3c'
+                                   ELSE '#95a5a6'
+                               END as status_color
                                FROM orders o
                                INNER JOIN production_tasks pt ON o.id = pt.order_id
                                LEFT JOIN contractors c ON o.customer_id = c.id
@@ -748,15 +764,23 @@ foreach ($allTasks as &$task) {
         
         .task-priority {
             font-size: 11px;
-            padding: 2px 8px;
+            padding: 4px 10px;
             border-radius: 12px;
             font-weight: 500;
+            display: inline-block;
         }
         
         .priority-urgent { background: #fee2e2; color: #dc2626; }
         .priority-high { background: #ffedd5; color: #ea580c; }
         .priority-normal { background: #dbeafe; color: #2563eb; }
         .priority-low { background: #f1f5f9; color: #64748b; }
+        
+        /* Статусы заказов */
+        .status-new { background: #3498db; color: white; }
+        .status-processing { background: #f39c12; color: white; }
+        .status-ready { background: #27ae60; color: white; }
+        .status-shipped { background: #9b59b6; color: white; }
+        .status-cancelled { background: #e74c3c; color: white; }
         
         .task-product-name {
             font-weight: 500;
@@ -1543,7 +1567,7 @@ foreach ($allTasks as &$task) {
                                              onmouseout="this.style.background='white'">
                                             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
                                                 <strong style="color: var(--primary-color); font-size: 15px;">Заказ <?= e($order['order_number']) ?></strong>
-                                                <span class="task-priority priority-normal"><?= e($order['status'] ?? 'В работе') ?></span>
+                                                <span class="task-priority status-<?= e($order['status']) ?>"><?= e($order['status_name'] ?? $order['status'] ?? 'В работе') ?></span>
                                             </div>
                                             <?php if (!empty($order['customer_name'])): ?>
                                                 <div style="font-size: 13px; color: var(--text-secondary); margin-bottom: 4px;">

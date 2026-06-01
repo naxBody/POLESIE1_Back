@@ -301,6 +301,11 @@ ORDER BY pd.document_date DESC, pd.document_number DESC;
 
 DELIMITER //
 
+-- Удаляем существующие процедуры перед созданием
+DROP PROCEDURE IF EXISTS `post_payment`//
+DROP PROCEDURE IF EXISTS `unpost_payment`//
+DROP PROCEDURE IF EXISTS `change_payment_status`//
+
 -- Процедура проведения платежа
 CREATE PROCEDURE `post_payment`(
     IN p_payment_id INT,
@@ -409,34 +414,59 @@ SET permissions = JSON_SET(permissions, '$.финансы', JSON_ARRAY('view', '
 WHERE code = 'accountant';
 
 -- Добавляем права для модуля finance (если таблица существует)
--- Администратор имеет полный доступ к финансам
-INSERT INTO `role_module_permissions` (`role_id`, `module`, `can_view`, `can_create`, `can_edit`, `can_delete`)
-SELECT id, 'finance', TRUE, TRUE, TRUE, TRUE
-FROM user_roles 
-WHERE code = 'admin'
-ON DUPLICATE KEY UPDATE 
-    can_view = TRUE, 
-    can_create = TRUE, 
-    can_edit = TRUE, 
-    can_delete = TRUE;
+-- Проверяем существование таблицы перед вставкой
+SET @table_exists = (SELECT COUNT(*) FROM information_schema.tables 
+                     WHERE table_schema = 'polesie_production' 
+                     AND table_name = 'role_module_permissions');
+
+SET @sql = IF(@table_exists > 0,
+  'INSERT INTO `role_module_permissions` (`role_id`, `module`, `can_view`, `can_create`, `can_edit`, `can_delete`)
+   SELECT id, ''finance'', TRUE, TRUE, TRUE, TRUE
+   FROM user_roles 
+   WHERE code = ''admin''
+   ON DUPLICATE KEY UPDATE 
+       can_view = TRUE, 
+       can_create = TRUE, 
+       can_edit = TRUE, 
+       can_delete = TRUE;',
+  'SELECT ''Table role_module_permissions does not exist, skipping...'' as message;'
+);
+
+PREPARE stmt FROM @sql;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
 
 -- Бухгалтер имеет полный доступ к финансам
-INSERT INTO `role_module_permissions` (`role_id`, `module`, `can_view`, `can_create`, `can_edit`, `can_delete`)
-SELECT id, 'finance', TRUE, TRUE, TRUE, TRUE
-FROM user_roles 
-WHERE code = 'accountant'
-ON DUPLICATE KEY UPDATE 
-    can_view = TRUE, 
-    can_create = TRUE, 
-    can_edit = TRUE, 
-    can_delete = TRUE;
+SET @sql = IF(@table_exists > 0,
+  'INSERT INTO `role_module_permissions` (`role_id`, `module`, `can_view`, `can_create`, `can_edit`, `can_delete`)
+   SELECT id, ''finance'', TRUE, TRUE, TRUE, TRUE
+   FROM user_roles 
+   WHERE code = ''accountant''
+   ON DUPLICATE KEY UPDATE 
+       can_view = TRUE, 
+       can_create = TRUE, 
+       can_edit = TRUE, 
+       can_delete = TRUE;',
+  'SELECT ''Table role_module_permissions does not exist, skipping...'' as message;'
+);
+
+PREPARE stmt FROM @sql;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
 
 -- Директор может просматривать финансы
-INSERT INTO `role_module_permissions` (`role_id`, `module`, `can_view`, `can_create`, `can_edit`, `can_delete`)
-SELECT id, 'finance', TRUE, FALSE, FALSE, FALSE
-FROM user_roles 
-WHERE code = 'director'
-ON DUPLICATE KEY UPDATE can_view = TRUE;
+SET @sql = IF(@table_exists > 0,
+  'INSERT INTO `role_module_permissions` (`role_id`, `module`, `can_view`, `can_create`, `can_edit`, `can_delete`)
+   SELECT id, ''finance'', TRUE, FALSE, FALSE, FALSE
+   FROM user_roles 
+   WHERE code = ''director''
+   ON DUPLICATE KEY UPDATE can_view = TRUE;',
+  'SELECT ''Table role_module_permissions does not exist, skipping...'' as message;'
+);
+
+PREPARE stmt FROM @sql;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
 
 -- ============================================
 -- ВОЗВРАЩАЕМ ПРОВЕРКИ ВНЕШНИХ КЛЮЧЕЙ

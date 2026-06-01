@@ -493,19 +493,108 @@ SET FOREIGN_KEY_CHECKS = 1;
 -- ПРИМЕРЫ ПЛАТЕЖЕЙ (ДЕМОНСТРАЦИОННЫЕ ДАННЫЕ)
 -- ============================================
 
+-- Сначала проверим и создадим тестовых контрагентов если их нет
+INSERT INTO `contractors` (`name`, `inn`, `type`) 
+SELECT 'ООО \"Поставщик материалов\"', '100123456', 'supplier'
+WHERE NOT EXISTS (SELECT 1 FROM contractors WHERE inn = '100123456');
+
+INSERT INTO `contractors` (`name`, `inn`, `type`) 
+SELECT 'ООО \"Торговый партнер\"', '100234567', 'customer'
+WHERE NOT EXISTS (SELECT 1 FROM contractors WHERE inn = '100234567');
+
+INSERT INTO `contractors` (`name`, `inn`, `type`) 
+SELECT 'ЗАО \"СтройКомплект\"', '100345678', 'supplier'
+WHERE NOT EXISTS (SELECT 1 FROM contractors WHERE inn = '100345678');
+
+INSERT INTO `contractors` (`name`, `inn`, `type`) 
+SELECT 'ОАО \"ЭнергоСбыт\"', '100456789', 'supplier'
+WHERE NOT EXISTS (SELECT 1 FROM contractors WHERE inn = '100456789');
+
+INSERT INTO `contractors` (`name`, `inn`, `type`) 
+SELECT 'ЧУП \"ТрансЛогистик\"', '100567890', 'supplier'
+WHERE NOT EXISTS (SELECT 1 FROM contractors WHERE inn = '100567890');
+
+INSERT INTO `contractors` (`name`, `inn`, `type`) 
+SELECT 'ООО \"АрендаПлюс\"', '100678901', 'supplier'
+WHERE NOT EXISTS (SELECT 1 FROM contractors WHERE inn = '100678901');
+
+INSERT INTO `contractors` (`name`, `inn`, `type`) 
+SELECT 'ИП \"СервисПро\"', '100789012', 'supplier'
+WHERE NOT EXISTS (SELECT 1 FROM contractors WHERE inn = '100789012');
+
+INSERT INTO `contractors` (`name`, `inn`, `type`) 
+SELECT 'ООО \"ОфисСнаб\"', '100890123', 'supplier'
+WHERE NOT EXISTS (SELECT 1 FROM contractors WHERE inn = '100890123');
+
+INSERT INTO `contractors` (`name`, `inn`, `type`) 
+SELECT 'ЗАО \"БелПромЗаказ\"', '100901234', 'customer'
+WHERE NOT EXISTS (SELECT 1 FROM contractors WHERE inn = '100901234');
+
+INSERT INTO `contractors` (`name`, `inn`, `type`) 
+SELECT 'ООО \"АвансТрейд\"', '101012345', 'customer'
+WHERE NOT EXISTS (SELECT 1 FROM contractors WHERE inn = '101012345');
+
+-- Получаем ID созданных контрагентов для использования в платежах
+SET @contractor_supplier_1 = (SELECT id FROM contractors WHERE inn = '100123456' LIMIT 1);
+SET @contractor_customer_1 = (SELECT id FROM contractors WHERE inn = '100234567' LIMIT 1);
+SET @contractor_supplier_2 = (SELECT id FROM contractors WHERE inn = '100345678' LIMIT 1);
+SET @contractor_supplier_3 = (SELECT id FROM contractors WHERE inn = '100456789' LIMIT 1);
+SET @contractor_supplier_4 = (SELECT id FROM contractors WHERE inn = '100567890' LIMIT 1);
+SET @contractor_supplier_5 = (SELECT id FROM contractors WHERE inn = '100678901' LIMIT 1);
+SET @contractor_supplier_6 = (SELECT id FROM contractors WHERE inn = '100789012' LIMIT 1);
+SET @contractor_supplier_7 = (SELECT id FROM contractors WHERE inn = '100890123' LIMIT 1);
+SET @contractor_customer_2 = (SELECT id FROM contractors WHERE inn = '100901234' LIMIT 1);
+SET @contractor_customer_3 = (SELECT id FROM contractors WHERE inn = '101012345' LIMIT 1);
+
+-- Получаем ID других справочников
+SET @bank_byn = (SELECT id FROM bank_accounts WHERE currency='BYN' AND account_type='checking' LIMIT 1);
+SET @bank_usd = (SELECT id FROM bank_accounts WHERE currency='USD' LIMIT 1);
+SET @bank_cash = (SELECT id FROM bank_accounts WHERE account_type='cash' LIMIT 1);
+
+SET @pt_income_order = (SELECT id FROM payment_types WHERE code='INCOME_ORDER' LIMIT 1);
+SET @pt_income_advance = (SELECT id FROM payment_types WHERE code='INCOME_ADVANCE' LIMIT 1);
+SET @pt_income_other = (SELECT id FROM payment_types WHERE code='INCOME_OTHER' LIMIT 1);
+SET @pt_income_loan = (SELECT id FROM payment_types WHERE code='INCOME_LOAN' LIMIT 1);
+SET @pt_expense_materials = (SELECT id FROM payment_types WHERE code='EXPENSE_MATERIALS' LIMIT 1);
+SET @pt_expense_services = (SELECT id FROM payment_types WHERE code='EXPENSE_SERVICES' LIMIT 1);
+SET @pt_expense_utilities = (SELECT id FROM payment_types WHERE code='EXPENSE_UTILITIES' LIMIT 1);
+SET @pt_expense_salary = (SELECT id FROM payment_types WHERE code='EXPENSE_SALARY' LIMIT 1);
+SET @pt_expense_taxes = (SELECT id FROM payment_types WHERE code='EXPENSE_TAXES' LIMIT 1);
+SET @pt_expense_rent = (SELECT id FROM payment_types WHERE code='EXPENSE_RENT' LIMIT 1);
+SET @pt_expense_transport = (SELECT id FROM payment_types WHERE code='EXPENSE_TRANSPORT' LIMIT 1);
+SET @pt_expense_office = (SELECT id FROM payment_types WHERE code='EXPENSE_OFFICE' LIMIT 1);
+
+SET @ea_mat_main = (SELECT id FROM expense_articles WHERE code='MAT_MAIN' LIMIT 1);
+SET @ea_serv_prod = (SELECT id FROM expense_articles WHERE code='SERV_PROD' LIMIT 1);
+SET @ea_util_elec = (SELECT id FROM expense_articles WHERE code='UTIL_ELEC' LIMIT 1);
+SET @ea_salary_main = (SELECT id FROM expense_articles WHERE code='SALARY_MAIN' LIMIT 1);
+SET @ea_tax_income = (SELECT id FROM expense_articles WHERE code='TAX_INCOME' LIMIT 1);
+SET @ea_rent_warehouse = (SELECT id FROM expense_articles WHERE code='RENT_WAREHOUSE' LIMIT 1);
+SET @ea_serv_trans = (SELECT id FROM expense_articles WHERE code='SERV_TRANS' LIMIT 1);
+SET @ea_mat_aux = (SELECT id FROM expense_articles WHERE code='MAT_AUX' LIMIT 1);
+
 -- Примеры платежей (доходы)
 INSERT INTO `payment_documents` (`document_number`, `document_date`, `payment_type_id`, `amount`, `currency`, `vat_amount`, `vat_rate`, `contractor_id`, `bank_account_id`, `expense_article_id`, `description`, `payment_purpose`, `status`, `created_by`) VALUES
-('PAY202501010001', '2025-01-05', (SELECT id FROM payment_types WHERE code='INCOME_ORDER'), 150000.00, 'BYN', 30000.00, 20.00, (SELECT id FROM contractors LIMIT 1), (SELECT id FROM bank_accounts WHERE currency='BYN' LIMIT 1), NULL, 'Оплата за заказ №001', 'Оплата по договору поставки №1 от 15.12.2024', 'posted', 1),
-('PAY202501010002', '2025-01-10', (SELECT id FROM payment_types WHERE code='INCOME_ADVANCE'), 50000.00, 'BYN', 10000.00, 20.00, (SELECT id FROM contractors LIMIT 2), (SELECT id FROM bank_accounts WHERE currency='BYN' LIMIT 1), NULL, 'Аванс за заказ №005', 'Авансовый платеж по договору №5 от 20.12.2024', 'posted', 1),
-('PAY202501010003', '2025-01-15', (SELECT id FROM payment_types WHERE code='INCOME_OTHER'), 25000.00, 'BYN', 0, 0, NULL, (SELECT id FROM bank_accounts WHERE currency='BYN' LIMIT 1), NULL, 'Прочие поступления', 'Возврат подотчетных средств', 'posted', 1);
+('PAY202501010001', '2025-01-05', @pt_income_order, 150000.00, 'BYN', 30000.00, 20.00, @contractor_customer_2, @bank_byn, NULL, 'Оплата за заказ №001', 'Оплата по договору поставки №1 от 15.12.2024', 'posted', 1),
+('PAY202501010002', '2025-01-10', @pt_income_advance, 50000.00, 'BYN', 10000.00, 20.00, @contractor_customer_3, @bank_byn, NULL, 'Аванс за заказ №005', 'Авансовый платеж по договору №5 от 20.12.2024', 'posted', 1),
+('PAY202501010003', '2025-01-15', @pt_income_other, 25000.00, 'BYN', 0, 0, NULL, @bank_byn, NULL, 'Прочие поступления', 'Возврат подотчетных средств', 'posted', 1),
+('PAY202501010004', '2025-01-20', @pt_income_order, 200000.00, 'BYN', 40000.00, 20.00, @contractor_customer_1, @bank_byn, NULL, 'Оплата за крупный заказ', 'Оплата по договору №10 от 05.01.2025', 'posted', 1),
+('PAY202501010005', '2025-01-25', @pt_income_loan, 100000.00, 'BYN', 0, 0, NULL, @bank_byn, NULL, 'Краткосрочный займ', 'Поступление займа от банка', 'posted', 1);
 
 -- Примеры платежей (расходы)
 INSERT INTO `payment_documents` (`document_number`, `document_date`, `payment_type_id`, `amount`, `currency`, `vat_amount`, `vat_rate`, `contractor_id`, `bank_account_id`, `expense_article_id`, `description`, `payment_purpose`, `status`, `created_by`) VALUES
-('PAY202501020001', '2025-01-08', (SELECT id FROM payment_types WHERE code='EXPENSE_MATERIALS'), 75000.00, 'BYN', 15000.00, 20.00, (SELECT id FROM contractors LIMIT 3), (SELECT id FROM bank_accounts WHERE currency='BYN' LIMIT 1), (SELECT id FROM expense_articles WHERE code='MAT_MAIN'), 'Оплата материалов от поставщика', 'Оплата по счету №123 от 05.01.2025 за материалы', 'posted', 1),
-('PAY202501020002', '2025-01-12', (SELECT id FROM payment_types WHERE code='EXPENSE_SERVICES'), 30000.00, 'BYN', 6000.00, 20.00, (SELECT id FROM contractors LIMIT 4), (SELECT id FROM bank_accounts WHERE currency='BYN' LIMIT 1), (SELECT id FROM expense_articles WHERE code='SERV_PROD'), 'Производственные услуги', 'Оплата услуг по договору подряда №15 от 10.01.2025', 'posted', 1),
-('PAY202501020003', '2025-01-15', (SELECT id FROM payment_types WHERE code='EXPENSE_UTILITIES'), 12000.00, 'BYN', 2400.00, 20.00, (SELECT id FROM contractors LIMIT 5), (SELECT id FROM bank_accounts WHERE currency='BYN' LIMIT 1), (SELECT id FROM expense_articles WHERE code='UTIL_ELEC'), 'Электроэнергия за январь 2025', 'Оплата электроэнергии по договору №Э-2024', 'posted', 1),
-('PAY202501020004', '2025-01-18', (SELECT id FROM payment_types WHERE code='EXPENSE_SALARY'), 45000.00, 'BYN', 0, 0, NULL, (SELECT id FROM bank_accounts WHERE account_type='cash' LIMIT 1), (SELECT id FROM expense_articles WHERE code='SALARY_MAIN'), 'Заработная плата за январь 2025', 'Выплата заработной платы сотрудникам', 'posted', 1),
-('PAY202501020005', '2025-01-20', (SELECT id FROM payment_types WHERE code='EXPENSE_TAXES'), 18000.00, 'BYN', 0, 0, NULL, (SELECT id FROM bank_accounts WHERE currency='BYN' LIMIT 1), (SELECT id FROM expense_articles WHERE code='TAX_INCOME'), 'Налог на прибыль за Q4 2024', 'Уплата налога на прибыль организаций', 'posted', 1),
-('PAY202501020006', '2025-01-22', (SELECT id FROM payment_types WHERE code='EXPENSE_RENT'), 8000.00, 'BYN', 1600.00, 20.00, (SELECT id FROM contractors LIMIT 6), (SELECT id FROM bank_accounts WHERE currency='BYN' LIMIT 1), (SELECT id FROM expense_articles WHERE code='RENT_WAREHOUSE'), 'Аренда склада за январь 2025', 'Оплата аренды складского помещения по договору №А-2024', 'approved', 1),
-('PAY202501020007', '2025-01-25', (SELECT id FROM payment_types WHERE code='EXPENSE_TRANSPORT'), 5000.00, 'BYN', 1000.00, 20.00, (SELECT id FROM contractors LIMIT 7), (SELECT id FROM bank_accounts WHERE currency='BYN' LIMIT 1), (SELECT id FROM expense_articles WHERE code='SERV_TRANS'), 'Транспортные услуги', 'Оплата доставки грузов по договору №Т-2025', 'pending', 1),
-('PAY202501020008', '2025-01-28', (SELECT id FROM payment_types WHERE code='EXPENSE_OFFICE'), 3500.00, 'BYN', 700.00, 20.00, (SELECT id FROM contractors LIMIT 8), (SELECT id FROM bank_accounts WHERE currency='BYN' LIMIT 1), (SELECT id FROM expense_articles WHERE code='MAT_AUX'), 'Канцелярские товары', 'Оплата канцелярских товаров по счету №456', 'draft', 1);
+('PAY202501020001', '2025-01-08', @pt_expense_materials, 75000.00, 'BYN', 15000.00, 20.00, @contractor_supplier_1, @bank_byn, @ea_mat_main, 'Оплата материалов от поставщика', 'Оплата по счету №123 от 05.01.2025 за материалы', 'posted', 1),
+('PAY202501020002', '2025-01-12', @pt_expense_services, 30000.00, 'BYN', 6000.00, 20.00, @contractor_supplier_2, @bank_byn, @ea_serv_prod, 'Производственные услуги', 'Оплата услуг по договору подряда №15 от 10.01.2025', 'posted', 1),
+('PAY202501020003', '2025-01-15', @pt_expense_utilities, 12000.00, 'BYN', 2400.00, 20.00, @contractor_supplier_3, @bank_byn, @ea_util_elec, 'Электроэнергия за январь 2025', 'Оплата электроэнергии по договору №Э-2024', 'posted', 1),
+('PAY202501020004', '2025-01-18', @pt_expense_salary, 45000.00, 'BYN', 0, 0, NULL, @bank_cash, @ea_salary_main, 'Заработная плата за январь 2025', 'Выплата заработной платы сотрудникам', 'posted', 1),
+('PAY202501020005', '2025-01-20', @pt_expense_taxes, 18000.00, 'BYN', 0, 0, NULL, @bank_byn, @ea_tax_income, 'Налог на прибыль за Q4 2024', 'Уплата налога на прибыль организаций', 'posted', 1),
+('PAY202501020006', '2025-01-22', @pt_expense_rent, 8000.00, 'BYN', 1600.00, 20.00, @contractor_supplier_5, @bank_byn, @ea_rent_warehouse, 'Аренда склада за январь 2025', 'Оплата аренды складского помещения по договору №А-2024', 'approved', 1),
+('PAY202501020007', '2025-01-25', @pt_expense_transport, 5000.00, 'BYN', 1000.00, 20.00, @contractor_supplier_4, @bank_byn, @ea_serv_trans, 'Транспортные услуги', 'Оплата доставки грузов по договору №Т-2025', 'pending', 1),
+('PAY202501020008', '2025-01-28', @pt_expense_office, 3500.00, 'BYN', 700.00, 20.00, @contractor_supplier_7, @bank_byn, @ea_mat_aux, 'Канцелярские товары', 'Оплата канцелярских товаров по счету №456', 'draft', 1),
+('PAY202501020009', '2025-01-30', @pt_expense_materials, 95000.00, 'BYN', 19000.00, 20.00, @contractor_supplier_1, @bank_byn, @ea_mat_main, 'Оплата второй партии материалов', 'Оплата по договору №М-2025 от 25.01.2025', 'approved', 1),
+('PAY202501020010', '2025-02-01', @pt_expense_services, 15000.00, 'BYN', 3000.00, 20.00, @contractor_supplier_6, @bank_byn, @ea_serv_prod, 'Консультационные услуги', 'Оплата консультационных услуг', 'draft', 1);
+
+-- Платежи в валюте (USD)
+INSERT INTO `payment_documents` (`document_number`, `document_date`, `payment_type_id`, `amount`, `currency`, `vat_amount`, `vat_rate`, `contractor_id`, `bank_account_id`, `expense_article_id`, `description`, `payment_purpose`, `status`, `created_by`) VALUES
+('PAY202501030001', '2025-01-15', @pt_expense_materials, 5000.00, 'USD', 0, 0, @contractor_supplier_2, @bank_usd, @ea_mat_main, 'Импорт материалов', 'Оплата импортного контракта №И-2025', 'posted', 1),
+('PAY202501030002', '2025-01-20', @pt_income_order, 8000.00, 'USD', 0, 0, @contractor_customer_1, @bank_usd, NULL, 'Экспорт продукции', 'Оплата экспортного контракта №Э-2025', 'posted', 1);

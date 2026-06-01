@@ -59,8 +59,8 @@
             <?php endif; ?>
         </div>
         
-        <!-- Заказы - ТОЛЬКО для менеджеров и админов -->
-        <?php if ($user['role_code'] === 'manager' || $user['role_code'] === 'admin'): ?>
+        <!-- Заказы - для менеджеров и тех, у кого есть доступ к модулю orders -->
+        <?php if ($user['role_code'] === 'manager' || $user['role_code'] === 'admin' || in_array('orders', $availableModules) || canAccessModule('orders')): ?>
         <div class="sidebar-nav-section">
             <div class="sidebar-nav-title">Заказы</div>
             <a href="<?= pageUrl('modules/orders/list.php') ?>" class="sidebar-nav-item <?= $relativePath === 'modules/orders/list.php' ? 'active' : '' ?>">
@@ -78,8 +78,8 @@
         </div>
         <?php endif; ?>
         
-        <!-- Производство - ТОЛЬКО для технологов и админов -->
-        <?php if ($user['role_code'] === 'technologist' || $user['role_code'] === 'admin'): ?>
+        <!-- Производство - для технологов и тех, у кого есть доступ к модулю production -->
+        <?php if ($user['role_code'] === 'technologist' || $user['role_code'] === 'admin' || in_array('production', $availableModules) || canAccessModule('production')): ?>
         <div class="sidebar-nav-section">
             <div class="sidebar-nav-title">Производство</div>
             <a href="<?= pageUrl('modules/production/execute.php') ?>" class="sidebar-nav-item <?= $relativePath === 'modules/production/execute.php' ? 'active' : '' ?>">
@@ -101,8 +101,8 @@
         </div>
         <?php endif; ?>
         
-        <!-- Склад - ТОЛЬКО для кладовщиков и админов -->
-        <?php if ($user['role_code'] === 'storekeeper' || $user['role_code'] === 'admin'): ?>
+        <!-- Склад - для кладовщиков и тех, у кого есть доступ к модулю warehouse -->
+        <?php if ($user['role_code'] === 'storekeeper' || $user['role_code'] === 'admin' || in_array('warehouse', $availableModules) || canAccessModule('warehouse')): ?>
         <div class="sidebar-nav-section">
             <div class="sidebar-nav-title">Склад</div>
             <a href="<?= pageUrl('modules/warehouse/materials.php') ?>" class="sidebar-nav-item <?= $relativePath === 'modules/warehouse/materials.php' ? 'active' : '' ?>">

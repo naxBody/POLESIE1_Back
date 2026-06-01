@@ -116,6 +116,7 @@ $pageTitle = 'Все платежи';
     <title><?= e($pageTitle) ?> - <?= e(APP_NAME) ?></title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="<?= asset('assets/css/style.css') ?>">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         .filters-panel {
             background: white;
@@ -164,14 +165,14 @@ $pageTitle = 'Все платежи';
                     <!-- Заголовок -->
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
                         <div>
-                            <h1 style="font-size: 24px; font-weight: 700; color: #1f2937; margin: 0;">📋 Все платежи</h1>
-                            <p style="color: #6b7280; margin: 4px 0 0 0;">Реестр платежных документов</p>
+                            <h1 style="font-size: 24px; font-weight: 700; color: #1f2937; margin: 0;"><i class="fas fa-file-invoice-dollar"></i> Все платежи</h1>
+                            <p style="color: #6b7280; margin: 4px 0 0 0;"><i class="fas fa-list"></i> Реестр платежных документов</p>
                         </div>
-                        <div style="display: flex; gap: 12px;">
+                        <div style="display: flex; gap: 10px;">
                             <?php if (canCreateInModule('finance')): ?>
-                            <a href="payment_create.php" class="btn btn-primary">➕ Новый платеж</a>
+                            <a href="payment_create.php" class="btn btn-primary"><i class="fas fa-plus-circle"></i> Новый платеж</a>
                             <?php endif; ?>
-                            <a href="index.php" class="btn btn-secondary">🏠 На главную</a>
+                            <a href="index.php" class="btn btn-secondary"><i class="fas fa-home"></i> На главную</a>
                         </div>
                     </div>
                     
@@ -221,8 +222,8 @@ $pageTitle = 'Все платежи';
                                 </div>
                             </div>
                             <div class="filter-actions">
-                                <button type="submit" class="btn btn-primary">🔍 Применить фильтры</button>
-                                <a href="list.php" class="btn btn-secondary">✖ Сбросить</a>
+                                <button type="submit" class="btn btn-primary"><i class="fas fa-filter"></i> Применить фильтры</button>
+                                <a href="list.php" class="btn btn-secondary"><i class="fas fa-times"></i> Сбросить</a>
                             </div>
                         </form>
                     </div>
@@ -234,21 +235,22 @@ $pageTitle = 'Все платежи';
                                 <table class="table">
                                     <thead>
                                         <tr>
-                                            <th>Номер</th>
-                                            <th>Дата</th>
-                                            <th>Тип</th>
-                                            <th>Контрагент</th>
-                                            <th>Сумма</th>
-                                            <th>НДС</th>
-                                            <th>Счет</th>
-                                            <th>Статус</th>
-                                            <th>Действия</th>
+                                            <th><i class="fas fa-file-invoice"></i> Номер</th>
+                                            <th><i class="far fa-calendar"></i> Дата</th>
+                                            <th><i class="fas fa-tags"></i> Тип</th>
+                                            <th><i class="fas fa-building"></i> Контрагент</th>
+                                            <th><i class="fas fa-coins"></i> Сумма</th>
+                                            <th><i class="fas fa-percent"></i> НДС</th>
+                                            <th><i class="fas fa-university"></i> Счет</th>
+                                            <th><i class="fas fa-circle-check"></i> Статус</th>
+                                            <th><i class="fas fa-cog"></i> Действия</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <?php if (empty($payments)): ?>
                                         <tr>
                                             <td colspan="9" style="text-align: center; padding: 40px; color: #6b7280;">
+                                                <i class="fas fa-inbox" style="font-size: 32px; margin-bottom: 10px; display: block;"></i>
                                                 Платежи не найдены
                                             </td>
                                         </tr>
@@ -257,38 +259,38 @@ $pageTitle = 'Все платежи';
                                         <tr>
                                             <td>
                                                 <a href="view.php?id=<?= $payment['id'] ?>" style="color: #3498db; text-decoration: none;">
-                                                    <strong><?= e($payment['document_number']) ?></strong>
+                                                    <strong><i class="fas fa-file-invoice-dollar"></i> <?= e($payment['document_number']) ?></strong>
                                                 </a>
                                             </td>
-                                            <td><?= formatDate($payment['document_date']) ?></td>
+                                            <td><i class="far fa-calendar-alt"></i> <?= formatDate($payment['document_date']) ?></td>
                                             <td>
                                                 <span style="font-size: 11px; padding: 4px 8px; border-radius: 4px; background: <?= $payment['flow_type'] === 'income' ? '#d1fae5' : '#fee2e2' ?>; color: <?= $payment['flow_type'] === 'income' ? '#065f46' : '#991b1b' ?>; font-weight: 600;">
-                                                    <?= $payment['flow_type'] === 'income' ? '⬆️ Доход' : '⬇️ Расход' ?>
+                                                    <i class="fas <?= $payment['flow_type'] === 'income' ? 'fa-arrow-up' : 'fa-arrow-down' ?>"></i> <?= $payment['flow_type'] === 'income' ? 'Доход' : 'Расход' ?>
                                                 </span>
-                                                <div style="font-size: 11px; color: #6b7280; margin-top: 4px;"><?= e($payment['payment_type_name']) ?></div>
+                                                <div style="font-size: 11px; color: #6b7280; margin-top: 4px;"><i class="fas fa-tag"></i> <?= e($payment['payment_type_name']) ?></div>
                                             </td>
                                             <td>
-                                                <div style="font-weight: 500;"><?= e($payment['contractor_name'] ?? '—') ?></div>
+                                                <div style="font-weight: 500;"><i class="fas fa-building"></i> <?= e($payment['contractor_name'] ?? '—') ?></div>
                                                 <?php if ($payment['contractor_inn']): ?>
-                                                <div style="font-size: 11px; color: #6b7280;">ИНН: <?= e($payment['contractor_inn']) ?></div>
+                                                <div style="font-size: 11px; color: #6b7280;"><i class="fas fa-id-card"></i> ИНН: <?= e($payment['contractor_inn']) ?></div>
                                                 <?php endif; ?>
                                             </td>
-                                            <td><strong><?= formatMoney($payment['amount']) ?></strong></td>
-                                            <td><?= $payment['vat_amount'] > 0 ? formatMoney($payment['vat_amount']) : '—' ?></td>
+                                            <td><strong style="color: <?= $payment['flow_type'] === 'income' ? '#27ae60' : '#e74c3c' ?>;"><i class="fas fa-money-bill-wave"></i> <?= formatMoney($payment['amount']) ?></strong></td>
+                                            <td><?= $payment['vat_amount'] > 0 ? '<i class="fas fa-percent"></i> ' . formatMoney($payment['vat_amount']) : '<span style="color: #9ca3af;"><i class="fas fa-minus"></i></span>' ?></td>
                                             <td>
-                                                <div style="font-size: 11px;"><?= e($payment['account_holder']) ?></div>
-                                                <div style="font-size: 10px; font-family: monospace; color: #6b7280;"><?= e($payment['bank_account']) ?></div>
+                                                <div style="font-size: 11px;"><i class="fas fa-user-tag"></i> <?= e($payment['account_holder']) ?></div>
+                                                <div style="font-size: 10px; font-family: monospace; color: #6b7280;"><i class="fas fa-credit-card"></i> <?= e($payment['bank_account']) ?></div>
                                             </td>
                                             <td>
-                                                <span class="badge" style="background: <?= e($payment['status_color']) ?>20; color: <?= e($payment['status_color']) ?>; font-size: 11px; padding: 4px 8px;">
-                                                    <?= e($payment['status_name']) ?>
+                                                <span class="badge" style="background: <?= e($payment['status_color']) ?>20; color: <?= e($payment['status_color']) ?>; font-size: 11px; padding: 4px 8px; border-radius: 4px;">
+                                                    <i class="fas <?= $payment['status'] === 'posted' ? 'fa-circle-check' : ($payment['status'] === 'approved' ? 'fa-user-check' : ($payment['status'] === 'pending' ? 'fa-clock' : ($payment['status'] === 'cancelled' ? 'fa-circle-xmark' : 'fa-file'))) ?>"></i> <?= e($payment['status_name']) ?>
                                                 </span>
                                             </td>
                                             <td>
                                                 <div style="display: flex; gap: 4px;">
-                                                    <a href="view.php?id=<?= $payment['id'] ?>" class="btn btn-sm btn-secondary" title="Просмотр">👁️</a>
+                                                    <a href="view.php?id=<?= $payment['id'] ?>" class="btn btn-sm btn-secondary" title="Просмотр"><i class="fas fa-eye"></i></a>
                                                     <?php if (canEditInModule('finance') && $payment['status'] === 'draft'): ?>
-                                                    <a href="payment_edit.php?id=<?= $payment['id'] ?>" class="btn btn-sm btn-primary" title="Редактировать">✏️</a>
+                                                    <a href="payment_edit.php?id=<?= $payment['id'] ?>" class="btn btn-sm btn-primary" title="Редактировать"><i class="fas fa-pen-to-square"></i></a>
                                                     <?php endif; ?>
                                                 </div>
                                             </td>
@@ -306,11 +308,11 @@ $pageTitle = 'Все платежи';
                     <div style="margin-top: 16px; padding: 16px; background: white; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
                         <div style="display: flex; justify-content: space-between; align-items: center;">
                             <div style="font-weight: 600; color: #374151;">
-                                Всего в списке: <?= count($payments) ?> платежей
+                                <i class="fas fa-chart-bar"></i> Всего в списке: <?= count($payments) ?> платежей
                             </div>
                             <div style="display: flex; gap: 24px;">
                                 <div>
-                                    <span style="color: #6b7280; font-size: 13px;">Доходы:</span>
+                                    <span style="color: #6b7280; font-size: 13px;"><i class="fas fa-arrow-up" style="color: #27ae60;"></i> Доходы:</span>
                                     <strong style="color: #27ae60; margin-left: 8px;">
                                         <?= formatMoney(array_sum(array_filter(array_column($payments, 'amount'), function($key, $index) use ($payments) {
                                             return $payments[$index]['flow_type'] === 'income';
@@ -318,7 +320,7 @@ $pageTitle = 'Все платежи';
                                     </strong>
                                 </div>
                                 <div>
-                                    <span style="color: #6b7280; font-size: 13px;">Расходы:</span>
+                                    <span style="color: #6b7280; font-size: 13px;"><i class="fas fa-arrow-down" style="color: #e74c3c;"></i> Расходы:</span>
                                     <strong style="color: #e74c3c; margin-left: 8px;">
                                         <?= formatMoney(array_sum(array_filter(array_column($payments, 'amount'), function($key, $index) use ($payments) {
                                             return $payments[$index]['flow_type'] === 'expense';

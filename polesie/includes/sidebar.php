@@ -1,4 +1,11 @@
 <!-- Боковая панель навигации -->
+<?php
+// Подключаем Font Awesome для иконок, если еще не подключено
+if (!isset($GLOBALS['font_awesome_loaded'])) {
+    echo '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">' . "\n";
+    $GLOBALS['font_awesome_loaded'] = true;
+}
+?>
 <div class="sidebar">
     <div class="sidebar-header">
         <div class="sidebar-logo">

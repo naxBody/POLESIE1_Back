@@ -230,7 +230,7 @@ SELECT
     SUM(pd.vat_amount) as total_vat
 FROM payment_documents pd
 JOIN payment_types pt ON pd.payment_type_id = pt.id
-WHERE pd.status = 'posted' AND pd.is_cancelled != TRUE
+WHERE pd.status = 'posted'
 GROUP BY DATE_FORMAT(pd.document_date, '%Y-%m'), pt.type, pt.category
 ORDER BY period DESC, pt.type, pt.category;
 
@@ -249,7 +249,7 @@ SELECT
 FROM payment_documents pd
 JOIN contractors c ON pd.contractor_id = c.id
 JOIN payment_types pt ON pd.payment_type_id = pt.id
-WHERE pd.status = 'posted' AND pd.is_cancelled != TRUE
+WHERE pd.status = 'posted'
 GROUP BY c.id, c.name, c.inn, pt.type
 ORDER BY total_amount DESC;
 
@@ -271,7 +271,7 @@ FROM payment_documents pd
 JOIN payment_types pt ON pd.payment_type_id = pt.id
 LEFT JOIN contractors c ON pd.contractor_id = c.id
 JOIN bank_accounts ba ON pd.bank_account_id = ba.id
-WHERE pd.status = 'posted' AND pd.is_cancelled != TRUE
+WHERE pd.status = 'posted'
 ORDER BY pd.document_date DESC, pd.document_number DESC;
 
 -- ============================================

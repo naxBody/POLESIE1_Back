@@ -33,7 +33,7 @@ if ($user['role_code'] === 'storekeeper') {
     $stats['orders_in_progress'] = $stmt->fetchColumn();
     
     // Последние поступления
-    $stmt = $pdo->query("SELECT COUNT(*) FROM material_receipts WHERE 1=1");
+    $stmt = $pdo->query("SELECT COUNT(*) FROM material_receipt_documents WHERE 1=1");
     $stats['new_orders'] = $stmt->fetchColumn() ?? 0;
     
     // Продукция на складе

@@ -376,7 +376,7 @@ $pageTitle = 'Панель управления';
                                     <tbody>
                                         <?php foreach ($activeProduction as $po): ?>
                                         <tr>
-                                            <td><strong><?= e($po['production_number']) ?></strong></td>
+                                            <td><strong><?= e($po['task_number']) ?></strong></td>
                                             <td><?= e($po['product_name']) ?></td>
                                             <td>
                                                 <span class="badge badge-primary" style="background: <?= e($po['status_color']) ?>20; color: <?= e($po['status_color']) ?>">

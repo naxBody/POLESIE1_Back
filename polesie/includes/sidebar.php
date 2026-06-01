@@ -60,89 +60,67 @@
         </div>
         
         <!-- Заказы - ТОЛЬКО для менеджеров и админов -->
-        <?php if ($user['role_code'] === 'manager' || $user['role_code'] === 'admin' || in_array('orders', $availableModules)): ?>
+        <?php if ($user['role_code'] === 'manager' || $user['role_code'] === 'admin'): ?>
         <div class="sidebar-nav-section">
             <div class="sidebar-nav-title">Заказы</div>
-            <?php if (canAccessModule('orders') || $user['role_code'] === 'admin'): ?>
             <a href="<?= pageUrl('modules/orders/list.php') ?>" class="sidebar-nav-item <?= $relativePath === 'modules/orders/list.php' ? 'active' : '' ?>">
                 <span class="sidebar-nav-icon">📦</span>
                 <span>Все заказы</span>
             </a>
-            <?php endif; ?>
-            <?php if (canCreateInModule('orders') || $user['role_code'] === 'admin'): ?>
             <a href="<?= pageUrl('modules/orders/create.php') ?>" class="sidebar-nav-item <?= $relativePath === 'modules/orders/create.php' ? 'active' : '' ?>">
                 <span class="sidebar-nav-icon">➕</span>
                 <span>Новый заказ</span>
             </a>
-            <?php endif; ?>
-            <?php if (canAccessModule('contractors') || $user['role_code'] === 'admin'): ?>
             <a href="<?= pageUrl('modules/contractors/list.php') ?>" class="sidebar-nav-item <?= $relativePath === 'modules/contractors/list.php' ? 'active' : '' ?>">
                 <span class="sidebar-nav-icon">🏢</span>
                 <span>Контрагенты</span>
             </a>
-            <?php endif; ?>
         </div>
         <?php endif; ?>
         
         <!-- Производство - ТОЛЬКО для технологов и админов -->
-        <?php if ($user['role_code'] === 'technologist' || $user['role_code'] === 'admin' || in_array('production', $availableModules)): ?>
+        <?php if ($user['role_code'] === 'technologist' || $user['role_code'] === 'admin'): ?>
         <div class="sidebar-nav-section">
             <div class="sidebar-nav-title">Производство</div>
-            <?php if (canAccessModule('production') || $user['role_code'] === 'admin'): ?>
             <a href="<?= pageUrl('modules/production/execute.php') ?>" class="sidebar-nav-item <?= $relativePath === 'modules/production/execute.php' ? 'active' : '' ?>">
                 <span class="sidebar-nav-icon">🏭</span>
                 <span>Исполнение производства</span>
             </a>
-            <?php endif; ?>
-            <?php if (canCreateInModule('production') || $user['role_code'] === 'admin'): ?>
             <a href="<?= pageUrl('modules/production/plan.php') ?>" class="sidebar-nav-item <?= $relativePath === 'modules/production/plan.php' ? 'active' : '' ?>">
                 <span class="sidebar-nav-icon">📋</span>
                 <span>План выпуска</span>
             </a>
-            <?php endif; ?>
-            <?php if (canAccessModule('products') || $user['role_code'] === 'admin'): ?>
             <a href="<?= pageUrl('modules/products/list.php') ?>" class="sidebar-nav-item <?= $relativePath === 'modules/products/list.php' ? 'active' : '' ?>">
                 <span class="sidebar-nav-icon">🔧</span>
                 <span>Продукция</span>
             </a>
-            <?php endif; ?>
-            <?php if (canAccessModule('products') || $user['role_code'] === 'admin'): ?>
             <a href="<?= pageUrl('modules/products/passports.php') ?>" class="sidebar-nav-item <?= $relativePath === 'modules/products/passports.php' ? 'active' : '' ?>">
                 <span class="sidebar-nav-icon">📄</span>
                 <span>Паспорта продуктов</span>
             </a>
-            <?php endif; ?>
         </div>
         <?php endif; ?>
         
         <!-- Склад - ТОЛЬКО для кладовщиков и админов -->
-        <?php if ($user['role_code'] === 'storekeeper' || $user['role_code'] === 'admin' || in_array('warehouse', $availableModules)): ?>
+        <?php if ($user['role_code'] === 'storekeeper' || $user['role_code'] === 'admin'): ?>
         <div class="sidebar-nav-section">
             <div class="sidebar-nav-title">Склад</div>
-            <?php if (canAccessModule('warehouse') || $user['role_code'] === 'admin'): ?>
             <a href="<?= pageUrl('modules/warehouse/materials.php') ?>" class="sidebar-nav-item <?= $relativePath === 'modules/warehouse/materials.php' ? 'active' : '' ?>">
                 <span class="sidebar-nav-icon">📦</span>
                 <span>Материалы</span>
             </a>
-            <?php endif; ?>
-            <?php if (canCreateInModule('warehouse') || $user['role_code'] === 'admin'): ?>
             <a href="<?= pageUrl('modules/warehouse/receipt.php') ?>" class="sidebar-nav-item <?= $relativePath === 'modules/warehouse/receipt.php' ? 'active' : '' ?>">
                 <span class="sidebar-nav-icon">📥</span>
                 <span>Поступление материалов</span>
             </a>
-            <?php endif; ?>
-            <?php if (canAccessModule('warehouse') || $user['role_code'] === 'admin'): ?>
             <a href="<?= pageUrl('modules/warehouse/list.php') ?>" class="sidebar-nav-item <?= $relativePath === 'modules/warehouse/list.php' ? 'active' : '' ?>">
                 <span class="sidebar-nav-icon">🏭</span>
                 <span>Остатки на складе</span>
             </a>
-            <?php endif; ?>
-            <?php if (canAccessModule('warehouse') || $user['role_code'] === 'admin'): ?>
             <a href="<?= pageUrl('modules/warehouse/docs.php') ?>" class="sidebar-nav-item <?= $relativePath === 'modules/warehouse/docs.php' ? 'active' : '' ?>">
                 <span class="sidebar-nav-icon">📚</span>
                 <span>Документы и справочники</span>
             </a>
-            <?php endif; ?>
         </div>
         <?php endif; ?>
         

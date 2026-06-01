@@ -97,7 +97,6 @@ $recentPayments = $pdo->query("
 // Балансы по счетам
 $accountsBalance = $pdo->query("
     SELECT * FROM bank_accounts 
-    WHERE is_active = TRUE 
     ORDER BY account_type, account_holder
 ")->fetchAll();
 

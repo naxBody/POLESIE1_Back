@@ -103,8 +103,8 @@ $stmt->execute($params);
 $payments = $stmt->fetchAll();
 
 // Списки для фильтров
-$paymentTypes = $pdo->query("SELECT DISTINCT type, category FROM payment_types WHERE is_active = TRUE ORDER BY type, category")->fetchAll();
-$contractors = $pdo->query("SELECT id, name FROM contractors WHERE is_active = TRUE ORDER BY name")->fetchAll();
+$paymentTypes = $pdo->query("SELECT DISTINCT type, category FROM payment_types ORDER BY type, category")->fetchAll();
+$contractors = $pdo->query("SELECT id, name FROM contractors ORDER BY name")->fetchAll();
 
 $pageTitle = 'Все платежи';
 ?>

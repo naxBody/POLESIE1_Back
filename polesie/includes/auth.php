@@ -279,6 +279,7 @@ function canAccessModule($module, $permission = 'can_view') {
         'materials' => 'материалы',
         'employees' => 'сотрудники',
         'quality' => 'контроль_качества',
+        'finance' => 'финансы',
         'reports' => 'отчеты',
         'settings' => 'настройки'
     ];
@@ -340,7 +341,7 @@ function getAvailableModules() {
     
     // Администратор имеет доступ ко всем модулям
     if ($user['role_code'] === 'admin') {
-        return ['dashboard', 'orders', 'contractors', 'production', 'products', 'warehouse', 'materials', 'employees', 'quality', 'reports', 'settings'];
+        return ['dashboard', 'orders', 'contractors', 'production', 'products', 'warehouse', 'materials', 'employees', 'quality', 'finance', 'reports', 'settings'];
     }
     
     // Проверяем права из JSON поля permissions
@@ -352,7 +353,7 @@ function getAvailableModules() {
     
     // Если есть флаг all: true - полный доступ
     if (isset($permissions['all']) && $permissions['all'] === true) {
-        return ['dashboard', 'orders', 'contractors', 'production', 'products', 'warehouse', 'materials', 'employees', 'quality', 'reports', 'settings'];
+        return ['dashboard', 'orders', 'contractors', 'production', 'products', 'warehouse', 'materials', 'employees', 'quality', 'finance', 'reports', 'settings'];
     }
     
     $availableModules = [];
@@ -365,6 +366,7 @@ function getAvailableModules() {
         'материалы' => ['materials'],
         'сотрудники' => ['employees'],
         'контроль_качества' => ['quality'],
+        'финансы' => ['finance'],
         'отчеты' => ['reports'],
         'настройки' => ['settings']
     ];

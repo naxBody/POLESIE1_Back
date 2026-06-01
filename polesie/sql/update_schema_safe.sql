@@ -81,7 +81,8 @@ INSERT IGNORE INTO `user_roles` (`name`, `code`, `description`, `permissions`) V
 ('Технолог', 'technologist', 'Управление производственными процессами', '{"production": ["read", "create", "update"], "route_cards": ["read", "create", "update"], "materials": ["read"], "tasks": ["read", "create", "update"]}'),
 ('Кладовщик', 'storekeeper', 'Учет материалов на складе', '{"warehouse": ["read", "create", "update"], "materials": ["read", "update"], "receipts": ["read", "create"], "writeoffs": ["read", "create"]}'),
 ('Рабочий', 'worker', 'Выполнение производственных заданий', '{"production": ["read"], "tasks": ["read", "update"], "my_tasks": ["read", "update"]}'),
-('Контроль качества', 'quality_control', 'Проверка качества продукции', '{"production": ["read"], "quality_checks": ["read", "create"], "tasks": ["read"]}');
+('Контроль качества', 'quality_control', 'Проверка качества продукции', '{"production": ["read"], "quality_checks": ["read", "create"], "tasks": ["read"]}'),
+('Бухгалтер', 'accountant', 'Финансовый учет, работа с документами и отчетами', '{"orders": ["read"], "contractors": ["read"], "reports": ["read", "export"], "finance": ["read", "create", "update"]}');
 
 -- ============================================
 -- 4. ОБНОВЛЕНИЕ ПОЛЬЗОВАТЕЛЕЙ (привязка к ролям)
@@ -102,7 +103,8 @@ INSERT INTO `temp_user_roles` (`username`, `role_code`) VALUES
 ('ivanov', 'sales_manager'),
 ('petrov', 'technologist'),
 ('sidorov', 'storekeeper'),
-('worker1', 'worker');
+('worker1', 'worker'),
+('accountant1', 'accountant');
 
 -- Обновляем role_id у существующих пользователей (с явным указанием collation для избежания конфликтов)
 UPDATE `users` u
@@ -155,6 +157,11 @@ INSERT IGNORE INTO `users` (`username`, `password_hash`, `full_name`, `email`, `
 SELECT 'qc1', 'qc123', 'Контролер Качества', 'qc@polesie.by',
        (SELECT id FROM `user_roles` WHERE code = 'quality_control'), TRUE
 WHERE NOT EXISTS (SELECT 1 FROM `users` WHERE username = 'qc1');
+
+INSERT IGNORE INTO `users` (`username`, `password_hash`, `full_name`, `email`, `role_id`, `is_active`) 
+SELECT 'accountant1', 'account123', 'Бухгалтер Елена', 'accountant1@polesie.by',
+       (SELECT id FROM `user_roles` WHERE code = 'accountant'), TRUE
+WHERE NOT EXISTS (SELECT 1 FROM `users` WHERE username = 'accountant1');
 
 -- ============================================
 -- 6. ИНФОРМАЦИЯ О РОЛЯХ ДЛЯ ПРОВЕРКИ

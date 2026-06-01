@@ -51,7 +51,8 @@ INSERT INTO `user_roles` (`name`, `code`, `description`, `permissions`) VALUES
 ('Технолог', 'technologist', 'Управление производственными процессами', '{"производство": ["view", "create", "edit"], "продукция": ["view", "edit"], "маршрутные_карты": ["view", "create", "edit"], "материалы": ["view"]}'),
 ('Кладовщик', 'storekeeper', 'Учет материалов и продукции на складе', '{"склад": ["view", "create", "edit"], "материалы": ["view", "edit"], "поступление": ["create"], "списание": ["create"], "продукция": ["view"]}'),
 ('Рабочий', 'worker', 'Исполнение производственных заданий', '{"производство": ["view"], "задания": ["view", "update_status"], "материалы": ["view"]}'),
-('Контроль качества', 'quality_inspector', 'Проверка качества продукции', '{"контроль_качества": ["view", "create"], "производство": ["view"], "продукция": ["view"]}');
+('Контроль качества', 'quality_inspector', 'Проверка качества продукции', '{"контроль_качества": ["view", "create"], "производство": ["view"], "продукция": ["view"]}'),
+('Бухгалтер', 'accountant', 'Финансовый учет, работа с документами и отчетами', '{"заказы": ["view"], "контрагенты": ["view"], "отчеты": ["view", "export"], "финансы": ["view", "create", "edit"]}');
 
 -- ============================================
 -- НАСТРОЙКА ПРАВ ДОСТУПА ПО МОДУЛЯМ
@@ -121,6 +122,13 @@ INSERT INTO `role_module_permissions` (`role_id`, `module`, `can_view`, `can_cre
 (7, 'production', TRUE, FALSE, FALSE, FALSE),
 (7, 'products', TRUE, FALSE, FALSE, FALSE);
 
+-- Бухгалтер - финансы и отчеты
+INSERT INTO `role_module_permissions` (`role_id`, `module`, `can_view`, `can_create`, `can_edit`, `can_delete`) VALUES
+(8, 'dashboard', TRUE, FALSE, FALSE, FALSE),
+(8, 'orders', TRUE, FALSE, FALSE, FALSE),
+(8, 'contractors', TRUE, FALSE, FALSE, FALSE),
+(8, 'reports', TRUE, TRUE, TRUE, FALSE);
+
 -- ============================================
 -- ОБНОВЛЕНИЕ ПОЛЬЗОВАТЕЛЕЙ
 -- ============================================
@@ -152,7 +160,8 @@ INSERT INTO `users` (`username`, `password_hash`, `full_name`, `email`, `phone`,
 ('petrov', 'tech123', 'Петров Петр', 'petrov@polesie.by', '+375 29 111-00-03', 4, 'Производство', 'Технолог'),
 ('sidorov', 'store123', 'Сидоров Сидор', 'sidorov@polesie.by', '+375 29 111-00-04', 5, 'Склад', 'Кладовщик'),
 ('worker1', 'worker123', 'Рабочий Алексей', 'worker1@polesie.by', '+375 29 111-00-05', 6, 'Производство', 'Рабочий'),
-('quality1', 'quality123', 'Контролер Ольга', 'quality1@polesie.by', '+375 29 111-00-06', 7, 'ОТК', 'Инспектор по качеству');
+('quality1', 'quality123', 'Контролер Ольга', 'quality1@polesie.by', '+375 29 111-00-06', 7, 'ОТК', 'Инспектор по качеству'),
+('accountant1', 'account123', 'Бухгалтер Елена', 'accountant1@polesie.by', '+375 29 111-00-07', 8, 'Бухгалтерия', 'Бухгалтер');
 
 -- ============================================
 -- ПРЕДСТАВЛЕНИЕ ДЛЯ БЫСТРОГО ПОЛУЧЕНИЯ ПРАВ

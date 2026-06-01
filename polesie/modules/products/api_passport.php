@@ -1,6 +1,6 @@
 <?php
 /**
- * API для получения данных паспорта продукта из БД
+ * API для получения данных паспорта продукта из БД и сохранения изменений
  */
 
 require_once __DIR__ . '/../../config/config.php';
@@ -16,6 +16,84 @@ if (!isLoggedIn()) {
 
 $pdo = getDbConnection();
 
+// Обработка POST запроса на сохранение паспорта
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $input = json_decode(file_get_contents('php://input'), true);
+    
+    if (!$input || !isset($input['action']) || $input['action'] !== 'save_passport') {
+        echo json_encode(['success' => false, 'error' => 'Неверный формат запроса']);
+        exit;
+    }
+    
+    try {
+        $passportId = isset($input['passport_id']) ? (int)$input['passport_id'] : null;
+        $productId = isset($input['product_id']) ? (int)$input['product_id'] : null;
+        
+        if (!$productId) {
+            echo json_encode(['success' => false, 'error' => 'Не указан ID продукта']);
+            exit;
+        }
+        
+        $totalWeight = isset($input['total_weight_kg']) ? floatval($input['total_weight_kg']) : 0;
+        $warrantyMonths = isset($input['warranty_months']) ? intval($input['warranty_months']) : 12;
+        $isSerialTracked = isset($input['is_serial_tracked']) ? ($input['is_serial_tracked'] ? 1 : 0) : 0;
+        
+        // Обработка примечаний и требований как JSON массивов
+        $productionNotes = !empty($input['production_notes']) 
+            ? json_encode(array_filter(array_map('trim', explode("\n", $input['production_notes']))))
+            : null;
+        $qualityRequirements = !empty($input['quality_requirements'])
+            ? json_encode(array_filter(array_map('trim', explode("\n", $input['quality_requirements']))))
+            : null;
+        
+        if ($passportId) {
+            // Обновление существующего паспорта
+            $stmt = $pdo->prepare("
+                UPDATE product_passports 
+                SET 
+                    total_weight_kg = :total_weight_kg,
+                    warranty_months = :warranty_months,
+                    is_serial_tracked = :is_serial_tracked,
+                    production_notes = :production_notes,
+                    quality_requirements = :quality_requirements,
+                    updated_at = CURRENT_TIMESTAMP
+                WHERE id = :passport_id
+            ");
+            $stmt->execute([
+                ':total_weight_kg' => $totalWeight,
+                ':warranty_months' => $warrantyMonths,
+                ':is_serial_tracked' => $isSerialTracked,
+                ':production_notes' => $productionNotes,
+                ':quality_requirements' => $qualityRequirements,
+                ':passport_id' => $passportId
+            ]);
+        } else {
+            // Создание нового паспорта
+            $stmt = $pdo->prepare("
+                INSERT INTO product_passports 
+                (product_id, total_weight_kg, warranty_months, is_serial_tracked, production_notes, quality_requirements)
+                VALUES (:product_id, :total_weight_kg, :warranty_months, :is_serial_tracked, :production_notes, :quality_requirements)
+            ");
+            $stmt->execute([
+                ':product_id' => $productId,
+                ':total_weight_kg' => $totalWeight,
+                ':warranty_months' => $warrantyMonths,
+                ':is_serial_tracked' => $isSerialTracked,
+                ':production_notes' => $productionNotes,
+                ':quality_requirements' => $qualityRequirements
+            ]);
+            $passportId = $pdo->lastInsertId();
+        }
+        
+        echo json_encode(['success' => true, 'passport_id' => $passportId]);
+        
+    } catch (PDOException $e) {
+        echo json_encode(['success' => false, 'error' => 'Ошибка БД: ' . $e->getMessage()]);
+    }
+    exit;
+}
+
+// GET запрос - получение данных паспорта
 $passportId = $_GET['id'] ?? null;
 
 if (!$passportId) {

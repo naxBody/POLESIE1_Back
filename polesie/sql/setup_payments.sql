@@ -488,3 +488,24 @@ SET FOREIGN_KEY_CHECKS = 1;
 
 -- Движение денежных средств
 -- SELECT * FROM v_cash_flow WHERE document_date >= DATE_SUB(CURDATE(), INTERVAL 30 DAY);
+
+-- ============================================
+-- ПРИМЕРЫ ПЛАТЕЖЕЙ (ДЕМОНСТРАЦИОННЫЕ ДАННЫЕ)
+-- ============================================
+
+-- Примеры платежей (доходы)
+INSERT INTO `payment_documents` (`document_number`, `document_date`, `payment_type_id`, `amount`, `currency`, `vat_amount`, `vat_rate`, `contractor_id`, `bank_account_id`, `expense_article_id`, `description`, `payment_purpose`, `status`, `created_by`) VALUES
+('PAY202501010001', '2025-01-05', (SELECT id FROM payment_types WHERE code='INCOME_ORDER'), 150000.00, 'BYN', 30000.00, 20.00, (SELECT id FROM contractors LIMIT 1), (SELECT id FROM bank_accounts WHERE currency='BYN' LIMIT 1), NULL, 'Оплата за заказ №001', 'Оплата по договору поставки №1 от 15.12.2024', 'posted', 1),
+('PAY202501010002', '2025-01-10', (SELECT id FROM payment_types WHERE code='INCOME_ADVANCE'), 50000.00, 'BYN', 10000.00, 20.00, (SELECT id FROM contractors LIMIT 2), (SELECT id FROM bank_accounts WHERE currency='BYN' LIMIT 1), NULL, 'Аванс за заказ №005', 'Авансовый платеж по договору №5 от 20.12.2024', 'posted', 1),
+('PAY202501010003', '2025-01-15', (SELECT id FROM payment_types WHERE code='INCOME_OTHER'), 25000.00, 'BYN', 0, 0, NULL, (SELECT id FROM bank_accounts WHERE currency='BYN' LIMIT 1), NULL, 'Прочие поступления', 'Возврат подотчетных средств', 'posted', 1);
+
+-- Примеры платежей (расходы)
+INSERT INTO `payment_documents` (`document_number`, `document_date`, `payment_type_id`, `amount`, `currency`, `vat_amount`, `vat_rate`, `contractor_id`, `bank_account_id`, `expense_article_id`, `description`, `payment_purpose`, `status`, `created_by`) VALUES
+('PAY202501020001', '2025-01-08', (SELECT id FROM payment_types WHERE code='EXPENSE_MATERIALS'), 75000.00, 'BYN', 15000.00, 20.00, (SELECT id FROM contractors LIMIT 3), (SELECT id FROM bank_accounts WHERE currency='BYN' LIMIT 1), (SELECT id FROM expense_articles WHERE code='MAT_MAIN'), 'Оплата материалов от поставщика', 'Оплата по счету №123 от 05.01.2025 за материалы', 'posted', 1),
+('PAY202501020002', '2025-01-12', (SELECT id FROM payment_types WHERE code='EXPENSE_SERVICES'), 30000.00, 'BYN', 6000.00, 20.00, (SELECT id FROM contractors LIMIT 4), (SELECT id FROM bank_accounts WHERE currency='BYN' LIMIT 1), (SELECT id FROM expense_articles WHERE code='SERV_PROD'), 'Производственные услуги', 'Оплата услуг по договору подряда №15 от 10.01.2025', 'posted', 1),
+('PAY202501020003', '2025-01-15', (SELECT id FROM payment_types WHERE code='EXPENSE_UTILITIES'), 12000.00, 'BYN', 2400.00, 20.00, (SELECT id FROM contractors LIMIT 5), (SELECT id FROM bank_accounts WHERE currency='BYN' LIMIT 1), (SELECT id FROM expense_articles WHERE code='UTIL_ELEC'), 'Электроэнергия за январь 2025', 'Оплата электроэнергии по договору №Э-2024', 'posted', 1),
+('PAY202501020004', '2025-01-18', (SELECT id FROM payment_types WHERE code='EXPENSE_SALARY'), 45000.00, 'BYN', 0, 0, NULL, (SELECT id FROM bank_accounts WHERE account_type='cash' LIMIT 1), (SELECT id FROM expense_articles WHERE code='SALARY_MAIN'), 'Заработная плата за январь 2025', 'Выплата заработной платы сотрудникам', 'posted', 1),
+('PAY202501020005', '2025-01-20', (SELECT id FROM payment_types WHERE code='EXPENSE_TAXES'), 18000.00, 'BYN', 0, 0, NULL, (SELECT id FROM bank_accounts WHERE currency='BYN' LIMIT 1), (SELECT id FROM expense_articles WHERE code='TAX_INCOME'), 'Налог на прибыль за Q4 2024', 'Уплата налога на прибыль организаций', 'posted', 1),
+('PAY202501020006', '2025-01-22', (SELECT id FROM payment_types WHERE code='EXPENSE_RENT'), 8000.00, 'BYN', 1600.00, 20.00, (SELECT id FROM contractors LIMIT 6), (SELECT id FROM bank_accounts WHERE currency='BYN' LIMIT 1), (SELECT id FROM expense_articles WHERE code='RENT_WAREHOUSE'), 'Аренда склада за январь 2025', 'Оплата аренды складского помещения по договору №А-2024', 'approved', 1),
+('PAY202501020007', '2025-01-25', (SELECT id FROM payment_types WHERE code='EXPENSE_TRANSPORT'), 5000.00, 'BYN', 1000.00, 20.00, (SELECT id FROM contractors LIMIT 7), (SELECT id FROM bank_accounts WHERE currency='BYN' LIMIT 1), (SELECT id FROM expense_articles WHERE code='SERV_TRANS'), 'Транспортные услуги', 'Оплата доставки грузов по договору №Т-2025', 'pending', 1),
+('PAY202501020008', '2025-01-28', (SELECT id FROM payment_types WHERE code='EXPENSE_OFFICE'), 3500.00, 'BYN', 700.00, 20.00, (SELECT id FROM contractors LIMIT 8), (SELECT id FROM bank_accounts WHERE currency='BYN' LIMIT 1), (SELECT id FROM expense_articles WHERE code='MAT_AUX'), 'Канцелярские товары', 'Оплата канцелярских товаров по счету №456', 'draft', 1);

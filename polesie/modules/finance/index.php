@@ -250,17 +250,17 @@ $pageTitle = 'Финансы и платежи';
                     <!-- Заголовок страницы -->
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px;">
                         <div>
-                            <h1 style="font-size: 28px; font-weight: 700; color: #1f2937; margin: 0;">💰 Финансы и платежи</h1>
+                            <h1 style="font-size: 28px; font-weight: 700; color: #1f2937; margin: 0;"><i class="fas fa-wallet"></i> Финансы и платежи</h1>
                             <p style="color: #6b7280; margin: 8px 0 0 0;">Управление платежами и финансовыми документами</p>
                         </div>
                         <div style="display: flex; gap: 12px;">
                             <?php if (canCreateInModule('finance')): ?>
                             <a href="payment_create.php" class="btn btn-primary">
-                                ➕ Новый платеж
+                                <i class="fas fa-plus-circle"></i> Новый платеж
                             </a>
                             <?php endif; ?>
                             <a href="reports.php" class="btn btn-secondary">
-                                📊 Отчеты
+                                <i class="fas fa-chart-bar"></i> Отчеты
                             </a>
                         </div>
                     </div>

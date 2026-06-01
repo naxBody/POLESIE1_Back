@@ -190,6 +190,7 @@ $pageTitle = 'Панель управления';
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= e($pageTitle) ?> - <?= e(APP_NAME) ?></title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="<?= asset('assets/css/style.css') ?>">
 </head>
 <body>
@@ -212,9 +213,9 @@ $pageTitle = 'Панель управления';
                                 <div class="stat-card-value"><?= $stats['total_orders'] ?></div>
                                 <div class="stat-card-label">Всего заказов</div>
                             </div>
-                            <div class="stat-card-icon primary">📦</div>
+                            <div class="stat-card-icon primary"><i class="fas fa-box"></i></div>
                         </div>
-                        <div class="stat-card-change positive">↑ 12% за месяц</div>
+                        <div class="stat-card-change positive"><i class="fas fa-arrow-up"></i> 12% за месяц</div>
                     </div>
                     
                     <div class="stat-card">
@@ -223,7 +224,7 @@ $pageTitle = 'Панель управления';
                                 <div class="stat-card-value"><?= $stats['orders_in_progress'] ?></div>
                                 <div class="stat-card-label">В производстве</div>
                             </div>
-                            <div class="stat-card-icon warning">⚙️</div>
+                            <div class="stat-card-icon warning"><i class="fas fa-cog"></i></div>
                         </div>
                         <div class="stat-card-change positive">Активные заказы</div>
                     </div>
@@ -234,7 +235,7 @@ $pageTitle = 'Панель управления';
                                 <div class="stat-card-value"><?= $stats['production_active'] ?></div>
                                 <div class="stat-card-label">Заданий в работе</div>
                             </div>
-                            <div class="stat-card-icon info">🔧</div>
+                            <div class="stat-card-icon info"><i class="fas fa-wrench"></i></div>
                         </div>
                         <div class="stat-card-change positive">Производство</div>
                     </div>
@@ -245,9 +246,9 @@ $pageTitle = 'Панель управления';
                                 <div class="stat-card-value"><?= number_format($stats['warehouse_products'], 0, ',', ' ') ?></div>
                                 <div class="stat-card-label">Продукции на складе</div>
                             </div>
-                            <div class="stat-card-icon success">📦</div>
+                            <div class="stat-card-icon success"><i class="fas fa-boxes"></i></div>
                         </div>
-                        <div class="stat-card-change negative">↓ 5% за неделю</div>
+                        <div class="stat-card-change negative"><i class="fas fa-arrow-down"></i> 5% за неделю</div>
                     </div>
                 </div>
                 
@@ -255,7 +256,7 @@ $pageTitle = 'Панель управления';
                 <?php if (!empty($problemOrders)): ?>
                 <div class="card" style="margin-bottom: 24px; border-left: 4px solid #e74c3c;">
                     <div class="card-header" style="background: #fdf2f2;">
-                        <h3 class="card-title" style="color: #c0392b;">⚠️ Требуют внимания</h3>
+                        <h3 class="card-title" style="color: #c0392b;"><i class="fas fa-exclamation-triangle"></i> Требуют внимания</h3>
                         <span class="badge" style="background: #e74c3c; color: white;"><?= count($problemOrders) ?> заказов</span>
                     </div>
                     <div class="card-body" style="padding: 0;">
@@ -295,18 +296,18 @@ $pageTitle = 'Панель управления';
                                         <td>
                                             <?php if ($po['material_shortages'] > 0): ?>
                                                 <span class="badge" style="background: #e74c3c20; color: #e74c3c;">
-                                                    📦 Нехватка материалов (<?= $po['material_shortages'] ?>)
+                                                    <i class="fas fa-boxes"></i> Нехватка материалов (<?= $po['material_shortages'] ?>)
                                                 </span>
                                             <?php endif; ?>
                                             <?php if ($po['pending_tasks'] > 0): ?>
                                                 <span class="badge" style="background: #f39c1220; color: #f39c12;">
-                                                    ⏳ Заданий в работе (<?= $po['pending_tasks'] ?>)
+                                                    <i class="fas fa-hourglass-half"></i> Заданий в работе (<?= $po['pending_tasks'] ?>)
                                                 </span>
                                             <?php endif; ?>
                                         </td>
                                         <td>
                                             <a href="<?= pageUrl('modules/orders/view.php?id=' . $po['id']) ?>" class="btn btn-sm btn-primary">
-                                                👁️ Просмотр
+                                                <i class="fas fa-eye"></i> Просмотр
                                             </a>
                                         </td>
                                     </tr>

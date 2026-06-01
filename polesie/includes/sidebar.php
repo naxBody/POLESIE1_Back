@@ -53,7 +53,7 @@
             ?>
             <?php if ($user['role_code'] === 'director' || $user['role_code'] === 'admin'): ?>
             <a href="<?= pageUrl('index.php') ?>" class="sidebar-nav-item <?= $relativePath === 'index.php' ? 'active' : '' ?>">
-                <span class="sidebar-nav-icon">📊</span>
+                <span class="sidebar-nav-icon"><i class="fas fa-chart-line"></i></span>
                 <span>Панель управления</span>
             </a>
             <?php endif; ?>
@@ -64,15 +64,15 @@
         <div class="sidebar-nav-section">
             <div class="sidebar-nav-title">Заказы</div>
             <a href="<?= pageUrl('modules/orders/list.php') ?>" class="sidebar-nav-item <?= $relativePath === 'modules/orders/list.php' ? 'active' : '' ?>">
-                <span class="sidebar-nav-icon">📦</span>
+                <span class="sidebar-nav-icon"><i class="fas fa-box"></i></span>
                 <span>Все заказы</span>
             </a>
             <a href="<?= pageUrl('modules/orders/create.php') ?>" class="sidebar-nav-item <?= $relativePath === 'modules/orders/create.php' ? 'active' : '' ?>">
-                <span class="sidebar-nav-icon">➕</span>
+                <span class="sidebar-nav-icon"><i class="fas fa-plus-circle"></i></span>
                 <span>Новый заказ</span>
             </a>
             <a href="<?= pageUrl('modules/contractors/list.php') ?>" class="sidebar-nav-item <?= $relativePath === 'modules/contractors/list.php' ? 'active' : '' ?>">
-                <span class="sidebar-nav-icon">🏢</span>
+                <span class="sidebar-nav-icon"><i class="fas fa-building"></i></span>
                 <span>Контрагенты</span>
             </a>
         </div>
@@ -83,19 +83,19 @@
         <div class="sidebar-nav-section">
             <div class="sidebar-nav-title">Производство</div>
             <a href="<?= pageUrl('modules/production/execute.php') ?>" class="sidebar-nav-item <?= $relativePath === 'modules/production/execute.php' ? 'active' : '' ?>">
-                <span class="sidebar-nav-icon">🏭</span>
+                <span class="sidebar-nav-icon"><i class="fas fa-industry"></i></span>
                 <span>Исполнение производства</span>
             </a>
             <a href="<?= pageUrl('modules/production/plan.php') ?>" class="sidebar-nav-item <?= $relativePath === 'modules/production/plan.php' ? 'active' : '' ?>">
-                <span class="sidebar-nav-icon">📋</span>
+                <span class="sidebar-nav-icon"><i class="fas fa-clipboard-list"></i></span>
                 <span>План выпуска</span>
             </a>
             <a href="<?= pageUrl('modules/products/list.php') ?>" class="sidebar-nav-item <?= $relativePath === 'modules/products/list.php' ? 'active' : '' ?>">
-                <span class="sidebar-nav-icon">🔧</span>
+                <span class="sidebar-nav-icon"><i class="fas fa-tools"></i></span>
                 <span>Продукция</span>
             </a>
             <a href="<?= pageUrl('modules/products/passports.php') ?>" class="sidebar-nav-item <?= $relativePath === 'modules/products/passports.php' ? 'active' : '' ?>">
-                <span class="sidebar-nav-icon">📄</span>
+                <span class="sidebar-nav-icon"><i class="fas fa-file-alt"></i></span>
                 <span>Паспорта продуктов</span>
             </a>
         </div>
@@ -106,19 +106,19 @@
         <div class="sidebar-nav-section">
             <div class="sidebar-nav-title">Склад</div>
             <a href="<?= pageUrl('modules/warehouse/materials.php') ?>" class="sidebar-nav-item <?= $relativePath === 'modules/warehouse/materials.php' ? 'active' : '' ?>">
-                <span class="sidebar-nav-icon">📦</span>
+                <span class="sidebar-nav-icon"><i class="fas fa-boxes"></i></span>
                 <span>Материалы</span>
             </a>
             <a href="<?= pageUrl('modules/warehouse/receipt.php') ?>" class="sidebar-nav-item <?= $relativePath === 'modules/warehouse/receipt.php' ? 'active' : '' ?>">
-                <span class="sidebar-nav-icon">📥</span>
+                <span class="sidebar-nav-icon"><i class="fas fa-dolly"></i></span>
                 <span>Поступление материалов</span>
             </a>
             <a href="<?= pageUrl('modules/warehouse/list.php') ?>" class="sidebar-nav-item <?= $relativePath === 'modules/warehouse/list.php' ? 'active' : '' ?>">
-                <span class="sidebar-nav-icon">🏭</span>
+                <span class="sidebar-nav-icon"><i class="fas fa-warehouse"></i></span>
                 <span>Остатки на складе</span>
             </a>
             <a href="<?= pageUrl('modules/warehouse/docs.php') ?>" class="sidebar-nav-item <?= $relativePath === 'modules/warehouse/docs.php' ? 'active' : '' ?>">
-                <span class="sidebar-nav-icon">📚</span>
+                <span class="sidebar-nav-icon"><i class="fas fa-book"></i></span>
                 <span>Документы и справочники</span>
             </a>
         </div>
@@ -130,7 +130,7 @@
             <div class="sidebar-nav-title">Контроль качества</div>
             <?php if (canAccessModule('quality') || $user['role_code'] === 'admin'): ?>
             <a href="<?= pageUrl('modules/quality/list.php') ?>" class="sidebar-nav-item <?= $relativePath === 'modules/quality/list.php' ? 'active' : '' ?>">
-                <span class="sidebar-nav-icon">✅</span>
+                <span class="sidebar-nav-icon"><i class="fas fa-check-circle"></i></span>
                 <span>Проверки</span>
             </a>
             <?php endif; ?>
@@ -143,7 +143,7 @@
             <div class="sidebar-nav-title">Сотрудники</div>
             <?php if (canAccessModule('employees') || $user['role_code'] === 'admin'): ?>
             <a href="<?= pageUrl('modules/employees/list.php') ?>" class="sidebar-nav-item <?= $relativePath === 'modules/employees/list.php' ? 'active' : '' ?>">
-                <span class="sidebar-nav-icon">👥</span>
+                <span class="sidebar-nav-icon"><i class="fas fa-users"></i></span>
                 <span>Все сотрудники</span>
             </a>
             <?php endif; ?>
@@ -155,15 +155,15 @@
         <div class="sidebar-nav-section">
             <div class="sidebar-nav-title">Финансы</div>
             <a href="<?= pageUrl('modules/finance/index.php') ?>" class="sidebar-nav-item <?= strpos($relativePath, 'modules/finance/') === 0 ? 'active' : '' ?>">
-                <span class="sidebar-nav-icon">💰</span>
+                <span class="sidebar-nav-icon"><i class="fas fa-wallet"></i></span>
                 <span>Платежи</span>
             </a>
             <a href="<?= pageUrl('modules/finance/list.php') ?>" class="sidebar-nav-item <?= $relativePath === 'modules/finance/list.php' ? 'active' : '' ?>">
-                <span class="sidebar-nav-icon">📋</span>
+                <span class="sidebar-nav-icon"><i class="fas fa-file-invoice-dollar"></i></span>
                 <span>Все платежи</span>
             </a>
             <a href="<?= pageUrl('modules/finance/reports.php') ?>" class="sidebar-nav-item <?= $relativePath === 'modules/finance/reports.php' ? 'active' : '' ?>">
-                <span class="sidebar-nav-icon">📊</span>
+                <span class="sidebar-nav-icon"><i class="fas fa-chart-bar"></i></span>
                 <span>Отчеты</span>
             </a>
         </div>

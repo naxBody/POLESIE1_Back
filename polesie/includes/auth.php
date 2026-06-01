@@ -304,7 +304,8 @@ function canAccessModule($module, $permission = 'can_view') {
         return in_array($requiredRight, $moduleRights);
     }
     
-    return false;
+    // Если права заданы как true/false или строка
+    return !empty($moduleRights);
 }
 
 /**
@@ -358,9 +359,9 @@ function getAvailableModules() {
     $reverseModuleMap = [
         'заказы' => ['dashboard', 'orders'],
         'контрагенты' => ['contractors'],
-        'производство' => ['production'],
+        'производство' => ['production', 'products'],
         'продукция' => ['products'],
-        'склад' => ['warehouse'],
+        'склад' => ['warehouse', 'materials'],
         'материалы' => ['materials'],
         'сотрудники' => ['employees'],
         'контроль_качества' => ['quality'],
@@ -369,7 +370,7 @@ function getAvailableModules() {
     ];
     
     foreach ($permissions as $moduleName => $rights) {
-        if (isset($reverseModuleMap[$moduleName]) && is_array($rights) && in_array('view', $rights)) {
+        if (isset($reverseModuleMap[$moduleName]) && !empty($rights)) {
             $availableModules = array_merge($availableModules, $reverseModuleMap[$moduleName]);
         }
     }

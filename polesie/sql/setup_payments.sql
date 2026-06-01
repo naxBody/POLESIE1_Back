@@ -408,22 +408,23 @@ UPDATE `user_roles`
 SET permissions = JSON_SET(permissions, '$.финансы', JSON_ARRAY('view', 'create', 'edit', 'delete'))
 WHERE code = 'accountant';
 
--- Добавляем права для модуля finance в role_module_permissions
+-- Добавляем права для модуля finance (если таблица существует)
+-- Администратор имеет полный доступ к финансам
 INSERT INTO `role_module_permissions` (`role_id`, `module`, `can_view`, `can_create`, `can_edit`, `can_delete`)
 SELECT id, 'finance', TRUE, TRUE, TRUE, TRUE
 FROM user_roles 
-WHERE code = 'accountant'
+WHERE code = 'admin'
 ON DUPLICATE KEY UPDATE 
     can_view = TRUE, 
     can_create = TRUE, 
     can_edit = TRUE, 
     can_delete = TRUE;
 
--- Администратор имеет полный доступ к финансам
+-- Бухгалтер имеет полный доступ к финансам
 INSERT INTO `role_module_permissions` (`role_id`, `module`, `can_view`, `can_create`, `can_edit`, `can_delete`)
 SELECT id, 'finance', TRUE, TRUE, TRUE, TRUE
 FROM user_roles 
-WHERE code = 'admin'
+WHERE code = 'accountant'
 ON DUPLICATE KEY UPDATE 
     can_view = TRUE, 
     can_create = TRUE, 

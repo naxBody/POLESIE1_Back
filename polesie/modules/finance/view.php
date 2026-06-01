@@ -1,6 +1,6 @@
 <?php
 /**
- * Модуль финансов и платежей - Просмотр платежа
+ * Модуль финансов и платежей - Просмотр платежа с печатью
  * ОАО "Полесьеэлектромаш"
  */
 
@@ -32,7 +32,7 @@ if (!$paymentId) {
 $stmt = $pdo->prepare("
     SELECT pd.*, 
         pt.name as payment_type_name, pt.type as flow_type, pt.category,
-        c.name as contractor_name, c.inn as contractor_inn, c.address as contractor_address,
+        c.name as contractor_name, c.inn as contractor_inn, c.address as contractor_address, c.email as contractor_email, c.phone as contractor_phone,
         ba.account_number as bank_account, ba.account_holder, ba.bank_name, ba.bank_bic,
         u.full_name as created_by_name, u2.full_name as posted_by_name,
         ea.name as expense_article_name,
@@ -160,6 +160,7 @@ $pageTitle = 'Платеж №' . $payment['document_number'];
     <title><?= e($pageTitle) ?> - <?= e(APP_NAME) ?></title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="<?= asset('assets/css/style.css') ?>">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         .view-container {
             max-width: 1200px;
@@ -271,6 +272,201 @@ $pageTitle = 'Платеж №' . $payment['document_number'];
             background: #fee2e2;
             color: #991b1b;
         }
+        
+        /* Стили для печати */
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            .print-area, .print-area * {
+                visibility: visible;
+            }
+            .print-area {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                background: white;
+                padding: 20mm;
+            }
+            .no-print {
+                display: none !important;
+            }
+            .print-header {
+                border-bottom: 2px solid #000;
+                padding-bottom: 10px;
+                margin-bottom: 20px;
+            }
+            .print-company-info {
+                font-size: 10pt;
+                line-height: 1.4;
+            }
+            .print-document-title {
+                text-align: center;
+                font-size: 14pt;
+                font-weight: bold;
+                margin: 20px 0;
+            }
+            .print-table {
+                width: 100%;
+                border-collapse: collapse;
+                margin: 15px 0;
+            }
+            .print-table td, .print-table th {
+                border: 1px solid #000;
+                padding: 8px;
+                font-size: 10pt;
+            }
+            .print-signatures {
+                margin-top: 40px;
+                display: flex;
+                justify-content: space-between;
+            }
+            .print-signature-block {
+                width: 45%;
+                border-top: 1px solid #000;
+                padding-top: 5px;
+                font-size: 10pt;
+            }
+            .print-stamp {
+                width: 100px;
+                height: 100px;
+                border: 2px dashed #999;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: #999;
+                font-size: 8pt;
+                text-align: center;
+                margin: 20px auto;
+            }
+        }
+        
+        .print-area {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            margin-bottom: 24px;
+            display: none;
+        }
+        .print-area.show {
+            display: block;
+        }
+        .print-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+        }
+        .print-company-logo {
+            width: 80px;
+            height: 80px;
+            background: #f3f4f6;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+        }
+        .print-company-info h3 {
+            margin: 0 0 5px 0;
+            font-size: 16px;
+            color: #1f2937;
+        }
+        .print-company-info p {
+            margin: 0;
+            font-size: 12px;
+            color: #6b7280;
+        }
+        .print-document-title {
+            text-align: center;
+            font-size: 18px;
+            font-weight: 700;
+            color: #1f2937;
+            margin: 20px 0;
+            text-transform: uppercase;
+        }
+        .print-details-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+        .print-details-table td {
+            padding: 8px;
+            border-bottom: 1px solid #e5e7eb;
+            font-size: 13px;
+        }
+        .print-details-table td.label {
+            font-weight: 600;
+            color: #6b7280;
+            width: 40%;
+        }
+        .print-amount-box {
+            background: #f9fafb;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            margin: 20px 0;
+        }
+        .print-amount-box .amount {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1f2937;
+        }
+        .print-amount-box .words {
+            font-size: 12px;
+            color: #6b7280;
+            margin-top: 5px;
+            font-style: italic;
+        }
+        .print-signatures {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 40px;
+            gap: 30px;
+        }
+        .print-signature-block {
+            flex: 1;
+            border-top: 1px solid #9ca3af;
+            padding-top: 8px;
+        }
+        .print-signature-block .label {
+            font-size: 11px;
+            color: #6b7280;
+            margin-bottom: 5px;
+        }
+        .print-signature-block .name {
+            font-size: 13px;
+            font-weight: 600;
+            color: #1f2937;
+        }
+        .print-signature-block .position {
+            font-size: 11px;
+            color: #6b7280;
+        }
+        .print-stamp-area {
+            width: 120px;
+            height: 120px;
+            border: 2px dashed #d1d5db;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #9ca3af;
+            font-size: 10px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+        .print-footer {
+            margin-top: 30px;
+            padding-top: 15px;
+            border-top: 1px solid #e5e7eb;
+            text-align: center;
+            font-size: 10px;
+            color: #9ca3af;
+        }
     </style>
 </head>
 <body>
@@ -286,39 +482,148 @@ $pageTitle = 'Платеж №' . $payment['document_number'];
                     <div class="alert alert-<?= $messageType ?>"><?= e($message) ?></div>
                     <?php endif; ?>
                     
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-                        <a href="list.php" class="btn btn-secondary">← Назад к списку</a>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;" class="no-print">
+                        <a href="list.php" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Назад к списку</a>
                         <div style="display: flex; gap: 12px;">
                             <?php if (canEditInModule('finance')): ?>
                                 <?php if ($payment['status'] === 'draft'): ?>
-                                <a href="payment_edit.php?id=<?= $payment['id'] ?>" class="btn btn-primary">✏️ Редактировать</a>
+                                <a href="payment_edit.php?id=<?= $payment['id'] ?>" class="btn btn-primary"><i class="fas fa-edit"></i> Редактировать</a>
                                 <form method="POST" style="display: inline;">
                                     <input type="hidden" name="action" value="pending">
-                                    <button type="submit" class="btn btn-warning" onclick="return confirm('Отправить на согласование?')">📤 На согласование</button>
+                                    <button type="submit" class="btn btn-warning" onclick="return confirm('Отправить на согласование?')"><i class="fas fa-paper-plane"></i> На согласование</button>
                                 </form>
                                 <?php elseif ($payment['status'] === 'pending'): ?>
                                 <form method="POST" style="display: inline;">
                                     <input type="hidden" name="action" value="approve">
-                                    <button type="submit" class="btn btn-success">✅ Утвердить</button>
+                                    <button type="submit" class="btn btn-success"><i class="fas fa-check-circle"></i> Утвердить</button>
                                 </form>
                                 <?php elseif ($payment['status'] === 'approved'): ?>
                                 <form method="POST" style="display: inline;">
                                     <input type="hidden" name="action" value="post">
-                                    <button type="submit" class="btn btn-success" onclick="return confirm('Провести платеж?')">💰 Провести</button>
+                                    <button type="submit" class="btn btn-success" onclick="return confirm('Провести платеж?')"><i class="fas fa-coins"></i> Провести</button>
                                 </form>
                                 <?php elseif ($payment['status'] === 'posted'): ?>
                                 <form method="POST" style="display: inline;">
                                     <input type="hidden" name="action" value="unpost">
-                                    <button type="submit" class="btn btn-warning" onclick="return confirm('Отменить проведение?')">↩️ Отменить проведение</button>
+                                    <button type="submit" class="btn btn-warning" onclick="return confirm('Отменить проведение?')"><i class="fas fa-undo"></i> Отменить проведение</button>
                                 </form>
                                 <?php endif; ?>
                                 <form method="POST" style="display: inline;" onsubmit="return showCancelComment()">
                                     <input type="hidden" name="action" value="cancel">
                                     <input type="hidden" name="cancel_comment" id="cancel_comment" value="">
-                                    <button type="submit" class="btn btn-danger">❌ Отменить</button>
+                                    <button type="submit" class="btn btn-danger"><i class="fas fa-times-circle"></i> Отменить</button>
                                 </form>
                             <?php endif; ?>
-                            <button onclick="window.print()" class="btn btn-secondary">🖨️ Печать</button>
+                            <button onclick="togglePrintPreview()" class="btn btn-secondary"><i class="fas fa-print"></i> Печать</button>
+                            <button onclick="window.print()" class="btn btn-primary"><i class="fas fa-file-pdf"></i> PDF</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Область для печати -->
+                    <div class="print-area" id="printArea">
+                        <div class="print-header">
+                            <div class="print-company-info">
+                                <h3><i class="fas fa-industry"></i> ОАО "Полесьеэлектромаш"</h3>
+                                <p>УНП: 123456789 | ОКПО: 37654321</p>
+                                <p>246000, г. Гомель, ул. Советская, д. 10</p>
+                                <p>Тел: +375 (232) 12-34-56 | Email: info@polesie.by</p>
+                                <p>Р/с: BY00 AKBB 3012 0000 0000 0000 0000</p>
+                            </div>
+                            <div class="print-company-logo">
+                                <i class="fas fa-bolt" style="color: #3498db;"></i>
+                            </div>
+                        </div>
+                        
+                        <div class="print-document-title">
+                            <?= $payment['flow_type'] === 'income' ? 'ПЛАТЕЖНОЕ ПОРУЧЕНИЕ №' : 'ПЛАТЕЖНОЕ ПОРУЧЕНИЕ №' ?>
+                            <?= e($payment['document_number']) ?>
+                        </div>
+                        <div style="text-align: center; font-size: 12px; color: #6b7280; margin-bottom: 20px;">
+                            от <?= formatDate($payment['document_date']) ?>
+                        </div>
+                        
+                        <table class="print-details-table">
+                            <tr>
+                                <td class="label">Тип операции:</td>
+                                <td><strong><?= $payment['flow_type'] === 'income' ? 'Доход' : 'Расход' ?></strong></td>
+                            </tr>
+                            <tr>
+                                <td class="label">Тип платежа:</td>
+                                <td><?= e($payment['payment_type_name']) ?> (<?= e($payment['category']) ?>)</td>
+                            </tr>
+                            <?php if ($payment['contractor_name']): ?>
+                            <tr>
+                                <td class="label">Контрагент:</td>
+                                <td><strong><?= e($payment['contractor_name']) ?></strong></td>
+                            </tr>
+                            <tr>
+                                <td class="label">ИНН контрагента:</td>
+                                <td><?= e($payment['contractor_inn'] ?? '—') ?></td>
+                            </tr>
+                            <?php endif; ?>
+                            <tr>
+                                <td class="label">Банк получателя:</td>
+                                <td><?= e($payment['bank_name']) ?> (БИК: <?= e($payment['bank_bic']) ?>)</td>
+                            </tr>
+                            <tr>
+                                <td class="label">Счет:</td>
+                                <td style="font-family: monospace;"><?= e($payment['bank_account']) ?></td>
+                            </tr>
+                            <?php if ($payment['expense_article_name']): ?>
+                            <tr>
+                                <td class="label">Статья затрат:</td>
+                                <td><?= e($payment['expense_article_name']) ?></td>
+                            </tr>
+                            <?php endif; ?>
+                            <?php if ($payment['order_number']): ?>
+                            <tr>
+                                <td class="label">Заказ:</td>
+                                <td><?= e($payment['order_number']) ?></td>
+                            </tr>
+                            <?php endif; ?>
+                            <?php if ($payment['document_reference']): ?>
+                            <tr>
+                                <td class="label">Основание:</td>
+                                <td><?= e($payment['document_reference']) ?></td>
+                            </tr>
+                            <?php endif; ?>
+                        </table>
+                        
+                        <div class="print-amount-box">
+                            <div class="amount"><?= formatMoney($payment['amount']) ?></div>
+                            <?php if ($payment['vat_amount'] > 0): ?>
+                            <div class="words">В том числе НДС (<?= $payment['vat_rate'] ?>%): <?= formatMoney($payment['vat_amount']) ?></div>
+                            <?php else: ?>
+                            <div class="words">Без НДС</div>
+                            <?php endif; ?>
+                        </div>
+                        
+                        <div style="margin: 20px 0;">
+                            <strong style="font-size: 13px; color: #6b7280;">Назначение платежа:</strong>
+                            <p style="font-size: 13px; line-height: 1.6; margin: 8px 0 0 0;"><?= nl2br(e($payment['payment_purpose'] ?: $payment['description'] ?: 'Не указано')) ?></p>
+                        </div>
+                        
+                        <div class="print-signatures">
+                            <div class="print-signature-block">
+                                <div class="label">Руководитель</div>
+                                <div class="name">_________________</div>
+                                <div class="position">Генеральный директор</div>
+                            </div>
+                            <div class="print-signature-block">
+                                <div class="label">Главный бухгалтер</div>
+                                <div class="name">_________________</div>
+                                <div class="position">Главный бухгалтер</div>
+                            </div>
+                            <div class="print-stamp-area">
+                                <i class="fas fa-stamp" style="font-size: 40px; opacity: 0.3;"></i>
+                                <div style="margin-top: 5px;">М.П.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="print-footer">
+                            Документ создан: <?= date('d.m.Y H:i', strtotime($payment['created_at'])) ?> | 
+                            Автор: <?= e($payment['created_by_name']) ?> | 
+                            Статус: <?= e($payment['status_name']) ?>
                         </div>
                     </div>
                     
@@ -326,7 +631,7 @@ $pageTitle = 'Платеж №' . $payment['document_number'];
                         <!-- Заголовок документа -->
                         <div class="document-header">
                             <div>
-                                <div class="document-number">📄 <?= e($payment['document_number']) ?></div>
+                                <div class="document-number"><i class="fas fa-file-invoice-dollar"></i> <?= e($payment['document_number']) ?></div>
                                 <div style="color: #6b7280; margin-top: 4px;">
                                     <span class="badge" style="background: <?= e($payment['status_color']) ?>20; color: <?= e($payment['status_color']) ?>; font-size: 13px; padding: 6px 12px;">
                                         <?= e($payment['status_name']) ?>
@@ -342,7 +647,7 @@ $pageTitle = 'Платеж №' . $payment['document_number'];
                         <div class="info-grid">
                             <!-- Основная информация -->
                             <div class="info-card">
-                                <div class="info-card-title">💰 Сумма</div>
+                                <div class="info-card-title"><i class="fas fa-coins"></i> Сумма</div>
                                 <div class="amount-display"><?= formatMoney($payment['amount']) ?></div>
                                 <?php if ($payment['vat_amount'] > 0): ?>
                                 <div class="info-row">
@@ -362,7 +667,7 @@ $pageTitle = 'Платеж №' . $payment['document_number'];
                             
                             <!-- Тип платежа -->
                             <div class="info-card">
-                                <div class="info-card-title">📋 Тип платежа</div>
+                                <div class="info-card-title"><i class="fas fa-tags"></i> Тип платежа</div>
                                 <div class="info-row">
                                     <span class="info-label">Категория:</span>
                                     <span class="info-value"><?= $payment['flow_type'] === 'income' ? '⬆️ Доход' : '⬇️ Расход' ?></span>
@@ -385,7 +690,7 @@ $pageTitle = 'Платеж №' . $payment['document_number'];
                             
                             <!-- Статусы и даты -->
                             <div class="info-card">
-                                <div class="info-card-title">📅 Статусы</div>
+                                <div class="info-card-title"><i class="fas fa-calendar-alt"></i> Статусы</div>
                                 <div class="info-row">
                                     <span class="info-label">Создан:</span>
                                     <span class="info-value"><?= formatDate($payment['created_at']) ?></span>
@@ -410,7 +715,7 @@ $pageTitle = 'Платеж №' . $payment['document_number'];
                         <!-- Контрагент и банк -->
                         <div class="info-grid">
                             <div class="info-card">
-                                <div class="info-card-title">🏢 Контрагент</div>
+                                <div class="info-card-title"><i class="fas fa-building"></i> Контрагент</div>
                                 <?php if ($payment['contractor_name']): ?>
                                 <div class="info-row">
                                     <span class="info-label">Название:</span>
@@ -426,7 +731,7 @@ $pageTitle = 'Платеж №' . $payment['document_number'];
                             </div>
                             
                             <div class="info-card">
-                                <div class="info-card-title">🏦 Банковский счет</div>
+                                <div class="info-card-title"><i class="fas fa-university"></i> Банковский счет</div>
                                 <div class="info-row">
                                     <span class="info-label">Владелец:</span>
                                     <span class="info-value"><?= e($payment['account_holder']) ?></span>
@@ -448,7 +753,7 @@ $pageTitle = 'Платеж №' . $payment['document_number'];
                             </div>
                             
                             <div class="info-card">
-                                <div class="info-card-title">🔗 Связи</div>
+                                <div class="info-card-title"><i class="fas fa-link"></i> Связи</div>
                                 <?php if ($payment['order_number']): ?>
                                 <div class="info-row">
                                     <span class="info-label">Заказ:</span>
@@ -466,13 +771,13 @@ $pageTitle = 'Платеж №' . $payment['document_number'];
                         
                         <!-- Назначение платежа -->
                         <div class="info-card" style="margin-bottom: 24px;">
-                            <div class="info-card-title">📝 Назначение платежа</div>
+                            <div class="info-card-title"><i class="fas fa-file-alt"></i> Назначение платежа</div>
                             <div style="color: #1f2937; line-height: 1.6;"><?= nl2br(e($payment['payment_purpose'] ?: $payment['description'] ?: 'Не указано')) ?></div>
                         </div>
                         
                         <!-- История изменений -->
                         <div class="timeline">
-                            <div class="info-card-title" style="margin-bottom: 16px;">📜 История изменений</div>
+                            <div class="info-card-title" style="margin-bottom: 16px;"><i class="fas fa-history"></i> История изменений</div>
                             <?php foreach ($history as $item): ?>
                             <div class="timeline-item">
                                 <div class="timeline-date"><?= date('d.m.Y H:i', strtotime($item['changed_at'])) ?></div>
@@ -501,6 +806,14 @@ $pageTitle = 'Платеж №' . $payment['document_number'];
             if (comment === null) return false;
             document.getElementById('cancel_comment').value = comment || 'Без комментария';
             return true;
+        }
+        
+        function togglePrintPreview() {
+            const printArea = document.getElementById('printArea');
+            printArea.classList.toggle('show');
+            if (printArea.classList.contains('show')) {
+                printArea.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
         }
     </script>
 </body>

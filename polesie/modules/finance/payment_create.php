@@ -136,10 +136,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 // Загрузка справочников
-$paymentTypes = $pdo->query("SELECT * FROM payment_types WHERE is_active = TRUE ORDER BY type, category")->fetchAll();
-$bankAccounts = $pdo->query("SELECT * FROM bank_accounts WHERE is_active = TRUE ORDER BY account_type, account_holder")->fetchAll();
-$contractors = $pdo->query("SELECT id, name, inn FROM contractors WHERE is_active = TRUE ORDER BY name")->fetchAll();
-$expenseArticles = $pdo->query("SELECT * FROM expense_articles WHERE is_active = TRUE ORDER BY sort_order, name")->fetchAll();
+$paymentTypes = $pdo->query("SELECT * FROM payment_types ORDER BY type, category")->fetchAll();
+$bankAccounts = $pdo->query("SELECT * FROM bank_accounts ORDER BY account_type, account_holder")->fetchAll();
+$contractors = $pdo->query("SELECT id, name, inn FROM contractors ORDER BY name")->fetchAll();
+$expenseArticles = $pdo->query("SELECT * FROM expense_articles ORDER BY sort_order, name")->fetchAll();
 $orders = $pdo->query("
     SELECT id, order_number, customer_id 
     FROM orders 

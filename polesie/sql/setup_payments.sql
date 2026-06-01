@@ -10,12 +10,33 @@ USE `polesie_production`;
 SET FOREIGN_KEY_CHECKS = 0;
 
 -- ============================================
+-- УДАЛЕНИЕ ТАБЛИЦ В ПРАВИЛЬНОМ ПОРЯДКЕ
+-- Сначала зависимые, потом справочники
+-- ============================================
+
+-- Удаляем представления
+DROP VIEW IF EXISTS `v_payments_summary`;
+DROP VIEW IF EXISTS `v_payments_by_contractor`;
+DROP VIEW IF EXISTS `v_cash_flow`;
+
+-- Удаляем основные таблицы платежей (зависимые)
+DROP TABLE IF EXISTS `payment_status_history`;
+DROP TABLE IF EXISTS `payment_document_items`;
+DROP TABLE IF EXISTS `payment_documents`;
+
+-- Удаляем справочники
+DROP TABLE IF EXISTS `expense_articles`;
+DROP TABLE IF EXISTS `bank_accounts`;
+DROP TABLE IF EXISTS `payment_types`;
+
+-- Включаем проверки внешних ключей обратно
+SET FOREIGN_KEY_CHECKS = 1;
+
+-- ============================================
 -- СПРАВОЧНИКИ ДЛЯ ПЛАТЕЖЕЙ
 -- ============================================
 
 -- Типы платежей
-DROP TABLE IF EXISTS `payment_types`;
-
 CREATE TABLE `payment_types` (
   `id` INT AUTO_INCREMENT PRIMARY KEY,
   `code` VARCHAR(50) NOT NULL UNIQUE,

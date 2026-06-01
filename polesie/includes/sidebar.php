@@ -51,7 +51,7 @@
             // Получаем доступные модули для текущего пользователя
             $availableModules = getAvailableModules();
             ?>
-            <?php if (in_array('dashboard', $availableModules) || $user['role_code'] === 'admin'): ?>
+            <?php if ($user['role_code'] === 'director' || $user['role_code'] === 'admin'): ?>
             <a href="<?= pageUrl('index.php') ?>" class="sidebar-nav-item <?= $relativePath === 'index.php' ? 'active' : '' ?>">
                 <span class="sidebar-nav-icon">📊</span>
                 <span>Панель управления</span>
@@ -154,7 +154,6 @@
         <?php if ($user['role_code'] === 'accountant' || $user['role_code'] === 'admin' || in_array('finance', $availableModules)): ?>
         <div class="sidebar-nav-section">
             <div class="sidebar-nav-title">Финансы</div>
-            <?php if (canAccessModule('finance') || $user['role_code'] === 'admin'): ?>
             <a href="<?= pageUrl('modules/finance/index.php') ?>" class="sidebar-nav-item <?= strpos($relativePath, 'modules/finance/') === 0 ? 'active' : '' ?>">
                 <span class="sidebar-nav-icon">💰</span>
                 <span>Платежи</span>
@@ -167,7 +166,6 @@
                 <span class="sidebar-nav-icon">📊</span>
                 <span>Отчеты</span>
             </a>
-            <?php endif; ?>
         </div>
         <?php endif; ?>
     </nav>

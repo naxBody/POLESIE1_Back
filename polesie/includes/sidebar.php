@@ -149,5 +149,26 @@
             <?php endif; ?>
         </div>
         <?php endif; ?>
+        
+        <!-- Финансы - доступно бухгалтеру и админам -->
+        <?php if ($user['role_code'] === 'accountant' || $user['role_code'] === 'admin' || in_array('finance', $availableModules)): ?>
+        <div class="sidebar-nav-section">
+            <div class="sidebar-nav-title">Финансы</div>
+            <?php if (canAccessModule('finance') || $user['role_code'] === 'admin'): ?>
+            <a href="<?= pageUrl('modules/finance/index.php') ?>" class="sidebar-nav-item <?= strpos($relativePath, 'modules/finance/') === 0 ? 'active' : '' ?>">
+                <span class="sidebar-nav-icon">💰</span>
+                <span>Платежи</span>
+            </a>
+            <a href="<?= pageUrl('modules/finance/list.php') ?>" class="sidebar-nav-item <?= $relativePath === 'modules/finance/list.php' ? 'active' : '' ?>">
+                <span class="sidebar-nav-icon">📋</span>
+                <span>Все платежи</span>
+            </a>
+            <a href="<?= pageUrl('modules/finance/reports.php') ?>" class="sidebar-nav-item <?= $relativePath === 'modules/finance/reports.php' ? 'active' : '' ?>">
+                <span class="sidebar-nav-icon">📊</span>
+                <span>Отчеты</span>
+            </a>
+            <?php endif; ?>
+        </div>
+        <?php endif; ?>
     </nav>
 </div>

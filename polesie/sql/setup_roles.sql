@@ -83,8 +83,7 @@ INSERT INTO `role_module_permissions` (`role_id`, `module`, `can_view`, `can_cre
 (2, 'materials', TRUE, FALSE, FALSE, FALSE),
 (2, 'employees', TRUE, FALSE, FALSE, FALSE),
 (2, 'quality', TRUE, FALSE, FALSE, FALSE),
-(2, 'reports', TRUE, TRUE, FALSE, FALSE),
-(2, 'finance', TRUE, FALSE, FALSE, FALSE);
+(2, 'reports', TRUE, TRUE, FALSE, FALSE);
 
 -- Менеджер по продажам
 INSERT INTO `role_module_permissions` (`role_id`, `module`, `can_view`, `can_create`, `can_edit`, `can_delete`) VALUES
@@ -92,8 +91,7 @@ INSERT INTO `role_module_permissions` (`role_id`, `module`, `can_view`, `can_cre
 (3, 'orders', TRUE, TRUE, TRUE, FALSE),
 (3, 'contractors', TRUE, TRUE, TRUE, FALSE),
 (3, 'products', TRUE, FALSE, FALSE, FALSE),
-(3, 'production', TRUE, FALSE, FALSE, FALSE),
-(3, 'warehouse', TRUE, FALSE, FALSE, FALSE);
+(3, 'production', TRUE, FALSE, FALSE, FALSE);
 
 -- Технолог
 INSERT INTO `role_module_permissions` (`role_id`, `module`, `can_view`, `can_create`, `can_edit`, `can_delete`) VALUES
@@ -102,40 +100,34 @@ INSERT INTO `role_module_permissions` (`role_id`, `module`, `can_view`, `can_cre
 (4, 'products', TRUE, FALSE, TRUE, FALSE),
 (4, 'materials', TRUE, FALSE, FALSE, FALSE),
 (4, 'warehouse', TRUE, FALSE, FALSE, FALSE),
-(4, 'orders', TRUE, FALSE, FALSE, FALSE),
-(4, 'finance', TRUE, FALSE, FALSE, FALSE);
+(4, 'orders', TRUE, FALSE, FALSE, FALSE);
 
 -- Кладовщик - ТОЛЬКО СКЛАД
 INSERT INTO `role_module_permissions` (`role_id`, `module`, `can_view`, `can_create`, `can_edit`, `can_delete`) VALUES
 (5, 'dashboard', TRUE, FALSE, FALSE, FALSE),
 (5, 'warehouse', TRUE, TRUE, TRUE, FALSE),
 (5, 'materials', TRUE, TRUE, TRUE, FALSE),
-(5, 'products', TRUE, FALSE, FALSE, FALSE),
-(5, 'orders', TRUE, FALSE, FALSE, FALSE);
+(5, 'products', TRUE, FALSE, FALSE, FALSE);
 
 -- Рабочий - ТОЛЬКО ПРОИЗВОДСТВЕННЫЕ ЗАДАНИЯ
 INSERT INTO `role_module_permissions` (`role_id`, `module`, `can_view`, `can_create`, `can_edit`, `can_delete`) VALUES
 (6, 'dashboard', TRUE, FALSE, FALSE, FALSE),
 (6, 'production', TRUE, FALSE, TRUE, FALSE),
-(6, 'materials', TRUE, FALSE, FALSE, FALSE),
-(6, 'warehouse', TRUE, FALSE, FALSE, FALSE);
+(6, 'materials', TRUE, FALSE, FALSE, FALSE);
 
 -- Контроль качества
 INSERT INTO `role_module_permissions` (`role_id`, `module`, `can_view`, `can_create`, `can_edit`, `can_delete`) VALUES
 (7, 'dashboard', TRUE, FALSE, FALSE, FALSE),
 (7, 'quality', TRUE, TRUE, TRUE, FALSE),
 (7, 'production', TRUE, FALSE, FALSE, FALSE),
-(7, 'products', TRUE, FALSE, FALSE, FALSE),
-(7, 'warehouse', TRUE, FALSE, FALSE, FALSE);
+(7, 'products', TRUE, FALSE, FALSE, FALSE);
 
 -- Бухгалтер - финансы и отчеты
 INSERT INTO `role_module_permissions` (`role_id`, `module`, `can_view`, `can_create`, `can_edit`, `can_delete`) VALUES
 (8, 'dashboard', TRUE, FALSE, FALSE, FALSE),
 (8, 'orders', TRUE, FALSE, FALSE, FALSE),
 (8, 'contractors', TRUE, FALSE, FALSE, FALSE),
-(8, 'finance', TRUE, TRUE, TRUE, FALSE),
-(8, 'reports', TRUE, TRUE, TRUE, FALSE),
-(8, 'warehouse', TRUE, FALSE, FALSE, FALSE);
+(8, 'reports', TRUE, TRUE, TRUE, FALSE);
 
 -- ============================================
 -- ОБНОВЛЕНИЕ ПОЛЬЗОВАТЕЛЕЙ

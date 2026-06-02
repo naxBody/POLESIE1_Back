@@ -33,7 +33,7 @@ if ($productIdFilter) {
     $pageTitle = 'Паспорт продукта';
 }
 
-// Построение основного запроса
+// Построение основного запроса - используем INNER JOIN для получения всех продуктов
 $query = "
     SELECT 
         pp.id as passport_id,
@@ -52,13 +52,12 @@ $query = "
     LEFT JOIN product_passports pp ON pp.product_id = p.id
     LEFT JOIN product_categories pc ON p.category_id = pc.id
     WHERE p.is_active = TRUE
+    ORDER BY pc.name ASC, p.name ASC
 ";
 
 $countQuery = "
     SELECT COUNT(*) as total
     FROM products p
-    LEFT JOIN product_passports pp ON pp.product_id = p.id
-    LEFT JOIN product_categories pc ON p.category_id = pc.id
     WHERE p.is_active = TRUE
 ";
 

@@ -85,13 +85,13 @@ if ($categoryFilter) {
 if ($weightFilter) {
     switch ($weightFilter) {
         case 'light':
-            $query .= " AND (pp.total_weight_kg IS NOT NULL AND pp.total_weight_kg < 5)";
+            $query .= " AND (pp.total_weight_kg IS NULL OR pp.total_weight_kg < 5)";
             break;
         case 'medium':
-            $query .= " AND (pp.total_weight_kg IS NOT NULL AND pp.total_weight_kg >= 5 AND pp.total_weight_kg < 20)";
+            $query .= " AND (pp.total_weight_kg IS NULL OR (pp.total_weight_kg >= 5 AND pp.total_weight_kg < 20))";
             break;
         case 'heavy':
-            $query .= " AND (pp.total_weight_kg IS NOT NULL AND pp.total_weight_kg >= 20)";
+            $query .= " AND (pp.total_weight_kg IS NULL OR pp.total_weight_kg >= 20)";
             break;
     }
     // Для countQuery не применяем фильтр по весу, так как сначала нужно создать паспорта
@@ -101,13 +101,13 @@ if ($weightFilter) {
 if ($warrantyFilter) {
     switch ($warrantyFilter) {
         case 'short':
-            $query .= " AND (pp.warranty_months IS NOT NULL AND pp.warranty_months <= 12)";
+            $query .= " AND (pp.warranty_months IS NULL OR pp.warranty_months <= 12)";
             break;
         case 'standard':
-            $query .= " AND (pp.warranty_months IS NOT NULL AND pp.warranty_months > 12 AND pp.warranty_months <= 36)";
+            $query .= " AND (pp.warranty_months IS NULL OR (pp.warranty_months > 12 AND pp.warranty_months <= 36))";
             break;
         case 'long':
-            $query .= " AND (pp.warranty_months IS NOT NULL AND pp.warranty_months > 36)";
+            $query .= " AND (pp.warranty_months IS NULL OR pp.warranty_months > 36)";
             break;
     }
     // Для countQuery не применяем фильтр по гарантии
@@ -116,9 +116,9 @@ if ($warrantyFilter) {
 // Фильтр по серийному учёту - применяем только если паспорт существует
 if ($serialFilter !== '') {
     if ($serialFilter === 'yes') {
-        $query .= " AND pp.is_serial_tracked = TRUE";
+        $query .= " AND (pp.is_serial_tracked IS NULL OR pp.is_serial_tracked = TRUE)";
     } elseif ($serialFilter === 'no') {
-        $query .= " AND pp.is_serial_tracked = FALSE";
+        $query .= " AND (pp.is_serial_tracked IS NULL OR pp.is_serial_tracked = FALSE)";
     }
     // Для countQuery не применяем фильтр по серийному учету
 }
@@ -176,25 +176,28 @@ $stmt->execute();
 $passports = $stmt->fetchAll();
 
 // Для продуктов без паспорта создаем запись
-foreach ($passports as &$passport) {
-    if ($passport['passport_id'] === null) {
-        // Создаем паспорт для продукта
-        $insertStmt = $pdo->prepare("
-            INSERT INTO product_passports (product_id, total_weight_kg, warranty_months, is_serial_tracked)
-            VALUES (:product_id, 0, 12, FALSE)
-        ");
-        $insertStmt->execute(['product_id' => $passport['product_id']]);
-        
-        // Получаем ID созданного паспорта
-        $passport['passport_id'] = $pdo->lastInsertId();
-        $passport['total_weight_kg'] = 0;
-        $passport['warranty_months'] = 12;
-        $passport['is_serial_tracked'] = false;
-        $passport['production_notes'] = null;
-        $passport['quality_requirements'] = null;
+// Важно: создаем паспорта даже если результат пустой из-за фильтров
+if (!empty($passports)) {
+    foreach ($passports as &$passport) {
+        if ($passport['passport_id'] === null) {
+            // Создаем паспорт для продукта
+            $insertStmt = $pdo->prepare("
+                INSERT INTO product_passports (product_id, total_weight_kg, warranty_months, is_serial_tracked)
+                VALUES (:product_id, 0, 12, FALSE)
+            ");
+            $insertStmt->execute(['product_id' => $passport['product_id']]);
+            
+            // Получаем ID созданного паспорта
+            $passport['passport_id'] = $pdo->lastInsertId();
+            $passport['total_weight_kg'] = 0;
+            $passport['warranty_months'] = 12;
+            $passport['is_serial_tracked'] = false;
+            $passport['production_notes'] = null;
+            $passport['quality_requirements'] = null;
+        }
     }
+    unset($passport);
 }
-unset($passport);
 
 // Получение уникальных категорий для фильтра
 $catQuery = "SELECT DISTINCT pc.code, pc.name 

@@ -865,7 +865,12 @@ $categories = $pdo->query($catQuery)->fetchAll();
                             <p>Спецификации и материалы для производства</p>
                         </div>
                         <div class="page-header-actions">
-                            <button class="btn btn-primary" onclick="openNewPassportModal()" title="Добавить новый паспорт продукта">➕ Новый паспорт</button>
+                            <button class="btn btn-primary" onclick="openNewPassportModal()" title="Добавить новый паспорт продукта">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="vertical-align: middle; margin-right: 6px;">
+                                    <path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                                Новый паспорт
+                            </button>
                         </div>
                     </div>
 
@@ -1101,7 +1106,12 @@ $categories = $pdo->query($catQuery)->fetchAll();
                                                         <div class="passport-title"><?= e($passport['product_name']) ?></div>
                                                         <div class="passport-category"><?= e($passport['category_name'] ?? 'Без категории') ?></div>
                                                     </div>
-                                                    <button class="btn btn-sm btn-outline" onclick="event.stopPropagation(); openEditPassportModal(this)" title="Редактировать паспорт" style="padding: 4px 8px; font-size: 11px;">✏️</button>
+                                                    <button class="btn btn-sm btn-outline" onclick="event.stopPropagation(); openEditPassportModal(this)" title="Редактировать паспорт" style="padding: 6px 10px; font-size: 12px; display: inline-flex; align-items: center; gap: 4px;">
+                                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                            <path d="M17 3L21 7L8 20H4V16L17 3Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                            <path d="M14.5 5.5L18.5 9.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                        </svg>
+                                                    </button>
                                                 </div>
                                                 <div class="passport-card-body">
                                                     <div class="card-info-row">
@@ -1505,6 +1515,12 @@ $categories = $pdo->query($catQuery)->fetchAll();
             document.getElementById('editModalTitle').textContent = 'Добавление нового паспорта';
             document.getElementById('editModalSubtitle').textContent = 'Выберите продукт и заполните данные';
             
+            // Удаляем старый селект если есть
+            var oldSelect = document.getElementById('newProductSelect');
+            if (oldSelect) {
+                oldSelect.parentElement.remove();
+            }
+            
             // Показать выбор продукта
             var selectHtml = '<div class="filter-group" style="margin-bottom: 16px;">' +
                 '<label for="newProductSelect">Продукт *</label>' +
@@ -1585,16 +1601,30 @@ $categories = $pdo->query($catQuery)->fetchAll();
         function closePassportEditModalDirect() {
             document.getElementById('passportEditModalOverlay').classList.remove('active');
             document.body.style.overflow = '';
+            
+            // Удаляем селект продукта при закрытии
+            var oldSelect = document.getElementById('newProductSelect');
+            if (oldSelect) {
+                oldSelect.parentElement.remove();
+            }
         }
         
         function savePassport(event) {
             event.preventDefault();
             
             var formData = new FormData(document.getElementById('passportEditForm'));
+            var productId = formData.get('product_id');
+            
+            // Проверка: продукт должен быть выбран
+            if (!productId) {
+                alert('Ошибка: выберите продукт из списка!');
+                return;
+            }
+            
             var data = {
                 action: 'save_passport',
                 passport_id: formData.get('passport_id'),
-                product_id: formData.get('product_id'),
+                product_id: productId,
                 total_weight_kg: parseFloat(formData.get('total_weight_kg')),
                 warranty_months: parseInt(formData.get('warranty_months')),
                 is_serial_tracked: parseInt(formData.get('is_serial_tracked')) === 1,

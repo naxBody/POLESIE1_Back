@@ -1,0 +1,523 @@
+@startuml
+' ============================================
+' UML Диаграмма Классов - Система Управления Производством
+' ОАО "Полесьеэлектромаш"
+' ============================================
+
+' Настройки стиля для компактности и красоты
+skinparam classAttributeIconSize 0
+skinparam defaultFontName Arial
+skinparam fontsize 11
+skinparam class {
+    BackgroundColor White
+    BorderColor #2C3E50
+    BorderThickness 2
+    ArrowColor #3498DB
+    ArrowThickness 2
+}
+skinparam package {
+    BackgroundColor #ECF0F1
+    BorderColor #BDC3C7
+    BorderThickness 2
+    FontSize 14
+    FontStyle bold
+}
+skinparam note {
+    BackgroundColor #FFF9C4
+    BorderColor #FBC02D
+    FontSize 10
+}
+skinparam shadowing false
+skinparam linetype ortho
+
+' Авто-расположение классов
+hide empty members
+
+package "📋 Справочники" as Reference {
+    class BaseUnit #E8F6F3 {
+        +id: int
+        +name: string
+        +code: string
+        +symbol: string
+        +toString(): string
+    }
+
+    class UserRole #E8F6F3 {
+        +id: int
+        +name: string
+        +code: string
+        +description: string
+        +permissions: JSON
+        +canAccess(module): bool
+    }
+
+    class User #E8F6F3 {
+        +id: int
+        +username: string
+        +passwordHash: string
+        +fullName: string
+        +email: string
+        +roleId: int
+        +isActive: bool
+        +createdAt: DateTime
+        +login(username, password): bool
+        +logout(): void
+        +hasPermission(permission): bool
+        +getRole(): UserRole
+    }
+
+    class Contractor #E8F6F3 {
+        +id: int
+        +name: string
+        +inn: string
+        +type: Enum
+        +contactPerson: string
+        +phone: string
+        +email: string
+        +address: string
+        +createdAt: DateTime
+        +isSupplier(): bool
+        +isCustomer(): bool
+    }
+}
+
+package "📁 Категории" as Categories {
+    class MaterialCategory #FEF9E7 {
+        +id: int
+        +parentId: int
+        +name: string
+        +nameRu: string
+        +code: string
+        +description: string
+        +getParent(): MaterialCategory
+        +getChildren(): List<MaterialCategory>
+        +getFullPath(): string
+    }
+
+    class ProductCategory #FEF9E7 {
+        +id: int
+        +parentId: int
+        +name: string
+        +nameRu: string
+        +code: string
+        +description: string
+        +getParent(): ProductCategory
+        +getChildren(): List<ProductCategory>
+        +getFullPath(): string
+    }
+}
+
+package "📦 Материалы" as Materials {
+    class Material #FCF3CF {
+        +id: int
+        +code: string
+        +nameFull: string
+        +nameShort: string
+        +categoryId: int
+        +baseUnitId: int
+        +specifications: JSON
+        +currentStock: decimal
+        +minStock: decimal
+        +location: string
+        +supplierId: int
+        +lastPrice: decimal
+        +currency: string
+        +createdAt: DateTime
+        +updatedAt: DateTime
+        +getCategory(): MaterialCategory
+        +getUnit(): BaseUnit
+        +getSupplier(): Contractor
+        +updateStock(quantity): void
+        +isLowStock(): bool
+    }
+}
+
+package "🏭 Продукция" as Products {
+    class Product #EBDEF0 {
+        +id: int
+        +article: string
+        +name: string
+        +categoryId: int
+        +baseUnitId: int
+        +specifications: JSON
+        +image: string
+        +basePrice: decimal
+        +currency: string
+        +isActive: bool
+        +createdAt: DateTime
+        +getCategory(): ProductCategory
+        +getUnit(): BaseUnit
+        +getPassport(): ProductPassport
+        +getRouteCard(): RouteCard
+        +calculatePrice(): decimal
+    }
+
+    class ProductPassport #EBDEF0 {
+        +id: int
+        +productId: int
+        +totalWeightKg: decimal
+        +warrantyMonths: int
+        +isSerialTracked: bool
+        +productionNotes: string
+        +qualityRequirements: string
+        +createdAt: DateTime
+        +updatedAt: DateTime
+        +getProduct(): Product
+        +getMaterials(): List<ProductPassportMaterial>
+        +generateDocument(): Document
+    }
+
+    class ProductPassportMaterial #EBDEF0 {
+        +id: int
+        +passportId: int
+        +materialId: int
+        +quantity: decimal
+        +unitId: int
+        +weightKg: decimal
+        +percentage: decimal
+        +sortOrder: int
+        +notes: string
+        +getPassport(): ProductPassport
+        +getMaterial(): Material
+        +getUnit(): BaseUnit
+    }
+}
+
+package "⚙️ Технологии" as Technology {
+    class ProductionStage #D5F5E3 {
+        +id: int
+        +name: string
+        +code: string
+        +description: string
+        +sortOrder: int
+        +color: string
+        +isActive: bool
+        +getOperations(): List<RouteCardOperation>
+    }
+
+    class RouteCard #D5F5E3 {
+        +id: int
+        +productId: int
+        +name: string
+        +version: string
+        +description: string
+        +totalTimeHours: decimal
+        +isActive: bool
+        +createdAt: DateTime
+        +updatedAt: DateTime
+        +getProduct(): Product
+        +getOperations(): List<RouteCardOperation>
+        +calculateTotalTime(): decimal
+        +activate(): void
+        +deactivate(): void
+    }
+
+    class RouteCardOperation #D5F5E3 {
+        +id: int
+        +routeCardId: int
+        +operationNumber: int
+        +stageId: int
+        +name: string
+        +description: string
+        +workCenter: string
+        +equipment: string
+        +timeNormHours: decimal
+        +materialsRequired: JSON
+        +instructions: string
+        +sortOrder: int
+        +getRouteCard(): RouteCard
+        +getStage(): ProductionStage
+        +getRequiredMaterials(): List<Material>
+    }
+}
+
+package "🛒 Заказы" as Orders {
+    class Order #FADBD8 {
+        +id: int
+        +orderNumber: string
+        +customerId: int
+        +responsibleUserId: int
+        +status: Enum
+        +orderDate: Date
+        +deliveryDate: Date
+        +totalAmount: decimal
+        +notes: string
+        +createdAt: DateTime
+        +updatedAt: DateTime
+        +getCustomer(): Contractor
+        +getResponsibleUser(): User
+        +getItems(): List<OrderItem>
+        +calculateTotal(): decimal
+        +setStatus(status): void
+        +cancel(): void
+    }
+
+    class OrderItem #FADBD8 {
+        +id: int
+        +orderId: int
+        +productId: int
+        +quantity: decimal
+        +price: decimal
+        +total: decimal
+        +productionStatus: Enum
+        +getOrder(): Order
+        +getProduct(): Product
+        +getProductionTasks(): List<ProductionTask>
+        +calculateTotal(): decimal
+    }
+}
+
+package "🏗️ Производство" as Production {
+    class ProductionTask #D6EAF8 {
+        +id: int
+        +taskNumber: string
+        +orderId: int
+        +orderItemId: int
+        +productId: int
+        +routeCardId: int
+        +quantityPlan: decimal
+        +quantityFact: decimal
+        +quantityGood: decimal
+        +quantityDefect: decimal
+        +status: Enum
+        +priority: Enum
+        +startDate: Date
+        +endDate: Date
+        +plannedStart: DateTime
+        +plannedEnd: DateTime
+        +actualStart: DateTime
+        +actualEnd: DateTime
+        +responsibleId: int
+        +workerId: int
+        +notes: string
+        +createdAt: DateTime
+        +updatedAt: DateTime
+        +getOrder(): Order
+        +getOrderItem(): OrderItem
+        +getProduct(): Product
+        +getRouteCard(): RouteCard
+        +getResponsible(): User
+        +getWorker(): User
+        +getStages(): List<ProductionTaskStage>
+        +getMaterials(): List<ProductionTaskMaterial>
+        +start(): void
+        +complete(): void
+        +cancel(): void
+        +reportDefect(quantity): void
+    }
+
+    class ProductionTaskStage #D6EAF8 {
+        +id: int
+        +taskId: int
+        +stageId: int
+        +operationId: int
+        +status: Enum
+        +startedAt: DateTime
+        +completedAt: DateTime
+        +workerId: int
+        +timeSpentHours: decimal
+        +quantityPassed: decimal
+        +quantityRejected: decimal
+        +notes: string
+        +createdAt: DateTime
+        +updatedAt: DateTime
+        +getTask(): ProductionTask
+        +getStage(): ProductionStage
+        +getOperation(): RouteCardOperation
+        +getWorker(): User
+        +start(): void
+        +complete(qtyPassed, qtyRejected): void
+        +recordTime(hours): void
+    }
+
+    class ProductionTaskMaterial #D6EAF8 {
+        +id: int
+        +taskId: int
+        +materialId: int
+        +quantityRequired: decimal
+        +quantityReserved: decimal
+        +quantityUsed: decimal
+        +unitCost: decimal
+        +totalCost: decimal
+        +status: Enum
+        +createdAt: DateTime
+        +getTask(): ProductionTask
+        +getMaterial(): Material
+        +reserve(quantity): void
+        +issue(quantity): void
+        +consume(quantity): void
+        +calculateCost(): decimal
+    }
+}
+
+package "✅ Качество" as Quality {
+    class QualityCheck #FDEDEC {
+        +id: int
+        +taskId: int
+        +taskStageId: int
+        +productId: int
+        +checkDate: DateTime
+        +inspectorId: int
+        +status: Enum
+        +defectDescription: string
+        +quantityChecked: int
+        +quantityDefective: int
+        +photos: JSON
+        +getTask(): ProductionTask
+        +getTaskStage(): ProductionTaskStage
+        +getProduct(): Product
+        +getInspector(): User
+        +pass(): void
+        +fail(description): void
+        +requestRework(): void
+    }
+}
+
+package "📄 Документы" as Documents {
+    class ProductSerialNumber #F5EEF8 {
+        +id: int
+        +productId: int
+        +serialNumber: string
+        +productionDate: Date
+        +taskId: int
+        +status: Enum
+        +warrantyStart: Date
+        +warrantyEnd: Date
+        +notes: string
+        +technicalSpecs: JSON
+        +passportData: JSON
+        +createdAt: DateTime
+        +updatedAt: DateTime
+        +getProduct(): Product
+        +getTask(): ProductionTask
+        +getDocuments(): List<ProductDocument>
+        +isUnderWarranty(): bool
+        +archive(): void
+    }
+
+    class ProductDocument #F5EEF8 {
+        +id: int
+        +serialNumberId: int
+        +documentType: Enum
+        +fileName: string
+        +filePath: string
+        +fileSize: int
+        +mimeType: string
+        +description: string
+        +uploadedBy: int
+        +uploadedAt: DateTime
+        +getSerialNumber(): ProductSerialNumber
+        +getUploader(): User
+        +download(): File
+        +delete(): void
+    }
+}
+
+' ============================================
+' СВЯЗИ МЕЖДУ КЛАССАМИ
+' ============================================
+
+' Справочники
+User "1" --> "1" UserRole : имеет
+Contractor ..> User : может быть
+
+' Категории
+MaterialCategory "0..1" --> "0..*" MaterialCategory : иерархия
+ProductCategory "0..1" --> "0..*" ProductCategory : иерархия
+
+' Материалы
+Material --> MaterialCategory : категория
+Material --> BaseUnit : единица
+Material --> Contractor : поставщик
+
+' Продукция
+Product --> ProductCategory : категория
+Product --> BaseUnit : единица
+Product "1" --> "0..1" ProductPassport : паспорт
+ProductPassport "1" *-- "0..*" ProductPassportMaterial : состав
+ProductPassportMaterial --> Material : материал
+ProductPassportMaterial --> BaseUnit : единица
+
+' Технологии
+RouteCard --> Product : для
+RouteCard "1" *-- "0..*" RouteCardOperation : операции
+RouteCardOperation --> ProductionStage : этап
+RouteCardOperation ..> Material : требует
+
+' Заказы
+Order --> Contractor : заказчик
+Order --> User : ответственный
+Order "1" *-- "0..*" OrderItem : позиции
+OrderItem --> Product : продукт
+OrderItem --> Order : принадлежит
+
+' Производство
+ProductionTask --> Order : на основе
+ProductionTask --> OrderItem : позиция
+ProductionTask --> Product : изделие
+ProductionTask --> RouteCard : по технологии
+ProductionTask --> User : ответственный
+ProductionTask --> User : рабочий
+ProductionTask "1" *-- "0..*" ProductionTaskStage : этапы
+ProductionTask "1" *-- "0..*" ProductionTaskMaterial : материалы
+
+ProductionTaskStage --> ProductionTask : задание
+ProductionTaskStage --> ProductionStage : этап
+ProductionTaskStage --> RouteCardOperation : операция
+ProductionTaskStage --> User : исполнитель
+
+ProductionTaskMaterial --> ProductionTask : задание
+ProductionTaskMaterial --> Material : материал
+
+' Качество
+QualityCheck --> ProductionTask : проверка
+QualityCheck --> ProductionTaskStage : этап
+QualityCheck --> Product : продукт
+QualityCheck --> User : инспектор
+
+' Документы
+ProductSerialNumber --> Product : изделие
+ProductSerialNumber --> ProductionTask : задание
+ProductSerialNumber "1" *-- "0..*" ProductDocument : документы
+ProductDocument --> ProductSerialNumber : принадлежит
+ProductDocument --> User : загружен
+
+' ============================================
+' ПРИМЕЧАНИЯ
+' ============================================
+
+note top of User
+  <b>Ролевая модель</b>
+  Аутентификация
+  Разрешения
+end note
+
+note right of Product
+  <b>Продукция</b>
+  Паспорта
+  Технологии
+  Цены
+end note
+
+note bottom of ProductionTask
+  <b>Производство</b>
+  Планирование
+  Контроль
+  Учёт
+end note
+
+note left of QualityCheck
+  <b>ОТК</b>
+  Проверки
+  Дефекты
+  Акты
+end note
+
+note bottom of ProductSerialNumber
+  <b>Серийный учёт</b>
+  Гарантия
+  Документы
+  История
+end note
+
+@enduml

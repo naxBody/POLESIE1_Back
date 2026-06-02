@@ -33,7 +33,7 @@ if ($productIdFilter) {
     $pageTitle = 'Паспорт продукта';
 }
 
-// Построение основного запроса - используем INNER JOIN для получения всех продуктов
+// Построение основного запроса
 $query = "
     SELECT 
         pp.id as passport_id,
@@ -57,6 +57,8 @@ $query = "
 $countQuery = "
     SELECT COUNT(*) as total
     FROM products p
+    LEFT JOIN product_passports pp ON pp.product_id = p.id
+    LEFT JOIN product_categories pc ON p.category_id = pc.id
     WHERE p.is_active = TRUE
 ";
 
@@ -81,46 +83,51 @@ if ($categoryFilter) {
     $countParams['category'] = $categoryFilter;
 }
 
-// Фильтр по весу - применяем только если паспорт существует
+// Фильтр по весу
 if ($weightFilter) {
     switch ($weightFilter) {
         case 'light':
-            $query .= " AND (pp.total_weight_kg IS NULL OR pp.total_weight_kg < 5)";
+            $query .= " AND pp.total_weight_kg < 5";
+            $countQuery .= " AND pp.total_weight_kg < 5";
             break;
         case 'medium':
-            $query .= " AND (pp.total_weight_kg IS NULL OR (pp.total_weight_kg >= 5 AND pp.total_weight_kg < 20))";
+            $query .= " AND pp.total_weight_kg >= 5 AND pp.total_weight_kg < 20";
+            $countQuery .= " AND pp.total_weight_kg >= 5 AND pp.total_weight_kg < 20";
             break;
         case 'heavy':
-            $query .= " AND (pp.total_weight_kg IS NULL OR pp.total_weight_kg >= 20)";
+            $query .= " AND pp.total_weight_kg >= 20";
+            $countQuery .= " AND pp.total_weight_kg >= 20";
             break;
     }
-    // Для countQuery не применяем фильтр по весу, так как сначала нужно создать паспорта
 }
 
-// Фильтр по гарантии - применяем только если паспорт существует
+// Фильтр по гарантии
 if ($warrantyFilter) {
     switch ($warrantyFilter) {
         case 'short':
-            $query .= " AND (pp.warranty_months IS NULL OR pp.warranty_months <= 12)";
+            $query .= " AND pp.warranty_months <= 12";
+            $countQuery .= " AND pp.warranty_months <= 12";
             break;
         case 'standard':
-            $query .= " AND (pp.warranty_months IS NULL OR (pp.warranty_months > 12 AND pp.warranty_months <= 36))";
+            $query .= " AND pp.warranty_months > 12 AND pp.warranty_months <= 36";
+            $countQuery .= " AND pp.warranty_months > 12 AND pp.warranty_months <= 36";
             break;
         case 'long':
-            $query .= " AND (pp.warranty_months IS NULL OR pp.warranty_months > 36)";
+            $query .= " AND pp.warranty_months > 36";
+            $countQuery .= " AND pp.warranty_months > 36";
             break;
     }
-    // Для countQuery не применяем фильтр по гарантии
 }
 
-// Фильтр по серийному учёту - применяем только если паспорт существует
+// Фильтр по серийному учёту
 if ($serialFilter !== '') {
     if ($serialFilter === 'yes') {
-        $query .= " AND (pp.is_serial_tracked IS NULL OR pp.is_serial_tracked = TRUE)";
+        $query .= " AND pp.is_serial_tracked = TRUE";
+        $countQuery .= " AND pp.is_serial_tracked = TRUE";
     } elseif ($serialFilter === 'no') {
-        $query .= " AND (pp.is_serial_tracked IS NULL OR pp.is_serial_tracked = FALSE)";
+        $query .= " AND pp.is_serial_tracked = FALSE";
+        $countQuery .= " AND pp.is_serial_tracked = FALSE";
     }
-    // Для countQuery не применяем фильтр по серийному учету
 }
 
 // Фильтр по конкретному продукту (при переходе из заказа)
@@ -176,28 +183,25 @@ $stmt->execute();
 $passports = $stmt->fetchAll();
 
 // Для продуктов без паспорта создаем запись
-// Важно: создаем паспорта даже если результат пустой из-за фильтров
-if (!empty($passports)) {
-    foreach ($passports as &$passport) {
-        if ($passport['passport_id'] === null) {
-            // Создаем паспорт для продукта
-            $insertStmt = $pdo->prepare("
-                INSERT INTO product_passports (product_id, total_weight_kg, warranty_months, is_serial_tracked)
-                VALUES (:product_id, 0, 12, FALSE)
-            ");
-            $insertStmt->execute(['product_id' => $passport['product_id']]);
-            
-            // Получаем ID созданного паспорта
-            $passport['passport_id'] = $pdo->lastInsertId();
-            $passport['total_weight_kg'] = 0;
-            $passport['warranty_months'] = 12;
-            $passport['is_serial_tracked'] = false;
-            $passport['production_notes'] = null;
-            $passport['quality_requirements'] = null;
-        }
+foreach ($passports as &$passport) {
+    if ($passport['passport_id'] === null) {
+        // Создаем паспорт для продукта
+        $insertStmt = $pdo->prepare("
+            INSERT INTO product_passports (product_id, total_weight_kg, warranty_months, is_serial_tracked)
+            VALUES (:product_id, 0, 12, FALSE)
+        ");
+        $insertStmt->execute(['product_id' => $passport['product_id']]);
+        
+        // Получаем ID созданного паспорта
+        $passport['passport_id'] = $pdo->lastInsertId();
+        $passport['total_weight_kg'] = 0;
+        $passport['warranty_months'] = 12;
+        $passport['is_serial_tracked'] = false;
+        $passport['production_notes'] = null;
+        $passport['quality_requirements'] = null;
     }
-    unset($passport);
 }
+unset($passport);
 
 // Получение уникальных категорий для фильтра
 $catQuery = "SELECT DISTINCT pc.code, pc.name 
@@ -629,36 +633,6 @@ $categories = $pdo->query($catQuery)->fetchAll();
         .empty-state p {
             color: var(--text-secondary);
         }
-        /* Стили для заголовка страницы с кнопками действий */
-        .page-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 24px;
-            gap: 20px;
-            padding: 20px 0;
-        }
-        .page-header-title h2 {
-            font-size: 24px;
-            font-weight: 700;
-            color: var(--text-primary);
-            margin-bottom: 4px;
-        }
-        .page-header-title p {
-            font-size: 13px;
-            color: var(--text-secondary);
-        }
-        .page-header-actions {
-            display: flex;
-            gap: 12px;
-            align-items: center;
-        }
-        @media (max-width: 768px) {
-            .page-header {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-        }
     </style>
     <style>
         /* Стили для фильтров */
@@ -859,14 +833,6 @@ $categories = $pdo->query($catQuery)->fetchAll();
                         <div class="page-header-title">
                             <h2>📄 Паспорта продуктов</h2>
                             <p>Спецификации и материалы для производства</p>
-                        </div>
-                        <div class="page-header-actions">
-                            <button class="btn btn-primary" onclick="openNewPassportModal()" title="Добавить новый паспорт продукта">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="vertical-align: middle; margin-right: 6px;">
-                                    <path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-                                </svg>
-                                Новый паспорт
-                            </button>
                         </div>
                     </div>
 
@@ -1095,19 +1061,13 @@ $categories = $pdo->query($catQuery)->fetchAll();
                                             $qualityRequirements = $passport['quality_requirements'] ? json_decode($passport['quality_requirements'], true) : [];
                                             $specifications = $passport['specifications'] ? json_decode($passport['specifications'], true) : [];
                                             ?>
-                                            <div class="passport-card" data-passport-id="<?= $passport['passport_id'] ?>" data-product-id="<?= $passport['product_id'] ?>" data-product-name="<?= e($passport['product_name']) ?>" data-sku="<?= e($passport['sku']) ?>" data-weight="<?= $passport['total_weight_kg'] ?? 0 ?>" data-warranty="<?= $passport['warranty_months'] ?? 12 ?>" data-serial="<?= $passport['is_serial_tracked'] ? '1' : '0' ?>" data-production-notes="<?= e(implode("\n", $productionNotes)) ?>" data-quality-requirements="<?= e(implode("\n", $qualityRequirements)) ?>" onclick="openPassportModal(this)">
+                                            <div class="passport-card" data-passport-id="<?= $passport['passport_id'] ?>" onclick="openPassportModal(this)">
                                                 <div class="passport-card-header">
                                                     <div style="flex: 1;">
                                                         <span class="passport-sku"><?= e($passport['sku']) ?></span>
                                                         <div class="passport-title"><?= e($passport['product_name']) ?></div>
                                                         <div class="passport-category"><?= e($passport['category_name'] ?? 'Без категории') ?></div>
                                                     </div>
-                                                    <button class="btn btn-sm btn-outline" onclick="event.stopPropagation(); openEditPassportModal(this)" title="Редактировать паспорт" style="padding: 6px 10px; font-size: 12px; display: inline-flex; align-items: center; gap: 4px;">
-                                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                            <path d="M17 3L21 7L8 20H4V16L17 3Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                                            <path d="M14.5 5.5L18.5 9.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                                        </svg>
-                                                    </button>
                                                 </div>
                                                 <div class="passport-card-body">
                                                     <div class="card-info-row">
@@ -1186,74 +1146,6 @@ $categories = $pdo->query($catQuery)->fetchAll();
             </div>
             <div class="passport-modal-body" id="modalPassportBody">
                 <!-- Контент заполняется через JS -->
-            </div>
-        </div>
-    </div>
-
-    <!-- Модальное окно редактирования/добавления паспорта -->
-    <div id="passportEditModalOverlay" class="passport-modal-overlay" onclick="closePassportEditModal(event)">
-        <div class="passport-modal" style="max-width: 700px;">
-            <div class="passport-modal-header" style="background: linear-gradient(135deg, #f59e0b, #d97706);">
-                <div>
-                    <div class="passport-modal-title" id="editModalTitle">Редактирование паспорта</div>
-                    <div class="passport-modal-subtitle" id="editModalSubtitle">Заполните данные паспорта</div>
-                </div>
-                <button class="passport-modal-close" onclick="closePassportEditModalDirect()">×</button>
-            </div>
-            <div class="passport-modal-body">
-                <form id="passportEditForm" onsubmit="savePassport(event)">
-                    <input type="hidden" id="editPassportId" name="passport_id">
-                    <input type="hidden" id="editProductId" name="product_id">
-                    
-                    <div class="passport-section">
-                        <div class="passport-section-title">📊 Основная информация</div>
-                        
-                        <div class="filter-group" style="margin-bottom: 16px;">
-                            <label for="editProductName">Название продукта</label>
-                            <input type="text" id="editProductName" name="product_name" readonly style="background: #f3f4f6;">
-                        </div>
-                        
-                        <div class="filter-group" style="margin-bottom: 16px;">
-                            <label for="editProductSku">Артикул (SKU)</label>
-                            <input type="text" id="editProductSku" name="product_sku" readonly style="background: #f3f4f6;">
-                        </div>
-                        
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
-                            <div class="filter-group">
-                                <label for="editTotalWeight">Общий вес (кг) *</label>
-                                <input type="number" step="0.001" id="editTotalWeight" name="total_weight_kg" required min="0">
-                            </div>
-                            
-                            <div class="filter-group">
-                                <label for="editWarrantyMonths">Гарантия (месяцев) *</label>
-                                <input type="number" id="editWarrantyMonths" name="warranty_months" required min="0" max="120">
-                            </div>
-                        </div>
-                        
-                        <div class="filter-group" style="margin-top: 16px;">
-                            <label for="editSerialTracked">Серийный учёт</label>
-                            <select id="editSerialTracked" name="is_serial_tracked">
-                                <option value="0">Не требуется</option>
-                                <option value="1">Требуется</option>
-                            </select>
-                        </div>
-                    </div>
-                    
-                    <div class="passport-section">
-                        <div class="passport-section-title">📋 Примечания к производству</div>
-                        <textarea id="editProductionNotes" name="production_notes" rows="4" placeholder="Введите примечания к производству (каждое с новой строки)" style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: var(--border-radius); font-size: 14px; resize: vertical;"></textarea>
-                    </div>
-                    
-                    <div class="passport-section">
-                        <div class="passport-section-title">✅ Требования к качеству</div>
-                        <textarea id="editQualityRequirements" name="quality_requirements" rows="4" placeholder="Введите требования к качеству (каждое с новой строки)" style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: var(--border-radius); font-size: 14px; resize: vertical;"></textarea>
-                    </div>
-                    
-                    <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 24px;">
-                        <button type="button" class="btn btn-outline" onclick="closePassportEditModalDirect()">Отмена</button>
-                        <button type="submit" class="btn btn-primary" id="savePassportBtn">💾 Сохранить</button>
-                    </div>
-                </form>
             </div>
         </div>
     </div>
@@ -1494,169 +1386,6 @@ $categories = $pdo->query($catQuery)->fetchAll();
         function closePassportModalDirect() {
             document.getElementById('passportModalOverlay').classList.remove('active');
             document.body.style.overflow = '';
-        }
-        
-        // Функции для модального окна редактирования паспорта
-        function openNewPassportModal() {
-            document.getElementById('editPassportId').value = '';
-            document.getElementById('editProductId').value = '';
-            document.getElementById('editProductName').value = '';
-            document.getElementById('editProductSku').value = '';
-            document.getElementById('editTotalWeight').value = '0';
-            document.getElementById('editWarrantyMonths').value = '12';
-            document.getElementById('editSerialTracked').value = '0';
-            document.getElementById('editProductionNotes').value = '';
-            document.getElementById('editQualityRequirements').value = '';
-            
-            document.getElementById('editModalTitle').textContent = 'Добавление нового паспорта';
-            document.getElementById('editModalSubtitle').textContent = 'Выберите продукт и заполните данные';
-            
-            // Удаляем старый селект если есть
-            var oldSelect = document.getElementById('newProductSelect');
-            if (oldSelect) {
-                oldSelect.parentElement.remove();
-            }
-            
-            // Показать выбор продукта
-            var selectHtml = '<div class="filter-group" style="margin-bottom: 16px;">' +
-                '<label for="newProductSelect">Продукт *</label>' +
-                '<select id="newProductSelect" onchange="loadProductData(this.value)">' +
-                '<option value="">-- Выберите продукт --</option>';
-            
-            <?php foreach ($passports as $p): ?>
-            selectHtml += '<option value="<?= $p['product_id'] ?>" data-name="<?= e($p['product_name']) ?>" data-sku="<?= e($p['sku']) ?>"><?= e($p['sku']) ?> - <?= e($p['product_name']) ?></option>';
-            <?php endforeach; ?>
-            
-            selectHtml += '</select></div>';
-            
-            // Вставляем перед полем "Название продукта"
-            var firstField = document.querySelector('#passportEditForm .filter-group');
-            if (firstField) {
-                var tempDiv = document.createElement('div');
-                tempDiv.innerHTML = selectHtml;
-                firstField.parentNode.insertBefore(tempDiv.firstElementChild, firstField);
-            }
-            
-            document.getElementById('passportEditModalOverlay').classList.add('active');
-            document.body.style.overflow = 'hidden';
-        }
-        
-        function loadProductData(productId) {
-            if (!productId) {
-                document.getElementById('editProductId').value = '';
-                document.getElementById('editProductName').value = '';
-                document.getElementById('editProductSku').value = '';
-                return;
-            }
-            
-            var select = document.getElementById('newProductSelect');
-            var option = select.options[select.selectedIndex];
-            
-            document.getElementById('editProductId').value = productId;
-            document.getElementById('editProductName').value = option.getAttribute('data-name') || '';
-            document.getElementById('editProductSku').value = option.getAttribute('data-sku') || '';
-            
-            document.getElementById('editModalSubtitle').textContent = 'SKU: ' + (option.getAttribute('data-sku') || '');
-        }
-        
-        function openEditPassportModal(element) {
-            var card = element.closest('.passport-card');
-            var passportId = card.getAttribute('data-passport-id');
-            var productId = card.getAttribute('data-product-id');
-            var productName = card.getAttribute('data-product-name');
-            var sku = card.getAttribute('data-sku');
-            var weight = card.getAttribute('data-weight');
-            var warranty = card.getAttribute('data-warranty');
-            var serial = card.getAttribute('data-serial');
-            var productionNotes = card.getAttribute('data-production-notes');
-            var qualityRequirements = card.getAttribute('data-quality-requirements');
-            
-            document.getElementById('editPassportId').value = passportId;
-            document.getElementById('editProductId').value = productId;
-            document.getElementById('editProductName').value = productName;
-            document.getElementById('editProductSku').value = sku;
-            document.getElementById('editTotalWeight').value = weight;
-            document.getElementById('editWarrantyMonths').value = warranty;
-            document.getElementById('editSerialTracked').value = serial;
-            document.getElementById('editProductionNotes').value = productionNotes || '';
-            document.getElementById('editQualityRequirements').value = qualityRequirements || '';
-            
-            document.getElementById('editModalTitle').textContent = 'Редактирование паспорта';
-            document.getElementById('editModalSubtitle').textContent = 'SKU: ' + sku;
-            
-            document.getElementById('passportEditModalOverlay').classList.add('active');
-            document.body.style.overflow = 'hidden';
-        }
-        
-        function closePassportEditModal(event) {
-            if (event.target === document.getElementById('passportEditModalOverlay')) {
-                closePassportEditModalDirect();
-            }
-        }
-        
-        function closePassportEditModalDirect() {
-            document.getElementById('passportEditModalOverlay').classList.remove('active');
-            document.body.style.overflow = '';
-            
-            // Удаляем селект продукта при закрытии
-            var oldSelect = document.getElementById('newProductSelect');
-            if (oldSelect) {
-                oldSelect.parentElement.remove();
-            }
-        }
-        
-        function savePassport(event) {
-            event.preventDefault();
-            
-            var formData = new FormData(document.getElementById('passportEditForm'));
-            var productId = formData.get('product_id');
-            
-            // Проверка: продукт должен быть выбран
-            if (!productId) {
-                alert('Ошибка: выберите продукт из списка!');
-                return;
-            }
-            
-            var data = {
-                action: 'save_passport',
-                passport_id: formData.get('passport_id'),
-                product_id: productId,
-                total_weight_kg: parseFloat(formData.get('total_weight_kg')),
-                warranty_months: parseInt(formData.get('warranty_months')),
-                is_serial_tracked: parseInt(formData.get('is_serial_tracked')) === 1,
-                production_notes: formData.get('production_notes'),
-                quality_requirements: formData.get('quality_requirements')
-            };
-            
-            var btn = document.getElementById('savePassportBtn');
-            btn.disabled = true;
-            btn.textContent = 'Сохранение...';
-            
-            fetch('api_passport.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(data)
-            })
-            .then(response => response.json())
-            .then(result => {
-                if (result.success) {
-                    alert('Паспорт успешно сохранён!');
-                    closePassportEditModalDirect();
-                    location.reload();
-                } else {
-                    alert('Ошибка сохранения: ' + result.error);
-                    btn.disabled = false;
-                    btn.textContent = '💾 Сохранить';
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Ошибка соединения с сервером');
-                btn.disabled = false;
-                btn.textContent = '💾 Сохранить';
-            });
         }
         
         function escapeHtml(text) {

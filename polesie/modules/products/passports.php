@@ -81,51 +81,46 @@ if ($categoryFilter) {
     $countParams['category'] = $categoryFilter;
 }
 
-// Фильтр по весу
+// Фильтр по весу - применяем только если паспорт существует
 if ($weightFilter) {
     switch ($weightFilter) {
         case 'light':
-            $query .= " AND pp.total_weight_kg < 5";
-            $countQuery .= " AND pp.total_weight_kg < 5";
+            $query .= " AND (pp.total_weight_kg IS NOT NULL AND pp.total_weight_kg < 5)";
             break;
         case 'medium':
-            $query .= " AND pp.total_weight_kg >= 5 AND pp.total_weight_kg < 20";
-            $countQuery .= " AND pp.total_weight_kg >= 5 AND pp.total_weight_kg < 20";
+            $query .= " AND (pp.total_weight_kg IS NOT NULL AND pp.total_weight_kg >= 5 AND pp.total_weight_kg < 20)";
             break;
         case 'heavy':
-            $query .= " AND pp.total_weight_kg >= 20";
-            $countQuery .= " AND pp.total_weight_kg >= 20";
+            $query .= " AND (pp.total_weight_kg IS NOT NULL AND pp.total_weight_kg >= 20)";
             break;
     }
+    // Для countQuery не применяем фильтр по весу, так как сначала нужно создать паспорта
 }
 
-// Фильтр по гарантии
+// Фильтр по гарантии - применяем только если паспорт существует
 if ($warrantyFilter) {
     switch ($warrantyFilter) {
         case 'short':
-            $query .= " AND pp.warranty_months <= 12";
-            $countQuery .= " AND pp.warranty_months <= 12";
+            $query .= " AND (pp.warranty_months IS NOT NULL AND pp.warranty_months <= 12)";
             break;
         case 'standard':
-            $query .= " AND pp.warranty_months > 12 AND pp.warranty_months <= 36";
-            $countQuery .= " AND pp.warranty_months > 12 AND pp.warranty_months <= 36";
+            $query .= " AND (pp.warranty_months IS NOT NULL AND pp.warranty_months > 12 AND pp.warranty_months <= 36)";
             break;
         case 'long':
-            $query .= " AND pp.warranty_months > 36";
-            $countQuery .= " AND pp.warranty_months > 36";
+            $query .= " AND (pp.warranty_months IS NOT NULL AND pp.warranty_months > 36)";
             break;
     }
+    // Для countQuery не применяем фильтр по гарантии
 }
 
-// Фильтр по серийному учёту
+// Фильтр по серийному учёту - применяем только если паспорт существует
 if ($serialFilter !== '') {
     if ($serialFilter === 'yes') {
         $query .= " AND pp.is_serial_tracked = TRUE";
-        $countQuery .= " AND pp.is_serial_tracked = TRUE";
     } elseif ($serialFilter === 'no') {
         $query .= " AND pp.is_serial_tracked = FALSE";
-        $countQuery .= " AND pp.is_serial_tracked = FALSE";
     }
+    // Для countQuery не применяем фильтр по серийному учету
 }
 
 // Фильтр по конкретному продукту (при переходе из заказа)

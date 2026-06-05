@@ -141,19 +141,37 @@ foreach ($materialsData as $material) {
 // Примеры расшифровок для常见ных аббревиатур удалены - используется только международный формат кодов
 $abbreviationDecodings = [];
 
-// Стандарты ГОСТ
-$gostStandards = [
-    ['gost_number' => 'ГОСТ 7798-70', 'title' => 'Болты с шестигранной головкой', 'category' => 'Крепеж', 'status' => 'active'],
-    ['gost_number' => 'ГОСТ 5915-70', 'title' => 'Гайки шестигранные', 'category' => 'Крепеж', 'status' => 'active'],
-    ['gost_number' => 'ГОСТ 11402-75', 'title' => 'Шайбы пружинные', 'category' => 'Крепеж', 'status' => 'active'],
-    ['gost_number' => 'ГОСТ 8736-2014', 'title' => 'Песок для строительных работ', 'category' => 'Материалы', 'status' => 'active'],
-    ['gost_number' => 'ГОСТ 1050-88', 'title' => 'Сталь сортовая калиброванная', 'category' => 'Металлы', 'status' => 'active'],
-    ['gost_number' => 'ГОСТ 2284-79', 'title' => 'Круги шлифовальные', 'category' => 'Инструмент', 'status' => 'active'],
-    ['gost_number' => 'ГОСТ 6311-2014', 'title' => 'Кабели силовые', 'category' => 'Электротехника', 'status' => 'active'],
-    ['gost_number' => 'ГОСТ 18599-2014', 'title' => 'Провода обмоточные', 'category' => 'Электротехника', 'status' => 'active'],
-    ['gost_number' => 'ГОСТ 8822-2014', 'title' => 'Подшипники качения', 'category' => 'Подшипники', 'status' => 'active'],
-    ['gost_number' => 'ГОСТ 5950-2000', 'title' => 'Стали инструментальные', 'category' => 'Металлы', 'status' => 'active'],
-];
+// Стандарты ГОСТ - загружаем из JSON файла
+$gostStandards = [];
+$docsPath = BASE_PATH . '/list_materials_docs.json';
+if (file_exists($docsPath)) {
+    $jsonData = file_get_contents($docsPath);
+    $docsData = json_decode($jsonData, true);
+    if (isset($docsData['gost_standards']) && is_array($docsData['gost_standards'])) {
+        // Фильтруем только реальные ГОСТы (исключаем служебные записи категорий)
+        foreach ($docsData['gost_standards'] as $gost) {
+            if (!isset($gost['gost_number']) || !str_starts_with($gost['gost_number'], '_CATEGORY_')) {
+                $gostStandards[] = $gost;
+            }
+        }
+    }
+}
+
+// Если файл не существует или пуст, используем стандартный набор
+if (empty($gostStandards)) {
+    $gostStandards = [
+        ['gost_number' => 'ГОСТ 7798-70', 'title' => 'Болты с шестигранной головкой', 'category' => 'Крепеж', 'status' => 'active'],
+        ['gost_number' => 'ГОСТ 5915-70', 'title' => 'Гайки шестигранные', 'category' => 'Крепеж', 'status' => 'active'],
+        ['gost_number' => 'ГОСТ 11402-75', 'title' => 'Шайбы пружинные', 'category' => 'Крепеж', 'status' => 'active'],
+        ['gost_number' => 'ГОСТ 8736-2014', 'title' => 'Песок для строительных работ', 'category' => 'Материалы', 'status' => 'active'],
+        ['gost_number' => 'ГОСТ 1050-88', 'title' => 'Сталь сортовая калиброванная', 'category' => 'Металлы', 'status' => 'active'],
+        ['gost_number' => 'ГОСТ 2284-79', 'title' => 'Круги шлифовальные', 'category' => 'Инструмент', 'status' => 'active'],
+        ['gost_number' => 'ГОСТ 6311-2014', 'title' => 'Кабели силовые', 'category' => 'Электротехника', 'status' => 'active'],
+        ['gost_number' => 'ГОСТ 18599-2014', 'title' => 'Провода обмоточные', 'category' => 'Электротехника', 'status' => 'active'],
+        ['gost_number' => 'ГОСТ 8822-2014', 'title' => 'Подшипники качения', 'category' => 'Подшипники', 'status' => 'active'],
+        ['gost_number' => 'ГОСТ 5950-2000', 'title' => 'Стали инструментальные', 'category' => 'Металлы', 'status' => 'active'],
+    ];
+}
 
 // Структуры кодов по категориям
 $codeStructures = [];

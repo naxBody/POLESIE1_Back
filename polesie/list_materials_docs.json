@@ -1,22 +1,3 @@
 {
-    "gost_standards": [
-        {
-            "gost_number": "тест",
-            "title": "тест",
-            "category": "Электротехнические материалы",
-            "status": "Действующий",
-            "file_name": "gost_тест.pdf",
-            "uploaded_at": "2026-06-05 13:36:52",
-            "uploaded_by": 1
-        },
-        {
-            "gost_number": "ГОСТ-1111-11",
-            "title": "тест",
-            "category": "Сварочные материалы",
-            "status": "Действующий",
-            "file_name": "gost_ГОСТ-1111-11.pdf",
-            "uploaded_at": "2026-06-05 13:37:33",
-            "uploaded_by": 1
-        }
-    ]
+  "gost_standards": []
 }

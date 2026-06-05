@@ -218,6 +218,7 @@ $categories = $pdo->query($catQuery)->fetchAll();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= e($pageTitle) ?> - <?= e(APP_NAME) ?></title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="<?= asset('assets/css/style.css') ?>">
     <style>
         .passport-card {
@@ -270,8 +271,11 @@ $categories = $pdo->query($catQuery)->fetchAll();
             gap: 4px;
         }
         .passport-category::before {
-            content: '📁';
+            content: '\f07b';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
             font-size: 11px;
+            margin-right: 4px;
         }
         .passport-card-body {
             padding: 12px 16px;
@@ -305,8 +309,11 @@ $categories = $pdo->query($catQuery)->fetchAll();
             gap: 4px;
         }
         .materials-count::before {
-            content: '📦';
+            content: '\f466';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
             font-size: 11px;
+            margin-right: 4px;
         }
         .materials-preview {
             display: flex;
@@ -577,10 +584,14 @@ $categories = $pdo->query($catQuery)->fetchAll();
             font-size: 14px;
         }
         .notes-list li::before {
-            content: '📋 ';
+            content: '\f0ea ';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
         }
         .requirements-list li::before {
-            content: '✓ ';
+            content: '\f00c ';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
         }
         .specs-list {
             display: flex;
@@ -831,7 +842,7 @@ $categories = $pdo->query($catQuery)->fetchAll();
                 <div class="content">
                     <div class="page-header">
                         <div class="page-header-title">
-                            <h2>📄 Паспорта продуктов</h2>
+                            <h2><i class="fas fa-file-contract"></i> Паспорта продуктов</h2>
                             <p>Спецификации и материалы для производства</p>
                         </div>
                     </div>
@@ -857,7 +868,7 @@ $categories = $pdo->query($catQuery)->fetchAll();
                             <!-- Панель фильтров -->
                             <div class="filters-panel">
                                 <div class="filters-header">
-                                    <span style="font-size: 20px;">🔍</span>
+                                    <i class="fas fa-search" style="font-size: 20px;"></i>
                                     <h3>Фильтры и поиск</h3>
                                 </div>
                                 
@@ -865,13 +876,13 @@ $categories = $pdo->query($catQuery)->fetchAll();
                                     <div class="filters-grid">
                                         <!-- Поиск -->
                                         <div class="filter-group">
-                                            <label for="search">🔎 Поиск</label>
+                                            <label for="search"><i class="fas fa-search"></i> Поиск</label>
                                             <input type="text" id="search" name="search" placeholder="SKU или название..." value="<?= e($search) ?>">
                                         </div>
                                         
                                         <!-- Категория -->
                                         <div class="filter-group">
-                                            <label for="category">📁 Категория</label>
+                                            <label for="category"><i class="fas fa-folder"></i> Категория</label>
                                             <select id="category" name="category">
                                                 <option value="">Все категории</option>
                                                 <?php foreach ($categories as $cat): ?>
@@ -882,7 +893,7 @@ $categories = $pdo->query($catQuery)->fetchAll();
                                         
                                         <!-- Вес -->
                                         <div class="filter-group">
-                                            <label for="weight">⚖️ Вес</label>
+                                            <label for="weight"><i class="fas fa-weight-hanging"></i> Вес</label>
                                             <select id="weight" name="weight">
                                                 <option value="">Любой вес</option>
                                                 <option value="light" <?= $weightFilter === 'light' ? 'selected' : '' ?>>Лёгкие (&lt; 5 кг)</option>
@@ -893,7 +904,7 @@ $categories = $pdo->query($catQuery)->fetchAll();
                                         
                                         <!-- Гарантия -->
                                         <div class="filter-group">
-                                            <label for="warranty">🛡️ Гарантия</label>
+                                            <label for="warranty"><i class="fas fa-shield-alt"></i> Гарантия</label>
                                             <select id="warranty" name="warranty">
                                                 <option value="">Любая</option>
                                                 <option value="short" <?= $warrantyFilter === 'short' ? 'selected' : '' ?>>Короткая (≤ 1 год)</option>
@@ -904,7 +915,7 @@ $categories = $pdo->query($catQuery)->fetchAll();
                                         
                                         <!-- Серийный учёт -->
                                         <div class="filter-group">
-                                            <label for="serial">📋 Серийный учёт</label>
+                                            <label for="serial"><i class="fas fa-barcode"></i> Серийный учёт</label>
                                             <select id="serial" name="serial">
                                                 <option value="">Все</option>
                                                 <option value="yes" <?= $serialFilter === 'yes' ? 'selected' : '' ?>>Требуется</option>
@@ -914,7 +925,7 @@ $categories = $pdo->query($catQuery)->fetchAll();
                                         
                                         <!-- Сортировка -->
                                         <div class="filter-group">
-                                            <label for="sort">🔀 Сортировка</label>
+                                            <label for="sort"><i class="fas fa-sort"></i> Сортировка</label>
                                             <select id="sort" name="sort">
                                                 <option value="category" <?= $sortBy === 'category' ? 'selected' : '' ?>>По категории</option>
                                                 <option value="name" <?= $sortBy === 'name' ? 'selected' : '' ?>>По названию</option>
@@ -926,17 +937,17 @@ $categories = $pdo->query($catQuery)->fetchAll();
                                         
                                         <!-- Порядок сортировки -->
                                         <div class="filter-group">
-                                            <label for="order">📊 Порядок</label>
+                                            <label for="order"><i class="fas fa-chart-bar"></i> Порядок</label>
                                             <select id="order" name="order">
-                                                <option value="asc" <?= $sortOrder === 'asc' ? 'selected' : '' ?>>⬆️ По возрастанию</option>
-                                                <option value="desc" <?= $sortOrder === 'desc' ? 'selected' : '' ?>>⬇️ По убыванию</option>
+                                                <option value="asc" <?= $sortOrder === 'asc' ? 'selected' : '' ?>><i class="fas fa-arrow-up"></i> По возрастанию</option>
+                                                <option value="desc" <?= $sortOrder === 'desc' ? 'selected' : '' ?>><i class="fas fa-arrow-down"></i> По убыванию</option>
                                             </select>
                                         </div>
                                     </div>
                                     
                                     <div class="filter-actions">
-                                        <button type="submit" class="btn btn-primary">🔍 Применить фильтры</button>
-                                        <a href="passports.php" class="btn btn-outline">🔄 Сбросить всё</a>
+                                        <button type="submit" class="btn btn-primary"><i class="fas fa-search"></i> Применить фильтры</button>
+                                        <a href="passports.php" class="btn btn-outline"><i class="fas fa-redo"></i> Сбросить всё</a>
                                     </div>
                                     
                                     <!-- Активные фильтры -->
@@ -948,32 +959,32 @@ $categories = $pdo->query($catQuery)->fetchAll();
                                         <span style="font-size: 12px; color: var(--text-secondary); align-self: center;">Активные фильтры:</span>
                                         <?php if ($search): ?>
                                             <span class="filter-chip">
-                                                🔎 «<?= e($search) ?>»
-                                                <a href="?<?= http_build_query(array_filter($_GET, function($k) { return $k !== 'search'; }, ARRAY_FILTER_USE_KEY)) ?>" class="filter-chip-remove">✕</a>
+                                                <i class="fas fa-search"></i> «<?= e($search) ?>»
+                                                <a href="?<?= http_build_query(array_filter($_GET, function($k) { return $k !== 'search'; }, ARRAY_FILTER_USE_KEY)) ?>" class="filter-chip-remove"><i class="fas fa-times"></i></a>
                                             </span>
                                         <?php endif; ?>
                                         <?php if ($categoryFilter): ?>
                                             <span class="filter-chip">
-                                                📁 <?= e($categories[array_search($categoryFilter, array_column($categories, 'code'))]['name'] ?? $categoryFilter) ?>
-                                                <a href="?<?= http_build_query(array_filter($_GET, function($k) { return $k !== 'category'; }, ARRAY_FILTER_USE_KEY)) ?>" class="filter-chip-remove">✕</a>
+                                                <i class="fas fa-folder"></i> <?= e($categories[array_search($categoryFilter, array_column($categories, 'code'))]['name'] ?? $categoryFilter) ?>
+                                                <a href="?<?= http_build_query(array_filter($_GET, function($k) { return $k !== 'category'; }, ARRAY_FILTER_USE_KEY)) ?>" class="filter-chip-remove"><i class="fas fa-times"></i></a>
                                             </span>
                                         <?php endif; ?>
                                         <?php if ($weightFilter): ?>
                                             <span class="filter-chip">
-                                                ⚖️ <?= ['light' => 'Лёгкие', 'medium' => 'Средние', 'heavy' => 'Тяжёлые'][$weightFilter] ?>
-                                                <a href="?<?= http_build_query(array_filter($_GET, function($k) { return $k !== 'weight'; }, ARRAY_FILTER_USE_KEY)) ?>" class="filter-chip-remove">✕</a>
+                                                <i class="fas fa-weight-hanging"></i> <?= ['light' => 'Лёгкие', 'medium' => 'Средние', 'heavy' => 'Тяжёлые'][$weightFilter] ?>
+                                                <a href="?<?= http_build_query(array_filter($_GET, function($k) { return $k !== 'weight'; }, ARRAY_FILTER_USE_KEY)) ?>" class="filter-chip-remove"><i class="fas fa-times"></i></a>
                                             </span>
                                         <?php endif; ?>
                                         <?php if ($warrantyFilter): ?>
                                             <span class="filter-chip">
-                                                🛡️ <?= ['short' => 'Короткая', 'standard' => 'Стандарт', 'long' => 'Длинная'][$warrantyFilter] ?>
-                                                <a href="?<?= http_build_query(array_filter($_GET, function($k) { return $k !== 'warranty'; }, ARRAY_FILTER_USE_KEY)) ?>" class="filter-chip-remove">✕</a>
+                                                <i class="fas fa-shield-alt"></i> <?= ['short' => 'Короткая', 'standard' => 'Стандарт', 'long' => 'Длинная'][$warrantyFilter] ?>
+                                                <a href="?<?= http_build_query(array_filter($_GET, function($k) { return $k !== 'warranty'; }, ARRAY_FILTER_USE_KEY)) ?>" class="filter-chip-remove"><i class="fas fa-times"></i></a>
                                             </span>
                                         <?php endif; ?>
                                         <?php if ($serialFilter !== ''): ?>
                                             <span class="filter-chip">
-                                                📋 <?= $serialFilter === 'yes' ? 'Требуется' : 'Не требуется' ?>
-                                                <a href="?<?= http_build_query(array_filter($_GET, function($k) { return $k !== 'serial'; }, ARRAY_FILTER_USE_KEY)) ?>" class="filter-chip-remove">✕</a>
+                                                <i class="fas fa-barcode"></i> <?= $serialFilter === 'yes' ? 'Требуется' : 'Не требуется' ?>
+                                                <a href="?<?= http_build_query(array_filter($_GET, function($k) { return $k !== 'serial'; }, ARRAY_FILTER_USE_KEY)) ?>" class="filter-chip-remove"><i class="fas fa-times"></i></a>
                                             </span>
                                         <?php endif; ?>
                                     </div>
@@ -989,17 +1000,17 @@ $categories = $pdo->query($catQuery)->fetchAll();
                                 <div class="sort-controls">
                                     <span style="font-size: 13px; color: var(--text-secondary);">Сортировать:</span>
                                     <select class="sort-select" onchange="window.location.href=this.value">
-                                        <option value="?<?= http_build_query(array_merge($_GET, ['sort' => 'category', 'order' => 'asc'])) ?>" <?= $sortBy === 'category' && $sortOrder === 'asc' ? 'selected' : '' ?>>По категории ⬆️</option>
-                                        <option value="?<?= http_build_query(array_merge($_GET, ['sort' => 'category', 'order' => 'desc'])) ?>" <?= $sortBy === 'category' && $sortOrder === 'desc' ? 'selected' : '' ?>>По категории ⬇️</option>
-                                        <option value="?<?= http_build_query(array_merge($_GET, ['sort' => 'name', 'order' => 'asc'])) ?>" <?= $sortBy === 'name' && $sortOrder === 'asc' ? 'selected' : '' ?>>По названию ⬆️</option>
-                                        <option value="?<?= http_build_query(array_merge($_GET, ['sort' => 'name', 'order' => 'desc'])) ?>" <?= $sortBy === 'name' && $sortOrder === 'desc' ? 'selected' : '' ?>>По названию ⬇️</option>
-                                        <option value="?<?= http_build_query(array_merge($_GET, ['sort' => 'sku', 'order' => 'asc'])) ?>" <?= $sortBy === 'sku' && $sortOrder === 'asc' ? 'selected' : '' ?>>По артикулу ⬆️</option>
-                                        <option value="?<?= http_build_query(array_merge($_GET, ['sort' => 'sku', 'order' => 'desc'])) ?>" <?= $sortBy === 'sku' && $sortOrder === 'desc' ? 'selected' : '' ?>>По артикулу ⬇️</option>
-                                        <option value="?<?= http_build_query(array_merge($_GET, ['sort' => 'weight', 'order' => 'asc'])) ?>" <?= $sortBy === 'weight' && $sortOrder === 'asc' ? 'selected' : '' ?>>По весу ⬆️</option>
-                                        <option value="?<?= http_build_query(array_merge($_GET, ['sort' => 'weight', 'order' => 'desc'])) ?>" <?= $sortBy === 'weight' && $sortOrder === 'desc' ? 'selected' : '' ?>>По весу ⬇️</option>
+                                        <option value="?<?= http_build_query(array_merge($_GET, ['sort' => 'category', 'order' => 'asc'])) ?>" <?= $sortBy === 'category' && $sortOrder === 'asc' ? 'selected' :  ?>>По категории <i class="fas fa-arrow-up"></i></option>
+                                        <option value="?<?= http_build_query(array_merge($_GET, ['sort' => 'category', 'order' => 'desc'])) ?>" <?= $sortBy === 'category' && $sortOrder === 'desc' ? 'selected' :  ?>>По категории <i class="fas fa-arrow-down"></i></option>
+                                        <option value="?<?= http_build_query(array_merge($_GET, ['sort' => 'name', 'order' => 'asc'])) ?>" <?= $sortBy === 'name' && $sortOrder === 'asc' ? 'selected' :  ?>>По названию <i class="fas fa-arrow-up"></i></option>
+                                        <option value="?<?= http_build_query(array_merge($_GET, ['sort' => 'name', 'order' => 'desc'])) ?>" <?= $sortBy === 'name' && $sortOrder === 'desc' ? 'selected' :  ?>>По названию <i class="fas fa-arrow-down"></i></option>
+                                        <option value="?<?= http_build_query(array_merge($_GET, ['sort' => 'sku', 'order' => 'asc'])) ?>" <?= $sortBy === 'sku' && $sortOrder === 'asc' ? 'selected' :  ?>>По артикулу <i class="fas fa-arrow-up"></i></option>
+                                        <option value="?<?= http_build_query(array_merge($_GET, ['sort' => 'sku', 'order' => 'desc'])) ?>" <?= $sortBy === 'sku' && $sortOrder === 'desc' ? 'selected' :  ?>>По артикулу <i class="fas fa-arrow-down"></i></option>
+                                        <option value="?<?= http_build_query(array_merge($_GET, ['sort' => 'weight', 'order' => 'asc'])) ?>" <?= $sortBy === 'weight' && $sortOrder === 'asc' ? 'selected' :  ?>>По весу <i class="fas fa-arrow-up"></i></option>
+                                        <option value="?<?= http_build_query(array_merge($_GET, ['sort' => 'weight', 'order' => 'desc'])) ?>" <?= $sortBy === 'weight' && $sortOrder === 'desc' ? 'selected' :  ?>>По весу <i class="fas fa-arrow-down"></i></option>
                                     </select>
                                     <a href="?<?= http_build_query(array_merge($_GET, ['order' => $sortOrder === 'asc' ? 'desc' : 'asc'])) ?>" class="sort-order-btn" title="<?= $sortOrder === 'asc' ? 'По убыванию' : 'По возрастанию' ?>">
-                                        <?= $sortOrder === 'asc' ? '⬆️' : '⬇️' ?>
+                                        <?= $sortOrder === 'asc' ? '<i class="fas fa-arrow-up"></i>' : '<i class="fas fa-arrow-down"></i>' ?>
                                     </a>
                                 </div>
                             </div>
@@ -1008,7 +1019,7 @@ $categories = $pdo->query($catQuery)->fetchAll();
                             <div style="margin-top: 20px;">
                                 <?php if (empty($passports)): ?>
                                     <div class="empty-state">
-                                        <div class="empty-state-icon">📄</div>
+                                        <div class="empty-state-icon"><i class="fas fa-file-contract" style="font-size: 48px; color: var(--text-secondary);"></i></div>
                                         <h3>Паспорта не найдены</h3>
                                         <p>Измените параметры поиска или сбросьте фильтры</p>
                                         <a href="passports.php" class="btn btn-primary" style="margin-top: 16px;">🔄 Сбросить фильтры</a>

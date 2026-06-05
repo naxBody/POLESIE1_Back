@@ -1,1 +1,39 @@
-Nothing should be ignored based on the provided file changes. The modified file 'polesie/modules/warehouse/upload_gost.php' is a PHP source file and should not be added to .gitignore. Since there are no build artifacts, dependencies, or temporary files in the changes, the .gitignore remains empty.
+```
+# Environment
+.env
+.env.local
+*.env.*
+
+# Logs and temp files
+*.log
+*.tmp
+*.swp
+
+# Editors
+.vscode/
+.idea/
+
+# Dependencies
+node_modules/
+vendor/
+composer.lock
+
+# Build artifacts
+dist/
+build/
+*.phar
+*.so
+*.dll
+*.exe
+
+# Cache
+.cache/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# OS generated files
+.DS_Store
+Thumbs.db
+```

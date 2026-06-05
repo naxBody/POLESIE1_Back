@@ -1,3 +1,13 @@
 {
-  "gost_standards": []
+    "gost_standards": [
+        {
+            "gost_number": "ГОСТ-1111-11",
+            "title": "тест",
+            "category": "Электротехнические материалы",
+            "status": "Действующий",
+            "file_name": "gost_ГОСТ-1111-11.pdf",
+            "uploaded_at": "2026-06-05 13:56:10",
+            "uploaded_by": 1
+        }
+    ]
 }

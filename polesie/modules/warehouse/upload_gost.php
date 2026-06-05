@@ -128,6 +128,58 @@ if ($action === 'delete_category') {
     exit;
 }
 
+// Обработка удаления ГОСТа
+if ($action === 'delete') {
+    $input = json_decode(file_get_contents('php://input'), true);
+    $index = $input['index'] ?? null;
+    $gostNumber = $input['gost_number'] ?? '';
+    $fileName = $input['file_name'] ?? '';
+    
+    if ($index === null || empty($gostNumber)) {
+        echo json_encode(['success' => false, 'message' => 'Некорректные данные для удаления']);
+        exit;
+    }
+    
+    // Загружаем существующие данные
+    $docsPath = BASE_PATH . '/list_materials_docs.json';
+    $docsData = [];
+    
+    if (file_exists($docsPath)) {
+        $jsonData = file_get_contents($docsPath);
+        $docsData = json_decode($jsonData, true);
+    }
+    
+    if (!isset($docsData['gost_standards']) || !is_array($docsData['gost_standards'])) {
+        echo json_encode(['success' => false, 'message' => 'Список ГОСТов пуст']);
+        exit;
+    }
+    
+    // Проверяем существование индекса
+    if (!isset($docsData['gost_standards'][$index])) {
+        echo json_encode(['success' => false, 'message' => 'ГОСТ не найден']);
+        exit;
+    }
+    
+    // Удаляем файл если он существует
+    if (!empty($fileName)) {
+        $filePath = ASSETS_PATH . '/gosts/' . $fileName;
+        if (file_exists($filePath)) {
+            unlink($filePath);
+        }
+    }
+    
+    // Удаляем запись из массива
+    array_splice($docsData['gost_standards'], $index, 1);
+    
+    // Сохранение обновленных данных
+    if (file_put_contents($docsPath, json_encode($docsData, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE))) {
+        echo json_encode(['success' => true, 'message' => 'ГОСТ успешно удалён']);
+    } else {
+        echo json_encode(['success' => false, 'message' => 'Ошибка сохранения данных']);
+    }
+    exit;
+}
+
 // Для редактирования файл не обязателен
 $fileRequired = !$isEdit;
 $hasFile = isset($_FILES['gost_file']) && $_FILES['gost_file']['error'] !== UPLOAD_ERR_NO_FILE;

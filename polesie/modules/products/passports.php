@@ -617,6 +617,22 @@ $categories = $pdo->query($catQuery)->fetchAll();
             color: var(--text-primary);
             text-align: right;
         }
+        .spec-value.editable {
+            border: 1px solid var(--primary-color);
+            background: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            min-width: 80px;
+        }
+        .spec-value input {
+            width: 100%;
+            border: none;
+            outline: none;
+            font-size: 12px;
+            font-weight: 600;
+            background: transparent;
+            text-align: right;
+        }
         .weight-badge {
             background: var(--success-color);
             color: white;
@@ -1250,11 +1266,11 @@ $categories = $pdo->query($catQuery)->fetchAll();
                 });
         }
         
-        function renderPassportModal(passport) {
-            console.log('Opening passport:', passport.sku);
+        function renderPassportModal(passport, editMode) {
+            editMode = editMode || false;
+            console.log('Opening passport:', passport.sku, 'editMode:', editMode);
             console.log('Full passport data:', passport);
             
-            // Сохраняем данные паспорта для редактирования
             currentPassportData = passport;
             
             document.getElementById('modalPassportTitle').textContent = passport.product_name || 'Без названия';
@@ -1263,14 +1279,18 @@ $categories = $pdo->query($catQuery)->fetchAll();
             var html = '';
             
             // Основная информация
-            html += '<div class="passport-section">';
-            html += '<div class="passport-section-title">📊 Основная информация</div>';
+            html += '<div class="passport-section' + (editMode ? ' editable-mode' : '') + '">';
+            html += '<div class="passport-section-title">📊 Основная информация';
+            if (editMode) {
+                html += '<button type="button" class="section-edit-btn" style="background:#4caf50;color:white;" onclick="saveAllChanges()"><i class="fas fa-save"></i> Сохранить</button>';
+            }
+            html += '</div>';
             html += '<div class="specs-list">';
             html += '<div class="spec-item"><div class="spec-name">Артикул</div><div class="spec-value">' + escapeHtml(passport.sku) + '</div></div>';
             html += '<div class="spec-item"><div class="spec-name">Категория</div><div class="spec-value">' + escapeHtml(passport.category_name || '—') + '</div></div>';
-            html += '<div class="spec-item"><div class="spec-name">Общий вес</div><div class="spec-value">' + (passport.total_weight_kg || '0') + ' кг</div></div>';
-            html += '<div class="spec-item"><div class="spec-name">Гарантия</div><div class="spec-value">' + (passport.warranty_months || 24) + ' мес.</div></div>';
-            html += '<div class="spec-item"><div class="spec-name">Серийный учёт</div><div class="spec-value">' + (passport.is_serial_tracked ? '✅ Да' : '❌ Нет') + '</div></div>';
+            html += '<div class="spec-item" data-field="total_weight_kg"><div class="spec-name">Общий вес</div><div class="spec-value' + (editMode ? ' editable' : '') + '">' + (editMode ? '<input type="number" step="0.001" value="' + (passport.total_weight_kg || 0) + '">' : (passport.total_weight_kg || '0') + ' кг') + '</div></div>';
+            html += '<div class="spec-item" data-field="warranty_months"><div class="spec-name">Гарантия</div><div class="spec-value' + (editMode ? ' editable' : '') + '">' + (editMode ? '<input type="number" value="' + (passport.warranty_months || 24) + '">' : (passport.warranty_months || 24) + ' мес.') + '</div></div>';
+            html += '<div class="spec-item" data-field="is_serial_tracked"><div class="spec-name">Серийный учёт</div><div class="spec-value' + (editMode ? ' editable' : '') + '">' + (editMode ? '<input type="checkbox"' + (passport.is_serial_tracked ? ' checked' : '') + '>' : (passport.is_serial_tracked ? '✅ Да' : '❌ Нет')) + '</div></div>';
             html += '</div>';
             html += '</div>';
             
@@ -1404,11 +1424,19 @@ $categories = $pdo->query($catQuery)->fetchAll();
             
             // Примечания к производству
             if (passport.production_notes && passport.production_notes.length > 0) {
-                html += '<div class="passport-section">';
-                html += '<div class="passport-section-title">📋 Примечания к производству</div>';
+                html += '<div class="passport-section' + (editMode ? ' editable-mode' : '') + '">';
+                html += '<div class="passport-section-title">📋 Примечания к производству';
+                if (editMode) {
+                    html += '<button type="button" class="section-edit-btn" style="background:#2196f3;color:white;" onclick="addNoteItem()"><i class="fas fa-plus"></i> Добавить</button>';
+                }
+                html += '</div>';
                 html += '<ul class="notes-list">';
                 for (var i = 0; i < passport.production_notes.length; i++) {
-                    html += '<li>' + escapeHtml(passport.production_notes[i]) + '</li>';
+                    if (editMode) {
+                        html += '<li><input type="text" value="' + escapeHtml(passport.production_notes[i]) + '" style="width:100%;border:none;outline:none;font-size:12px;padding:4px;"><button type="button" onclick="removeNoteItem(this)" style="float:right;background:#f44336;color:white;border:none;border-radius:4px;padding:2px 6px;cursor:pointer;"><i class="fas fa-times"></i></button></li>';
+                    } else {
+                        html += '<li>' + escapeHtml(passport.production_notes[i]) + '</li>';
+                    }
                 }
                 html += '</ul>';
                 html += '</div>';
@@ -1416,11 +1444,19 @@ $categories = $pdo->query($catQuery)->fetchAll();
             
             // Требования к качеству
             if (passport.quality_requirements && passport.quality_requirements.length > 0) {
-                html += '<div class="passport-section">';
-                html += '<div class="passport-section-title">✅ Требования к качеству</div>';
+                html += '<div class="passport-section' + (editMode ? ' editable-mode' : '') + '">';
+                html += '<div class="passport-section-title">✅ Требования к качеству';
+                if (editMode) {
+                    html += '<button type="button" class="section-edit-btn" style="background:#2196f3;color:white;" onclick="addRequirementItem()"><i class="fas fa-plus"></i> Добавить</button>';
+                }
+                html += '</div>';
                 html += '<ul class="requirements-list">';
                 for (var i = 0; i < passport.quality_requirements.length; i++) {
-                    html += '<li>' + escapeHtml(passport.quality_requirements[i]) + '</li>';
+                    if (editMode) {
+                        html += '<li><input type="text" value="' + escapeHtml(passport.quality_requirements[i]) + '" style="width:100%;border:none;outline:none;font-size:12px;padding:4px;"><button type="button" onclick="removeRequirementItem(this)" style="float:right;background:#f44336;color:white;border:none;border-radius:4px;padding:2px 6px;cursor:pointer;"><i class="fas fa-times"></i></button></li>';
+                    } else {
+                        html += '<li>' + escapeHtml(passport.quality_requirements[i]) + '</li>';
+                    }
                 }
                 html += '</ul>';
                 html += '</div>';
@@ -1494,37 +1530,119 @@ $categories = $pdo->query($catQuery)->fetchAll();
         
         // Функция включения режима редактирования
         var currentPassportData = null;
+        var editMode = false;
+        
+        function toggleEditMode() {
+            editMode = !editMode;
+            var btn = document.getElementById('editPassportBtn');
+            if (editMode) {
+                btn.innerHTML = '<i class="fas fa-save"></i>';
+                btn.classList.remove('btn-primary');
+                btn.classList.add('btn-success');
+                btn.title = 'Сохранить изменения';
+                renderPassportModal(currentPassportData, true);
+            } else {
+                btn.innerHTML = '<i class="fas fa-edit"></i>';
+                btn.classList.remove('btn-success');
+                btn.classList.add('btn-primary');
+                btn.title = 'Редактировать паспорт';
+                renderPassportModal(currentPassportData, false);
+            }
+        }
         
         function enableEditMode() {
-            if (!currentPassportData) {
-                alert('Данные паспорта не загружены');
-                return;
+            toggleEditMode();
+        }
+        
+        function saveAllChanges() {
+            if (!currentPassportData) return;
+            
+            var totalWeightEl = document.querySelector('[data-field="total_weight_kg"] input');
+            var warrantyEl = document.querySelector('[data-field="warranty_months"] input');
+            var serialEl = document.querySelector('[data-field="is_serial_tracked"] input');
+            
+            var updatedData = {
+                action: 'save_passport',
+                passport_id: currentPassportData.passport_id || null,
+                product_id: currentPassportData.product_id,
+                total_weight_kg: totalWeightEl ? parseFloat(totalWeightEl.value) : currentPassportData.total_weight_kg,
+                warranty_months: warrantyEl ? parseInt(warrantyEl.value) : currentPassportData.warranty_months,
+                is_serial_tracked: serialEl ? serialEl.checked : currentPassportData.is_serial_tracked,
+                production_notes: currentPassportData.production_notes,
+                quality_requirements: currentPassportData.quality_requirements
+            };
+            
+            var notesList = document.querySelector('.notes-list');
+            if (notesList) {
+                var notes = [];
+                notesList.querySelectorAll('li').forEach(function(li) {
+                    var input = li.querySelector('input');
+                    if (input && input.value.trim()) {
+                        notes.push(input.value.trim());
+                    }
+                });
+                updatedData.production_notes = notes;
             }
             
-            // Заполняем форму данными из паспорта
-            document.getElementById('editPassportId').value = currentPassportData.passport_id || '';
-            document.getElementById('editProductId').value = currentPassportData.product_id || '';
-            document.getElementById('editModalSKU').textContent = 'SKU: ' + (currentPassportData.sku || '—');
-            document.getElementById('editTotalWeight').value = currentPassportData.total_weight_kg || 0;
-            document.getElementById('editWarranty').value = currentPassportData.warranty_months || 12;
-            document.getElementById('editSerialTracked').checked = currentPassportData.is_serial_tracked ? true : false;
-            
-            // Преобразуем массивы в текст (каждый элемент с новой строки)
-            var productionNotesText = '';
-            if (currentPassportData.production_notes && Array.isArray(currentPassportData.production_notes)) {
-                productionNotesText = currentPassportData.production_notes.join('\n');
+            var reqList = document.querySelector('.requirements-list');
+            if (reqList) {
+                var reqs = [];
+                reqList.querySelectorAll('li').forEach(function(li) {
+                    var input = li.querySelector('input');
+                    if (input && input.value.trim()) {
+                        reqs.push(input.value.trim());
+                    }
+                });
+                updatedData.quality_requirements = reqs;
             }
-            document.getElementById('editProductionNotes').value = productionNotesText;
             
-            var qualityRequirementsText = '';
-            if (currentPassportData.quality_requirements && Array.isArray(currentPassportData.quality_requirements)) {
-                qualityRequirementsText = currentPassportData.quality_requirements.join('\n');
+            fetch('api_passport.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(updatedData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Паспорт успешно сохранён!');
+                    toggleEditMode();
+                    fetch('api_passport.php?id=' + currentPassportData.passport_id)
+                        .then(r => r.json())
+                        .then(d => { if (d.success) renderPassportModal(d.passport, false); });
+                } else {
+                    alert('Ошибка сохранения: ' + data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Ошибка соединения с сервером');
+            });
+        }
+        
+        function addNoteItem() {
+            var notesList = document.querySelector('.notes-list');
+            if (notesList) {
+                var li = document.createElement('li');
+                li.innerHTML = '<input type="text" value="" placeholder="Введите примечание..." style="width:100%;border:none;outline:none;font-size:12px;padding:4px;"><button type="button" onclick="removeNoteItem(this)" style="float:right;background:#f44336;color:white;border:none;border-radius:4px;padding:2px 6px;cursor:pointer;"><i class="fas fa-times"></i></button>';
+                notesList.appendChild(li);
             }
-            document.getElementById('editQualityRequirements').value = qualityRequirementsText;
-            
-            // Показываем модальное окно редактирования
-            document.getElementById('editPassportModalOverlay').style.display = 'flex';
-            document.getElementById('editPassportModalOverlay').classList.add('active');
+        }
+        
+        function removeNoteItem(btn) {
+            btn.parentNode.remove();
+        }
+        
+        function addRequirementItem() {
+            var reqList = document.querySelector('.requirements-list');
+            if (reqList) {
+                var li = document.createElement('li');
+                li.innerHTML = '<input type="text" value="" placeholder="Введите требование..." style="width:100%;border:none;outline:none;font-size:12px;padding:4px;"><button type="button" onclick="removeRequirementItem(this)" style="float:right;background:#f44336;color:white;border:none;border-radius:4px;padding:2px 6px;cursor:pointer;"><i class="fas fa-times"></i></button>';
+                reqList.appendChild(li);
+            }
+        }
+        
+        function removeRequirementItem(btn) {
+            btn.parentNode.remove();
         }
         
         function closeEditModal(event) {

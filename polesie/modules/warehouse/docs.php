@@ -804,8 +804,9 @@ foreach ($materialCategories as $category) {
                     <!-- Секция: ГОСТы -->
                     <div id="gost-section" class="doc-section active">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-                            <div class="search-box" style="margin-bottom: 0;">
-                                <input type="text" class="search-input" placeholder="<i class='fas fa-search'></i> Поиск ГОСТа..." onkeyup="filterStandards(this.value)">
+                            <div class="search-box" style="margin-bottom: 0; position: relative;">
+                                <i class="fas fa-search" style="position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--text-secondary); z-index: 1;"></i>
+                                <input type="text" class="search-input" placeholder="Поиск ГОСТа..." style="padding-left: 48px;" onkeyup="filterStandards(this.value)">
                             </div>
                             <button class="btn btn-primary" onclick="openUploadModal()" style="padding: 12px 24px; border-radius: var(--border-radius-lg); font-weight: 500;">
                                 <i class="fas fa-upload"></i> Загрузить ГОСТ
@@ -853,8 +854,9 @@ foreach ($materialCategories as $category) {
                     
                     <!-- Секция: Аббревиатуры -->
                     <div id="abbreviations-section" class="doc-section">
-                        <div class="search-box">
-                            <input type="text" class="search-input" placeholder="<i class='fas fa-search'></i> Поиск аббревиатуры..." onkeyup="filterAbbreviations(this.value)">
+                        <div class="search-box" style="position: relative;">
+                            <i class="fas fa-search" style="position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--text-secondary); z-index: 1;"></i>
+                            <input type="text" class="search-input" placeholder="Поиск аббревиатуры..." style="padding-left: 48px;" onkeyup="filterAbbreviations(this.value)">
                         </div>
                         
                         <div class="abbreviations-grid" id="abbreviationsGrid">
@@ -884,8 +886,9 @@ foreach ($materialCategories as $category) {
                     
                     <!-- Секция: Структура кодов -->
                     <div id="structures-section" class="doc-section">
-                        <div class="search-box">
-                            <input type="text" class="search-input" placeholder="<i class='fas fa-search'></i> Поиск по структуре кода..." onkeyup="filterStructures(this.value)">
+                        <div class="search-box" style="position: relative;">
+                            <i class="fas fa-search" style="position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--text-secondary); z-index: 1;"></i>
+                            <input type="text" class="search-input" placeholder="Поиск по структуре кода..." style="padding-left: 48px;" onkeyup="filterStructures(this.value)">
                         </div>
                         
                         <!-- Справочник всех аббревиатур -->

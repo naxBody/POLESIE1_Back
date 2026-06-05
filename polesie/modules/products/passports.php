@@ -445,8 +445,8 @@ $categories = $pdo->query($catQuery)->fetchAll();
             transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
         }
         .passport-modal-body textarea {
-            width: 100%;
-            max-width: 500px;
+            width: 400px;
+            max-width: 400px;
             padding: 10px 14px;
             border: 1px solid var(--border-color);
             border-radius: var(--border-radius);

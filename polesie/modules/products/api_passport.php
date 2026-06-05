@@ -38,6 +38,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $warrantyMonths = isset($input['warranty_months']) ? intval($input['warranty_months']) : 12;
         $isSerialTracked = isset($input['is_serial_tracked']) ? ($input['is_serial_tracked'] ? 1 : 0) : 0;
         
+        // Обработка спецификаций
+        $specifications = !empty($input['specifications']) && is_array($input['specifications'])
+            ? json_encode($input['specifications'])
+            : null;
+        
         // Обработка примечаний и требований как JSON массивов
         $productionNotes = !empty($input['production_notes']) 
             ? json_encode(array_filter(array_map('trim', explode("\n", $input['production_notes']))))
@@ -67,6 +72,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 ':quality_requirements' => $qualityRequirements,
                 ':passport_id' => $passportId
             ]);
+            
+            // Обновление спецификаций в таблице products
+            if ($specifications !== null) {
+                $specStmt = $pdo->prepare("
+                    UPDATE products 
+                    SET specifications = :specifications
+                    WHERE id = :product_id
+                ");
+                $specStmt->execute([
+                    ':specifications' => $specifications,
+                    ':product_id' => $productId
+                ]);
+            }
         } else {
             // Создание нового паспорта
             $stmt = $pdo->prepare("
@@ -83,6 +101,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 ':quality_requirements' => $qualityRequirements
             ]);
             $passportId = $pdo->lastInsertId();
+            
+            // Обновление спецификаций в таблице products
+            if ($specifications !== null) {
+                $specStmt = $pdo->prepare("
+                    UPDATE products 
+                    SET specifications = :specifications
+                    WHERE id = :product_id
+                ");
+                $specStmt->execute([
+                    ':specifications' => $specifications,
+                    ':product_id' => $productId
+                ]);
+            }
         }
         
         echo json_encode(['success' => true, 'passport_id' => $passportId]);

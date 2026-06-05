@@ -382,7 +382,7 @@ $categories = $pdo->query($catQuery)->fetchAll();
         .passport-modal {
             background: white;
             border-radius: var(--border-radius);
-            max-width: 900px;
+            max-width: 700px;
             width: 90%;
             max-height: 90vh;
             overflow-y: auto;
@@ -422,7 +422,44 @@ $categories = $pdo->query($catQuery)->fetchAll();
             background: rgba(255,255,255,0.3);
         }
         .passport-modal-body {
-            padding: 12px;
+            padding: 20px;
+        }
+        .passport-modal-body .form-group {
+            margin-bottom: 16px;
+        }
+        .passport-modal-body label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 500;
+            color: var(--text-primary);
+            font-size: 13px;
+        }
+        .passport-modal-body input[type="number"],
+        .passport-modal-body textarea {
+            width: 100%;
+            max-width: 400px;
+            padding: 10px 14px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            font-size: 14px;
+            color: var(--text-primary);
+            background: var(--bg-primary);
+            transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+        }
+        .passport-modal-body input[type="number"]:focus,
+        .passport-modal-body textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+        .passport-modal-body textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        .passport-modal-body .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 16px;
         }
         .passport-section {
             margin-bottom: 12px;
@@ -1184,7 +1221,7 @@ $categories = $pdo->query($catQuery)->fetchAll();
     
     <!-- Модальное окно редактирования паспорта -->
     <div id="editPassportModalOverlay" class="passport-modal-overlay" style="display: none;" onclick="closeEditModal(event)">
-        <div class="passport-modal" style="max-width: 700px;">
+        <div class="passport-modal">
             <div class="passport-modal-header">
                 <div>
                     <div class="passport-modal-title">Редактирование паспорта</div>
@@ -1197,14 +1234,16 @@ $categories = $pdo->query($catQuery)->fetchAll();
                     <input type="hidden" id="editPassportId" name="passport_id">
                     <input type="hidden" id="editProductId" name="product_id">
                     
-                    <div class="form-group">
-                        <label for="editTotalWeight"><i class="fas fa-weight-hanging"></i> Общий вес (кг)</label>
-                        <input type="number" id="editTotalWeight" name="total_weight_kg" step="0.001" min="0" required style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: var(--border-radius); font-size: 14px;">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="editWarranty"><i class="fas fa-shield-alt"></i> Гарантия (месяцев)</label>
-                        <input type="number" id="editWarranty" name="warranty_months" min="0" max="120" required style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: var(--border-radius); font-size: 14px;">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="editTotalWeight"><i class="fas fa-weight-hanging"></i> Общий вес (кг)</label>
+                            <input type="number" id="editTotalWeight" name="total_weight_kg" step="0.001" min="0" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="editWarranty"><i class="fas fa-shield-alt"></i> Гарантия (месяцев)</label>
+                            <input type="number" id="editWarranty" name="warranty_months" min="0" max="120" required>
+                        </div>
                     </div>
                     
                     <div class="form-group">
@@ -1216,12 +1255,12 @@ $categories = $pdo->query($catQuery)->fetchAll();
                     
                     <div class="form-group">
                         <label for="editProductionNotes"><i class="fas fa-clipboard-list"></i> Примечания к производству (каждое с новой строки)</label>
-                        <textarea id="editProductionNotes" name="production_notes" rows="4" style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: var(--border-radius); font-size: 14px; resize: vertical;"></textarea>
+                        <textarea id="editProductionNotes" name="production_notes" rows="4"></textarea>
                     </div>
                     
                     <div class="form-group">
                         <label for="editQualityRequirements"><i class="fas fa-check-circle"></i> Требования к качеству (каждое с новой строки)</label>
-                        <textarea id="editQualityRequirements" name="quality_requirements" rows="4" style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: var(--border-radius); font-size: 14px; resize: vertical;"></textarea>
+                        <textarea id="editQualityRequirements" name="quality_requirements" rows="4"></textarea>
                     </div>
                     
                     <div style="display: flex; gap: 12px; margin-top: 20px;">

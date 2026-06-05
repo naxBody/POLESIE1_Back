@@ -708,6 +708,18 @@ foreach ($materialCategories as $category) {
         border-color: var(--primary-color);
     }
     
+    .delete-gost-btn {
+        background: #ef4444 !important;
+        color: white !important;
+        border-color: #ef4444 !important;
+    }
+    
+    .delete-gost-btn:hover {
+        background: #dc2626 !important;
+        color: white !important;
+        border-color: #dc2626 !important;
+    }
+    
     .btn-icon i {
         font-size: 14px;
     }
@@ -859,10 +871,16 @@ foreach ($materialCategories as $category) {
                                     </div>
                                 </a>
                                 <button class="btn-icon edit-gost-btn" 
-                                        onclick="openEditModal(<?= $index ?>);" 
+                                        onclick="openEditModal(<?= $index ?>); event.stopPropagation();" 
                                         title="Редактировать"
-                                        style="position: absolute; bottom: 12px; right: 12px; z-index: 10;">
+                                        style="position: absolute; bottom: 12px; right: 52px; z-index: 10;">
                                     <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn-icon delete-gost-btn" 
+                                        onclick="deleteGost(<?= $index ?>); event.stopPropagation();" 
+                                        title="Удалить"
+                                        style="position: absolute; bottom: 12px; right: 12px; z-index: 10;">
+                                    <i class="fas fa-trash"></i>
                                 </button>
                             </div>
                             <?php endforeach; ?>
@@ -1787,6 +1805,38 @@ foreach ($materialCategories as $category) {
         } finally {
             submitBtn.disabled = false;
             submitBtn.textContent = originalBtnText;
+        }
+    }
+    
+    // Функция удаления ГОСТа
+    function deleteGost(index) {
+        const gost = gostStandardsData[index];
+        if (!gost) return;
+        
+        if (confirm('Вы уверены, что хотите удалить ГОСТ "' + gost.gost_number + '"? Это действие нельзя отменить.')) {
+            fetch('upload_gost.php?action=delete', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ 
+                    index: index,
+                    gost_number: gost.gost_number,
+                    file_name: gost.file_name || ''
+                })
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.success) {
+                    alert('✅ ' + result.message);
+                    location.reload();
+                } else {
+                    alert('⚠️ Ошибка: ' + result.message);
+                }
+            })
+            .catch(error => {
+                alert('⚠️ Ошибка сети: ' + error.message);
+            });
         }
     }
     

@@ -244,6 +244,7 @@ foreach ($materialCategories as $category) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= e($pageTitle) ?> - <?= e(APP_NAME) ?></title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="<?= asset('assets/css/style.css') ?>">
     <style>
     .docs-page {
@@ -663,6 +664,36 @@ foreach ($materialCategories as $category) {
         color: var(--text-secondary);
     }
     
+    .file-upload-icon i {
+        font-size: 48px;
+        color: var(--primary-color);
+    }
+    
+    .btn-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
+        padding: 0;
+        border: 1px solid var(--border-color);
+        border-radius: 6px;
+        background: var(--bg-primary);
+        cursor: pointer;
+        transition: all var(--transition-fast);
+        color: var(--text-primary);
+    }
+    
+    .btn-icon:hover {
+        background: var(--primary-color);
+        color: white;
+        border-color: var(--primary-color);
+    }
+    
+    .btn-icon i {
+        font-size: 14px;
+    }
+    
     .file-upload-text {
         font-size: 12px;
         color: var(--text-secondary);
@@ -761,23 +792,23 @@ foreach ($materialCategories as $category) {
             
             <div class="content-area">
                 <div class="docs-page">
-                    <h1 style="margin-bottom: 24px;">📚 Документы и справочники материалов</h1>
+                    <h1 style="margin-bottom: 24px;"><i class="fas fa-book"></i> Документы и справочники материалов</h1>
                     
                     <!-- Вкладки -->
                     <div class="docs-tabs">
-                        <button class="doc-tab active" onclick="switchTab('gost')">📋 ГОСТы и стандарты</button>
-                        <button class="doc-tab" onclick="switchTab('abbreviations')">🔤 Расшифровка аббревиатур</button>
-                        <button class="doc-tab" onclick="switchTab('structures')">📝 Структура кодов материалов</button>
+                        <button class="doc-tab active" onclick="switchTab('gost')"><i class="fas fa-file-contract"></i> ГОСТы и стандарты</button>
+                        <button class="doc-tab" onclick="switchTab('abbreviations')"><i class="fas fa-font"></i> Расшифровка аббревиатур</button>
+                        <button class="doc-tab" onclick="switchTab('structures')"><i class="fas fa-sitemap"></i> Структура кодов материалов</button>
                     </div>
                     
                     <!-- Секция: ГОСТы -->
                     <div id="gost-section" class="doc-section active">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
                             <div class="search-box" style="margin-bottom: 0;">
-                                <input type="text" class="search-input" placeholder="🔍 Поиск ГОСТа..." onkeyup="filterStandards(this.value)">
+                                <input type="text" class="search-input" placeholder="<i class='fas fa-search'></i> Поиск ГОСТа..." onkeyup="filterStandards(this.value)">
                             </div>
                             <button class="btn btn-primary" onclick="openUploadModal()" style="padding: 12px 24px; border-radius: var(--border-radius-lg); font-weight: 500;">
-                                📤 Загрузить ГОСТ
+                                <i class="fas fa-upload"></i> Загрузить ГОСТ
                             </button>
                         </div>
                         
@@ -805,17 +836,15 @@ foreach ($materialCategories as $category) {
                                             <span class="standard-status status-active"><?= e($gost['status']) ?></span>
                                         </div>
                                         <div class="standard-title"><?= e($gost['title']) ?></div>
-                                        <div class="standard-category">📁 <?= e($gost['category']) ?></div>
+                                        <div class="standard-category"><i class="fas fa-folder"></i> <?= e($gost['category']) ?></div>
                                         <div class="standard-card-footer"></div>
                                     </div>
                                 </a>
                                 <button class="btn-icon edit-gost-btn" 
                                         onclick="openEditModal(<?= $index ?>);" 
                                         title="Редактировать"
-                                        style="position: absolute; bottom: 12px; right: 12px; background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 6px; padding: 6px 10px; cursor: pointer; transition: all var(--transition-fast); z-index: 10;"
-                                        onmouseover="this.style.background='var(--primary-color)'; this.style.color='white'"
-                                        onmouseout="this.style.background='var(--bg-primary)'; this.style.color='var(--text-primary)'">
-                                    ✏️
+                                        style="position: absolute; bottom: 12px; right: 12px; z-index: 10;">
+                                    <i class="fas fa-edit"></i>
                                 </button>
                             </div>
                             <?php endforeach; ?>
@@ -825,7 +854,7 @@ foreach ($materialCategories as $category) {
                     <!-- Секция: Аббревиатуры -->
                     <div id="abbreviations-section" class="doc-section">
                         <div class="search-box">
-                            <input type="text" class="search-input" placeholder="🔍 Поиск аббревиатуры..." onkeyup="filterAbbreviations(this.value)">
+                            <input type="text" class="search-input" placeholder="<i class='fas fa-search'></i> Поиск аббревиатуры..." onkeyup="filterAbbreviations(this.value)">
                         </div>
                         
                         <div class="abbreviations-grid" id="abbreviationsGrid">
@@ -836,7 +865,7 @@ foreach ($materialCategories as $category) {
                                     <span class="abbr-full-name"><?= e($info['full_name']) ?></span>
                                 </div>
                                 <div class="abbr-description"><?= e($info['description']) ?></div>
-                                <div class="abbr-category">📁 <?= e($info['category']) ?></div>
+                                <div class="abbr-category"><i class="fas fa-folder"></i> <?= e($info['category']) ?></div>
                             </div>
                             <?php endforeach; ?>
                             
@@ -847,7 +876,7 @@ foreach ($materialCategories as $category) {
                                     <span class="abbr-full-name"><?= e($info['full_name']) ?></span>
                                 </div>
                                 <div class="abbr-description"><?= e($info['description']) ?></div>
-                                <div class="abbr-category">📁 <?= e($info['category']) ?></div>
+                                <div class="abbr-category"><i class="fas fa-folder"></i> <?= e($info['category']) ?></div>
                             </div>
                             <?php endforeach; ?>
                         </div>
@@ -856,14 +885,14 @@ foreach ($materialCategories as $category) {
                     <!-- Секция: Структура кодов -->
                     <div id="structures-section" class="doc-section">
                         <div class="search-box">
-                            <input type="text" class="search-input" placeholder="🔍 Поиск по структуре кода..." onkeyup="filterStructures(this.value)">
+                            <input type="text" class="search-input" placeholder="<i class='fas fa-search'></i> Поиск по структуре кода..." onkeyup="filterStructures(this.value)">
                         </div>
                         
                         <!-- Справочник всех аббревиатур -->
                         <?php if (!empty($abbreviationDecodings)): ?>
                         <div style="margin-bottom: 32px; background: var(--bg-primary); border-radius: var(--border-radius-lg); padding: 20px; box-shadow: var(--shadow);">
                             <h3 style="margin-bottom: 16px; font-size: 16px; font-weight: 600;">
-                                📖 Полный справочник аббревиатур
+                                <i class="fas fa-book"></i> Полный справочник аббревиатур
                             </h3>
                             <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px;">
                                 <?php foreach ($abbreviationDecodings as $abbrInfo): ?>
@@ -926,7 +955,7 @@ foreach ($materialCategories as $category) {
     <div class="modal-overlay" id="uploadModal">
         <div class="modal-window">
             <div class="modal-header">
-                <h3 class="modal-title">📤 Загрузка ГОСТа</h3>
+                <h3 class="modal-title"><i class="fas fa-upload"></i> Загрузка ГОСТа</h3>
                 <button class="modal-close" onclick="closeUploadModal()">&times;</button>
             </div>
             
@@ -962,10 +991,10 @@ foreach ($materialCategories as $category) {
                             <option value="Другое">Другое</option>
                         </select>
                         <button type="button" class="btn btn-secondary" onclick="addNewCategory()" style="padding: 10px 14px; border-radius: var(--border-radius-lg);" title="Добавить новую категорию">
-                            ➕
+                            <i class="fas fa-plus"></i>
                         </button>
                         <button type="button" class="btn btn-secondary" onclick="deleteCategory()" style="padding: 10px 14px; border-radius: var(--border-radius-lg);" title="Удалить выбранную категорию">
-                            🗑️
+                            <i class="fas fa-trash"></i>
                         </button>
                     </div>
                 </div>
@@ -982,7 +1011,7 @@ foreach ($materialCategories as $category) {
                 <div class="form-group">
                     <label class="form-label" for="gost_file">Файл PDF *</label>
                     <div class="file-upload-wrapper" id="fileUploadWrapper" onclick="document.getElementById('gost_file').click()">
-                        <div class="file-upload-icon">📄</div>
+                        <div class="file-upload-icon"><i class="fas fa-file-pdf"></i></div>
                         <div class="file-upload-text">Перетащите файл или кликните</div>
                         <div class="file-upload-hint">PDF, макс. 50 MB</div>
                         <div class="file-name-display" id="fileNameDisplay"></div>
@@ -993,8 +1022,8 @@ foreach ($materialCategories as $category) {
                 <div id="uploadStatus" class="upload-status"></div>
                 
                 <div class="form-actions">
-                    <button type="button" class="btn btn-secondary" onclick="closeUploadModal()">Отмена</button>
-                    <button type="submit" class="btn btn-primary">📤 Загрузить</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeUploadModal()"><i class="fas fa-times"></i> Отмена</button>
+                    <button type="submit" class="btn btn-primary"><i class="fas fa-upload"></i> Загрузить</button>
                 </div>
             </form>
         </div>
@@ -1004,7 +1033,7 @@ foreach ($materialCategories as $category) {
     <div class="modal-overlay" id="editModal">
         <div class="modal-window">
             <div class="modal-header">
-                <h3 class="modal-title">✏️ Редактирование ГОСТа</h3>
+                <h3 class="modal-title"><i class="fas fa-edit"></i> Редактирование ГОСТа</h3>
                 <button class="modal-close" onclick="closeEditModal()">&times;</button>
             </div>
             
@@ -1042,10 +1071,10 @@ foreach ($materialCategories as $category) {
                             <option value="Другое">Другое</option>
                         </select>
                         <button type="button" class="btn btn-secondary" onclick="addNewCategoryEdit()" style="padding: 10px 14px; border-radius: var(--border-radius-lg);" title="Добавить новую категорию">
-                            ➕
+                            <i class="fas fa-plus"></i>
                         </button>
                         <button type="button" class="btn btn-secondary" onclick="deleteCategoryEdit()" style="padding: 10px 14px; border-radius: var(--border-radius-lg);" title="Удалить выбранную категорию">
-                            🗑️
+                            <i class="fas fa-trash"></i>
                         </button>
                     </div>
                 </div>
@@ -1062,7 +1091,7 @@ foreach ($materialCategories as $category) {
                 <div class="form-group">
                     <label class="form-label" for="edit_gost_file">Новый файл PDF (необязательно)</label>
                     <div class="file-upload-wrapper" id="editFileUploadWrapper" onclick="document.getElementById('edit_gost_file').click()">
-                        <div class="file-upload-icon">📄</div>
+                        <div class="file-upload-icon"><i class="fas fa-file-pdf"></i></div>
                         <div class="file-upload-text">Перетащите файл или кликните</div>
                         <div class="file-upload-hint">PDF, макс. 50 MB (оставьте пустым, чтобы сохранить текущий файл)</div>
                         <div class="file-name-display" id="editFileNameDisplay"></div>
@@ -1074,8 +1103,8 @@ foreach ($materialCategories as $category) {
                 <div id="editUploadStatus" class="upload-status"></div>
                 
                 <div class="form-actions">
-                    <button type="button" class="btn btn-secondary" onclick="closeEditModal()">Отмена</button>
-                    <button type="submit" class="btn btn-primary">💾 Сохранить</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeEditModal()"><i class="fas fa-times"></i> Отмена</button>
+                    <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Сохранить</button>
                 </div>
             </form>
         </div>

@@ -662,31 +662,35 @@ $categories = $pdo->query($catQuery)->fetchAll();
             font-weight: 600;
             color: var(--text-primary);
             text-align: right;
+            max-width: 200px;
         }
         .spec-value.editable {
             border: 1px solid var(--primary-color);
             background: white;
             padding: 4px 8px;
             border-radius: 4px;
-            min-width: 80px;
+            min-width: auto;
             display: inline-block;
+            max-width: 200px;
         }
         .spec-value input {
             width: auto;
             min-width: 60px;
-            max-width: 200px;
+            max-width: 180px;
             border: none;
             outline: none;
             font-size: 12px;
             font-weight: 600;
             background: transparent;
             text-align: right;
+            display: inline-block;
         }
         .spec-value input[type="text"] {
-            width: 150px;
+            width: 120px;
+            max-width: 180px;
         }
         .spec-value input[type="number"] {
-            width: 80px;
+            width: 70px;
         }
         .spec-value input[type="checkbox"] {
             width: 16px;
@@ -1341,11 +1345,7 @@ $categories = $pdo->query($catQuery)->fetchAll();
             
             // Основная информация
             html += '<div class="passport-section' + (editMode ? ' editable-mode' : '') + '">';
-            html += '<div class="passport-section-title">📊 Основная информация';
-            if (editMode) {
-                html += '<button type="button" class="section-edit-btn" style="background:#4caf50;color:white;" onclick="saveAllChanges()"><i class="fas fa-save"></i> Сохранить</button>';
-            }
-            html += '</div>';
+            html += '<div class="passport-section-title">📊 Основная информация</div>';
             html += '<div class="specs-list">';
             html += '<div class="spec-item"><div class="spec-name">Артикул</div><div class="spec-value">' + escapeHtml(passport.sku) + '</div></div>';
             html += '<div class="spec-item"><div class="spec-name">Категория</div><div class="spec-value">' + escapeHtml(passport.category_name || '—') + '</div></div>';
@@ -1358,11 +1358,7 @@ $categories = $pdo->query($catQuery)->fetchAll();
             // Характеристики
             if (passport.specifications && Object.keys(passport.specifications).length > 0) {
                 html += '<div class="passport-section' + (editMode ? ' editable-mode' : '') + '">';
-                html += '<div class="passport-section-title">⚙️ Технические характеристики';
-                if (editMode) {
-                    html += '<button type="button" class="section-edit-btn" style="background:#4caf50;color:white;" onclick="saveAllChanges()"><i class="fas fa-save"></i> Сохранить</button>';
-                }
-                html += '</div>';
+                html += '<div class="passport-section-title">⚙️ Технические характеристики</div>';
                 html += '<div class="specs-list">';
                 for (var key in passport.specifications) {
                     if (passport.specifications.hasOwnProperty(key)) {
@@ -1616,7 +1612,12 @@ $categories = $pdo->query($catQuery)->fetchAll();
         }
         
         function enableEditMode() {
-            toggleEditMode();
+            // Если уже в режиме редактирования - сохраняем
+            if (editMode) {
+                saveAllChanges();
+            } else {
+                toggleEditMode();
+            }
         }
         
         function saveAllChanges() {

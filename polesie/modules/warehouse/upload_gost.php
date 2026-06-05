@@ -204,8 +204,9 @@ if (empty($category)) {
 // Получение существующих данных
 $docsPath = BASE_PATH . '/list_materials_docs.json';
 $docsData = [];
+$fileExists = file_exists($docsPath);
 
-if (file_exists($docsPath)) {
+if ($fileExists) {
     $jsonData = file_get_contents($docsPath);
     $docsData = json_decode($jsonData, true);
 }
@@ -215,20 +216,22 @@ if (!isset($docsData['gost_standards'])) {
     $docsData['gost_standards'] = [];
 }
 
-// Если файл существовал, но был пуст, инициализируем стандартным набором
-if (empty($docsData['gost_standards']) && !empty($_POST['gost_number'])) {
-    $docsData['gost_standards'] = [
-        ['gost_number' => 'ГОСТ 7798-70', 'title' => 'Болты с шестигранной головкой', 'category' => 'Крепеж', 'status' => 'Действующий', 'file_name' => '', 'uploaded_at' => date('Y-m-d H:i:s'), 'uploaded_by' => $user['id']],
-        ['gost_number' => 'ГОСТ 5915-70', 'title' => 'Гайки шестигранные', 'category' => 'Крепеж', 'status' => 'Действующий', 'file_name' => '', 'uploaded_at' => date('Y-m-d H:i:s'), 'uploaded_by' => $user['id']],
-        ['gost_number' => 'ГОСТ 11402-75', 'title' => 'Шайбы пружинные', 'category' => 'Крепеж', 'status' => 'Действующий', 'file_name' => '', 'uploaded_at' => date('Y-m-d H:i:s'), 'uploaded_by' => $user['id']],
-        ['gost_number' => 'ГОСТ 8736-2014', 'title' => 'Песок для строительных работ', 'category' => 'Материалы', 'status' => 'Действующий', 'file_name' => '', 'uploaded_at' => date('Y-m-d H:i:s'), 'uploaded_by' => $user['id']],
-        ['gost_number' => 'ГОСТ 1050-88', 'title' => 'Сталь сортовая калиброванная', 'category' => 'Металлы', 'status' => 'Действующий', 'file_name' => '', 'uploaded_at' => date('Y-m-d H:i:s'), 'uploaded_by' => $user['id']],
-        ['gost_number' => 'ГОСТ 2284-79', 'title' => 'Круги шлифовальные', 'category' => 'Инструмент', 'status' => 'Действующий', 'file_name' => '', 'uploaded_at' => date('Y-m-d H:i:s'), 'uploaded_by' => $user['id']],
-        ['gost_number' => 'ГОСТ 6311-2014', 'title' => 'Кабели силовые', 'category' => 'Электротехника', 'status' => 'Действующий', 'file_name' => '', 'uploaded_at' => date('Y-m-d H:i:s'), 'uploaded_by' => $user['id']],
-        ['gost_number' => 'ГОСТ 18599-2014', 'title' => 'Провода обмоточные', 'category' => 'Электротехника', 'status' => 'Действующий', 'file_name' => '', 'uploaded_at' => date('Y-m-d H:i:s'), 'uploaded_by' => $user['id']],
-        ['gost_number' => 'ГОСТ 8822-2014', 'title' => 'Подшипники качения', 'category' => 'Подшипники', 'status' => 'Действующий', 'file_name' => '', 'uploaded_at' => date('Y-m-d H:i:s'), 'uploaded_by' => $user['id']],
-        ['gost_number' => 'ГОСТ 5950-2000', 'title' => 'Стали инструментальные', 'category' => 'Металлы', 'status' => 'Действующий', 'file_name' => '', 'uploaded_at' => date('Y-m-d H:i:s'), 'uploaded_by' => $user['id']],
-    ];
+// Если файл не существовал ИЛИ массив пуст - инициализируем стандартным набором
+$standardGosts = [
+    ['gost_number' => 'ГОСТ 7798-70', 'title' => 'Болты с шестигранной головкой', 'category' => 'Крепеж', 'status' => 'Действующий', 'file_name' => '', 'uploaded_at' => date('Y-m-d H:i:s'), 'uploaded_by' => $user['id']],
+    ['gost_number' => 'ГОСТ 5915-70', 'title' => 'Гайки шестигранные', 'category' => 'Крепеж', 'status' => 'Действующий', 'file_name' => '', 'uploaded_at' => date('Y-m-d H:i:s'), 'uploaded_by' => $user['id']],
+    ['gost_number' => 'ГОСТ 11402-75', 'title' => 'Шайбы пружинные', 'category' => 'Крепеж', 'status' => 'Действующий', 'file_name' => '', 'uploaded_at' => date('Y-m-d H:i:s'), 'uploaded_by' => $user['id']],
+    ['gost_number' => 'ГОСТ 8736-2014', 'title' => 'Песок для строительных работ', 'category' => 'Материалы', 'status' => 'Действующий', 'file_name' => '', 'uploaded_at' => date('Y-m-d H:i:s'), 'uploaded_by' => $user['id']],
+    ['gost_number' => 'ГОСТ 1050-88', 'title' => 'Сталь сортовая калиброванная', 'category' => 'Металлы', 'status' => 'Действующий', 'file_name' => '', 'uploaded_at' => date('Y-m-d H:i:s'), 'uploaded_by' => $user['id']],
+    ['gost_number' => 'ГОСТ 2284-79', 'title' => 'Круги шлифовальные', 'category' => 'Инструмент', 'status' => 'Действующий', 'file_name' => '', 'uploaded_at' => date('Y-m-d H:i:s'), 'uploaded_by' => $user['id']],
+    ['gost_number' => 'ГОСТ 6311-2014', 'title' => 'Кабели силовые', 'category' => 'Электротехника', 'status' => 'Действующий', 'file_name' => '', 'uploaded_at' => date('Y-m-d H:i:s'), 'uploaded_by' => $user['id']],
+    ['gost_number' => 'ГОСТ 18599-2014', 'title' => 'Провода обмоточные', 'category' => 'Электротехника', 'status' => 'Действующий', 'file_name' => '', 'uploaded_at' => date('Y-m-d H:i:s'), 'uploaded_by' => $user['id']],
+    ['gost_number' => 'ГОСТ 8822-2014', 'title' => 'Подшипники качения', 'category' => 'Подшипники', 'status' => 'Действующий', 'file_name' => '', 'uploaded_at' => date('Y-m-d H:i:s'), 'uploaded_by' => $user['id']],
+    ['gost_number' => 'ГОСТ 5950-2000', 'title' => 'Стали инструментальные', 'category' => 'Металлы', 'status' => 'Действующий', 'file_name' => '', 'uploaded_at' => date('Y-m-d H:i:s'), 'uploaded_by' => $user['id']],
+];
+
+if (!$fileExists || empty($docsData['gost_standards'])) {
+    $docsData['gost_standards'] = $standardGosts;
 }
 
 // Для редактирования - ищем существующий ГОСТ по индексу

@@ -1153,10 +1153,70 @@ $categories = $pdo->query($catQuery)->fetchAll();
                     <div class="passport-modal-title" id="modalPassportTitle">Название продукта</div>
                     <div class="passport-modal-subtitle" id="modalPassportSKU">SKU: —</div>
                 </div>
-                <button class="passport-modal-close" onclick="closePassportModalDirect()">×</button>
+                <div style="display: flex; gap: 8px; align-items: center;">
+                    <button class="btn btn-sm btn-primary" id="editPassportBtn" onclick="enableEditMode()" title="Редактировать паспорт">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="passport-modal-close" onclick="closePassportModalDirect()">×</button>
+                </div>
             </div>
             <div class="passport-modal-body" id="modalPassportBody">
                 <!-- Контент заполняется через JS -->
+            </div>
+        </div>
+    </div>
+    
+    <!-- Модальное окно редактирования паспорта -->
+    <div id="editPassportModalOverlay" class="passport-modal-overlay" style="display: none;" onclick="closeEditModal(event)">
+        <div class="passport-modal" style="max-width: 700px;">
+            <div class="passport-modal-header">
+                <div>
+                    <div class="passport-modal-title">Редактирование паспорта</div>
+                    <div class="passport-modal-subtitle" id="editModalSKU">SKU: —</div>
+                </div>
+                <button class="passport-modal-close" onclick="closeEditModalDirect()">×</button>
+            </div>
+            <div class="passport-modal-body">
+                <form id="editPassportForm" onsubmit="savePassport(event)">
+                    <input type="hidden" id="editPassportId" name="passport_id">
+                    <input type="hidden" id="editProductId" name="product_id">
+                    
+                    <div class="form-group">
+                        <label for="editTotalWeight"><i class="fas fa-weight-hanging"></i> Общий вес (кг)</label>
+                        <input type="number" id="editTotalWeight" name="total_weight_kg" step="0.001" min="0" required style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: var(--border-radius); font-size: 14px;">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="editWarranty"><i class="fas fa-shield-alt"></i> Гарантия (месяцев)</label>
+                        <input type="number" id="editWarranty" name="warranty_months" min="0" max="120" required style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: var(--border-radius); font-size: 14px;">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label style="display: flex; align-items: center; gap: 8px;">
+                            <input type="checkbox" id="editSerialTracked" name="is_serial_tracked" style="width: 18px; height: 18px;">
+                            <span><i class="fas fa-barcode"></i> Серийный учёт</span>
+                        </label>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="editProductionNotes"><i class="fas fa-clipboard-list"></i> Примечания к производству (каждое с новой строки)</label>
+                        <textarea id="editProductionNotes" name="production_notes" rows="4" style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: var(--border-radius); font-size: 14px; resize: vertical;"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="editQualityRequirements"><i class="fas fa-check-circle"></i> Требования к качеству (каждое с новой строки)</label>
+                        <textarea id="editQualityRequirements" name="quality_requirements" rows="4" style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: var(--border-radius); font-size: 14px; resize: vertical;"></textarea>
+                    </div>
+                    
+                    <div style="display: flex; gap: 12px; margin-top: 20px;">
+                        <button type="submit" class="btn btn-primary" style="flex: 1;">
+                            <i class="fas fa-save"></i> Сохранить изменения
+                        </button>
+                        <button type="button" class="btn btn-secondary" onclick="closeEditModalDirect()" style="flex: 1;">
+                            <i class="fas fa-times"></i> Отмена
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
@@ -1193,6 +1253,9 @@ $categories = $pdo->query($catQuery)->fetchAll();
         function renderPassportModal(passport) {
             console.log('Opening passport:', passport.sku);
             console.log('Full passport data:', passport);
+            
+            // Сохраняем данные паспорта для редактирования
+            currentPassportData = passport;
             
             document.getElementById('modalPassportTitle').textContent = passport.product_name || 'Без названия';
             document.getElementById('modalPassportSKU').textContent = 'SKU: ' + (passport.sku || '—');
@@ -1422,8 +1485,112 @@ $categories = $pdo->query($catQuery)->fetchAll();
                 if (modal.classList.contains('active')) {
                     closePassportModalDirect();
                 }
+                var editModal = document.getElementById('editPassportModalOverlay');
+                if (editModal && editModal.style.display !== 'none') {
+                    closeEditModalDirect();
+                }
             }
         });
+        
+        // Функция включения режима редактирования
+        var currentPassportData = null;
+        
+        function enableEditMode() {
+            if (!currentPassportData) {
+                alert('Данные паспорта не загружены');
+                return;
+            }
+            
+            // Заполняем форму данными из паспорта
+            document.getElementById('editPassportId').value = currentPassportData.passport_id || '';
+            document.getElementById('editProductId').value = currentPassportData.product_id || '';
+            document.getElementById('editModalSKU').textContent = 'SKU: ' + (currentPassportData.sku || '—');
+            document.getElementById('editTotalWeight').value = currentPassportData.total_weight_kg || 0;
+            document.getElementById('editWarranty').value = currentPassportData.warranty_months || 12;
+            document.getElementById('editSerialTracked').checked = currentPassportData.is_serial_tracked ? true : false;
+            
+            // Преобразуем массивы в текст (каждый элемент с новой строки)
+            var productionNotesText = '';
+            if (currentPassportData.production_notes && Array.isArray(currentPassportData.production_notes)) {
+                productionNotesText = currentPassportData.production_notes.join('\n');
+            }
+            document.getElementById('editProductionNotes').value = productionNotesText;
+            
+            var qualityRequirementsText = '';
+            if (currentPassportData.quality_requirements && Array.isArray(currentPassportData.quality_requirements)) {
+                qualityRequirementsText = currentPassportData.quality_requirements.join('\n');
+            }
+            document.getElementById('editQualityRequirements').value = qualityRequirementsText;
+            
+            // Показываем модальное окно редактирования
+            document.getElementById('editPassportModalOverlay').style.display = 'flex';
+            document.getElementById('editPassportModalOverlay').classList.add('active');
+        }
+        
+        function closeEditModal(event) {
+            if (event.target === document.getElementById('editPassportModalOverlay')) {
+                closeEditModalDirect();
+            }
+        }
+        
+        function closeEditModalDirect() {
+            document.getElementById('editPassportModalOverlay').style.display = 'none';
+            document.getElementById('editPassportModalOverlay').classList.remove('active');
+        }
+        
+        function savePassport(event) {
+            event.preventDefault();
+            
+            var passportId = document.getElementById('editPassportId').value;
+            var productId = document.getElementById('editProductId').value;
+            
+            if (!productId) {
+                alert('Ошибка: не указан ID продукта');
+                return;
+            }
+            
+            var formData = {
+                action: 'save_passport',
+                passport_id: passportId ? parseInt(passportId) : null,
+                product_id: parseInt(productId),
+                total_weight_kg: parseFloat(document.getElementById('editTotalWeight').value) || 0,
+                warranty_months: parseInt(document.getElementById('editWarranty').value) || 12,
+                is_serial_tracked: document.getElementById('editSerialTracked').checked,
+                production_notes: document.getElementById('editProductionNotes').value,
+                quality_requirements: document.getElementById('editQualityRequirements').value
+            };
+            
+            fetch('api_passport.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Паспорт успешно сохранён!');
+                    closeEditModalDirect();
+                    // Перезагружаем данные паспорта
+                    if (passportId) {
+                        fetch('api_passport.php?id=' + passportId)
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.success) {
+                                    renderPassportModal(data.passport);
+                                }
+                            });
+                    }
+                } else {
+                    alert('Ошибка сохранения: ' + data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Ошибка соединения с сервером');
+            });
+        }
     </script>
 </body>
 </html>

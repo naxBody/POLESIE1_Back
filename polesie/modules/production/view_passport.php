@@ -1099,7 +1099,7 @@ $isPrint = isset($_GET['print']);
                 <button class="product-modal-close" onclick="closeEditPassportModalDirect()">×</button>
             </div>
             <div class="product-modal-body">
-                <form method="POST" action="api_passport.php">
+                <form id="editPassportForm">
                     <input type="hidden" name="action" value="update_passport">
                     <input type="hidden" name="serial_id" value="<?= $id ?>">
                     
@@ -1110,13 +1110,13 @@ $isPrint = isset($_GET['print']);
                             <label style="display: block; margin-bottom: 6px; font-weight: 500;">Дата изготовления</label>
                             <input type="date" name="manufacture_date" 
                                    value="<?= e($dynamicPassportData['manufacture_date'] ?? $serialData['manufacture_date']) ?>"
-                                   style="width: 100%; padding: 10px 14px; border: 1px solid var(--border-color); border-radius: var(--border-radius);">
+                                   style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: var(--border-radius); font-size: 14px;">
                         </div>
                         <div>
                             <label style="display: block; margin-bottom: 6px; font-weight: 500;">Гарантийный срок (мес.)</label>
                             <input type="number" name="warranty_months" 
                                    value="<?= e($dynamicPassportData['warranty_months'] ?? $serialData['warranty_months'] ?? 12) ?>"
-                                   style="width: 100%; padding: 10px 14px; border: 1px solid var(--border-color); border-radius: var(--border-radius);">
+                                   style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: var(--border-radius); font-size: 14px;">
                         </div>
                     </div>
                     
@@ -1125,13 +1125,13 @@ $isPrint = isset($_GET['print']);
                             <label style="display: block; margin-bottom: 6px; font-weight: 500;">Начало гарантии</label>
                             <input type="date" name="warranty_start" 
                                    value="<?= e($dynamicPassportData['warranty_start'] ?? $serialData['warranty_start']) ?>"
-                                   style="width: 100%; padding: 10px 14px; border: 1px solid var(--border-color); border-radius: var(--border-radius);">
+                                   style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: var(--border-radius); font-size: 14px;">
                         </div>
                         <div>
                             <label style="display: block; margin-bottom: 6px; font-weight: 500;">Окончание гарантии</label>
                             <input type="date" name="warranty_end" 
                                    value="<?= e($dynamicPassportData['warranty_end'] ?? $serialData['warranty_end']) ?>"
-                                   style="width: 100%; padding: 10px 14px; border: 1px solid var(--border-color); border-radius: var(--border-radius);">
+                                   style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: var(--border-radius); font-size: 14px;">
                         </div>
                     </div>
                     
@@ -1150,7 +1150,7 @@ $isPrint = isset($_GET['print']);
                         <input type="text" name="company_name" 
                                value="<?= e($dynamicPassportData['company_name'] ?? $editDefaultCompanyName) ?>"
                                placeholder="ОАО «Полесьеэлектромаш»"
-                               style="width: 100%; padding: 10px 14px; border: 1px solid var(--border-color); border-radius: var(--border-radius);">
+                               style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: var(--border-radius); font-size: 14px;">
                     </div>
                     
                     <div style="margin-bottom: 12px;">
@@ -1158,7 +1158,7 @@ $isPrint = isset($_GET['print']);
                         <input type="text" name="company_address" 
                                value="<?= e($dynamicPassportData['company_address'] ?? $editDefaultCompanyAddress) ?>"
                                placeholder="225644, Брестская область, г. Лунинец, ул. Красная, 179"
-                               style="width: 100%; padding: 10px 14px; border: 1px solid var(--border-color); border-radius: var(--border-radius);">
+                               style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: var(--border-radius); font-size: 14px;">
                     </div>
                     
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px;">
@@ -1167,14 +1167,14 @@ $isPrint = isset($_GET['print']);
                             <input type="text" name="company_phone" 
                                    value="<?= e($dynamicPassportData['company_phone'] ?? $editDefaultCompanyPhone) ?>"
                                    placeholder="+375 1647 2-78-09"
-                                   style="width: 100%; padding: 10px 14px; border: 1px solid var(--border-color); border-radius: var(--border-radius);">
+                                   style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: var(--border-radius); font-size: 14px;">
                         </div>
                         <div>
                             <label style="display: block; margin-bottom: 6px; font-weight: 500;">E-mail</label>
                             <input type="email" name="company_email" 
                                    value="<?= e($dynamicPassportData['company_email'] ?? $editDefaultCompanyEmail) ?>"
                                    placeholder="polesie@polesieelectromash.by"
-                                   style="width: 100%; padding: 10px 14px; border: 1px solid var(--border-color); border-radius: var(--border-radius);">
+                                   style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: var(--border-radius); font-size: 14px;">
                         </div>
                     </div>
                     
@@ -1185,22 +1185,31 @@ $isPrint = isset($_GET['print']);
                         <input type="text" name="product_name_custom" 
                                value="<?= e($dynamicPassportData['product_name_custom'] ?? '') ?>"
                                placeholder="Оставьте пустым для использования стандартного названия"
-                               style="width: 100%; padding: 10px 14px; border: 1px solid var(--border-color); border-radius: var(--border-radius);">
+                               style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: var(--border-radius); font-size: 14px;">
+                    </div>
+                    
+                    <div style="margin-bottom: 16px;">
+                        <label style="display: block; margin-bottom: 6px; font-weight: 500;">Технические характеристики продукта (JSON)</label>
+                        <textarea name="product_specifications" rows="8" 
+                                  id="editProductSpecs"
+                                  style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: var(--border-radius); font-family: monospace; font-size: 12px;"
+                        ><?= e(json_encode($productSpecs, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT)) ?></textarea>
                     </div>
                     
                     <h4 style="margin-bottom: 12px; color: var(--primary-color); margin-top: 20px;">⚙️ Технические характеристики</h4>
                     
                     <div style="margin-bottom: 16px;">
-                        <label style="display: block; margin-bottom: 6px; font-weight: 500;">Технические характеристики (JSON)</label>
-                        <textarea name="technical_specs" rows="6" 
-                                  style="width: 100%; padding: 10px 14px; border: 1px solid var(--border-color); border-radius: var(--border-radius); font-family: monospace; font-size: 12px;"
+                        <label style="display: block; margin-bottom: 6px; font-weight: 500;">Индивидуальные технические характеристики (JSON)</label>
+                        <textarea name="technical_specs" rows="8" 
+                                  id="editTechnicalSpecs"
+                                  style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: var(--border-radius); font-family: monospace; font-size: 12px;"
                         ><?= e(json_encode($technicalSpecs, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT)) ?></textarea>
                     </div>
                     
                     <div style="margin-bottom: 16px;">
                         <label style="display: block; margin-bottom: 6px; font-weight: 500;">Примечания</label>
                         <textarea name="notes" rows="3" 
-                                  style="width: 100%; padding: 10px 14px; border: 1px solid var(--border-color); border-radius: var(--border-radius);"><?= e($serialData['notes'] ?? '') ?></textarea>
+                                  style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: var(--border-radius); font-size: 14px;"><?= e($serialData['notes'] ?? '') ?></textarea>
                     </div>
                     
                     <div style="display: flex; gap: 12px; justify-content: flex-end;">
@@ -1219,7 +1228,7 @@ $isPrint = isset($_GET['print']);
                     <div style="margin-bottom: 12px;">
                         <label style="display: block; margin-bottom: 6px; font-weight: 500;">Тип документа</label>
                         <select name="document_type" required 
-                                style="width: 100%; padding: 10px 14px; border: 1px solid var(--border-color); border-radius: var(--border-radius);">
+                                style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: var(--border-radius); font-size: 14px;">
                             <option value="manual">Руководство по эксплуатации</option>
                             <option value="certificate">Сертификат</option>
                             <option value="test_report">Отчёт о тестировании</option>
@@ -1232,7 +1241,7 @@ $isPrint = isset($_GET['print']);
                         <label style="display: block; margin-bottom: 6px; font-weight: 500;">Файл</label>
                         <input type="file" name="document_file" required 
                                accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
-                               style="width: 100%; padding: 10px 14px; border: 1px solid var(--border-color); border-radius: var(--border-radius);">
+                               style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: var(--border-radius); font-size: 14px;">
                     </div>
                     
                     <button type="submit" class="btn btn-primary">Загрузить</button>
@@ -1363,6 +1372,37 @@ $isPrint = isset($_GET['print']);
         
         // Обработка кнопки "Сохранить и печатать"
         document.addEventListener('DOMContentLoaded', function() {
+            // Обработчик для формы редактирования паспорта
+            const editPassportForm = document.getElementById('editPassportForm');
+            if (editPassportForm) {
+                editPassportForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    const formData = new FormData(editPassportForm);
+                    
+                    // Сохраняем данные через AJAX
+                    fetch('api_passport.php', {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            alert('Паспорт успешно обновлён!');
+                            closeEditPassportModalDirect();
+                            // Перезагружаем страницу для отображения изменений
+                            location.reload();
+                        } else {
+                            alert('Ошибка сохранения: ' + (data.error || 'Неизвестная ошибка'));
+                        }
+                    })
+                    .catch(error => {
+                        alert('Ошибка соединения с сервером: ' + error.message);
+                    });
+                });
+            }
+            
+            // Обработчик для кнопки "Сохранить и печатать"
             const saveAndPrintBtn = document.getElementById('saveAndPrintBtn');
             if (saveAndPrintBtn) {
                 saveAndPrintBtn.addEventListener('click', function() {

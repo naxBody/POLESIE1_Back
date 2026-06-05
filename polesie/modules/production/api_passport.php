@@ -185,6 +185,7 @@ try {
         
         $serialId = (int)$_POST['serial_id'];
         $technicalSpecs = !empty($_POST['technical_specs']) ? json_decode($_POST['technical_specs'], true) : null;
+        $productSpecs = !empty($_POST['product_specifications']) ? json_decode($_POST['product_specifications'], true) : null;
         $notes = trim($_POST['notes'] ?? '');
         
         // Данные для динамического паспорта
@@ -217,6 +218,7 @@ try {
         ");
         $passportData = [
             'technical_specs' => $technicalSpecs,
+            'product_specifications' => $productSpecs,
             'notes' => $notes,
             'warranty_start' => $warrantyStart,
             'warranty_end' => $warrantyEnd,
@@ -233,11 +235,12 @@ try {
         // Обновляем запись в product_serial_numbers
         $stmt = $pdo->prepare("
             UPDATE product_serial_numbers 
-            SET technical_specs = ?, notes = ?, updated_at = NOW()
+            SET technical_specs = ?, product_specifications = ?, notes = ?, updated_at = NOW()
             WHERE id = ?
         ");
         $stmt->execute([
             $technicalSpecs ? json_encode($technicalSpecs, JSON_UNESCAPED_UNICODE) : null,
+            $productSpecs ? json_encode($productSpecs, JSON_UNESCAPED_UNICODE) : null,
             $notes,
             $serialId
         ]);

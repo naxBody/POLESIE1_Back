@@ -834,7 +834,6 @@ foreach ($materialCategories as $category) {
                                          data-category="<?= e(mb_strtolower($gost['category'], 'UTF-8')) ?>">
                                         <div class="standard-header">
                                             <span class="standard-number"><?= e($gost['gost_number']) ?></span>
-                                            <span class="standard-status status-active"><?= e($gost['status']) ?></span>
                                         </div>
                                         <div class="standard-title"><?= e($gost['title']) ?></div>
                                         <div class="standard-category"><i class="fas fa-folder"></i> <?= e($gost['category']) ?></div>

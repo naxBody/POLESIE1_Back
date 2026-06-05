@@ -669,15 +669,28 @@ $categories = $pdo->query($catQuery)->fetchAll();
             padding: 4px 8px;
             border-radius: 4px;
             min-width: 80px;
+            display: inline-block;
         }
         .spec-value input {
-            width: 100%;
+            width: auto;
+            min-width: 60px;
+            max-width: 200px;
             border: none;
             outline: none;
             font-size: 12px;
             font-weight: 600;
             background: transparent;
             text-align: right;
+        }
+        .spec-value input[type="text"] {
+            width: 150px;
+        }
+        .spec-value input[type="number"] {
+            width: 80px;
+        }
+        .spec-value input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
         }
         .weight-badge {
             background: var(--success-color);
@@ -1344,8 +1357,12 @@ $categories = $pdo->query($catQuery)->fetchAll();
             
             // Характеристики
             if (passport.specifications && Object.keys(passport.specifications).length > 0) {
-                html += '<div class="passport-section">';
-                html += '<div class="passport-section-title">⚙️ Технические характеристики</div>';
+                html += '<div class="passport-section' + (editMode ? ' editable-mode' : '') + '">';
+                html += '<div class="passport-section-title">⚙️ Технические характеристики';
+                if (editMode) {
+                    html += '<button type="button" class="section-edit-btn" style="background:#4caf50;color:white;" onclick="saveAllChanges()"><i class="fas fa-save"></i> Сохранить</button>';
+                }
+                html += '</div>';
                 html += '<div class="specs-list">';
                 for (var key in passport.specifications) {
                     if (passport.specifications.hasOwnProperty(key)) {
@@ -1353,9 +1370,9 @@ $categories = $pdo->query($catQuery)->fetchAll();
                         if (Array.isArray(value)) {
                             value = value.join(', ');
                         }
-                        html += '<div class="spec-item">';
+                        html += '<div class="spec-item" data-spec-key="' + escapeHtml(key) + '">';
                         html += '<div class="spec-name">' + escapeHtml(formatSpecName(key)) + '</div>';
-                        html += '<div class="spec-value">' + escapeHtml(String(value)) + '</div>';
+                        html += '<div class="spec-value' + (editMode ? ' editable' : '') + '">' + (editMode ? '<input type="text" value="' + escapeHtml(String(value)) + '">' : escapeHtml(String(value))) + '</div>';
                         html += '</div>';
                     }
                 }
@@ -1609,6 +1626,16 @@ $categories = $pdo->query($catQuery)->fetchAll();
             var warrantyEl = document.querySelector('[data-field="warranty_months"] input');
             var serialEl = document.querySelector('[data-field="is_serial_tracked"] input');
             
+            // Сбор данных технических характеристик
+            var specifications = {};
+            document.querySelectorAll('[data-spec-key]').forEach(function(specItem) {
+                var key = specItem.getAttribute('data-spec-key');
+                var input = specItem.querySelector('input');
+                if (key && input) {
+                    specifications[key] = input.value.trim();
+                }
+            });
+            
             var updatedData = {
                 action: 'save_passport',
                 passport_id: currentPassportData.passport_id || null,
@@ -1617,7 +1644,8 @@ $categories = $pdo->query($catQuery)->fetchAll();
                 warranty_months: warrantyEl ? parseInt(warrantyEl.value) : currentPassportData.warranty_months,
                 is_serial_tracked: serialEl ? serialEl.checked : currentPassportData.is_serial_tracked,
                 production_notes: currentPassportData.production_notes,
-                quality_requirements: currentPassportData.quality_requirements
+                quality_requirements: currentPassportData.quality_requirements,
+                specifications: Object.keys(specifications).length > 0 ? specifications : null
             };
             
             var notesList = document.querySelector('.notes-list');

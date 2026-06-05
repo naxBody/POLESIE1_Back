@@ -208,6 +208,11 @@ $docsData = [];
 if (file_exists($docsPath)) {
     $jsonData = file_get_contents($docsPath);
     $docsData = json_decode($jsonData, true);
+    
+    // Если декодирование не удалось, инициализируем пустой массив
+    if (!is_array($docsData)) {
+        $docsData = [];
+    }
 }
 
 // Инициализация структуры если не существует
@@ -215,8 +220,8 @@ if (!isset($docsData['gost_standards'])) {
     $docsData['gost_standards'] = [];
 }
 
-// Если файл существовал, но был пуст, инициализируем стандартным набором
-if (empty($docsData['gost_standards']) && !empty($_POST['gost_number'])) {
+// Если массив ГОСТов пуст, инициализируем стандартным набором
+if (empty($docsData['gost_standards'])) {
     $docsData['gost_standards'] = [
         ['gost_number' => 'ГОСТ 7798-70', 'title' => 'Болты с шестигранной головкой', 'category' => 'Крепеж', 'status' => 'Действующий', 'file_name' => '', 'uploaded_at' => date('Y-m-d H:i:s'), 'uploaded_by' => $user['id']],
         ['gost_number' => 'ГОСТ 5915-70', 'title' => 'Гайки шестигранные', 'category' => 'Крепеж', 'status' => 'Действующий', 'file_name' => '', 'uploaded_at' => date('Y-m-d H:i:s'), 'uploaded_by' => $user['id']],

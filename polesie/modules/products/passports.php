@@ -422,17 +422,17 @@ $categories = $pdo->query($catQuery)->fetchAll();
             background: rgba(255,255,255,0.3);
         }
         .passport-modal-body {
-            padding: 18px;
+            padding: 12px;
         }
         .passport-section {
-            margin-bottom: 18px;
+            margin-bottom: 12px;
         }
         .passport-section-title {
-            font-size: 15px;
+            font-size: 14px;
             font-weight: 600;
             color: var(--primary-color);
-            margin-bottom: 10px;
-            padding-bottom: 6px;
+            margin-bottom: 8px;
+            padding-bottom: 4px;
             border-bottom: 2px solid var(--border-color);
             display: flex;
             align-items: center;
@@ -454,11 +454,11 @@ $categories = $pdo->query($catQuery)->fetchAll();
         }
         .stage-item {
             position: relative;
-            padding: 12px;
+            padding: 8px;
             background: white;
             border: 1px solid var(--border-color);
-            border-radius: 10px;
-            margin-bottom: 12px;
+            border-radius: 8px;
+            margin-bottom: 8px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.08);
             transition: transform 0.2s, box-shadow 0.2s;
         }
@@ -489,51 +489,51 @@ $categories = $pdo->query($catQuery)->fetchAll();
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 6px;
+            margin-bottom: 4px;
         }
         .stage-name {
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 600;
             color: var(--text-primary);
         }
         .stage-badge {
-            padding: 3px 10px;
+            padding: 2px 8px;
             border-radius: 16px;
-            font-size: 10px;
+            font-size: 9px;
             font-weight: 600;
             text-transform: uppercase;
         }
         .stage-description {
-            font-size: 12px;
+            font-size: 11px;
             color: var(--text-secondary);
-            margin-bottom: 10px;
+            margin-bottom: 8px;
             line-height: 1.4;
         }
         .stage-details {
             display: flex;
-            gap: 12px;
+            gap: 8px;
             flex-wrap: wrap;
-            padding-top: 10px;
+            padding-top: 8px;
             border-top: 1px dashed var(--border-color);
         }
         .stage-detail-item {
             display: flex;
             align-items: center;
             gap: 4px;
-            font-size: 11px;
+            font-size: 10px;
             color: var(--text-secondary);
         }
         .materials-grouped {
-            margin-bottom: 16px;
+            margin-bottom: 12px;
         }
         .material-category-header {
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 600;
             color: var(--text-primary);
-            padding: 8px 10px;
+            padding: 6px 8px;
             background: var(--bg-secondary);
-            border-radius: 6px 6px 0 0;
-            margin-top: 12px;
+            border-radius: 4px 4px 0 0;
+            margin-top: 10px;
             display: flex;
             align-items: center;
             gap: 6px;
@@ -551,9 +551,9 @@ $categories = $pdo->query($catQuery)->fetchAll();
         }
         .materials-table th {
             text-align: left;
-            padding: 8px 10px;
+            padding: 6px 8px;
             background: linear-gradient(135deg, #f8f9fa, #e9ecef);
-            font-size: 11px;
+            font-size: 10px;
             font-weight: 700;
             color: var(--text-secondary);
             text-transform: uppercase;
@@ -561,9 +561,9 @@ $categories = $pdo->query($catQuery)->fetchAll();
             border-bottom: 2px solid var(--primary-color);
         }
         .materials-table td {
-            padding: 8px 10px;
+            padding: 6px 8px;
             border-bottom: 1px solid #f1f3f4;
-            font-size: 12px;
+            font-size: 11px;
             vertical-align: middle;
         }
         .materials-table tr:last-child td {
@@ -577,11 +577,11 @@ $categories = $pdo->query($catQuery)->fetchAll();
             padding: 0;
         }
         .notes-list li, .requirements-list li {
-            padding: 6px 10px;
+            padding: 4px 8px;
             background: var(--bg-tertiary);
-            margin-bottom: 6px;
+            margin-bottom: 4px;
             border-radius: 4px;
-            font-size: 13px;
+            font-size: 12px;
         }
         .notes-list li::before {
             content: '\f0ea ';
@@ -596,23 +596,23 @@ $categories = $pdo->query($catQuery)->fetchAll();
         .specs-list {
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 6px;
         }
         .spec-item {
             background: var(--bg-tertiary);
-            padding: 10px;
+            padding: 8px;
             border-radius: 6px;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
         .spec-name {
-            font-size: 13px;
+            font-size: 12px;
             color: var(--text-secondary);
             font-weight: 500;
         }
         .spec-value {
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 600;
             color: var(--text-primary);
             text-align: right;
@@ -620,9 +620,9 @@ $categories = $pdo->query($catQuery)->fetchAll();
         .weight-badge {
             background: var(--success-color);
             color: white;
-            padding: 5px 12px;
+            padding: 4px 10px;
             border-radius: 16px;
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 600;
         }
         .empty-state {

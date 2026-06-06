@@ -670,8 +670,8 @@ $categories = $pdo->query($catQuery)->fetchAll();
             font-weight: 900;
         }
         .specs-list {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            display: flex;
+            flex-direction: column;
             gap: 10px;
         }
         .spec-item {
@@ -679,8 +679,8 @@ $categories = $pdo->query($catQuery)->fetchAll();
             padding: 12px;
             border-radius: 8px;
             display: flex;
-            justify-content: space-between;
-            align-items: center;
+            flex-direction: column;
+            gap: 6px;
             transition: all 0.2s;
         }
         .spec-item:hover {
@@ -692,48 +692,40 @@ $categories = $pdo->query($catQuery)->fetchAll();
             font-weight: 600;
         }
         .spec-value {
-            font-size: 13px;
+            font-size: 14px;
             font-weight: 700;
             color: var(--text-primary);
-            text-align: right;
-            max-width: 200px;
-            min-width: 80px;
+            width: 100%;
         }
         .spec-value.editable {
             border: 2px solid var(--primary-color);
             background: white;
-            padding: 8px 12px;
+            padding: 10px 14px;
             border-radius: 6px;
-            min-width: auto;
-            display: inline-block;
-            max-width: 200px;
+            display: block;
             box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
         .spec-value input {
-            width: auto;
-            min-width: 80px;
-            max-width: 200px;
+            width: 100%;
             border: none;
             outline: none;
-            font-size: 13px;
+            font-size: 14px;
             font-weight: 700;
             background: transparent;
-            text-align: right;
-            display: inline-block;
             padding: 4px 8px;
             color: var(--text-primary);
         }
         .spec-value input[type="text"] {
-            width: 120px;
-            max-width: 200px;
+            width: 100%;
+            max-width: 100%;
             padding: 6px 10px;
-            font-size: 13px;
+            font-size: 14px;
             border-radius: 4px;
         }
         .spec-value input[type="number"] {
-            width: 80px;
+            width: 100%;
             padding: 6px 10px;
-            font-size: 13px;
+            font-size: 14px;
             border-radius: 4px;
         }
         .spec-value input[type="checkbox"] {
@@ -1305,16 +1297,14 @@ $categories = $pdo->query($catQuery)->fetchAll();
                     <input type="hidden" id="editPassportId" name="passport_id">
                     <input type="hidden" id="editProductId" name="product_id">
                     
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="editTotalWeight"><i class="fas fa-weight-hanging"></i> Общий вес (кг)</label>
-                            <input type="number" id="editTotalWeight" name="total_weight_kg" step="0.001" min="0" required placeholder="0.000">
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="editWarranty"><i class="fas fa-shield-alt"></i> Гарантия (месяцев)</label>
-                            <input type="number" id="editWarranty" name="warranty_months" min="0" max="120" required placeholder="24">
-                        </div>
+                    <div class="form-group">
+                        <label for="editTotalWeight"><i class="fas fa-weight-hanging"></i> Общий вес (кг)</label>
+                        <input type="number" id="editTotalWeight" name="total_weight_kg" step="0.001" min="0" required placeholder="0.000">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="editWarranty"><i class="fas fa-shield-alt"></i> Гарантия (месяцев)</label>
+                        <input type="number" id="editWarranty" name="warranty_months" min="0" max="120" required placeholder="24">
                     </div>
                     
                     <div class="form-group">

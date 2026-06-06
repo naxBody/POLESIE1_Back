@@ -422,54 +422,86 @@ $categories = $pdo->query($catQuery)->fetchAll();
             background: rgba(255,255,255,0.3);
         }
         .passport-modal-body {
-            padding: 20px;
+            padding: 24px;
         }
         .passport-modal-body .form-group {
-            margin-bottom: 16px;
+            margin-bottom: 20px;
         }
         .passport-modal-body label {
             display: block;
-            margin-bottom: 6px;
-            font-weight: 500;
+            margin-bottom: 8px;
+            font-weight: 600;
             color: var(--text-primary);
             font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
-        .passport-modal-body input[type="number"] {
-            width: 120px;
-            padding: 8px 12px;
-            border: 1px solid var(--border-color);
+        .passport-modal-body label i {
+            color: var(--primary-color);
+            width: 16px;
+            text-align: center;
+        }
+        .passport-modal-body input[type="number"],
+        .passport-modal-body input[type="text"] {
+            width: 100%;
+            padding: 10px 14px;
+            border: 2px solid var(--border-color);
             border-radius: var(--border-radius);
             font-size: 14px;
             color: var(--text-primary);
             background: var(--bg-primary);
-            transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+            transition: all var(--transition-fast);
+            box-sizing: border-box;
+        }
+        .passport-modal-body input[type="number"]:hover,
+        .passport-modal-body input[type="text"]:hover {
+            border-color: #cbd5e1;
+        }
+        .passport-modal-body input[type="number"]:focus,
+        .passport-modal-body input[type="text"]:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+            background: white;
         }
         .passport-modal-body textarea {
             width: 100%;
             max-width: 100%;
-            padding: 8px 12px;
-            border: 1px solid var(--border-color);
+            padding: 12px 14px;
+            border: 2px solid var(--border-color);
             border-radius: var(--border-radius);
             font-size: 14px;
             color: var(--text-primary);
             background: var(--bg-primary);
-            transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+            transition: all var(--transition-fast);
             box-sizing: border-box;
+            font-family: inherit;
+            line-height: 1.5;
         }
-        .passport-modal-body input[type="number"]:focus,
+        .passport-modal-body textarea:hover {
+            border-color: #cbd5e1;
+        }
         .passport-modal-body textarea:focus {
             outline: none;
             border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+            background: white;
+            resize: vertical;
         }
         .passport-modal-body textarea {
-            resize: vertical;
             min-height: 100px;
         }
         .passport-modal-body .form-row {
-            display: flex;
-            gap: 24px;
-            align-items: flex-start;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            align-items: stretch;
+        }
+        @media (max-width: 600px) {
+            .passport-modal-body .form-row {
+                grid-template-columns: 1fr;
+            }
         }
         .passport-section {
             margin-bottom: 12px;
@@ -641,65 +673,76 @@ $categories = $pdo->query($catQuery)->fetchAll();
             font-weight: 900;
         }
         .specs-list {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 10px;
         }
         .spec-item {
             background: var(--bg-tertiary);
-            padding: 8px;
-            border-radius: 6px;
+            padding: 12px;
+            border-radius: 8px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            transition: all 0.2s;
+        }
+        .spec-item:hover {
+            background: #f1f5f9;
         }
         .spec-name {
-            font-size: 12px;
+            font-size: 13px;
             color: var(--text-secondary);
-            font-weight: 500;
+            font-weight: 600;
         }
         .spec-value {
-            font-size: 12px;
-            font-weight: 600;
+            font-size: 13px;
+            font-weight: 700;
             color: var(--text-primary);
             text-align: right;
-            max-width: 150px;
+            max-width: 200px;
+            min-width: 80px;
         }
         .spec-value.editable {
-            border: 1px solid var(--primary-color);
+            border: 2px solid var(--primary-color);
             background: white;
-            padding: 4px 8px;
-            border-radius: 4px;
+            padding: 8px 12px;
+            border-radius: 6px;
             min-width: auto;
             display: inline-block;
-            max-width: 150px;
+            max-width: 200px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
         .spec-value input {
             width: auto;
-            min-width: 60px;
-            max-width: 150px;
+            min-width: 80px;
+            max-width: 200px;
             border: none;
             outline: none;
-            font-size: 12px;
-            font-weight: 600;
+            font-size: 13px;
+            font-weight: 700;
             background: transparent;
             text-align: right;
             display: inline-block;
             padding: 4px 8px;
+            color: var(--text-primary);
         }
         .spec-value input[type="text"] {
-            width: 100px;
-            max-width: 150px;
-            padding: 4px 8px;
+            width: 120px;
+            max-width: 200px;
+            padding: 6px 10px;
             font-size: 13px;
+            border-radius: 4px;
         }
         .spec-value input[type="number"] {
-            width: 60px;
-            padding: 4px 8px;
+            width: 80px;
+            padding: 6px 10px;
+            font-size: 13px;
+            border-radius: 4px;
         }
         .spec-value input[type="checkbox"] {
-            width: 16px;
-            height: 16px;
+            width: 18px;
+            height: 18px;
+            accent-color: var(--primary-color);
         }
         .weight-badge {
             background: var(--success-color);
@@ -1268,30 +1311,30 @@ $categories = $pdo->query($catQuery)->fetchAll();
                     <div class="form-row">
                         <div class="form-group">
                             <label for="editTotalWeight"><i class="fas fa-weight-hanging"></i> Общий вес (кг)</label>
-                            <input type="number" id="editTotalWeight" name="total_weight_kg" step="0.001" min="0" required>
+                            <input type="number" id="editTotalWeight" name="total_weight_kg" step="0.001" min="0" required placeholder="0.000">
                         </div>
                         
                         <div class="form-group">
                             <label for="editWarranty"><i class="fas fa-shield-alt"></i> Гарантия (месяцев)</label>
-                            <input type="number" id="editWarranty" name="warranty_months" min="0" max="120" required>
+                            <input type="number" id="editWarranty" name="warranty_months" min="0" max="120" required placeholder="24">
                         </div>
                     </div>
                     
                     <div class="form-group">
-                        <label style="display: flex; align-items: center; gap: 8px;">
-                            <input type="checkbox" id="editSerialTracked" name="is_serial_tracked" style="width: 18px; height: 18px;">
-                            <span><i class="fas fa-barcode"></i> Серийный учёт</span>
+                        <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; padding: 12px; background: #f8fafc; border-radius: var(--border-radius); border: 2px solid var(--border-color); transition: all 0.2s;">
+                            <input type="checkbox" id="editSerialTracked" name="is_serial_tracked" style="width: 20px; height: 20px; accent-color: var(--primary-color);">
+                            <span style="font-weight: 600; color: var(--text-primary); display: flex; align-items: center; gap: 6px;"><i class="fas fa-barcode" style="color: var(--primary-color);"></i> Серийный учёт</span>
                         </label>
                     </div>
                     
                     <div class="form-group">
-                        <label for="editProductionNotes"><i class="fas fa-clipboard-list"></i> Примечания к производству (каждое с новой строки)</label>
-                        <textarea id="editProductionNotes" name="production_notes" rows="4"></textarea>
+                        <label for="editProductionNotes"><i class="fas fa-clipboard-list"></i> Примечания к производству</label>
+                        <textarea id="editProductionNotes" name="production_notes" rows="5" placeholder="Введите примечания для производства, каждое с новой строки..."></textarea>
                     </div>
                     
                     <div class="form-group">
-                        <label for="editQualityRequirements"><i class="fas fa-check-circle"></i> Требования к качеству (каждое с новой строки)</label>
-                        <textarea id="editQualityRequirements" name="quality_requirements" rows="4"></textarea>
+                        <label for="editQualityRequirements"><i class="fas fa-check-circle"></i> Требования к качеству</label>
+                        <textarea id="editQualityRequirements" name="quality_requirements" rows="5" placeholder="Введите требования к качеству, каждое с новой строки..."></textarea>
                     </div>
                     
                     <div style="display: flex; gap: 12px; margin-top: 20px;">

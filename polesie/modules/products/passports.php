@@ -444,7 +444,8 @@ $categories = $pdo->query($catQuery)->fetchAll();
         }
         .passport-modal-body input[type="number"],
         .passport-modal-body input[type="text"] {
-            width: 70%;
+            width: 65% !important;
+            max-width: 65% !important;
             padding: 6px 10px;
             border: 1px solid var(--border-color);
             border-radius: var(--border-radius);
@@ -460,14 +461,14 @@ $categories = $pdo->query($catQuery)->fetchAll();
         }
         .passport-modal-body input[type="number"]:focus,
         .passport-modal-body input[type="text"]:focus {
-            outline: none;
+            outline: none !important;
             border-color: var(--border-color);
-            box-shadow: none;
+            box-shadow: none !important;
             background: white;
         }
         .passport-modal-body textarea {
-            width: 70%;
-            max-width: 70%;
+            width: 65% !important;
+            max-width: 65% !important;
             padding: 8px 10px;
             border: 1px solid var(--border-color);
             border-radius: var(--border-radius);
@@ -483,9 +484,9 @@ $categories = $pdo->query($catQuery)->fetchAll();
             border-color: #cbd5e1;
         }
         .passport-modal-body textarea:focus {
-            outline: none;
+            outline: none !important;
             border-color: var(--border-color);
-            box-shadow: none;
+            box-shadow: none !important;
             background: white;
             resize: vertical;
         }

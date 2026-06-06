@@ -554,7 +554,6 @@ a[href^="tel:"]:hover, a[href^="mailto:"]:hover {
     font-size: 14px;
     color: var(--text-primary);
     background: var(--bg-primary);
-    transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
 }
 
 .form-control:focus {

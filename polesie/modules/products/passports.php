@@ -719,40 +719,43 @@ $categories = $pdo->query($catQuery)->fetchAll();
             text-align: right;
         }
         .spec-value.editable {
-            border: 2px solid var(--primary-color);
-            background: white;
-            padding: 10px 14px;
-            border-radius: 6px;
+            border: none;
+            background: transparent;
+            padding: 0;
             display: block;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            box-shadow: none;
         }
         .spec-value input {
             width: 100%;
             border: none;
-            outline: none;
+            outline: none !important;
             font-size: 14px;
             font-weight: 700;
             background: transparent;
-            padding: 4px 8px;
+            padding: 0;
             color: var(--text-primary);
+            box-shadow: none !important;
+            -webkit-box-shadow: none !important;
+            -moz-box-shadow: none !important;
         }
-        .spec-value input[type="text"] {
-            width: 100%;
-            max-width: 100%;
-            padding: 6px 10px;
-            font-size: 14px;
-            border-radius: 4px;
-        }
+        .spec-value input[type="text"],
         .spec-value input[type="number"] {
             width: 100%;
-            padding: 6px 10px;
+            max-width: 100%;
+            padding: 0;
             font-size: 14px;
-            border-radius: 4px;
+            border-radius: 0;
+            border: none;
+            outline: none !important;
+            box-shadow: none !important;
+            -webkit-box-shadow: none !important;
+            -moz-box-shadow: none !important;
+            background: transparent;
         }
         .spec-value input[type="checkbox"] {
             width: 18px;
             height: 18px;
-            accent-color: var(--primary-color);
+            accent-color: var(--border-color);
         }
         .weight-badge {
             background: var(--success-color);
@@ -1331,8 +1334,8 @@ $categories = $pdo->query($catQuery)->fetchAll();
                     
                     <div class="form-group">
                         <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; padding: 12px; background: #f8fafc; border-radius: var(--border-radius); border: 2px solid var(--border-color); transition: all 0.2s;">
-                            <input type="checkbox" id="editSerialTracked" name="is_serial_tracked" style="width: 20px; height: 20px; accent-color: var(--primary-color);">
-                            <span style="font-weight: 600; color: var(--text-primary); display: flex; align-items: center; gap: 6px;"><i class="fas fa-barcode" style="color: var(--primary-color);"></i> Серийный учёт</span>
+                            <input type="checkbox" id="editSerialTracked" name="is_serial_tracked" style="width: 20px; height: 20px; accent-color: var(--border-color);">
+                            <span style="font-weight: 600; color: var(--text-primary); display: flex; align-items: center; gap: 6px;"><i class="fas fa-barcode" style="color: var(--text-secondary);"></i> Серийный учёт</span>
                         </label>
                     </div>
                     

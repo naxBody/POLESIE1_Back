@@ -142,9 +142,11 @@ require_once BASE_PATH . '/includes/topbar.php';
 }
 
 .form-control:focus {
-    outline: none;
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    outline: none !important;
+    border-color: var(--border-color) !important;
+    box-shadow: none !important;
+    -webkit-box-shadow: none !important;
+    -moz-box-shadow: none !important;
 }
 
 textarea.form-control {

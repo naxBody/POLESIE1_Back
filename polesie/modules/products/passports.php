@@ -738,6 +738,13 @@ $categories = $pdo->query($catQuery)->fetchAll();
             -webkit-box-shadow: none !important;
             -moz-box-shadow: none !important;
         }
+        .spec-value input:focus {
+            outline: none !important;
+            border: none !important;
+            box-shadow: none !important;
+            -webkit-box-shadow: none !important;
+            -moz-box-shadow: none !important;
+        }
         .spec-value input[type="text"],
         .spec-value input[type="number"] {
             width: 100%;

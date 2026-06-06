@@ -20,7 +20,8 @@ $pdo = getDbConnection();
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $input = json_decode(file_get_contents('php://input'), true);
     
-    if (!$input || !isset($input['action']) || $input['action'] !== 'save_passport') {
+    // Проверяем наличие passport_id для сохранения
+    if (!$input || !isset($input['passport_id'])) {
         echo json_encode(['success' => false, 'error' => 'Неверный формат запроса']);
         exit;
     }
@@ -44,12 +45,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             : null;
         
         // Обработка примечаний и требований как JSON массивов
-        $productionNotes = !empty($input['production_notes']) && is_array($input['production_notes'])
-            ? json_encode(array_values(array_filter($input['production_notes'])))
-            : null;
-        $qualityRequirements = !empty($input['quality_requirements']) && is_array($input['quality_requirements'])
-            ? json_encode(array_values(array_filter($input['quality_requirements'])))
-            : null;
+        $productionNotesRaw = $input['production_notes'] ?? '';
+        if (is_array($input['production_notes'])) {
+            $productionNotes = !empty($input['production_notes'])
+                ? json_encode(array_values(array_filter($input['production_notes'])))
+                : null;
+        } else {
+            // Если пришла строка, разбиваем на массив по строкам
+            $notesArray = array_filter(array_map('trim', explode("\n", $productionNotesRaw)));
+            $productionNotes = !empty($notesArray) ? json_encode($notesArray) : null;
+        }
+        
+        $qualityRequirementsRaw = $input['quality_requirements'] ?? '';
+        if (is_array($input['quality_requirements'])) {
+            $qualityRequirements = !empty($input['quality_requirements'])
+                ? json_encode(array_values(array_filter($input['quality_requirements'])))
+                : null;
+        } else {
+            // Если пришла строка, разбиваем на массив по строкам
+            $reqsArray = array_filter(array_map('trim', explode("\n", $qualityRequirementsRaw)));
+            $qualityRequirements = !empty($reqsArray) ? json_encode($reqsArray) : null;
+        }
         
         if ($passportId) {
             // Обновление существующего паспорта

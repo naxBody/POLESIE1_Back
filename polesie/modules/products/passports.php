@@ -446,14 +446,15 @@ $categories = $pdo->query($catQuery)->fetchAll();
         }
         .passport-modal-body textarea {
             width: 100%;
-            max-width: 500px;
-            padding: 10px 14px;
+            max-width: 100%;
+            padding: 8px 12px;
             border: 1px solid var(--border-color);
             border-radius: var(--border-radius);
             font-size: 14px;
             color: var(--text-primary);
             background: var(--bg-primary);
             transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+            box-sizing: border-box;
         }
         .passport-modal-body input[type="number"]:focus,
         .passport-modal-body textarea:focus {
@@ -662,7 +663,7 @@ $categories = $pdo->query($catQuery)->fetchAll();
             font-weight: 600;
             color: var(--text-primary);
             text-align: right;
-            max-width: 200px;
+            max-width: 150px;
         }
         .spec-value.editable {
             border: 1px solid var(--primary-color);
@@ -671,12 +672,12 @@ $categories = $pdo->query($catQuery)->fetchAll();
             border-radius: 4px;
             min-width: auto;
             display: inline-block;
-            max-width: 200px;
+            max-width: 150px;
         }
         .spec-value input {
             width: auto;
             min-width: 60px;
-            max-width: 180px;
+            max-width: 150px;
             border: none;
             outline: none;
             font-size: 12px;
@@ -684,13 +685,17 @@ $categories = $pdo->query($catQuery)->fetchAll();
             background: transparent;
             text-align: right;
             display: inline-block;
+            padding: 4px 8px;
         }
         .spec-value input[type="text"] {
-            width: 120px;
-            max-width: 180px;
+            width: 100px;
+            max-width: 150px;
+            padding: 4px 8px;
+            font-size: 13px;
         }
         .spec-value input[type="number"] {
-            width: 70px;
+            width: 60px;
+            padding: 4px 8px;
         }
         .spec-value input[type="checkbox"] {
             width: 16px;
@@ -1638,7 +1643,6 @@ $categories = $pdo->query($catQuery)->fetchAll();
             });
             
             var updatedData = {
-                action: 'save_passport',
                 passport_id: currentPassportData.passport_id || null,
                 product_id: currentPassportData.product_id,
                 total_weight_kg: totalWeightEl ? parseFloat(totalWeightEl.value) : currentPassportData.total_weight_kg,
@@ -1745,7 +1749,6 @@ $categories = $pdo->query($catQuery)->fetchAll();
             }
             
             var formData = {
-                action: 'save_passport',
                 passport_id: passportId ? parseInt(passportId) : null,
                 product_id: parseInt(productId),
                 total_weight_kg: parseFloat(document.getElementById('editTotalWeight').value) || 0,

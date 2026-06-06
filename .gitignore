@@ -1,1 +1,21 @@
-Nothing should be ignored based on the provided file changes. The modified files ('polesie/modules/contractors/edit.php', 'polesie/modules/products/passports.php') are PHP source files, which should not be added to .gitignore. Since there are no build artifacts, dependencies, temporary files, or other ignorable items in the changes, no .gitignore rules are needed.
+# Compiled and build artifacts
+*.pyc
+__pycache__/
+
+# Dependencies
+vendor/
+composer.lock
+
+# Logs and temp files
+*.log
+*.tmp
+*.swp
+
+# Environment
+.env
+.env.local
+*.env.*
+
+# Editors
+.vscode/
+.idea/

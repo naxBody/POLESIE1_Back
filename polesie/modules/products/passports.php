@@ -462,7 +462,7 @@ $categories = $pdo->query($catQuery)->fetchAll();
         .passport-modal-body input[type="number"]:focus,
         .passport-modal-body input[type="text"]:focus {
             outline: none !important;
-            border-color: var(--border-color);
+            border: 1px solid var(--border-color);
             box-shadow: none !important;
             background: white;
         }
@@ -485,7 +485,7 @@ $categories = $pdo->query($catQuery)->fetchAll();
         }
         .passport-modal-body textarea:focus {
             outline: none !important;
-            border-color: var(--border-color);
+            border: 1px solid var(--border-color);
             box-shadow: none !important;
             background: white;
             resize: vertical;
@@ -823,8 +823,8 @@ $categories = $pdo->query($catQuery)->fetchAll();
         .filter-group input:focus,
         .filter-group select:focus {
             outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.1);
+            border-color: var(--border-color);
+            box-shadow: none;
         }
         .filter-actions {
             display: flex;

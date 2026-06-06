@@ -462,9 +462,22 @@ $categories = $pdo->query($catQuery)->fetchAll();
         .passport-modal-body input[type="number"]:focus,
         .passport-modal-body input[type="text"]:focus {
             outline: none !important;
-            border: 1px solid var(--border-color);
+            border: 1px solid var(--border-color) !important;
             box-shadow: none !important;
+            -webkit-box-shadow: none !important;
+            -moz-box-shadow: none !important;
             background: white;
+        }
+        .passport-modal-body input::-moz-focus-inner {
+            border: 0 !important;
+            padding: 0 !important;
+        }
+        .passport-modal-body input:-webkit-autofill,
+        .passport-modal-body input:-webkit-autofill:hover,
+        .passport-modal-body input:-webkit-autofill:focus {
+            -webkit-box-shadow: 0 0 0 30px white inset !important;
+            box-shadow: 0 0 0 30px white inset !important;
+            -webkit-text-fill-color: var(--text-primary) !important;
         }
         .passport-modal-body textarea {
             width: 65% !important;
@@ -485,8 +498,10 @@ $categories = $pdo->query($catQuery)->fetchAll();
         }
         .passport-modal-body textarea:focus {
             outline: none !important;
-            border: 1px solid var(--border-color);
+            border: 1px solid var(--border-color) !important;
             box-shadow: none !important;
+            -webkit-box-shadow: none !important;
+            -moz-box-shadow: none !important;
             background: white;
             resize: vertical;
         }
@@ -822,9 +837,11 @@ $categories = $pdo->query($catQuery)->fetchAll();
         }
         .filter-group input:focus,
         .filter-group select:focus {
-            outline: none;
-            border-color: var(--border-color);
-            box-shadow: none;
+            outline: none !important;
+            border-color: var(--border-color) !important;
+            box-shadow: none !important;
+            -webkit-box-shadow: none !important;
+            -moz-box-shadow: none !important;
         }
         .filter-actions {
             display: flex;

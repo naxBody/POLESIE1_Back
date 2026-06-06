@@ -679,8 +679,10 @@ $categories = $pdo->query($catQuery)->fetchAll();
             padding: 12px;
             border-radius: 8px;
             display: flex;
-            flex-direction: column;
-            gap: 8px;
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
             transition: all 0.2s;
         }
         .spec-item:hover {
@@ -690,12 +692,15 @@ $categories = $pdo->query($catQuery)->fetchAll();
             font-size: 13px;
             color: var(--text-secondary);
             font-weight: 600;
+            min-width: 150px;
+            flex-shrink: 0;
         }
         .spec-value {
             font-size: 14px;
             font-weight: 700;
             color: var(--text-primary);
             width: 100%;
+            text-align: right;
         }
         .spec-value.editable {
             border: 2px solid var(--primary-color);

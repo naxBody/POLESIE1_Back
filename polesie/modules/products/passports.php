@@ -493,14 +493,11 @@ $categories = $pdo->query($catQuery)->fetchAll();
             min-height: 100px;
         }
         .passport-modal-body .form-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            align-items: stretch;
+            display: block;
         }
         @media (max-width: 600px) {
             .passport-modal-body .form-row {
-                grid-template-columns: 1fr;
+                display: block;
             }
         }
         .passport-section {

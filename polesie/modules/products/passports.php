@@ -519,6 +519,12 @@ $categories = $pdo->query($catQuery)->fetchAll();
         .passport-section {
             margin-bottom: 12px;
         }
+        .passport-section.editable-mode {
+            background: #f8fafc;
+            padding: 16px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
         .passport-section-title {
             font-size: 14px;
             font-weight: 600;
@@ -529,6 +535,9 @@ $categories = $pdo->query($catQuery)->fetchAll();
             display: flex;
             align-items: center;
             gap: 6px;
+        }
+        .passport-section.editable-mode .passport-section-title {
+            border-bottom-color: #3b82f6;
         }
         .production-flow {
             position: relative;
@@ -667,28 +676,64 @@ $categories = $pdo->query($catQuery)->fetchAll();
         .notes-list, .requirements-list {
             list-style: none;
             padding: 0;
+            margin: 0;
         }
         .notes-list li, .requirements-list li {
+            padding: 8px 12px;
+            background: white;
+            margin-bottom: 8px;
+            border-radius: 6px;
+            font-size: 13px;
+            border: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+        }
+        .notes-list li:hover, .requirements-list li:hover {
+            border-color: #cbd5e1;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .editable-mode .notes-list li, .editable-mode .requirements-list li {
+            background: #f8fafc;
+            border-color: #94a3b8;
+        }
+        .notes-list li input[type="text"], .requirements-list li input[type="text"] {
+            flex: 1;
+            border: none;
+            outline: none;
+            font-size: 13px;
             padding: 4px 8px;
-            background: var(--bg-tertiary);
-            margin-bottom: 4px;
+            background: white;
             border-radius: 4px;
-            font-size: 12px;
+            border: 1px solid #e2e8f0;
+            min-height: 32px;
+        }
+        .notes-list li input[type="text"]:focus, .requirements-list li input[type="text"]:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
         }
         .notes-list li::before {
             content: '\f0ea ';
             font-family: 'Font Awesome 6 Free';
             font-weight: 900;
+            color: #f59e0b;
+            font-size: 14px;
         }
         .requirements-list li::before {
             content: '\f00c ';
             font-family: 'Font Awesome 6 Free';
             font-weight: 900;
+            color: #10b981;
+            font-size: 14px;
         }
         .specs-list {
             display: flex;
             flex-direction: column;
             gap: 10px;
+        }
+        .editable-mode .specs-list {
+            gap: 12px;
         }
         .spec-item {
             background: var(--bg-tertiary);
@@ -704,6 +749,14 @@ $categories = $pdo->query($catQuery)->fetchAll();
         .spec-item:hover {
             background: #f1f5f9;
         }
+        .editable-mode .spec-item {
+            background: white;
+            border: 1px solid #e2e8f0;
+        }
+        .editable-mode .spec-item:hover {
+            border-color: #cbd5e1;
+            background: #f8fafc;
+        }
         .spec-name {
             font-size: 13px;
             color: var(--text-secondary);
@@ -717,20 +770,37 @@ $categories = $pdo->query($catQuery)->fetchAll();
             color: var(--text-primary);
             width: 100%;
             text-align: right;
+            display: flex;
+            align-items: center;
         }
         .spec-value.editable {
-            border: none;
-            background: transparent;
-            padding: 0;
-            display: block;
-            box-shadow: none;
+            border-radius: 6px;
+            background: #f8fafc;
+            padding: 10px 14px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.05);
+            border: 2px solid #e2e8f0;
+            transition: all 0.2s ease;
+            min-height: 44px;
+        }
+        .spec-value.editable:hover {
+            border-color: #94a3b8;
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.08);
+            background: #f1f5f9;
+        }
+        .spec-value.editable:focus-within {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+            background: white;
         }
         .spec-value input {
             width: 100%;
             border: none;
             outline: none !important;
             font-size: 14px;
-            font-weight: 700;
+            font-weight: 600;
             background: transparent;
             padding: 0;
             color: var(--text-primary);
@@ -758,11 +828,14 @@ $categories = $pdo->query($catQuery)->fetchAll();
             -webkit-box-shadow: none !important;
             -moz-box-shadow: none !important;
             background: transparent;
+            color: #1e293b;
+            font-weight: 600;
         }
         .spec-value input[type="checkbox"] {
-            width: 18px;
-            height: 18px;
-            accent-color: var(--border-color);
+            width: 20px;
+            height: 20px;
+            accent-color: #3b82f6;
+            cursor: pointer;
         }
         .weight-badge {
             background: var(--success-color);
@@ -1416,8 +1489,8 @@ $categories = $pdo->query($catQuery)->fetchAll();
             html += '<div class="specs-list">';
             html += '<div class="spec-item"><div class="spec-name">Артикул</div><div class="spec-value">' + escapeHtml(passport.sku) + '</div></div>';
             html += '<div class="spec-item"><div class="spec-name">Категория</div><div class="spec-value">' + escapeHtml(passport.category_name || '—') + '</div></div>';
-            html += '<div class="spec-item" data-field="total_weight_kg"><div class="spec-name">Общий вес</div><div class="spec-value' + (editMode ? ' editable' : '') + '">' + (editMode ? '<input type="number" step="0.001" value="' + (passport.total_weight_kg || 0) + '">' : (passport.total_weight_kg || '0') + ' кг') + '</div></div>';
-            html += '<div class="spec-item" data-field="warranty_months"><div class="spec-name">Гарантия</div><div class="spec-value' + (editMode ? ' editable' : '') + '">' + (editMode ? '<input type="number" value="' + (passport.warranty_months || 24) + '">' : (passport.warranty_months || 24) + ' мес.') + '</div></div>';
+            html += '<div class="spec-item" data-field="total_weight_kg"><div class="spec-name">Общий вес</div><div class="spec-value' + (editMode ? ' editable' : '') + '">' + (editMode ? '<input type="number" step="0.001" value="' + (passport.total_weight_kg || 0) + '" placeholder="0.00">' : (passport.total_weight_kg || '0') + ' кг') + '</div></div>';
+            html += '<div class="spec-item" data-field="warranty_months"><div class="spec-name">Гарантия</div><div class="spec-value' + (editMode ? ' editable' : '') + '">' + (editMode ? '<input type="number" value="' + (passport.warranty_months || 24) + '" placeholder="24">' : (passport.warranty_months || 24) + ' мес.') + '</div></div>';
             html += '<div class="spec-item" data-field="is_serial_tracked"><div class="spec-name">Серийный учёт</div><div class="spec-value' + (editMode ? ' editable' : '') + '">' + (editMode ? '<input type="checkbox"' + (passport.is_serial_tracked ? ' checked' : '') + '>' : (passport.is_serial_tracked ? '✅ Да' : '❌ Нет')) + '</div></div>';
             html += '</div>';
             html += '</div>';
@@ -1435,7 +1508,7 @@ $categories = $pdo->query($catQuery)->fetchAll();
                         }
                         html += '<div class="spec-item" data-spec-key="' + escapeHtml(key) + '">';
                         html += '<div class="spec-name">' + escapeHtml(formatSpecName(key)) + '</div>';
-                        html += '<div class="spec-value' + (editMode ? ' editable' : '') + '">' + (editMode ? '<input type="text" value="' + escapeHtml(String(value)) + '">' : escapeHtml(String(value))) + '</div>';
+                        html += '<div class="spec-value' + (editMode ? ' editable' : '') + '">' + (editMode ? '<input type="text" value="' + escapeHtml(String(value)) + '" placeholder="' + escapeHtml(formatSpecName(key)) + '">' : escapeHtml(String(value))) + '</div>';
                         html += '</div>';
                     }
                 }

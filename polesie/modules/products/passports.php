@@ -795,6 +795,13 @@ $categories = $pdo->query($catQuery)->fetchAll();
             -moz-box-shadow: none !important;
             background: white;
         }
+        .spec-value.editable input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            accent-color: var(--border-color);
+            margin: 0;
+            cursor: pointer;
+        }
         .spec-value input {
             width: 100%;
             border: none;
@@ -853,6 +860,13 @@ $categories = $pdo->query($catQuery)->fetchAll();
             height: 20px;
             accent-color: #3b82f6;
             cursor: pointer;
+            margin: 0;
+            flex-shrink: 0;
+        }
+        .spec-value.editable {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
         }
         .weight-badge {
             background: var(--success-color);
@@ -1430,10 +1444,10 @@ $categories = $pdo->query($catQuery)->fetchAll();
                         <input type="number" id="editWarranty" name="warranty_months" min="0" max="120" required placeholder="24">
                     </div>
                     
-                    <div class="form-group">
+                    <div class="form-group" style="grid-template-columns: 1.8fr 1fr; align-items: center;">
                         <label for="editSerialTracked"><i class="fas fa-barcode"></i> Серийный учёт</label>
-                        <div style="display: flex; align-items: center; gap: 10px; padding: 12px; background: #f8fafc; border-radius: var(--border-radius); border: 2px solid var(--border-color); transition: all 0.2s;">
-                            <input type="checkbox" id="editSerialTracked" name="is_serial_tracked" style="width: 20px; height: 20px; accent-color: var(--border-color);">
+                        <div style="display: flex; align-items: center; gap: 10px; padding: 12px 14px; background: #f8fafc; border-radius: var(--border-radius); border: 2px solid var(--border-color); transition: all 0.2s;">
+                            <input type="checkbox" id="editSerialTracked" name="is_serial_tracked" style="width: 20px; height: 20px; accent-color: var(--border-color); margin-right: 10px;">
                             <span style="font-weight: 600; color: var(--text-primary);">Включить серийный учёт</span>
                         </div>
                     </div>
@@ -1510,7 +1524,7 @@ $categories = $pdo->query($catQuery)->fetchAll();
             html += '<div class="spec-item"><div class="spec-name">Категория</div><div class="spec-value">' + escapeHtml(passport.category_name || '—') + '</div></div>';
             html += '<div class="spec-item" data-field="total_weight_kg"><div class="spec-name">Общий вес</div><div class="spec-value' + (editMode ? ' editable' : '') + '">' + (editMode ? '<input type="number" step="0.001" value="' + (passport.total_weight_kg || 0) + '" placeholder="0.00">' : (passport.total_weight_kg || '0') + ' кг') + '</div></div>';
             html += '<div class="spec-item" data-field="warranty_months"><div class="spec-name">Гарантия</div><div class="spec-value' + (editMode ? ' editable' : '') + '">' + (editMode ? '<input type="number" value="' + (passport.warranty_months || 24) + '" placeholder="24">' : (passport.warranty_months || 24) + ' мес.') + '</div></div>';
-            html += '<div class="spec-item" data-field="is_serial_tracked"><div class="spec-name">Серийный учёт</div><div class="spec-value' + (editMode ? ' editable' : '') + '">' + (editMode ? '<input type="checkbox"' + (passport.is_serial_tracked ? ' checked' : '') + '>' : (passport.is_serial_tracked ? '✅ Да' : '❌ Нет')) + '</div></div>';
+            html += '<div class="spec-item" data-field="is_serial_tracked"><div class="spec-name">Серийный учёт</div><div class="spec-value' + (editMode ? ' editable' : '') + '" style="' + (editMode ? 'justify-content: flex-end; padding-right: 14px;' : '') + '">' + (editMode ? '<input type="checkbox"' + (passport.is_serial_tracked ? ' checked' : '') + ' style="margin: 0;">' : (passport.is_serial_tracked ? '✅ Да' : '❌ Нет')) + '</div></div>';
             html += '</div>';
             html += '</div>';
             

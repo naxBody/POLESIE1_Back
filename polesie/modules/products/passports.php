@@ -443,25 +443,32 @@ $categories = $pdo->query($catQuery)->fetchAll();
             text-align: center;
         }
         .passport-modal-body input[type="number"],
-        .passport-modal-body input[type="text"] {
-            width: 65% !important;
-            max-width: 65% !important;
-            padding: 6px 10px;
+        .passport-modal-body input[type="text"],
+        .passport-modal-body textarea,
+        .passport-modal-body select {
+            width: 100%;
+            max-width: 100%;
+            padding: 12px 14px;
             border: 1px solid var(--border-color);
             border-radius: var(--border-radius);
             font-size: 14px;
             color: var(--text-primary);
             background: var(--bg-primary);
             box-sizing: border-box;
+            transition: all var(--transition-fast);
         }
         .passport-modal-body input[type="number"]:hover,
-        .passport-modal-body input[type="text"]:hover {
+        .passport-modal-body input[type="text"]:hover,
+        .passport-modal-body textarea:hover,
+        .passport-modal-body select:hover {
             border-color: var(--border-color);
         }
         .passport-modal-body input[type="number"]:focus,
-        .passport-modal-body input[type="text"]:focus {
+        .passport-modal-body input[type="text"]:focus,
+        .passport-modal-body textarea:focus,
+        .passport-modal-body select:focus {
             outline: none !important;
-            border: 1px solid var(--border-color) !important;
+            border-color: var(--border-color) !important;
             box-shadow: none !important;
             -webkit-box-shadow: none !important;
             -moz-box-shadow: none !important;
@@ -481,32 +488,13 @@ $categories = $pdo->query($catQuery)->fetchAll();
             border: 1px solid var(--border-color) !important;
         }
         .passport-modal-body textarea {
-            width: 65% !important;
-            max-width: 65% !important;
-            padding: 8px 10px;
-            border: 1px solid var(--border-color);
-            border-radius: var(--border-radius);
-            font-size: 14px;
-            color: var(--text-primary);
-            background: var(--bg-primary);
-            box-sizing: border-box;
             font-family: inherit;
             line-height: 1.5;
-        }
-        .passport-modal-body textarea:hover {
-            border-color: var(--border-color);
-        }
-        .passport-modal-body textarea:focus {
-            outline: none !important;
-            border: 1px solid var(--border-color) !important;
-            box-shadow: none !important;
-            -webkit-box-shadow: none !important;
-            -moz-box-shadow: none !important;
-            background: white;
+            min-height: 100px;
             resize: vertical;
         }
-        .passport-modal-body textarea {
-            min-height: 100px;
+        .passport-modal-body select {
+            cursor: pointer;
         }
         .passport-modal-body .form-row {
             display: block;
@@ -700,18 +688,23 @@ $categories = $pdo->query($catQuery)->fetchAll();
         }
         .notes-list li input[type="text"], .requirements-list li input[type="text"] {
             flex: 1;
-            border: none;
+            border: 1px solid var(--border-color);
             outline: none;
-            font-size: 13px;
-            padding: 4px 8px;
-            background: white;
-            border-radius: 4px;
-            border: 1px solid #e2e8f0;
-            min-height: 32px;
+            font-size: 14px;
+            padding: 12px 14px;
+            background: var(--bg-primary);
+            border-radius: var(--border-radius);
+            min-height: 44px;
+            transition: all var(--transition-fast);
+            color: var(--text-primary);
         }
         .notes-list li input[type="text"]:focus, .requirements-list li input[type="text"]:focus {
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+            outline: none !important;
+            border-color: var(--border-color) !important;
+            box-shadow: none !important;
+            -webkit-box-shadow: none !important;
+            -moz-box-shadow: none !important;
+            background: white;
         }
         .notes-list li::before {
             content: '\f0ea ';
@@ -774,25 +767,26 @@ $categories = $pdo->query($catQuery)->fetchAll();
             align-items: center;
         }
         .spec-value.editable {
-            border-radius: 6px;
-            background: #f8fafc;
-            padding: 10px 14px;
+            border-radius: var(--border-radius);
+            background: var(--bg-primary);
+            padding: 0;
             display: flex;
             align-items: center;
             justify-content: flex-end;
-            box-shadow: inset 0 1px 2px rgba(0,0,0,0.05);
-            border: 2px solid #e2e8f0;
-            transition: all 0.2s ease;
-            min-height: 44px;
+            box-shadow: none;
+            border: 1px solid var(--border-color);
+            transition: all var(--transition-fast);
+            min-height: 48px;
         }
         .spec-value.editable:hover {
-            border-color: #94a3b8;
-            box-shadow: inset 0 1px 2px rgba(0,0,0,0.08);
-            background: #f1f5f9;
+            border-color: var(--border-color);
+            background: var(--bg-primary);
         }
         .spec-value.editable:focus-within {
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+            border-color: var(--border-color) !important;
+            box-shadow: none !important;
+            -webkit-box-shadow: none !important;
+            -moz-box-shadow: none !important;
             background: white;
         }
         .spec-value input {
@@ -802,11 +796,12 @@ $categories = $pdo->query($catQuery)->fetchAll();
             font-size: 14px;
             font-weight: 600;
             background: transparent;
-            padding: 0;
+            padding: 12px 14px;
             color: var(--text-primary);
             box-shadow: none !important;
             -webkit-box-shadow: none !important;
             -moz-box-shadow: none !important;
+            transition: all var(--transition-fast);
         }
         .spec-value input:focus {
             outline: none !important;
@@ -819,7 +814,7 @@ $categories = $pdo->query($catQuery)->fetchAll();
         .spec-value input[type="number"] {
             width: 100%;
             max-width: 100%;
-            padding: 0;
+            padding: 12px 14px;
             font-size: 14px;
             border-radius: 0;
             border: none;
@@ -828,7 +823,7 @@ $categories = $pdo->query($catQuery)->fetchAll();
             -webkit-box-shadow: none !important;
             -moz-box-shadow: none !important;
             background: transparent;
-            color: #1e293b;
+            color: var(--text-primary);
             font-weight: 600;
         }
         .spec-value input[type="checkbox"] {

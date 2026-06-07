@@ -1099,40 +1099,85 @@ $isPrint = isset($_GET['print']);
                 <button class="product-modal-close" onclick="closeEditPassportModalDirect()">×</button>
             </div>
             <div class="product-modal-body">
+                <style>
+                    .passport-edit-grid {
+                        display: grid;
+                        grid-template-columns: 220px 1fr;
+                        gap: 16px;
+                        align-items: start;
+                        margin-bottom: 16px;
+                    }
+                    .passport-edit-label {
+                        display: block;
+                        font-size: 13px;
+                        font-weight: 600;
+                        color: var(--text-primary);
+                        padding-top: 10px;
+                    }
+                    .passport-edit-control {
+                        width: 100%;
+                        padding: 12px 14px;
+                        border: 1px solid var(--border-color);
+                        border-radius: var(--border-radius);
+                        font-size: 14px;
+                        background: var(--bg-primary);
+                        transition: all var(--transition-fast);
+                        box-sizing: border-box;
+                    }
+                    .passport-edit-control:focus {
+                        outline: none !important;
+                        border-color: var(--border-color) !important;
+                        box-shadow: none !important;
+                    }
+                    textarea.passport-edit-control {
+                        min-height: 100px;
+                        resize: vertical;
+                        font-family: monospace;
+                        font-size: 12px;
+                    }
+                    .passport-edit-section {
+                        margin-top: 24px;
+                        padding-top: 24px;
+                        border-top: 1px solid var(--border-color);
+                    }
+                    .passport-edit-section-title {
+                        font-size: 15px;
+                        font-weight: 600;
+                        color: var(--primary-color);
+                        margin-bottom: 16px;
+                        grid-column: 1 / -1;
+                    }
+                    .passport-edit-full {
+                        grid-column: 1 / -1;
+                    }
+                </style>
+                
                 <form id="editPassportForm">
                     <input type="hidden" name="action" value="update_passport">
                     <input type="hidden" name="serial_id" value="<?= $id ?>">
                     
-                    <h4 style="margin-bottom: 12px; color: var(--primary-color);">📅 Даты и гарантия</h4>
-                    
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px;">
-                        <div>
-                            <label style="display: block; margin-bottom: 6px; font-weight: 500;">Дата изготовления</label>
-                            <input type="date" name="manufacture_date" 
-                                   value="<?= e($dynamicPassportData['manufacture_date'] ?? $serialData['manufacture_date']) ?>"
-                                   style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: var(--border-radius); font-size: 14px;">
-                        </div>
-                        <div>
-                            <label style="display: block; margin-bottom: 6px; font-weight: 500;">Гарантийный срок (мес.)</label>
-                            <input type="number" name="warranty_months" 
-                                   value="<?= e($dynamicPassportData['warranty_months'] ?? $serialData['warranty_months'] ?? 12) ?>"
-                                   style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: var(--border-radius); font-size: 14px;">
-                        </div>
-                    </div>
-                    
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px;">
-                        <div>
-                            <label style="display: block; margin-bottom: 6px; font-weight: 500;">Начало гарантии</label>
-                            <input type="date" name="warranty_start" 
-                                   value="<?= e($dynamicPassportData['warranty_start'] ?? $serialData['warranty_start']) ?>"
-                                   style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: var(--border-radius); font-size: 14px;">
-                        </div>
-                        <div>
-                            <label style="display: block; margin-bottom: 6px; font-weight: 500;">Окончание гарантии</label>
-                            <input type="date" name="warranty_end" 
-                                   value="<?= e($dynamicPassportData['warranty_end'] ?? $serialData['warranty_end']) ?>"
-                                   style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: var(--border-radius); font-size: 14px;">
-                        </div>
+                    <div class="passport-edit-grid">
+                        <span class="passport-edit-section-title">📅 Даты и гарантия</span>
+                        
+                        <label class="passport-edit-label">Дата изготовления</label>
+                        <input type="date" name="manufacture_date" 
+                               value="<?= e($dynamicPassportData['manufacture_date'] ?? $serialData['manufacture_date']) ?>"
+                               class="passport-edit-control">
+                        
+                        <label class="passport-edit-label">Гарантийный срок (мес.)</label>
+                        <input type="number" name="warranty_months" 
+                               value="<?= e($dynamicPassportData['warranty_months'] ?? $serialData['warranty_months'] ?? 12) ?>"
+                               class="passport-edit-control">
+                        
+                        <label class="passport-edit-label">Начало гарантии</label>
+                        <input type="date" name="warranty_start" 
+                               value="<?= e($dynamicPassportData['warranty_start'] ?? $serialData['warranty_start']) ?>"
+                               class="passport-edit-control">
+                        
+                        <label class="passport-edit-label">Окончание гарантии</label>
+                        <input type="date" name="warranty_end" 
+                               value="<?= e($dynamicPassportData['warranty_end'] ?? $serialData['warranty_end']) ?>"
+                               class="passport-edit-control">
                     </div>
                     
                     <?php
@@ -1143,76 +1188,65 @@ $isPrint = isset($_GET['print']);
                     $editDefaultCompanyEmail = 'polesie@polesieelectromash.by';
                     ?>
                     
-                    <h4 style="margin-bottom: 12px; color: var(--primary-color); margin-top: 20px;">🏢 Данные организации</h4>
-                    
-                    <div style="margin-bottom: 12px;">
-                        <label style="display: block; margin-bottom: 6px; font-weight: 500;">Название организации</label>
+                    <div class="passport-edit-grid passport-edit-section">
+                        <span class="passport-edit-section-title">🏢 Данные организации</span>
+                        
+                        <label class="passport-edit-label">Название организации</label>
                         <input type="text" name="company_name" 
                                value="<?= e($dynamicPassportData['company_name'] ?? $editDefaultCompanyName) ?>"
                                placeholder="ОАО «Полесьеэлектромаш»"
-                               style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: var(--border-radius); font-size: 14px;">
-                    </div>
-                    
-                    <div style="margin-bottom: 12px;">
-                        <label style="display: block; margin-bottom: 6px; font-weight: 500;">Адрес</label>
+                               class="passport-edit-control passport-edit-full">
+                        
+                        <label class="passport-edit-label">Адрес</label>
                         <input type="text" name="company_address" 
                                value="<?= e($dynamicPassportData['company_address'] ?? $editDefaultCompanyAddress) ?>"
                                placeholder="225644, Брестская область, г. Лунинец, ул. Красная, 179"
-                               style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: var(--border-radius); font-size: 14px;">
+                               class="passport-edit-control passport-edit-full">
+                        
+                        <label class="passport-edit-label">Телефон</label>
+                        <input type="text" name="company_phone" 
+                               value="<?= e($dynamicPassportData['company_phone'] ?? $editDefaultCompanyPhone) ?>"
+                               placeholder="+375 1647 2-78-09"
+                               class="passport-edit-control">
+                        
+                        <label class="passport-edit-label">E-mail</label>
+                        <input type="email" name="company_email" 
+                               value="<?= e($dynamicPassportData['company_email'] ?? $editDefaultCompanyEmail) ?>"
+                               placeholder="polesie@polesieelectromash.by"
+                               class="passport-edit-control">
                     </div>
                     
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px;">
-                        <div>
-                            <label style="display: block; margin-bottom: 6px; font-weight: 500;">Телефон</label>
-                            <input type="text" name="company_phone" 
-                                   value="<?= e($dynamicPassportData['company_phone'] ?? $editDefaultCompanyPhone) ?>"
-                                   placeholder="+375 1647 2-78-09"
-                                   style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: var(--border-radius); font-size: 14px;">
-                        </div>
-                        <div>
-                            <label style="display: block; margin-bottom: 6px; font-weight: 500;">E-mail</label>
-                            <input type="email" name="company_email" 
-                                   value="<?= e($dynamicPassportData['company_email'] ?? $editDefaultCompanyEmail) ?>"
-                                   placeholder="polesie@polesieelectromash.by"
-                                   style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: var(--border-radius); font-size: 14px;">
-                        </div>
-                    </div>
-                    
-                    <h4 style="margin-bottom: 12px; color: var(--primary-color); margin-top: 20px;">📦 Информация об изделии</h4>
-                    
-                    <div style="margin-bottom: 12px;">
-                        <label style="display: block; margin-bottom: 6px; font-weight: 500;">Наименование изделия (кастомное)</label>
+                    <div class="passport-edit-grid passport-edit-section">
+                        <span class="passport-edit-section-title">📦 Информация об изделии</span>
+                        
+                        <label class="passport-edit-label">Наименование изделия (кастомное)</label>
                         <input type="text" name="product_name_custom" 
                                value="<?= e($dynamicPassportData['product_name_custom'] ?? '') ?>"
                                placeholder="Оставьте пустым для использования стандартного названия"
-                               style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: var(--border-radius); font-size: 14px;">
-                    </div>
-                    
-                    <div style="margin-bottom: 16px;">
-                        <label style="display: block; margin-bottom: 6px; font-weight: 500;">Технические характеристики продукта (JSON)</label>
+                               class="passport-edit-control passport-edit-full">
+                        
+                        <label class="passport-edit-label">Технические характеристики продукта (JSON)</label>
                         <textarea name="product_specifications" rows="8" 
                                   id="editProductSpecs"
-                                  style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: var(--border-radius); font-family: monospace; font-size: 12px;"
+                                  class="passport-edit-control passport-edit-full"
                         ><?= e(json_encode($productSpecs, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT)) ?></textarea>
                     </div>
                     
-                    <h4 style="margin-bottom: 12px; color: var(--primary-color); margin-top: 20px;">⚙️ Технические характеристики</h4>
-                    
-                    <div style="margin-bottom: 16px;">
-                        <label style="display: block; margin-bottom: 6px; font-weight: 500;">Индивидуальные технические характеристики (JSON)</label>
+                    <div class="passport-edit-grid passport-edit-section">
+                        <span class="passport-edit-section-title">⚙️ Технические характеристики</span>
+                        
+                        <label class="passport-edit-label">Индивидуальные технические характеристики (JSON)</label>
                         <textarea name="technical_specs" rows="8" 
                                   id="editTechnicalSpecs"
-                                  style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: var(--border-radius); font-family: monospace; font-size: 12px;"
+                                  class="passport-edit-control passport-edit-full"
                         ><?= e(json_encode($technicalSpecs, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT)) ?></textarea>
-                    </div>
-                    
-                    <div style="margin-bottom: 16px;">
-                        <label style="display: block; margin-bottom: 6px; font-weight: 500;">Примечания</label>
+                        
+                        <label class="passport-edit-label">Примечания</label>
                         <textarea name="notes" rows="3" 
-                                  style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: var(--border-radius); font-size: 14px;"><?= e($serialData['notes'] ?? '') ?></textarea>
+                                  class="passport-edit-control passport-edit-full"><?= e($serialData['notes'] ?? '') ?></textarea>
                     </div>
                     
-                    <div style="display: flex; gap: 12px; justify-content: flex-end;">
+                    <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 24px; padding-top: 24px; border-top: 1px solid var(--border-color);">
                         <button type="button" onclick="closeEditPassportModalDirect()" class="btn btn-outline">Отмена</button>
                         <button type="submit" class="btn btn-primary">💾 Сохранить изменения</button>
                     </div>

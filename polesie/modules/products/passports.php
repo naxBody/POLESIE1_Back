@@ -701,7 +701,7 @@ $categories = $pdo->query($catQuery)->fetchAll();
             min-height: 44px;
             transition: all var(--transition-fast);
             color: var(--text-primary);
-            width: calc(100% - 40px);
+            width: 100%;
         }
         .notes-list li input[type="text"]:focus, .requirements-list li input[type="text"]:focus {
             outline: none !important;
@@ -759,14 +759,14 @@ $categories = $pdo->query($catQuery)->fetchAll();
             font-size: 13px;
             color: var(--text-secondary);
             font-weight: 600;
-            min-width: 45%;
+            min-width: 55%;
             flex-shrink: 0;
         }
         .spec-value {
             font-size: 14px;
             font-weight: 700;
             color: var(--text-primary);
-            width: 55%;
+            width: 45%;
             text-align: right;
             display: flex;
             align-items: center;
@@ -1646,13 +1646,13 @@ $categories = $pdo->query($catQuery)->fetchAll();
                 html += '<div class="passport-section' + (editMode ? ' editable-mode' : '') + '">';
                 html += '<div class="passport-section-title">📋 Примечания к производству';
                 if (editMode) {
-                    html += '<button type="button" class="section-edit-btn" style="background:#2196f3;color:white;" onclick="addNoteItem()"><i class="fas fa-plus"></i> Добавить</button>';
+                    html += '<button type="button" onclick="addNoteItem()" style="margin-left:12px;background:#2196f3;color:white;border:none;border-radius:6px;padding:6px 12px;cursor:pointer;font-size:13px;display:inline-flex;align-items:center;gap:6px;"><i class="fas fa-plus"></i> Добавить</button>';
                 }
                 html += '</div>';
                 html += '<ul class="notes-list">';
                 for (var i = 0; i < passport.production_notes.length; i++) {
                     if (editMode) {
-                        html += '<li><input type="text" value="' + escapeHtml(passport.production_notes[i]) + '" style="flex:1;border:none;outline:none;font-size:14px;padding:12px 14px;background:var(--bg-primary);border-radius:var(--border-radius);min-height:44px;color:var(--text-primary);"><button type="button" onclick="removeNoteItem(this)" style="background:#f44336;color:white;border:none;border-radius:6px;padding:8px 12px;cursor:pointer;margin-left:8px;"><i class="fas fa-times"></i></button></li>';
+                        html += '<li><input type="text" value="' + escapeHtml(passport.production_notes[i]) + '" placeholder="Введите примечание..."><button type="button" onclick="removeNoteItem(this)" style="background:#f44336;color:white;border:none;border-radius:6px;padding:8px 12px;cursor:pointer;margin-left:8px;"><i class="fas fa-times"></i></button></li>';
                     } else {
                         html += '<li>' + escapeHtml(passport.production_notes[i]) + '</li>';
                     }
@@ -1666,13 +1666,13 @@ $categories = $pdo->query($catQuery)->fetchAll();
                 html += '<div class="passport-section' + (editMode ? ' editable-mode' : '') + '">';
                 html += '<div class="passport-section-title">✅ Требования к качеству';
                 if (editMode) {
-                    html += '<button type="button" class="section-edit-btn" style="background:#2196f3;color:white;" onclick="addRequirementItem()"><i class="fas fa-plus"></i> Добавить</button>';
+                    html += '<button type="button" onclick="addRequirementItem()" style="margin-left:12px;background:#2196f3;color:white;border:none;border-radius:6px;padding:6px 12px;cursor:pointer;font-size:13px;display:inline-flex;align-items:center;gap:6px;"><i class="fas fa-plus"></i> Добавить</button>';
                 }
                 html += '</div>';
                 html += '<ul class="requirements-list">';
                 for (var i = 0; i < passport.quality_requirements.length; i++) {
                     if (editMode) {
-                        html += '<li><input type="text" value="' + escapeHtml(passport.quality_requirements[i]) + '" style="flex:1;border:none;outline:none;font-size:14px;padding:12px 14px;background:var(--bg-primary);border-radius:var(--border-radius);min-height:44px;color:var(--text-primary);"><button type="button" onclick="removeRequirementItem(this)" style="background:#f44336;color:white;border:none;border-radius:6px;padding:8px 12px;cursor:pointer;margin-left:8px;"><i class="fas fa-times"></i></button></li>';
+                        html += '<li><input type="text" value="' + escapeHtml(passport.quality_requirements[i]) + '" placeholder="Введите требование..."><button type="button" onclick="removeRequirementItem(this)" style="background:#f44336;color:white;border:none;border-radius:6px;padding:8px 12px;cursor:pointer;margin-left:8px;"><i class="fas fa-times"></i></button></li>';
                     } else {
                         html += '<li>' + escapeHtml(passport.quality_requirements[i]) + '</li>';
                     }
@@ -1835,21 +1835,37 @@ $categories = $pdo->query($catQuery)->fetchAll();
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(updatedData)
             })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('HTTP error! status: ' + response.status);
+                }
+                return response.json();
+            })
             .then(data => {
                 if (data.success) {
                     alert('Паспорт успешно сохранён!');
-                    toggleEditMode();
+                    // Сбрасываем режим редактирования вручную
+                    editMode = false;
+                    var btn = document.getElementById('editPassportBtn');
+                    btn.innerHTML = '<i class="fas fa-edit"></i>';
+                    btn.classList.remove('btn-success');
+                    btn.classList.add('btn-primary');
+                    btn.title = 'Редактировать паспорт';
+                    // Перезагружаем данные паспорта
                     fetch('api_passport.php?id=' + currentPassportData.passport_id)
                         .then(r => r.json())
-                        .then(d => { if (d.success) renderPassportModal(d.passport, false); });
+                        .then(d => { 
+                            if (d.success) {
+                                renderPassportModal(d.passport, false);
+                            }
+                        });
                 } else {
                     alert('Ошибка сохранения: ' + data.error);
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('Ошибка соединения с сервером');
+                alert('Ошибка соединения с сервером: ' + error.message);
             });
         }
         
@@ -1857,7 +1873,7 @@ $categories = $pdo->query($catQuery)->fetchAll();
             var notesList = document.querySelector('.notes-list');
             if (notesList) {
                 var li = document.createElement('li');
-                li.innerHTML = '<input type="text" value="" placeholder="Введите примечание..." style="width:100%;border:none;outline:none;font-size:12px;padding:4px;"><button type="button" onclick="removeNoteItem(this)" style="float:right;background:#f44336;color:white;border:none;border-radius:4px;padding:2px 6px;cursor:pointer;"><i class="fas fa-times"></i></button>';
+                li.innerHTML = '<input type="text" value="" placeholder="Введите примечание..."><button type="button" onclick="removeNoteItem(this)" style="background:#f44336;color:white;border:none;border-radius:6px;padding:8px 12px;cursor:pointer;margin-left:8px;"><i class="fas fa-times"></i></button>';
                 notesList.appendChild(li);
             }
         }
@@ -1870,7 +1886,7 @@ $categories = $pdo->query($catQuery)->fetchAll();
             var reqList = document.querySelector('.requirements-list');
             if (reqList) {
                 var li = document.createElement('li');
-                li.innerHTML = '<input type="text" value="" placeholder="Введите требование..." style="width:100%;border:none;outline:none;font-size:12px;padding:4px;"><button type="button" onclick="removeRequirementItem(this)" style="float:right;background:#f44336;color:white;border:none;border-radius:4px;padding:2px 6px;cursor:pointer;"><i class="fas fa-times"></i></button>';
+                li.innerHTML = '<input type="text" value="" placeholder="Введите требование..."><button type="button" onclick="removeRequirementItem(this)" style="background:#f44336;color:white;border:none;border-radius:6px;padding:8px 12px;cursor:pointer;margin-left:8px;"><i class="fas fa-times"></i></button>';
                 reqList.appendChild(li);
             }
         }
@@ -1918,7 +1934,12 @@ $categories = $pdo->query($catQuery)->fetchAll();
                 },
                 body: JSON.stringify(formData)
             })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('HTTP error! status: ' + response.status);
+                }
+                return response.json();
+            })
             .then(data => {
                 if (data.success) {
                     alert('Паспорт успешно сохранён!');
@@ -1939,7 +1960,7 @@ $categories = $pdo->query($catQuery)->fetchAll();
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('Ошибка соединения с сервером');
+                alert('Ошибка соединения с сервером: ' + error.message);
             });
         }
     </script>

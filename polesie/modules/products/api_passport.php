@@ -7,6 +7,10 @@ require_once __DIR__ . '/../../config/config.php';
 require_once __DIR__ . '/../../includes/auth.php';
 session_start();
 
+// Очищаем буфер вывода чтобы избежать лишних символов в ответе
+if (ob_get_level()) {
+    ob_clean();
+}
 header('Content-Type: application/json; charset=utf-8');
 
 if (!isLoggedIn()) {
@@ -135,12 +139,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
             
             echo json_encode(['success' => true, 'passport_id' => $passportId]);
+            exit;
         }
         
     } catch (PDOException $e) {
         echo json_encode(['success' => false, 'error' => 'Ошибка БД: ' . $e->getMessage()]);
+        exit;
     }
-    exit;
 }
 
 // GET запрос - получение данных паспорта

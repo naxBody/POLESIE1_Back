@@ -103,6 +103,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
             
             echo json_encode(['success' => true, 'passport_id' => $passportId]);
+            exit;
         } else {
             // Создание нового паспорта
             $stmt = $pdo->prepare("
@@ -132,9 +133,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     ':product_id' => $productId
                 ]);
             }
+            
+            echo json_encode(['success' => true, 'passport_id' => $passportId]);
         }
-        
-        echo json_encode(['success' => true, 'passport_id' => $passportId]);
         
     } catch (PDOException $e) {
         echo json_encode(['success' => false, 'error' => 'Ошибка БД: ' . $e->getMessage()]);

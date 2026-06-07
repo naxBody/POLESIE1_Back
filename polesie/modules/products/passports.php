@@ -853,6 +853,13 @@ $categories = $pdo->query($catQuery)->fetchAll();
             height: 20px;
             accent-color: #3b82f6;
             cursor: pointer;
+            margin: 0;
+            flex-shrink: 0;
+        }
+        .spec-value.editable {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
         }
         .weight-badge {
             background: var(--success-color);

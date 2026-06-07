@@ -1391,9 +1391,10 @@ $categories = $pdo->query($catQuery)->fetchAll();
                     <div class="passport-modal-title" id="modalPassportTitle">Название продукта</div>
                     <div class="passport-modal-subtitle" id="modalPassportSKU">SKU: —</div>
                 </div>
-                <div style="display: flex; gap: 8px; align-items: center;">
-                    <button class="btn btn-sm btn-primary" id="editPassportBtn" onclick="enableEditMode()" title="Редактировать паспорт">
+                <div style="display: flex; gap: 12px; align-items: center; justify-content: flex-end;">
+                    <button class="btn btn-primary" id="editPassportBtn" onclick="enableEditMode()" title="Редактировать паспорт" style="padding: 10px 20px; font-size: 14px; display: inline-flex; align-items: center; gap: 8px;">
                         <i class="fas fa-edit"></i>
+                        <span>Редактировать</span>
                     </button>
                     <button class="passport-modal-close" onclick="closePassportModalDirect()">×</button>
                 </div>
@@ -1755,13 +1756,13 @@ $categories = $pdo->query($catQuery)->fetchAll();
             editMode = !editMode;
             var btn = document.getElementById('editPassportBtn');
             if (editMode) {
-                btn.innerHTML = '<i class="fas fa-save"></i>';
+                btn.innerHTML = '<i class="fas fa-save"></i><span>Сохранить</span>';
                 btn.classList.remove('btn-primary');
                 btn.classList.add('btn-success');
                 btn.title = 'Сохранить изменения';
                 renderPassportModal(currentPassportData, true);
             } else {
-                btn.innerHTML = '<i class="fas fa-edit"></i>';
+                btn.innerHTML = '<i class="fas fa-edit"></i><span>Редактировать</span>';
                 btn.classList.remove('btn-success');
                 btn.classList.add('btn-primary');
                 btn.title = 'Редактировать паспорт';
@@ -1847,7 +1848,7 @@ $categories = $pdo->query($catQuery)->fetchAll();
                     // Сбрасываем режим редактирования вручную
                     editMode = false;
                     var btn = document.getElementById('editPassportBtn');
-                    btn.innerHTML = '<i class="fas fa-edit"></i>';
+                    btn.innerHTML = '<i class="fas fa-edit"></i><span>Редактировать</span>';
                     btn.classList.remove('btn-success');
                     btn.classList.add('btn-primary');
                     btn.title = 'Редактировать паспорт';

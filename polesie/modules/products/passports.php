@@ -426,16 +426,20 @@ $categories = $pdo->query($catQuery)->fetchAll();
         }
         .passport-modal-body .form-group {
             margin-bottom: 20px;
+            display: grid;
+            grid-template-columns: 1.8fr 1fr;
+            gap: 20px;
+            align-items: start;
         }
         .passport-modal-body label {
-            display: block;
-            margin-bottom: 8px;
             font-weight: 600;
             color: var(--text-primary);
             font-size: 13px;
             display: flex;
             align-items: center;
             gap: 6px;
+            padding-top: 12px;
+            margin-bottom: 0;
         }
         .passport-modal-body label i {
             color: var(--primary-color);
@@ -667,15 +671,15 @@ $categories = $pdo->query($catQuery)->fetchAll();
             margin: 0;
         }
         .notes-list li, .requirements-list li {
-            padding: 8px 12px;
+            padding: 12px;
             background: white;
             margin-bottom: 8px;
-            border-radius: 6px;
-            font-size: 13px;
+            border-radius: var(--border-radius);
+            font-size: 14px;
             border: 1px solid #e2e8f0;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 12px;
             transition: all 0.2s ease;
         }
         .notes-list li:hover, .requirements-list li:hover {
@@ -697,6 +701,7 @@ $categories = $pdo->query($catQuery)->fetchAll();
             min-height: 44px;
             transition: all var(--transition-fast);
             color: var(--text-primary);
+            width: calc(100% - 40px);
         }
         .notes-list li input[type="text"]:focus, .requirements-list li input[type="text"]:focus {
             outline: none !important;
@@ -730,13 +735,13 @@ $categories = $pdo->query($catQuery)->fetchAll();
         }
         .spec-item {
             background: var(--bg-tertiary);
-            padding: 12px;
-            border-radius: 8px;
+            padding: 14px 16px;
+            border-radius: var(--border-radius);
             display: flex;
             flex-direction: row;
             align-items: center;
             justify-content: space-between;
-            gap: 15px;
+            gap: 20px;
             transition: all 0.2s;
         }
         .spec-item:hover {
@@ -754,17 +759,18 @@ $categories = $pdo->query($catQuery)->fetchAll();
             font-size: 13px;
             color: var(--text-secondary);
             font-weight: 600;
-            min-width: 150px;
+            min-width: 45%;
             flex-shrink: 0;
         }
         .spec-value {
             font-size: 14px;
             font-weight: 700;
             color: var(--text-primary);
-            width: 100%;
+            width: 55%;
             text-align: right;
             display: flex;
             align-items: center;
+            justify-content: flex-end;
         }
         .spec-value.editable {
             border-radius: var(--border-radius);
@@ -802,6 +808,7 @@ $categories = $pdo->query($catQuery)->fetchAll();
             -webkit-box-shadow: none !important;
             -moz-box-shadow: none !important;
             transition: all var(--transition-fast);
+            text-align: right;
         }
         .spec-value input:focus {
             outline: none !important;
@@ -816,15 +823,30 @@ $categories = $pdo->query($catQuery)->fetchAll();
             max-width: 100%;
             padding: 12px 14px;
             font-size: 14px;
-            border-radius: 0;
-            border: none;
+            border-radius: var(--border-radius);
+            border: 1px solid var(--border-color);
             outline: none !important;
             box-shadow: none !important;
             -webkit-box-shadow: none !important;
             -moz-box-shadow: none !important;
-            background: transparent;
+            background: var(--bg-primary);
             color: var(--text-primary);
             font-weight: 600;
+            text-align: right;
+        }
+        .spec-value.editable input[type="text"],
+        .spec-value.editable input[type="number"] {
+            border: none;
+            background: transparent;
+            padding: 12px 14px;
+        }
+        .spec-value.editable:hover input[type="text"],
+        .spec-value.editable:hover input[type="number"] {
+            background: white;
+        }
+        .spec-value.editable:focus-within input[type="text"],
+        .spec-value.editable:focus-within input[type="number"] {
+            background: white;
         }
         .spec-value input[type="checkbox"] {
             width: 20px;
@@ -1408,10 +1430,11 @@ $categories = $pdo->query($catQuery)->fetchAll();
                     </div>
                     
                     <div class="form-group">
-                        <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; padding: 12px; background: #f8fafc; border-radius: var(--border-radius); border: 2px solid var(--border-color); transition: all 0.2s;">
+                        <label for="editSerialTracked"><i class="fas fa-barcode"></i> Серийный учёт</label>
+                        <div style="display: flex; align-items: center; gap: 10px; padding: 12px; background: #f8fafc; border-radius: var(--border-radius); border: 2px solid var(--border-color); transition: all 0.2s;">
                             <input type="checkbox" id="editSerialTracked" name="is_serial_tracked" style="width: 20px; height: 20px; accent-color: var(--border-color);">
-                            <span style="font-weight: 600; color: var(--text-primary); display: flex; align-items: center; gap: 6px;"><i class="fas fa-barcode" style="color: var(--text-secondary);"></i> Серийный учёт</span>
-                        </label>
+                            <span style="font-weight: 600; color: var(--text-primary);">Включить серийный учёт</span>
+                        </div>
                     </div>
                     
                     <div class="form-group">
@@ -1629,7 +1652,7 @@ $categories = $pdo->query($catQuery)->fetchAll();
                 html += '<ul class="notes-list">';
                 for (var i = 0; i < passport.production_notes.length; i++) {
                     if (editMode) {
-                        html += '<li><input type="text" value="' + escapeHtml(passport.production_notes[i]) + '" style="width:100%;border:none;outline:none;font-size:12px;padding:4px;"><button type="button" onclick="removeNoteItem(this)" style="float:right;background:#f44336;color:white;border:none;border-radius:4px;padding:2px 6px;cursor:pointer;"><i class="fas fa-times"></i></button></li>';
+                        html += '<li><input type="text" value="' + escapeHtml(passport.production_notes[i]) + '" style="flex:1;border:none;outline:none;font-size:14px;padding:12px 14px;background:var(--bg-primary);border-radius:var(--border-radius);min-height:44px;color:var(--text-primary);"><button type="button" onclick="removeNoteItem(this)" style="background:#f44336;color:white;border:none;border-radius:6px;padding:8px 12px;cursor:pointer;margin-left:8px;"><i class="fas fa-times"></i></button></li>';
                     } else {
                         html += '<li>' + escapeHtml(passport.production_notes[i]) + '</li>';
                     }
@@ -1649,7 +1672,7 @@ $categories = $pdo->query($catQuery)->fetchAll();
                 html += '<ul class="requirements-list">';
                 for (var i = 0; i < passport.quality_requirements.length; i++) {
                     if (editMode) {
-                        html += '<li><input type="text" value="' + escapeHtml(passport.quality_requirements[i]) + '" style="width:100%;border:none;outline:none;font-size:12px;padding:4px;"><button type="button" onclick="removeRequirementItem(this)" style="float:right;background:#f44336;color:white;border:none;border-radius:4px;padding:2px 6px;cursor:pointer;"><i class="fas fa-times"></i></button></li>';
+                        html += '<li><input type="text" value="' + escapeHtml(passport.quality_requirements[i]) + '" style="flex:1;border:none;outline:none;font-size:14px;padding:12px 14px;background:var(--bg-primary);border-radius:var(--border-radius);min-height:44px;color:var(--text-primary);"><button type="button" onclick="removeRequirementItem(this)" style="background:#f44336;color:white;border:none;border-radius:6px;padding:8px 12px;cursor:pointer;margin-left:8px;"><i class="fas fa-times"></i></button></li>';
                     } else {
                         html += '<li>' + escapeHtml(passport.quality_requirements[i]) + '</li>';
                     }

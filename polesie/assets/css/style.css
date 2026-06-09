@@ -482,7 +482,8 @@ a[href^="tel:"]:hover, a[href^="mailto:"]:hover {
 
 .btn-primary:hover {
     background: var(--primary-dark);
-    opacity: 0.9;
+    opacity: 1;
+    filter: brightness(0.95);
 }
 
 .btn-secondary {

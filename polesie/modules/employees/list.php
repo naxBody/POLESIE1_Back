@@ -430,14 +430,14 @@ require_once BASE_PATH . '/includes/topbar.php';
                             <td>
                                 <?php 
                                 $deptLabels = [
-                                    'production' => '🏭 Производство',
-                                    'quality' => '✅ ОТК',
-                                    'warehouse' => '📦 Склад',
-                                    'management' => '👔 Руководство',
-                                    'sales' => '📞 Продажи',
-                                    'it' => '💻 IT',
-                                    'hr' => '👥 HR',
-                                    'accounting' => '📊 Бухгалтерия',
+                                    'production' => 'Производство',
+                                    'quality' => 'ОТК',
+                                    'warehouse' => 'Склад',
+                                    'management' => 'Руководство',
+                                    'sales' => 'Продажи',
+                                    'it' => 'IT',
+                                    'hr' => 'HR',
+                                    'accounting' => 'Бухгалтерия',
                                 ];
                                 $deptLabel = $deptLabels[$e['department']] ?? e($e['department']);
                                 ?>

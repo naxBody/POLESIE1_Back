@@ -677,12 +677,41 @@ $isPrint = isset($_GET['print']);
                     'weight_kg' => 'Масса',
                     'ip_rating' => 'Степень защиты IP'
                 ];
+                
+                $specUnits = [
+                    'power_kw' => 'кВт',
+                    'rpm' => 'об/мин',
+                    'voltage_v' => 'В',
+                    'frequency_hz' => 'Гц',
+                    'weight_kg' => 'кг',
+                    'shaft_height_mm' => 'мм',
+                    'ambient_temp' => '°C',
+                    'noise_level' => 'дБ',
+                    'efficiency' => '%',
+                    'power_factor' => 'cos φ'
+                ];
+                
                 foreach ($productSpecs as $key => $value): 
-                    $label = $specLabels[$key] ?? ucfirst($key);
+                    $label = $specLabels[$key] ?? ucfirst(str_replace('_', ' ', $key));
+                    $unit = $specUnits[$key] ?? '';
+                    
+                    // Форматируем значение
+                    if (is_array($value)) {
+                        $displayValue = $value['value'] ?? json_encode($value, JSON_UNESCAPED_UNICODE);
+                        $displayUnit = $value['unit'] ?? $unit;
+                    } else {
+                        $displayValue = $value;
+                        $displayUnit = $unit;
+                    }
                 ?>
                 <div class="spec-row">
                     <div class="spec-label"><?= e($label) ?></div>
-                    <div class="spec-value"><?= e(is_array($value) ? json_encode($value, JSON_UNESCAPED_UNICODE) : $value) ?></div>
+                    <div class="spec-value">
+                        <span><?= e($displayValue) ?></span>
+                        <?php if (!empty($displayUnit)): ?>
+                            <span class="spec-unit"> <?= e($displayUnit) ?></span>
+                        <?php endif; ?>
+                    </div>
                 </div>
                 <?php endforeach; ?>
             </div>
@@ -712,12 +741,41 @@ $isPrint = isset($_GET['print']);
                     'weight_kg' => 'Масса',
                     'ip_rating' => 'Степень защиты IP'
                 ];
+                
+                $techSpecUnits = [
+                    'power_kw' => 'кВт',
+                    'rpm' => 'об/мин',
+                    'voltage_v' => 'В',
+                    'frequency_hz' => 'Гц',
+                    'weight_kg' => 'кг',
+                    'shaft_height_mm' => 'мм',
+                    'ambient_temp' => '°C',
+                    'noise_level' => 'дБ',
+                    'efficiency' => '%',
+                    'power_factor' => 'cos φ'
+                ];
+                
                 foreach ($technicalSpecs as $key => $value): 
-                    $label = $techSpecLabels[$key] ?? ucfirst($key);
+                    $label = $techSpecLabels[$key] ?? ucfirst(str_replace('_', ' ', $key));
+                    $unit = $techSpecUnits[$key] ?? '';
+                    
+                    // Форматируем значение
+                    if (is_array($value)) {
+                        $displayValue = $value['value'] ?? json_encode($value, JSON_UNESCAPED_UNICODE);
+                        $displayUnit = $value['unit'] ?? $unit;
+                    } else {
+                        $displayValue = $value;
+                        $displayUnit = $unit;
+                    }
                 ?>
                 <div class="spec-row">
                     <div class="spec-label"><?= e($label) ?></div>
-                    <div class="spec-value"><?= e(is_array($value) ? json_encode($value, JSON_UNESCAPED_UNICODE) : $value) ?></div>
+                    <div class="spec-value">
+                        <span><?= e($displayValue) ?></span>
+                        <?php if (!empty($displayUnit)): ?>
+                            <span class="spec-unit"> <?= e($displayUnit) ?></span>
+                        <?php endif; ?>
+                    </div>
                 </div>
                 <?php endforeach; ?>
             </div>

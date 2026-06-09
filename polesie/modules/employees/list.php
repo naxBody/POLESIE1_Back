@@ -338,7 +338,10 @@ require_once BASE_PATH . '/includes/topbar.php';
         <div class="page-header-actions">
             <?php if (hasPermission('employees.create')): ?>
                 <a href="add.php" class="btn btn-primary">
-                    <span>➕</span> Добавить сотрудника
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    Добавить сотрудника
                 </a>
             <?php endif; ?>
         </div>

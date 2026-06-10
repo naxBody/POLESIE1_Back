@@ -26,8 +26,7 @@ $formData = [
     'phone' => '',
     'hire_date' => date('Y-m-d'),
     'salary' => '',
-    'status' => 'active',
-    'notes' => ''
+    'status' => 'active'
 ];
 
 // Обработка формы
@@ -40,8 +39,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'phone' => trim($_POST['phone'] ?? ''),
         'hire_date' => $_POST['hire_date'] ?? '',
         'salary' => trim($_POST['salary'] ?? ''),
-        'status' => $_POST['status'] ?? 'active',
-        'notes' => trim($_POST['notes'] ?? '')
+        'status' => $_POST['status'] ?? 'active'
     ];
 
     // Валидация
@@ -77,9 +75,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         try {
             $stmt = $pdo->prepare("
                 INSERT INTO employees 
-                (full_name, position, department, email, phone, hire_date, salary, is_active, notes, created_at) 
+                (full_name, position, department, email, phone, hire_date, salary, is_active, created_at) 
                 VALUES 
-                (:full_name, :position, :department, :email, :phone, :hire_date, :salary, :is_active, :notes, NOW())
+                (:full_name, :position, :department, :email, :phone, :hire_date, :salary, :is_active, NOW())
             ");
             
             $stmt->execute([
@@ -90,8 +88,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 ':phone' => $formData['phone'] ?: null,
                 ':hire_date' => $formData['hire_date'],
                 ':salary' => $formData['salary'] ?: null,
-                ':is_active' => $formData['status'] !== 'terminated' ? 1 : 0,
-                ':notes' => $formData['notes'] ?: null
+                ':is_active' => $formData['status'] !== 'terminated' ? 1 : 0
             ]);
             
             $success = true;
@@ -103,8 +100,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'phone' => '',
                 'hire_date' => date('Y-m-d'),
                 'salary' => '',
-                'status' => 'active',
-                'notes' => ''
+                'status' => 'active'
             ];
             
             // Перенаправление через 2 секунды
@@ -565,22 +561,6 @@ $pageTitle = 'Добавление сотрудника';
                                                 <option value="sick" <?= $formData['status'] === 'sick' ? 'selected' : '' ?>>🤒 На больничном</option>
                                                 <option value="terminated" <?= $formData['status'] === 'terminated' ? 'selected' : '' ?>>❌ Уволен</option>
                                             </select>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Заметки -->
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <div class="form-group">
-                                            <label class="form-label" for="notes">
-                                                Заметки
-                                            </label>
-                                            <textarea class="form-control"
-                                                      id="notes"
-                                                      name="notes"
-                                                      rows="4"
-                                                      placeholder="Дополнительная информация о сотруднике..."><?= htmlspecialchars($formData['notes']) ?></textarea>
                                         </div>
                                     </div>
                                 </div>

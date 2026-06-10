@@ -77,9 +77,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         try {
             $stmt = $pdo->prepare("
                 INSERT INTO employees 
-                (full_name, position, department, email, phone, hire_date, salary, status, notes, created_at) 
+                (full_name, position, department, email, phone, hire_date, salary, is_active, notes, created_at) 
                 VALUES 
-                (:full_name, :position, :department, :email, :phone, :hire_date, :salary, :status, :notes, NOW())
+                (:full_name, :position, :department, :email, :phone, :hire_date, :salary, :is_active, :notes, NOW())
             ");
             
             $stmt->execute([
@@ -90,7 +90,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 ':phone' => $formData['phone'] ?: null,
                 ':hire_date' => $formData['hire_date'],
                 ':salary' => $formData['salary'] ?: null,
-                ':status' => $formData['status'],
+                ':is_active' => $formData['status'] !== 'terminated' ? 1 : 0,
                 ':notes' => $formData['notes'] ?: null
             ]);
             

@@ -1,1 +1,1 @@
-Nothing should be ignored based on the provided file changes, as they are all PHP source files (.php) which are legitimate code files to track in version control.
+Nothing should be ignored based on the provided file changes. The only modified file is a PHP source file (`polesie/modules/products/passports.php`), which is a legitimate source code file that should not be ignored. No build artifacts, dependencies, temporary files, or other ignorable items are present in the changes.

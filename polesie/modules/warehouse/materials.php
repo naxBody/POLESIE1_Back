@@ -1347,13 +1347,39 @@ $availableCombinationsJson = json_encode($availableCombinations, JSON_UNESCAPED_
                                 'shelf_life_months' => 'Срок хранения',
                                 'packaging' => 'Упаковка',
                                 'color' => 'Цвет',
-                                'application' => 'Применение'
+                                'application' => 'Применение',
+                                'потребляемая_мощность_вт' => 'Потребляемая мощность'
                             ];
+                            
+                            $specUnits = [
+                                'diameter_mm' => 'мм',
+                                'length_m' => 'м',
+                                'length_mm' => 'мм',
+                                'thickness_mm' => 'мм',
+                                'width_mm' => 'мм',
+                                'density_kg_m3' => 'кг/м³',
+                                'tensile_strength_mpa' => 'МПа',
+                                'yield_strength_mpa' => 'МПа',
+                                'hardness_hb' => 'HB',
+                                'hardness_hrc' => 'HRC',
+                                'temperature_range_c' => '°C',
+                                'viscosity_sec_20C' => 'сек',
+                                'flash_point_c' => '°C',
+                                'shelf_life_months' => 'мес',
+                                'потребляемая_мощность_вт' => 'Вт'
+                            ];
+                            
                             $label = $specLabels[$key] ?? ucfirst(str_replace('_', ' ', $key));
+                            $unit = $specUnits[$key] ?? '';
                         ?>
                             <div class="spec-row">
                                 <span class="spec-label"><?= e($label) ?></span>
-                                <span class="spec-value"><?= is_array($value) ? e(implode(', ', array_slice($value, 0, 3))) : e($value) ?></span>
+                                <span class="spec-value">
+                                    <?= is_array($value) ? e(implode(', ', array_slice($value, 0, 3))) : e($value) ?>
+                                    <?php if (!empty($unit)): ?>
+                                        <span class="spec-unit"> <?= e($unit) ?></span>
+                                    <?php endif; ?>
+                                </span>
                             </div>
                         <?php endforeach; ?>
                     </div>
@@ -2290,7 +2316,30 @@ function printMaterial() {
         'temperature_range_c': 'Температурный диапазон (°C)',
         'storage_condition': 'Условия хранения',
         'shelf_life_months': 'Срок хранения (мес)',
-        'manufacturer': 'Производитель'
+        'manufacturer': 'Производитель',
+        'потребляемая_мощность_вт': 'Потребляемая мощность'
+    };
+    
+    // Словарь единиц измерения
+    const specUnits = {
+        'diameter_mm': 'мм',
+        'length_m': 'м',
+        'thickness_mm': 'мм',
+        'width_mm': 'мм',
+        'length_mm': 'мм',
+        'density_kg_m3': 'кг/м³',
+        'tensile_strength_mpa': 'МПа',
+        'yield_strength_mpa': 'МПа',
+        'hardness_hb': 'HB',
+        'hardness_hrc': 'HRC',
+        'hardness_hv': 'HV',
+        'impact_strength_cm': 'см',
+        'temperature_range_c': '°C',
+        'flash_point_c': '°C',
+        'heat_resistance_c': '°C',
+        'shelf_life_months': 'мес',
+        'viscosity_sec_20C': 'сек',
+        'потребляемая_мощность_вт': 'Вт'
     };
     
     const printWindow = window.open('', '_blank');
@@ -2319,11 +2368,12 @@ function printMaterial() {
                 <div class="section-title">Характеристики</div>
                 ${Object.entries(currentMaterial.specifications || {}).map(([key, value]) => {
                     const label = specLabels[key] || key.replace(/_/g, ' ');
+                    const unit = specUnits[key] || '';
                     const displayValue = Array.isArray(value) ? value.join(', ') : (typeof value === 'object' ? Object.entries(value).map(([k, v]) => `${k}: ${v}`).join('; ') : value);
                     return `
                     <div class="spec-row">
                         <span class="spec-label">${label}</span>
-                        <span class="spec-value">${displayValue}</span>
+                        <span class="spec-value">${displayValue}${unit ? ' ' + unit : ''}</span>
                     </div>`;
                 }).join('')}
             </div>

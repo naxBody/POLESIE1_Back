@@ -667,6 +667,7 @@ $isPrint = isset($_GET['print']);
                     'shaft_material' => 'Материал вала',
                     'winding_material' => 'Материал обмотки',
                     'power_kw' => 'Мощность',
+                    'потребляемая_мощность_вт' => 'Потребляемая мощность',
                     'rpm' => 'Частота вращения',
                     'voltage_v' => 'Напряжение питания',
                     'frequency_hz' => 'Частота тока',
@@ -680,6 +681,7 @@ $isPrint = isset($_GET['print']);
                 
                 $specUnits = [
                     'power_kw' => 'кВт',
+                    'потребляемая_мощность_вт' => 'Вт',
                     'rpm' => 'об/мин',
                     'voltage_v' => 'В',
                     'frequency_hz' => 'Гц',
@@ -1370,19 +1372,29 @@ $isPrint = isset($_GET['print']);
                     'width_mm': 'Ширина',
                     'strength_class': 'Кл. прочности',
                     'coating': 'Покрытие',
-                    'material_type': 'Тип'
+                    'material_type': 'Тип',
+                    'потребляемая_мощность_вт': 'Потребляемая мощность'
+                };
+                
+                const specUnits = {
+                    'diameter_mm': 'мм',
+                    'length_m': 'м',
+                    'thickness_mm': 'мм',
+                    'width_mm': 'мм',
+                    'потребляемая_мощность_вт': 'Вт'
                 };
                 
                 for (const [key, value] of Object.entries(materialData.specifications)) {
                     if (value && value !== '') {
                         const label = specLabels[key] || key;
+                        const unit = specUnits[key] || '';
                         const displayValue = Array.isArray(value) ? value.join(', ') : value;
                         
                         const specItem = document.createElement('div');
                         specItem.className = 'spec-row';
                         specItem.innerHTML = `
                             <span class="spec-label">${label}:</span>
-                            <span class="spec-value">${displayValue}</span>
+                            <span class="spec-value">${displayValue}${unit ? ' ' + unit : ''}</span>
                         `;
                         specsContainer.appendChild(specItem);
                     }

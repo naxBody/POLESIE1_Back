@@ -590,6 +590,7 @@ foreach ($ordersData as $oid => $data) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= e($pageTitle) ?> - <?= e(APP_NAME) ?></title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="<?= asset('assets/css/style.css') ?>">
     <style>
         .plan-header { margin-bottom: 24px; }
@@ -957,7 +958,7 @@ foreach ($ordersData as $oid => $data) {
                                     <td><?= $order['tasks_count'] ?? 0 ?></td>
                                     <td><?= e($order['responsible_name'] ?? '—') ?></td>
                                     <td onclick="event.stopPropagation();">
-                                        <button class="btn btn-sm btn-primary" onclick="openOrderDetailModal('<?= $order['id'] ?>')">👁️</button>
+                                        <button class="btn btn-sm btn-primary" onclick="openOrderDetailModal('<?= $order['id'] ?>')"><i class="bi bi-eye"></i></button>
                                     </td>
                                 </tr>
                                 <?php endforeach; ?>
@@ -969,11 +970,11 @@ foreach ($ordersData as $oid => $data) {
                 <?php if (empty($orders)): ?>
                 <div class="card">
                     <div class="card-body" style="text-align: center; padding: 60px 20px;">
-                        <div style="font-size: 48px; margin-bottom: 16px;">📋</div>
+                        <div style="font-size: 48px; margin-bottom: 16px;"><i class="bi bi-clipboard-list" style="font-size: 48px;"></i></div>
                         <h3>Заказов нет</h3>
                         <p style="color: var(--text-secondary);">Создайте первый заказ для начала работы</p>
                         <a href="<?= pageUrl('modules/orders/create.php') ?>" class="btn btn-primary" style="margin-top: 16px;">
-                            ➕ Создать заказ
+                            <i class="bi bi-plus-lg"></i> Создать заказ
                         </a>
                     </div>
                 </div>
@@ -1237,7 +1238,7 @@ foreach ($ordersData as $oid => $data) {
                         html += '<div style="background: #f8f9fa; padding: 12px 16px; border-bottom: 1px solid #e9ecef; display: flex; justify-content: space-between; align-items: center;">';
                         html += '<div style="font-weight: 600; color: #2c3e50;">' + escapeHtml(item.product_name) + ' (' + formatNumber(item.quantity) + ' шт.)</div>';
                         html += '<button class="toggle-details-btn" onclick="toggleItemMaterials(' + itemIndex + ', this)">';
-                        html += '<span>📋</span><span class="btn-text">Материалы</span>';
+                        html += '<span><i class="bi bi-clipboard-list"></i></span><span class="btn-text">Материалы</span>';
                         html += '</button>';
                         html += '</div>';
                         html += '<div class="item-materials-section" id="item-materials-' + itemIndex + '" style="display: none; padding: 12px 16px; background: white;">';
@@ -1278,7 +1279,7 @@ foreach ($ordersData as $oid => $data) {
                     html += '<div style="margin-top: 20px; border: 1px solid #e9ecef; border-radius: 6px; overflow: hidden;">';
                     html += '<div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 12px 16px; color: white;">';
                     html += '<div style="display: flex; justify-content: space-between; align-items: center;">';
-                    html += '<div style="font-weight: 600; font-size: 14px;">📊 Сводная потребность в материалах по заказу</div>';
+                    html += '<div style="font-weight: 600; font-size: 14px;"><i class="bi bi-graph-up"></i> Сводная потребность в материалах по заказу</div>';
                     html += '<div style="display: flex; gap: 12px; font-size: 12px;">';
                     html += '<span style="background: rgba(255,255,255,0.2); padding: 4px 10px; border-radius: 12px;">Всего: <strong>' + totalMaterialsNeeded + '</strong></span>';
                     html += '<span style="background: rgba(40,167,69,0.3); padding: 4px 10px; border-radius: 12px;">✅ Хватает: <strong>' + materialsOk + '</strong></span>';
@@ -1358,7 +1359,7 @@ foreach ($ordersData as $oid => $data) {
                     var statusName = taskStatusNames[task.task_status] || task.task_status || '—';
                     html += '<span class="badge">' + escapeHtml(statusName) + '</span>';
                     html += '<button class="toggle-details-btn" onclick="toggleTaskDetails(' + task.id + ', this)" data-task-id="' + task.id + '">';
-                    html += '<span>📋</span><span class="btn-text">Подробнее</span>';
+                    html += '<span><i class="bi bi-list-task"></i></span><span class="btn-text">Подробнее</span>';
                     html += '</button>';
                     html += '</div>';
                     html += '</div>';
@@ -1432,7 +1433,7 @@ foreach ($ordersData as $oid => $data) {
                     // Этапы производства - Timeline
                     if (task.stages && task.stages.length > 0) {
                         html += '<div style="margin-top: 16px;">';
-                        html += '<h5 style="margin-bottom: 10px; font-size: 13px; color: #2c3e50; font-weight: 600;">🔄 Этапы производства:</h5>';
+                        html += '<h5 style="margin-bottom: 10px; font-size: 13px; color: #2c3e50; font-weight: 600;"><i class="bi bi-arrow-repeat"></i> Этапы производства:</h5>';
                         html += '<div class="production-timeline">';
                         
                         // Определяем иконки для этапов
@@ -1481,7 +1482,7 @@ foreach ($ordersData as $oid => $data) {
                 
                 if (allMaterials.length > 0) {
                     html += '<div class="passport-section fade-in" style="margin-top: 20px;">';
-                    html += '<div class="passport-section-title">📊 Общая потребность в материалах:</div>';
+                    html += '<div class="passport-section-title"><i class="bi bi-graph-up"></i> Общая потребность в материалах:</div>';
                     html += '<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-top: 12px;">';
                     html += '<div style="background: #fff; padding: 12px; border-radius: 6px; border: 1px solid #e9ecef;">';
                     html += '<div style="font-size: 12px; color: #7f8c8d;">Всего материалов:</div>';

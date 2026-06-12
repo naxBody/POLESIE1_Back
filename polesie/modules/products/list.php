@@ -289,6 +289,40 @@ error_log("Всего категорий продукции: " . count($categori
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="<?= asset('assets/css/style.css') ?>">
+    <style>
+        /* Table action buttons - larger icons like in contractors */
+        .table .btn-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--gray-100);
+            border: 1px solid var(--border-color);
+            cursor: pointer;
+            text-decoration: none;
+            color: var(--text-secondary);
+            transition: all var(--transition-fast);
+        }
+
+        .table .btn-icon:hover {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+            transform: scale(1.1);
+        }
+
+        .table .btn-icon.btn-danger:hover {
+            background: var(--danger-color);
+            border-color: var(--danger-color);
+        }
+
+        .table .btn-icon svg {
+            width: 20px;
+            height: 20px;
+        }
+    </style>
 </head>
 <body>
     <div class="app-container">
@@ -378,18 +412,18 @@ error_log("Всего категорий продукции: " . count($categori
                         <td onclick="event.stopPropagation()">
                             <div style="display: flex; gap: 8px;">
                                 <?php if (hasPermission('products.view')): ?>
-                                    <a href="view.php?id=<?= $p['id'] ?>" class="btn btn-sm btn-icon" title="Просмотр">
-                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                                    <a href="view.php?id=<?= $p['id'] ?>" class="btn-icon" title="Просмотр">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
                                     </a>
                                 <?php endif; ?>
                                 <?php if (hasPermission('products.edit')): ?>
-                                    <a href="edit.php?id=<?= $p['id'] ?>" class="btn btn-sm btn-icon" title="Редактировать">
-                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                                    <a href="edit.php?id=<?= $p['id'] ?>" class="btn-icon" title="Редактировать">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
                                     </a>
                                 <?php endif; ?>
                                 <?php if (hasPermission('products.delete')): ?>
-                                    <a href="delete.php?id=<?= $p['id'] ?>" class="btn btn-sm btn-icon btn-danger" title="Удалить" onclick="return confirm('Вы уверены, что хотите удалить продукцию <?= e($p['name_full'] ?? $p['name_short'] ?? $p['name'] ?? '') ?>?')">
-                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                                    <a href="delete.php?id=<?= $p['id'] ?>" class="btn-icon btn-danger" title="Удалить" onclick="return confirm('Вы уверены, что хотите удалить продукцию <?= e($p['name_full'] ?? $p['name_short'] ?? $p['name'] ?? '') ?>?')">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
                                     </a>
                                 <?php endif; ?>
                             </div>

@@ -2105,7 +2105,7 @@ foreach ($allTasks as &$task) {
                                         </td>
                                         <td style="text-align: right;">
                                             <button class="btn btn-sm btn-outline" onclick="event.stopPropagation(); openOrderDetailModal(<?= $order['id'] ?>)" style="padding: 8px 16px; font-size: 13px;">
-                                                ℹ️ Подробнее
+                                                <i class="bi bi-info-circle"></i> Подробнее
                                             </button>
                                         </td>
                                     </tr>

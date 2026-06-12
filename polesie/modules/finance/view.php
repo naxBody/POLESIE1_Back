@@ -160,7 +160,7 @@ $pageTitle = 'Платеж №' . $payment['document_number'];
     <title><?= e($pageTitle) ?> - <?= e(APP_NAME) ?></title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="<?= asset('assets/css/style.css') ?>">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <style>
         .view-container {
             max-width: 1200px;
@@ -483,39 +483,39 @@ $pageTitle = 'Платеж №' . $payment['document_number'];
                     <?php endif; ?>
                     
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;" class="no-print">
-                        <a href="list.php" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Назад к списку</a>
+                        <a href="list.php" class="btn btn-secondary"><i class="bi bi-arrow-left"></i> Назад к списку</a>
                         <div style="display: flex; gap: 10px;">
                             <?php if (canEditInModule('finance')): ?>
                                 <?php if ($payment['status'] === 'draft'): ?>
-                                <a href="payment_edit.php?id=<?= $payment['id'] ?>" class="btn btn-primary"><i class="fas fa-pen-to-square"></i> Редактировать</a>
+                                <a href="payment_edit.php?id=<?= $payment['id'] ?>" class="btn btn-primary"><i class="bi bi-pencil"></i> Редактировать</a>
                                 <form method="POST" style="display: inline;">
                                     <input type="hidden" name="action" value="pending">
-                                    <button type="submit" class="btn btn-warning" onclick="return confirm('Отправить на согласование?')"><i class="fas fa-paper-plane"></i> На согласование</button>
+                                    <button type="submit" class="btn btn-warning" onclick="return confirm('Отправить на согласование?')"><i class="bi bi-send"></i> На согласование</button>
                                 </form>
                                 <?php elseif ($payment['status'] === 'pending'): ?>
                                 <form method="POST" style="display: inline;">
                                     <input type="hidden" name="action" value="approve">
-                                    <button type="submit" class="btn btn-success"><i class="fas fa-circle-check"></i> Утвердить</button>
+                                    <button type="submit" class="btn btn-success"><i class="bi bi-patch-check-fill"></i> Утвердить</button>
                                 </form>
                                 <?php elseif ($payment['status'] === 'approved'): ?>
                                 <form method="POST" style="display: inline;">
                                     <input type="hidden" name="action" value="post">
-                                    <button type="submit" class="btn btn-success" onclick="return confirm('Провести платеж?')"><i class="fas fa-money-bill-transfer"></i> Провести</button>
+                                    <button type="submit" class="btn btn-success" onclick="return confirm('Провести платеж?')"><i class="bi bi-cash-stack"></i> Провести</button>
                                 </form>
                                 <?php elseif ($payment['status'] === 'posted'): ?>
                                 <form method="POST" style="display: inline;">
                                     <input type="hidden" name="action" value="unpost">
-                                    <button type="submit" class="btn btn-warning" onclick="return confirm('Отменить проведение?')"><i class="fas fa-rotate-left"></i> Отменить проведение</button>
+                                    <button type="submit" class="btn btn-warning" onclick="return confirm('Отменить проведение?')"><i class="bi bi-arrow-counterclockwise"></i> Отменить проведение</button>
                                 </form>
                                 <?php endif; ?>
                                 <form method="POST" style="display: inline;" onsubmit="return showCancelComment()">
                                     <input type="hidden" name="action" value="cancel">
                                     <input type="hidden" name="cancel_comment" id="cancel_comment" value="">
-                                    <button type="submit" class="btn btn-danger"><i class="fas fa-circle-xmark"></i> Отменить</button>
+                                    <button type="submit" class="btn btn-danger"><i class="bi bi-x-circle-fill"></i> Отменить</button>
                                 </form>
                             <?php endif; ?>
-                            <button onclick="togglePrintPreview()" class="btn btn-secondary"><i class="fas fa-print"></i> Печать</button>
-                            <button onclick="window.print()" class="btn btn-primary"><i class="fas fa-file-pdf"></i> PDF</button>
+                            <button onclick="togglePrintPreview()" class="btn btn-secondary"><i class="bi bi-printer"></i> Печать</button>
+                            <button onclick="window.print()" class="btn btn-primary"><i class="bi bi-file-earmark-pdf"></i> PDF</button>
                         </div>
                     </div>
                     
@@ -523,7 +523,7 @@ $pageTitle = 'Платеж №' . $payment['document_number'];
                     <div class="print-area" id="printArea">
                         <div class="print-header">
                             <div class="print-company-info">
-                                <h3><i class="fas fa-industry"></i> ОАО "Полесьеэлектромаш"</h3>
+                                <h3><i class="bi bi-buildings"></i> ОАО "Полесьеэлектромаш"</h3>
                                 <p>УНП: 123456789 | ОКПО: 37654321</p>
                                 <p>246000, г. Гомель, ул. Советская, д. 10</p>
                                 <p>Тел: +375 (232) 12-34-56 | Email: info@polesie.by</p>
@@ -631,7 +631,7 @@ $pageTitle = 'Платеж №' . $payment['document_number'];
                         <!-- Заголовок документа -->
                         <div class="document-header">
                             <div>
-                                <div class="document-number"><i class="fas fa-file-invoice-dollar"></i> <?= e($payment['document_number']) ?></div>
+                                <div class="document-number"><i class="bi bi-cash-stack"></i> <?= e($payment['document_number']) ?></div>
                                 <div style="color: #6b7280; margin-top: 4px;">
                                     <span class="badge" style="background: <?= e($payment['status_color']) ?>20; color: <?= e($payment['status_color']) ?>; font-size: 13px; padding: 6px 12px; border-radius: 6px;">
                                         <i class="fas <?= $payment['status'] === 'posted' ? 'fa-circle-check' : ($payment['status'] === 'approved' ? 'fa-user-check' : ($payment['status'] === 'pending' ? 'fa-clock' : ($payment['status'] === 'cancelled' ? 'fa-circle-xmark' : 'fa-file'))) ?>"></i>
@@ -640,7 +640,7 @@ $pageTitle = 'Платеж №' . $payment['document_number'];
                                 </div>
                             </div>
                             <div class="document-meta">
-                                <div style="font-size: 14px; color: #6b7280;"><i class="far fa-calendar"></i> Дата документа</div>
+                                <div style="font-size: 14px; color: #6b7280;"><i class="bi bi-calendar3"></i> Дата документа</div>
                                 <div style="font-size: 20px; font-weight: 600;"><?= formatDate($payment['document_date']) ?></div>
                             </div>
                         </div>
@@ -648,42 +648,42 @@ $pageTitle = 'Платеж №' . $payment['document_number'];
                         <div class="info-grid">
                             <!-- Основная информация -->
                             <div class="info-card">
-                                <div class="info-card-title"><i class="fas fa-coins"></i> Сумма платежа</div>
+                                <div class="info-card-title"><i class="bi bi-cash-coin"></i> Сумма платежа</div>
                                 <div class="amount-display"><?= formatMoney($payment['amount']) ?></div>
                                 <?php if ($payment['vat_amount'] > 0): ?>
                                 <div class="info-row">
-                                    <span class="info-label"><i class="fas fa-percent"></i> НДС:</span>
+                                    <span class="info-label"><i class="bi bi-percent"></i> НДС:</span>
                                     <span class="info-value"><?= formatMoney($payment['vat_amount']) ?></span>
                                 </div>
                                 <div class="info-row">
-                                    <span class="info-label"><i class="fas fa-tag"></i> Ставка:</span>
+                                    <span class="info-label"><i class="bi bi-tag"></i> Ставка:</span>
                                     <span class="info-value"><?= $payment['vat_rate'] ?>%</span>
                                 </div>
                                 <?php endif; ?>
                                 <div class="info-row">
-                                    <span class="info-label"><i class="fas fa-money-bill"></i> Валюта:</span>
+                                    <span class="info-label"><i class="bi bi-currency-dollar"></i> Валюта:</span>
                                     <span class="info-value"><?= $payment['currency'] ?></span>
                                 </div>
                             </div>
                             
                             <!-- Тип платежа -->
                             <div class="info-card">
-                                <div class="info-card-title"><i class="fas fa-tags"></i> Классификация</div>
+                                <div class="info-card-title"><i class="bi bi-tags"></i> Классификация</div>
                                 <div class="info-row">
-                                    <span class="info-label"><i class="fas fa-arrow-right"></i> Поток:</span>
-                                    <span class="info-value"><?= $payment['flow_type'] === 'income' ? '<span style="color: #27ae60;"><i class="fas fa-arrow-up"></i> Доход</span>' : '<span style="color: #e74c3c;"><i class="fas fa-arrow-down"></i> Расход</span>' ?></span>
+                                    <span class="info-label"><i class="bi bi-arrow-right"></i> Поток:</span>
+                                    <span class="info-value"><?= $payment['flow_type'] === 'income' ? '<span style="color: #27ae60;"><i class="bi bi-arrow-up-circle-fill"></i> Доход</span>' : '<span style="color: #e74c3c;"><i class="bi bi-arrow-down-circle-fill"></i> Расход</span>' ?></span>
                                 </div>
                                 <div class="info-row">
-                                    <span class="info-label"><i class="fas fa-list"></i> Тип:</span>
+                                    <span class="info-label"><i class="bi bi-list-ul"></i> Тип:</span>
                                     <span class="info-value"><?= e($payment['payment_type_name']) ?></span>
                                 </div>
                                 <div class="info-row">
-                                    <span class="info-label"><i class="fas fa-folder"></i> Категория:</span>
+                                    <span class="info-label"><i class="bi bi-folder"></i> Категория:</span>
                                     <span class="info-value"><?= e($payment['category']) ?></span>
                                 </div>
                                 <?php if ($payment['expense_article_name']): ?>
                                 <div class="info-row">
-                                    <span class="info-label"><i class="fas fa-clipboard-list"></i> Статья затрат:</span>
+                                    <span class="info-label"><i class="bi bi-clipboard-list"></i> Статья затрат:</span>
                                     <span class="info-value"><?= e($payment['expense_article_name']) ?></span>
                                 </div>
                                 <?php endif; ?>
@@ -691,22 +691,22 @@ $pageTitle = 'Платеж №' . $payment['document_number'];
                             
                             <!-- Статусы и даты -->
                             <div class="info-card">
-                                <div class="info-card-title"><i class="fas fa-calendar-alt"></i> Информация о документе</div>
+                                <div class="info-card-title"><i class="bi bi-calendar3"></i> Информация о документе</div>
                                 <div class="info-row">
-                                    <span class="info-label"><i class="fas fa-plus-circle"></i> Создан:</span>
+                                    <span class="info-label"><i class="bi bi-plus-lg"></i> Создан:</span>
                                     <span class="info-value"><?= formatDate($payment['created_at']) ?></span>
                                 </div>
                                 <div class="info-row">
-                                    <span class="info-label"><i class="fas fa-user"></i> Автор:</span>
+                                    <span class="info-label"><i class="bi bi-person"></i> Автор:</span>
                                     <span class="info-value"><?= e($payment['created_by_name']) ?></span>
                                 </div>
                                 <?php if ($payment['posted_at']): ?>
                                 <div class="info-row">
-                                    <span class="info-label"><i class="fas fa-check-double"></i> Проведен:</span>
+                                    <span class="info-label"><i class="bi bi-check2-all"></i> Проведен:</span>
                                     <span class="info-value"><?= formatDate($payment['posted_at']) ?></span>
                                 </div>
                                 <div class="info-row">
-                                    <span class="info-label"><i class="fas fa-user-check"></i> Провел:</span>
+                                    <span class="info-label"><i class="bi bi-person-check"></i> Провел:</span>
                                     <span class="info-value"><?= e($payment['posted_by_name']) ?></span>
                                 </div>
                                 <?php endif; ?>
@@ -716,91 +716,91 @@ $pageTitle = 'Платеж №' . $payment['document_number'];
                         <!-- Контрагент и банк -->
                         <div class="info-grid">
                             <div class="info-card">
-                                <div class="info-card-title"><i class="fas fa-building"></i> Контрагент</div>
+                                <div class="info-card-title"><i class="bi bi-building"></i> Контрагент</div>
                                 <?php if ($payment['contractor_name']): ?>
                                 <div class="info-row">
-                                    <span class="info-label"><i class="fas fa-signature"></i> Название:</span>
+                                    <span class="info-label"><i class="bi bi-signature"></i> Название:</span>
                                     <span class="info-value"><?= e($payment['contractor_name']) ?></span>
                                 </div>
                                 <div class="info-row">
-                                    <span class="info-label"><i class="fas fa-id-card"></i> ИНН:</span>
+                                    <span class="info-label"><i class="bi bi-person-badge"></i> ИНН:</span>
                                     <span class="info-value"><?= e($payment['contractor_inn'] ?? '—') ?></span>
                                 </div>
                                 <?php if ($payment['contractor_address']): ?>
                                 <div class="info-row">
-                                    <span class="info-label"><i class="fas fa-map-marker-alt"></i> Адрес:</span>
+                                    <span class="info-label"><i class="bi bi-geo-alt"></i> Адрес:</span>
                                     <span class="info-value" style="text-align: left;"><?= e($payment['contractor_address']) ?></span>
                                 </div>
                                 <?php endif; ?>
                                 <?php if ($payment['contractor_phone']): ?>
                                 <div class="info-row">
-                                    <span class="info-label"><i class="fas fa-phone"></i> Телефон:</span>
+                                    <span class="info-label"><i class="bi bi-telephone"></i> Телефон:</span>
                                     <span class="info-value"><?= e($payment['contractor_phone']) ?></span>
                                 </div>
                                 <?php endif; ?>
                                 <?php else: ?>
-                                <div style="color: #6b7280; font-style: italic;"><i class="fas fa-info-circle"></i> Контрагент не указан</div>
+                                <div style="color: #6b7280; font-style: italic;"><i class="bi bi-info-circle"></i> Контрагент не указан</div>
                                 <?php endif; ?>
                             </div>
                             
                             <div class="info-card">
-                                <div class="info-card-title"><i class="fas fa-university"></i> Банковские реквизиты</div>
+                                <div class="info-card-title"><i class="bi bi-bank"></i> Банковские реквизиты</div>
                                 <div class="info-row">
-                                    <span class="info-label"><i class="fas fa-user-tag"></i> Владелец:</span>
+                                    <span class="info-label"><i class="bi bi-person-badge"></i> Владелец:</span>
                                     <span class="info-value"><?= e($payment['account_holder']) ?></span>
                                 </div>
                                 <div class="info-row">
-                                    <span class="info-label"><i class="fas fa-credit-card"></i> Счет:</span>
+                                    <span class="info-label"><i class="bi bi-credit-card"></i> Счет:</span>
                                     <span class="info-value" style="font-family: monospace;"><?= e($payment['bank_account']) ?></span>
                                 </div>
                                 <div class="info-row">
-                                    <span class="info-label"><i class="fas fa-landmark"></i> Банк:</span>
+                                    <span class="info-label"><i class="bi bi-building"></i> Банк:</span>
                                     <span class="info-value"><?= e($payment['bank_name']) ?></span>
                                 </div>
                                 <?php if ($payment['bank_bic']): ?>
                                 <div class="info-row">
-                                    <span class="info-label"><i class="fas fa-code"></i> БИК:</span>
+                                    <span class="info-label"><i class="bi bi-code-slash"></i> БИК:</span>
                                     <span class="info-value"><?= e($payment['bank_bic']) ?></span>
                                 </div>
                                 <?php endif; ?>
                             </div>
                             
                             <div class="info-card">
-                                <div class="info-card-title"><i class="fas fa-link"></i> Связанные документы</div>
+                                <div class="info-card-title"><i class="bi bi-link-45deg"></i> Связанные документы</div>
                                 <?php if ($payment['order_number']): ?>
                                 <div class="info-row">
-                                    <span class="info-label"><i class="fas fa-shopping-cart"></i> Заказ:</span>
-                                    <span class="info-value"><a href="../orders/view.php?id=<?= $payment['order_id'] ?>" style="color: #3498db; text-decoration: none;"><i class="fas fa-external-link-alt"></i> <?= e($payment['order_number']) ?></a></span>
+                                    <span class="info-label"><i class="bi bi-cart3"></i> Заказ:</span>
+                                    <span class="info-value"><a href="../orders/view.php?id=<?= $payment['order_id'] ?>" style="color: #3498db; text-decoration: none;"><i class="bi bi-box-arrow-up-right"></i> <?= e($payment['order_number']) ?></a></span>
                                 </div>
                                 <?php endif; ?>
                                 <?php if ($payment['document_reference']): ?>
                                 <div class="info-row">
-                                    <span class="info-label"><i class="fas fa-file-contract"></i> Документ-основание:</span>
+                                    <span class="info-label"><i class="bi bi-file-earmark-text"></i> Документ-основание:</span>
                                     <span class="info-value"><?= e($payment['document_reference']) ?></span>
                                 </div>
                                 <?php endif; ?>
                                 <?php if (!$payment['order_number'] && !$payment['document_reference']): ?>
-                                <div style="color: #6b7280; font-style: italic;"><i class="fas fa-info-circle"></i> Связи отсутствуют</div>
+                                <div style="color: #6b7280; font-style: italic;"><i class="bi bi-info-circle"></i> Связи отсутствуют</div>
                                 <?php endif; ?>
                             </div>
                         </div>
                         
                         <!-- Назначение платежа -->
                         <div class="info-card" style="margin-bottom: 24px;">
-                            <div class="info-card-title"><i class="fas fa-file-alt"></i> Назначение платежа</div>
+                            <div class="info-card-title"><i class="bi bi-file-earmark-text"></i> Назначение платежа</div>
                             <div style="color: #1f2937; line-height: 1.6; padding: 10px 0;"><?= nl2br(e($payment['payment_purpose'] ?: $payment['description'] ?: 'Не указано')) ?></div>
                         </div>
                         
                         <!-- История изменений -->
                         <div class="timeline">
-                            <div class="info-card-title" style="margin-bottom: 16px;"><i class="fas fa-history"></i> История изменений статуса</div>
+                            <div class="info-card-title" style="margin-bottom: 16px;"><i class="bi bi-clock-history"></i> История изменений статуса</div>
                             <?php foreach ($history as $item): ?>
                             <div class="timeline-item">
                                 <div class="timeline-date">
-                                    <i class="far fa-clock"></i> <?= date('d.m.Y H:i', strtotime($item['changed_at'])) ?>
+                                    <i class="bi bi-clock"></i> <?= date('d.m.Y H:i', strtotime($item['changed_at'])) ?>
                                 </div>
                                 <div class="timeline-content">
-                                    <div style="font-weight: 600; color: #1f2937;"><i class="fas fa-user"></i> <?= e($item['changed_by_name']) ?></div>
+                                    <div style="font-weight: 600; color: #1f2937;"><i class="bi bi-person"></i> <?= e($item['changed_by_name']) ?></div>
                                     <div style="font-size: 13px; color: #6b7280; margin: 4px 0;">
                                         <span style="color: #95a5a6;"><?= e($item['old_status'] ?? 'Создание') ?></span>
                                         <i class="fas fa-arrow-right" style="margin: 0 6px; font-size: 10px;"></i>
@@ -808,7 +808,7 @@ $pageTitle = 'Платеж №' . $payment['document_number'];
                                     </div>
                                     <?php if ($item['comment']): ?>
                                     <div style="font-size: 13px; margin-top: 6px; color: #374151; background: #f9fafb; padding: 8px; border-radius: 6px; border-left: 3px solid #3498db;">
-                                        <i class="fas fa-comment"></i> <?= e($item['comment']) ?>
+                                        <i class="bi bi-chat-left-text"></i> <?= e($item['comment']) ?>
                                     </div>
                                     <?php endif; ?>
                                 </div>

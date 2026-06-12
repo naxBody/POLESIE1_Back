@@ -1348,7 +1348,7 @@ $availableCombinationsJson = json_encode($availableCombinations, JSON_UNESCAPED_
                                 'packaging' => 'Упаковка',
                                 'color' => 'Цвет',
                                 'application' => 'Применение',
-                                'потребляемая_мощность_вт' => 'Потребляемая мощность'
+                                'потребляемая_мощность' => 'Потребляемая мощность'
                             ];
                             
                             $specUnits = [
@@ -1366,7 +1366,7 @@ $availableCombinationsJson = json_encode($availableCombinations, JSON_UNESCAPED_
                                 'viscosity_sec_20C' => 'сек',
                                 'flash_point_c' => '°C',
                                 'shelf_life_months' => 'мес',
-                                'потребляемая_мощность_вт' => 'Вт'
+                                'потребляемая_мощность' => 'Вт'
                             ];
                             
                             $label = $specLabels[$key] ?? ucfirst(str_replace('_', ' ', $key));
@@ -2317,7 +2317,7 @@ function printMaterial() {
         'storage_condition': 'Условия хранения',
         'shelf_life_months': 'Срок хранения (мес)',
         'manufacturer': 'Производитель',
-        'потребляемая_мощность_вт': 'Потребляемая мощность'
+        'потребляемая_мощность': 'Потребляемая мощность'
     };
     
     // Словарь единиц измерения
@@ -2339,7 +2339,7 @@ function printMaterial() {
         'heat_resistance_c': '°C',
         'shelf_life_months': 'мес',
         'viscosity_sec_20C': 'сек',
-        'потребляемая_мощность_вт': 'Вт'
+        'потребляемая_мощность': 'Вт'
     };
     
     const printWindow = window.open('', '_blank');

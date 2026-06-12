@@ -667,7 +667,7 @@ $isPrint = isset($_GET['print']);
                     'shaft_material' => 'Материал вала',
                     'winding_material' => 'Материал обмотки',
                     'power_kw' => 'Мощность',
-                    'потребляемая_мощность_вт' => 'Потребляемая мощность',
+                    'потребляемая_мощность' => 'Потребляемая мощность',
                     'rpm' => 'Частота вращения',
                     'voltage_v' => 'Напряжение питания',
                     'frequency_hz' => 'Частота тока',
@@ -681,7 +681,7 @@ $isPrint = isset($_GET['print']);
                 
                 $specUnits = [
                     'power_kw' => 'кВт',
-                    'потребляемая_мощность_вт' => 'Вт',
+                    'потребляемая_мощность' => 'Вт',
                     'rpm' => 'об/мин',
                     'voltage_v' => 'В',
                     'frequency_hz' => 'Гц',
@@ -1373,7 +1373,7 @@ $isPrint = isset($_GET['print']);
                     'strength_class': 'Кл. прочности',
                     'coating': 'Покрытие',
                     'material_type': 'Тип',
-                    'потребляемая_мощность_вт': 'Потребляемая мощность'
+                    'потребляемая_мощность': 'Потребляемая мощность'
                 };
                 
                 const specUnits = {
@@ -1381,7 +1381,7 @@ $isPrint = isset($_GET['print']);
                     'length_m': 'м',
                     'thickness_mm': 'мм',
                     'width_mm': 'мм',
-                    'потребляемая_мощность_вт': 'Вт'
+                    'потребляемая_мощность': 'Вт'
                 };
                 
                 for (const [key, value] of Object.entries(materialData.specifications)) {

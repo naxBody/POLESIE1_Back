@@ -1441,7 +1441,7 @@ $categories = $pdo->query($catQuery)->fetchAll();
                         <label for="editSerialTracked"><i class="fas fa-barcode"></i> Серийный учёт</label>
                         <div style="display: flex; align-items: center; gap: 10px; padding: 12px; background: #f8fafc; border-radius: var(--border-radius); border: 2px solid var(--border-color); transition: all 0.2s;">
                             <span style="font-weight: 600; color: var(--text-primary);">Включить серийный учёт</span>
-                            <input type="checkbox" id="editSerialTracked" name="is_serial_tracked" style="width: 20px; height: 20px; accent-color: var(--border-color); margin-left: auto;">
+                            <input type="checkbox" id="editSerialTracked" name="is_serial_tracked" style="width: 20px; height: 20px; accent-color: var(--border-color); margin-left: 10px;">
                         </div>
                     </div>
                     

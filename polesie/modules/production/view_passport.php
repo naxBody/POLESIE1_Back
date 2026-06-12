@@ -246,9 +246,9 @@ $isPrint = isset($_GET['print']);
         .spec-row {
             display: flex;
             align-items: baseline;
-            padding: 8px 0;
+            padding: 6px 0;
             border-bottom: 1px solid #e5e5e5;
-            gap: 16px;
+            gap: 12px;
         }
         .spec-row:last-child {
             border-bottom: none;
@@ -267,7 +267,7 @@ $isPrint = isset($_GET['print']);
             flex: 1;
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 4px;
         }
         .spec-unit {
             font-size: 14px;

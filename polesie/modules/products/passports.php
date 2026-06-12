@@ -735,13 +735,13 @@ $categories = $pdo->query($catQuery)->fetchAll();
         }
         .spec-item {
             background: var(--bg-tertiary);
-            padding: 14px 16px;
+            padding: 8px 12px;
             border-radius: var(--border-radius);
             display: flex;
             flex-direction: row;
             align-items: center;
             justify-content: space-between;
-            gap: 20px;
+            gap: 12px;
             transition: all 0.2s;
         }
         .spec-item:hover {
@@ -771,7 +771,7 @@ $categories = $pdo->query($catQuery)->fetchAll();
             display: flex;
             align-items: center;
             justify-content: flex-end;
-            gap: 6px;
+            gap: 4px;
         }
         .spec-unit {
             font-size: 14px;

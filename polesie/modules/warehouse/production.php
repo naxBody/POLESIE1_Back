@@ -591,6 +591,9 @@ if ($filterCategory !== '') {
 .spec-value {
     font-weight: 500;
     color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 6px;
 }
 
 .product-badges {
@@ -2130,12 +2133,9 @@ if ($filterCategory !== '') {
         }
 
         .spec-unit {
-            font-size: 12px;
-            font-weight: 500;
-            color: #6b7280;
-            background: #f3f4f6;
-            padding: 2px 8px;
-            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 700;
+            color: #333;
             white-space: nowrap;
         }
 

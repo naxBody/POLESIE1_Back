@@ -264,6 +264,15 @@ $isPrint = isset($_GET['print']);
             font-weight: 600;
             color: #333;
             flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .spec-unit {
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+            white-space: nowrap;
         }
         .document-list {
             list-style: none;

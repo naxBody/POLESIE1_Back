@@ -287,6 +287,7 @@ error_log("Всего категорий продукции: " . count($categori
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= e($pageTitle) ?> - <?= e(APP_NAME) ?></title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="<?= asset('assets/css/style.css') ?>">
 </head>
 <body>
@@ -304,7 +305,7 @@ error_log("Всего категорий продукции: " . count($categori
                 <div class="content">
                     <div class="page-header">
                         <div class="page-header-title">
-                            <h2>📦 Продукция</h2>
+                            <h2><i class="bi bi-box-seam"></i> Продукция</h2>
                             <p>Каталог выпускаемой продукции</p>
                         </div>
                         <div class="page-header-actions">
@@ -376,7 +377,7 @@ error_log("Всего категорий продукции: " . count($categori
                         </td>
                         <td onclick="event.stopPropagation()">
                             <?php if (hasPermission('products.edit')): ?>
-                                <a href="edit.php?id=<?= $p['id'] ?>" class="btn-icon" title="Редактировать">✏️</a>
+                                <a href="edit.php?id=<?= $p['id'] ?>" class="btn-icon" title="Редактировать"><i class="bi bi-pencil"></i></a>
                             <?php endif; ?>
                         </td>
                     </tr>
@@ -386,7 +387,7 @@ error_log("Всего категорий продукции: " . count($categori
 
             <?php if (empty($products)): ?>
                 <div class="empty-state">
-                    <div class="empty-state-icon">📦</div>
+                    <div class="empty-state-icon"><i class="bi bi-box-seam"></i></div>
                     <h3>Продукция не найдена</h3>
                     <p>Измените параметры фильтрации или добавьте первую позицию продукции</p>
                 </div>
@@ -577,18 +578,18 @@ error_log("Всего категорий продукции: " . count($categori
             // Полное описание
             if (product.description && product.description.trim() !== '') {
                 html += '<div class="passport-section">';
-                html += '<div class="passport-section-title">📝 Описание</div>';
+                html += '<div class="passport-section-title"><i class="bi bi-file-text"></i> Описание</div>';
                 html += '<div class="spec-row"><div class="spec-value" style="white-space: pre-wrap; line-height: 1.6;">' + escapeHtml(product.description) + '</div></div>';
                 html += '</div>';
             }
             
             // Паспорт (документы)
             html += '<div class="passport-section">';
-            html += '<div class="passport-section-title">📄 Паспорт</div>';
+            html += '<div class="passport-section-title"><i class="bi bi-file-earmark-text"></i> Паспорт</div>';
             
             if (product.documents && product.documents.length > 0) {
                 html += '<button onclick="printProductPassport()" style="background: var(--primary-color); border: none; color: white; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500; display: inline-flex; align-items: center; gap: 8px; margin-bottom: 16px;" title="Сформировать паспорт изделия">';
-                html += '📄 Сформировать паспорт';
+                html += '<i class="bi bi-file-earmark-text"></i> Сформировать паспорт';
                 html += '</button>';
                 html += '<ul class="document-list">';
                 for (var i = 0; i < product.documents.length; i++) {
@@ -603,8 +604,8 @@ error_log("Всего категорий продукции: " . count($categori
                     }
                     html += '</div>';
                     html += '<div class="document-actions">';
-                    html += '<a href="' + escapeHtml(doc.url) + '" target="_blank" class="btn-icon" title="Просмотреть">👁️</a>';
-                    html += '<a href="' + escapeHtml(doc.url) + '" download class="btn-icon" title="Скачать">⬇️</a>';
+                    html += '<a href="' + escapeHtml(doc.url) + '" target="_blank" class="btn-icon" title="Просмотреть"><i class="bi bi-eye"></i></a>';
+                    html += '<a href="' + escapeHtml(doc.url) + '" download class="btn-icon" title="Скачать"><i class="bi bi-download"></i></a>';
                     html += '</div>';
                     html += '</li>';
                 }
@@ -612,7 +613,7 @@ error_log("Всего категорий продукции: " . count($categori
             } else {
                 // Если документов нет, показываем только красивую кнопку
                 html += '<button type="button" onclick="printProductPassport(' + productId + ')" style="width: 100%; padding: 14px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 15px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 10px; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);">';
-                html += '<span style="font-size: 18px;">📄</span> Сформировать паспорт';
+                html += '<i class="bi bi-file-earmark-text" style="font-size: 18px;"></i> Сформировать паспорт';
                 html += '</button>';
             }
             html += '</div>';
@@ -620,7 +621,7 @@ error_log("Всего категорий продукции: " . count($categori
             // Инструкция по эксплуатации
             if (product.manual_url || product.manual_text) {
                 html += '<div class="passport-section">';
-                html += '<div class="passport-section-title">📘 Руководство по эксплуатации</div>';
+                html += '<div class="passport-section-title"><i class="bi bi-book"></i> Руководство по эксплуатации</div>';
                 if (product.manual_url) {
                     html += '<a href="' + escapeHtml(product.manual_url) + '" target="_blank" class="btn btn-primary" style="width: 100%; justify-content: center; margin-bottom: 12px;">📥 Скачать инструкцию</a>';
                 }
@@ -735,14 +736,14 @@ error_log("Всего категорий продукции: " . count($categori
         
         function getDocumentIcon(type) {
             var icons = {
-                'passport': '📄',
-                'certificate': '📜',
-                'manual': '📘',
-                'warranty': '🛡️',
-                'test_report': '📊',
-                'other': '📁'
+                'passport': '<i class="bi bi-file-earmark-text"></i>',
+                'certificate': '<i class="bi bi-award"></i>',
+                'manual': '<i class="bi bi-book"></i>',
+                'warranty': '<i class="bi bi-shield-check"></i>',
+                'test_report': '<i class="bi bi-bar-chart-line"></i>',
+                'other': '<i class="bi bi-folder"></i>'
             };
-            return icons[type] || '📁';
+            return icons[type] || '<i class="bi bi-folder"></i>';
         }
         
         function closeProductModal(event) {

@@ -660,6 +660,38 @@ $isPrint = isset($_GET['print']);
             <div class="passport-section-title">⚙️ Технические характеристики</div>
             <div class="specs-list">
                 <?php 
+                // Функция для разбора ключа с суффиксом единицы измерения
+                function parseSpecKey($key) {
+                    // Массив известных суффиксов единиц измерения
+                    $unitSuffixes = [
+                        '_вт' => 'Вт',
+                        '_в' => 'В',
+                        '_л_мин' => 'л/мин',
+                        '_м' => 'м',
+                        '_квт' => 'кВт',
+                        '_об_мин' => 'об/мин',
+                        '_Гц' => 'Гц',
+                        '_кг' => 'кг',
+                        '_мм' => 'мм',
+                        '_С' => '°C',
+                        '_дБ' => 'дБ',
+                        '_проц' => '%',
+                    ];
+                    
+                    $unit = '';
+                    $baseKey = $key;
+                    
+                    foreach ($unitSuffixes as $suffix => $unitValue) {
+                        if (substr($key, -strlen($suffix)) === $suffix) {
+                            $unit = $unitValue;
+                            $baseKey = substr($key, 0, -strlen($suffix));
+                            break;
+                        }
+                    }
+                    
+                    return ['base_key' => $baseKey, 'unit' => $unit];
+                }
+                
                 $specLabels = [
                     'explosion_protection' => 'Вид взрывозащиты',
                     'housing_material' => 'Материал корпуса',
@@ -670,13 +702,17 @@ $isPrint = isset($_GET['print']);
                     'потребляемая_мощность' => 'Потребляемая мощность',
                     'rpm' => 'Частота вращения',
                     'voltage_v' => 'Напряжение питания',
+                    'напряжение' => 'Напряжение',
                     'frequency_hz' => 'Частота тока',
                     'protection_class' => 'Степень защиты',
                     'efficiency_class' => 'Класс энергоэффективности',
                     'climate_versions' => 'Климатическое исполнение',
                     'mounting_versions' => 'Исполнение по монтажу',
                     'weight_kg' => 'Масса',
-                    'ip_rating' => 'Степень защиты IP'
+                    'ip_rating' => 'Степень защиты IP',
+                    'производительность' => 'Производительность',
+                    'номинальный_напор' => 'Номинальный напор',
+                    'макс_высота_всасывания' => 'Макс. высота всасывания'
                 ];
                 
                 $specUnits = [
@@ -684,18 +720,28 @@ $isPrint = isset($_GET['print']);
                     'потребляемая_мощность' => 'Вт',
                     'rpm' => 'об/мин',
                     'voltage_v' => 'В',
+                    'напряжение' => 'В',
                     'frequency_hz' => 'Гц',
                     'weight_kg' => 'кг',
                     'shaft_height_mm' => 'мм',
                     'ambient_temp' => '°C',
                     'noise_level' => 'дБ',
                     'efficiency' => '%',
-                    'power_factor' => 'cos φ'
+                    'power_factor' => 'cos φ',
+                    'производительность' => 'л/мин',
+                    'номинальный_напор' => 'м',
+                    'макс_высота_всасывания' => 'м'
                 ];
                 
                 foreach ($productSpecs as $key => $value): 
-                    $label = $specLabels[$key] ?? ucfirst(str_replace('_', ' ', $key));
-                    $unit = $specUnits[$key] ?? '';
+                    // Разбираем ключ на базовое имя и единицу измерения
+                    $parsed = parseSpecKey($key);
+                    $baseKey = $parsed['base_key'];
+                    $parsedUnit = $parsed['unit'];
+                    
+                    // Определяем label и unit
+                    $label = $specLabels[$baseKey] ?? ucfirst(str_replace('_', ' ', $baseKey));
+                    $unit = !empty($parsedUnit) ? $parsedUnit : ($specUnits[$baseKey] ?? '');
                     
                     // Форматируем значение
                     if (is_array($value)) {
@@ -735,31 +781,45 @@ $isPrint = isset($_GET['print']);
                     'power_kw' => 'Мощность',
                     'rpm' => 'Частота вращения',
                     'voltage_v' => 'Напряжение питания',
+                    'напряжение' => 'Напряжение',
                     'frequency_hz' => 'Частота тока',
                     'protection_class' => 'Степень защиты',
                     'efficiency_class' => 'Класс энергоэффективности',
                     'climate_versions' => 'Климатическое исполнение',
                     'mounting_versions' => 'Исполнение по монтажу',
                     'weight_kg' => 'Масса',
-                    'ip_rating' => 'Степень защиты IP'
+                    'ip_rating' => 'Степень защиты IP',
+                    'производительность' => 'Производительность',
+                    'номинальный_напор' => 'Номинальный напор',
+                    'макс_высота_всасывания' => 'Макс. высота всасывания'
                 ];
                 
                 $techSpecUnits = [
                     'power_kw' => 'кВт',
                     'rpm' => 'об/мин',
                     'voltage_v' => 'В',
+                    'напряжение' => 'В',
                     'frequency_hz' => 'Гц',
                     'weight_kg' => 'кг',
                     'shaft_height_mm' => 'мм',
                     'ambient_temp' => '°C',
                     'noise_level' => 'дБ',
                     'efficiency' => '%',
-                    'power_factor' => 'cos φ'
+                    'power_factor' => 'cos φ',
+                    'производительность' => 'л/мин',
+                    'номинальный_напор' => 'м',
+                    'макс_высота_всасывания' => 'м'
                 ];
                 
                 foreach ($technicalSpecs as $key => $value): 
-                    $label = $techSpecLabels[$key] ?? ucfirst(str_replace('_', ' ', $key));
-                    $unit = $techSpecUnits[$key] ?? '';
+                    // Разбираем ключ на базовое имя и единицу измерения
+                    $parsed = parseSpecKey($key);
+                    $baseKey = $parsed['base_key'];
+                    $parsedUnit = $parsed['unit'];
+                    
+                    // Определяем label и unit
+                    $label = $techSpecLabels[$baseKey] ?? ucfirst(str_replace('_', ' ', $baseKey));
+                    $unit = !empty($parsedUnit) ? $parsedUnit : ($techSpecUnits[$baseKey] ?? '');
                     
                     // Форматируем значение
                     if (is_array($value)) {

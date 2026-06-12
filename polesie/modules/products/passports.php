@@ -774,12 +774,9 @@ $categories = $pdo->query($catQuery)->fetchAll();
             gap: 6px;
         }
         .spec-unit {
-            font-size: 12px;
-            font-weight: 500;
-            color: var(--text-secondary);
-            background: var(--bg-tertiary);
-            padding: 2px 8px;
-            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-primary);
             white-space: nowrap;
         }
         .spec-value.editable {

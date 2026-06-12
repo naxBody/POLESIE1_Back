@@ -162,6 +162,28 @@ try {
         if (isset($specsArray['гарантия_мес'])) {
             $product['warranty_months'] = is_numeric($specsArray['гарантия_мес']) ? intval($specsArray['гарантия_мес']) : $specsArray['гарантия_мес'];
         }
+        // Дополнительные характеристики для насосов и другого оборудования
+        if (isset($specsArray['потребляемая_мощность_вт'])) {
+            $product['consumed_power_w'] = is_numeric($specsArray['потребляемая_мощность_вт']) ? floatval($specsArray['потребляемая_мощность_вт']) : $specsArray['потребляемая_мощность_вт'];
+        }
+        if (isset($specsArray['производительность_л_мин'])) {
+            $product['flow_rate_l_min'] = is_numeric($specsArray['производительность_л_мин']) ? floatval($specsArray['производительность_л_мин']) : $specsArray['производительность_л_мин'];
+        }
+        if (isset($specsArray['номинальный_напор_м'])) {
+            $product['head_m'] = is_numeric($specsArray['номинальный_напор_м']) ? floatval($specsArray['номинальный_напор_м']) : $specsArray['номинальный_напор_м'];
+        }
+        if (isset($specsArray['макс_высота_всасывания_м'])) {
+            $product['max_suction_height_m'] = is_numeric($specsArray['макс_высота_всасывания_м']) ? floatval($specsArray['макс_высота_всасывания_м']) : $specsArray['макс_высота_всасывания_м'];
+        }
+        if (isset($specsArray['температура_воды_град_ц'])) {
+            $product['water_temp_c'] = is_numeric($specsArray['температура_воды_град_ц']) ? floatval($specsArray['температура_воды_град_ц']) : $specsArray['температура_воды_град_ц'];
+        }
+        if (isset($specsArray['частота_вращения_об_мин'])) {
+            $product['rpm'] = is_numeric($specsArray['частота_вращения_об_мин']) ? intval($specsArray['частота_вращения_об_мин']) : $specsArray['частота_вращения_об_мин'];
+        }
+        if (isset($specsArray['кпд_проц'])) {
+            $product['efficiency_percent'] = is_numeric($specsArray['кпд_проц']) ? floatval($specsArray['кпд_проц']) : $specsArray['кпд_проц'];
+        }
     }
     unset($product);
     
@@ -446,7 +468,7 @@ error_log("Всего категорий продукции: " . count($categori
             html += '</div>';
             
             // Технические характеристики электродвигателя из отдельных полей
-            var hasSpecs = product.power_kw || product.rpm || product.voltage_v || product.shaft_height_mm || product.frame_size;
+            var hasSpecs = product.power_kw || product.rpm || product.voltage_v || product.shaft_height_mm || product.frame_size || product.consumed_power_w || product.flow_rate_l_min || product.head_m || product.max_suction_height_m || product.water_temp_c || product.efficiency_percent;
             if (hasSpecs) {
                 html += '<div class="passport-section">';
                 html += '<div class="passport-section-title">⚙️ Технические характеристики</div>';
@@ -505,6 +527,25 @@ error_log("Всего категорий продукции: " . count($categori
                 }
                 if (product.weight_range_kg) {
                     html += '<div class="spec-row"><div class="spec-label">Вес, кг</div><div class="spec-value">' + escapeHtml(product.weight_range_kg) + '</div></div>';
+                }
+                // Дополнительные характеристики для насосов и другого оборудования
+                if (product.consumed_power_w) {
+                    html += '<div class="spec-row"><div class="spec-label">Потребляемая мощность</div><div class="spec-value">' + escapeHtml(String(product.consumed_power_w)) + ' Вт</div></div>';
+                }
+                if (product.flow_rate_l_min) {
+                    html += '<div class="spec-row"><div class="spec-label">Производительность</div><div class="spec-value">' + escapeHtml(String(product.flow_rate_l_min)) + ' л/мин</div></div>';
+                }
+                if (product.head_m) {
+                    html += '<div class="spec-row"><div class="spec-label">Номинальный напор</div><div class="spec-value">' + escapeHtml(String(product.head_m)) + ' м</div></div>';
+                }
+                if (product.max_suction_height_m) {
+                    html += '<div class="spec-row"><div class="spec-label">Макс. высота всасывания</div><div class="spec-value">' + escapeHtml(String(product.max_suction_height_m)) + ' м</div></div>';
+                }
+                if (product.water_temp_c) {
+                    html += '<div class="spec-row"><div class="spec-label">Температура воды</div><div class="spec-value">' + escapeHtml(String(product.water_temp_c)) + ' °C</div></div>';
+                }
+                if (product.efficiency_percent) {
+                    html += '<div class="spec-row"><div class="spec-label">КПД</div><div class="spec-value">' + escapeHtml(String(product.efficiency_percent)) + '%</div></div>';
                 }
                 
                 html += '</div>';

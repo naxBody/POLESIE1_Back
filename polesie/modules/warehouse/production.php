@@ -1611,6 +1611,36 @@ if ($filterCategory !== '') {
                     'dimensions', 'размеры', 'length_mm', 'длина_мм', 'width_mm', 'ширина_мм', 'height_mm', 'высота_мм',
                     'diameter_mm', 'диаметр_мм'];
                 
+                var specLabels = {
+                    'power_kw': 'Мощность', 'мощность_квт': 'Мощность',
+                    'power_kw_min': 'Мощность мин.', 'power_kw_max': 'Мощность макс.',
+                    'мощность_квт_min': 'Мощность мин.', 'мощность_квт_max': 'Мощность макс.',
+                    'rpm': 'Обороты', 'обороты_мин': 'Обороты',
+                    'shaft_height_mm': 'Высота оси', 'высота_оси_мм': 'Высота оси',
+                    'voltage_v': 'Напряжение', 'напряжение_в': 'Напряжение',
+                    'frequency_hz': 'Частота', 'частота_гц': 'Частота',
+                    'weight_kg': 'Вес', 'вес_кг': 'Вес', 'масса_кг': 'Масса',
+                    'diameter_mm': 'Диаметр', 'диаметр_мм': 'Диаметр',
+                    'length_mm': 'Длина', 'длина_мм': 'Длина',
+                    'width_mm': 'Ширина', 'ширина_мм': 'Ширина',
+                    'height_mm': 'Высота', 'высота_мм': 'Высота'
+                };
+                
+                var specUnits = {
+                    'power_kw': 'кВт', 'мощность_квт': 'кВт',
+                    'power_kw_min': 'кВт', 'power_kw_max': 'кВт',
+                    'мощность_квт_min': 'кВт', 'мощность_квт_max': 'кВт',
+                    'rpm': 'об/мин', 'обороты_мин': 'об/мин',
+                    'shaft_height_mm': 'мм', 'высота_оси_мм': 'мм',
+                    'voltage_v': 'В', 'напряжение_в': 'В',
+                    'frequency_hz': 'Гц', 'частота_гц': 'Гц',
+                    'weight_kg': 'кг', 'вес_кг': 'кг', 'масса_кг': 'кг',
+                    'diameter_mm': 'мм', 'диаметр_мм': 'мм',
+                    'length_mm': 'мм', 'длина_мм': 'мм',
+                    'width_mm': 'мм', 'ширина_мм': 'мм',
+                    'height_mm': 'мм', 'высота_мм': 'мм'
+                };
+                
                 for (var key in specs) {
                     if (!processedKeys.includes(key)) {
                         var value = specs[key];
@@ -1618,7 +1648,9 @@ if ($filterCategory !== '') {
                             if (Array.isArray(value)) {
                                 value = value.join(', ');
                             }
-                            html += '<div class="spec-row"><span class="spec-label">' + escapeHtml(key) + ':</span><span class="spec-value">' + escapeHtml(String(value)) + '</span></div>';
+                            var label = specLabels[key] || key.replace(/_в$|_квт$|_гц$|_об_мин$|_мм$|_кг$|_м3$/, '').replace(/_/g, ' ');
+                            var unit = specUnits[key] || '';
+                            html += '<div class="spec-row"><span class="spec-label">' + escapeHtml(label) + ':</span><span class="spec-value">' + escapeHtml(String(value)) + (unit ? ' <span class="spec-unit">' + unit + '</span>' : '') + '</span></div>';
                         }
                     }
                 }
@@ -2092,6 +2124,19 @@ if ($filterCategory !== '') {
             font-weight: 600;
             color: #111827;
             flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .spec-unit {
+            font-size: 12px;
+            font-weight: 500;
+            color: #6b7280;
+            background: #f3f4f6;
+            padding: 2px 8px;
+            border-radius: 6px;
+            white-space: nowrap;
         }
 
         .document-list {

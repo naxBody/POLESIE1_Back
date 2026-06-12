@@ -771,6 +771,16 @@ $categories = $pdo->query($catQuery)->fetchAll();
             display: flex;
             align-items: center;
             justify-content: flex-end;
+            gap: 6px;
+        }
+        .spec-unit {
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            background: var(--bg-tertiary);
+            padding: 2px 8px;
+            border-radius: 6px;
+            white-space: nowrap;
         }
         .spec-value.editable {
             border-radius: var(--border-radius);
@@ -1535,7 +1545,13 @@ $categories = $pdo->query($catQuery)->fetchAll();
                         }
                         html += '<div class="spec-item" data-spec-key="' + escapeHtml(key) + '">';
                         html += '<div class="spec-name">' + escapeHtml(formatSpecName(key)) + '</div>';
-                        html += '<div class="spec-value' + (editMode ? ' editable' : '') + '">' + (editMode ? '<input type="text" value="' + escapeHtml(String(value)) + '" placeholder="' + escapeHtml(formatSpecName(key)) + '">' : escapeHtml(String(value))) + '</div>';
+                        var specValue = escapeHtml(String(value));
+                        var specUnit = formatSpecUnit(key);
+                        if (editMode) {
+                            html += '<div class="spec-value editable"><input type="text" value="' + specValue + '" placeholder="' + escapeHtml(formatSpecName(key)) + '">' + (specUnit ? ' <span class="spec-unit">' + specUnit + '</span>' : '') + '</div>';
+                        } else {
+                            html += '<div class="spec-value">' + specValue + (specUnit ? ' <span class="spec-unit">' + specUnit + '</span>' : '') + '</div>';
+                        }
                         html += '</div>';
                     }
                 }
@@ -1697,22 +1713,52 @@ $categories = $pdo->query($catQuery)->fetchAll();
         
         function formatSpecName(key) {
             var names = {
-                'power_kw_min': 'Мощность мин., кВт',
-                'power_kw_max': 'Мощность макс., кВт',
-                'rpm': 'Обороты, об/мин',
-                'shaft_height_mm': 'Высота оси, мм',
-                'voltage_v': 'Напряжение, В',
-                'frequency_hz': 'Частота, Гц',
+                'power_kw_min': 'Мощность мин.',
+                'power_kw_max': 'Мощность макс.',
+                'rpm': 'Обороты',
+                'shaft_height_mm': 'Высота оси',
+                'voltage_v': 'Напряжение',
+                'frequency_hz': 'Частота',
                 'climate_versions': 'Климатическое исполнение',
                 'mounting_versions': 'Варианты монтажа',
                 'protection_class': 'Класс защиты',
-                'power_kw': 'Мощность, кВт',
-                'diameter_mm': 'Диаметр, мм',
+                'power_kw': 'Мощность',
+                'diameter_mm': 'Диаметр',
                 'material': 'Материал',
                 'application': 'Применение',
-                'type': 'Тип'
+                'type': 'Тип',
+                'напряжение_в': 'Напряжение',
+                'мощность_квт': 'Мощность',
+                'частота_гц': 'Частота',
+                'обороты_об_мин': 'Обороты',
+                'высота_оси_мм': 'Высота оси',
+                'диаметр_мм': 'Диаметр',
+                'вес_кг': 'Вес',
+                'объем_м3': 'Объем'
             };
-            return names[key] || key;
+            return names[key] || key.replace(/_в$|_квт$|_гц$|_об_мин$|_мм$|_кг$|_м3$/, '').replace(/_/g, ' ');
+        }
+        
+        function formatSpecUnit(key) {
+            var units = {
+                'power_kw_min': 'кВт',
+                'power_kw_max': 'кВт',
+                'rpm': 'об/мин',
+                'shaft_height_mm': 'мм',
+                'voltage_v': 'В',
+                'frequency_hz': 'Гц',
+                'power_kw': 'кВт',
+                'diameter_mm': 'мм',
+                'напряжение_в': 'В',
+                'мощность_квт': 'кВт',
+                'частота_гц': 'Гц',
+                'обороты_об_мин': 'об/мин',
+                'высота_оси_мм': 'мм',
+                'диаметр_мм': 'мм',
+                'вес_кг': 'кг',
+                'объем_м3': 'м³'
+            };
+            return units[key] || '';
         }
         
         function closePassportModal(event) {

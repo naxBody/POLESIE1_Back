@@ -69,6 +69,38 @@ if (!empty($serialData['passport_data'])) {
     }
 }
 
+// Функция для разбора ключа с суффиксом единицы измерения (вынесена наверх)
+function parseSpecKey($key) {
+    // Массив известных суффиксов единиц измерения (от длинных к коротким)
+    $unitSuffixes = [
+        '_л_мин' => 'л/мин',
+        '_об_мин' => 'об/мин',
+        '_квт' => 'кВт',
+        '_вт' => 'Вт',
+        '_Гц' => 'Гц',
+        '_дБ' => 'дБ',
+        '_проц' => '%',
+        '_кг' => 'кг',
+        '_мм' => 'мм',
+        '_С' => '°C',
+        '_в' => 'В',
+        '_м' => 'м',
+    ];
+    
+    $unit = '';
+    $baseKey = $key;
+    
+    foreach ($unitSuffixes as $suffix => $unitValue) {
+        if (substr($key, -strlen($suffix)) === $suffix) {
+            $unit = $unitValue;
+            $baseKey = substr($key, 0, -strlen($suffix));
+            break;
+        }
+    }
+    
+    return ['base_key' => $baseKey, 'unit' => $unit];
+}
+
 // Получение документов
 $docsStmt = $pdo->prepare("SELECT * FROM product_documents WHERE serial_number_id = ? ORDER BY uploaded_at DESC");
 $docsStmt->execute([$id]);
@@ -660,38 +692,6 @@ $isPrint = isset($_GET['print']);
             <div class="passport-section-title">⚙️ Технические характеристики</div>
             <div class="specs-list">
                 <?php 
-                // Функция для разбора ключа с суффиксом единицы измерения
-                function parseSpecKey($key) {
-                    // Массив известных суффиксов единиц измерения
-                    $unitSuffixes = [
-                        '_вт' => 'Вт',
-                        '_в' => 'В',
-                        '_л_мин' => 'л/мин',
-                        '_м' => 'м',
-                        '_квт' => 'кВт',
-                        '_об_мин' => 'об/мин',
-                        '_Гц' => 'Гц',
-                        '_кг' => 'кг',
-                        '_мм' => 'мм',
-                        '_С' => '°C',
-                        '_дБ' => 'дБ',
-                        '_проц' => '%',
-                    ];
-                    
-                    $unit = '';
-                    $baseKey = $key;
-                    
-                    foreach ($unitSuffixes as $suffix => $unitValue) {
-                        if (substr($key, -strlen($suffix)) === $suffix) {
-                            $unit = $unitValue;
-                            $baseKey = substr($key, 0, -strlen($suffix));
-                            break;
-                        }
-                    }
-                    
-                    return ['base_key' => $baseKey, 'unit' => $unit];
-                }
-                
                 $specLabels = [
                     'explosion_protection' => 'Вид взрывозащиты',
                     'housing_material' => 'Материал корпуса',

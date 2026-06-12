@@ -246,7 +246,7 @@ if ($isAjaxRequest && $selectedTaskId) {
             </div>
             <div class="work-area-actions">
                 <button class="btn btn-primary" onclick="openProductionModal(<?= $selectedTask['id'] ?>)">
-                    ✅ Завершить производство
+                    <i class="bi bi-check-circle-fill"></i> Завершить производство
                 </button>
             </div>
         </div>
@@ -352,7 +352,7 @@ if ($isAjaxRequest && $selectedTaskId) {
                 </div>
             <?php else: ?>
                 <div class="empty-state">
-                    <div class="empty-state-icon">📋</div>
+                    <div class="empty-state-icon"><i class="bi bi-clipboard"></i></div>
                     <h3>Этапы не найдены</h3>
                     <p>Для данного продукта не настроена маршрутная карта</p>
                 </div>
@@ -458,7 +458,7 @@ if ($isAjaxRequest && $selectedTaskId) {
                 </table>
             <?php else: ?>
                 <div class="empty-state">
-                    <div class="empty-state-icon">📦</div>
+                    <div class="empty-state-icon"><i class="bi bi-box"></i></div>
                     <h3>Материалы не найдены</h3>
                     <p>Для данного задания не указаны материалы</p>
                 </div>
@@ -477,7 +477,7 @@ if ($isAjaxRequest && $selectedTaskId) {
                 </div>
             <?php else: ?>
                 <div class="empty-state">
-                    <div class="empty-state-icon">🏷️</div>
+                    <div class="empty-state-icon"><i class="bi bi-tag"></i></div>
                     <h3>Серийные номера не найдены</h3>
                     <p>Серийные номера будут созданы при завершении производства</p>
                 </div>
@@ -743,6 +743,7 @@ foreach ($allTasks as &$task) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= e($pageTitle) ?> - <?= e(APP_NAME) ?></title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="<?= asset('assets/css/style.css') ?>">
     <style>
         /* Специфичные стили для страницы исполнения */
@@ -2021,7 +2022,7 @@ foreach ($allTasks as &$task) {
                 <div class="content">
                     <div class="page-header">
                         <div class="page-header-title">
-                            <h2>🏭 Исполнение производства</h2>
+                            <h2><i class="bi bi-gear-wide-connected"></i> Исполнение производства</h2>
                             <p>Управление производственными заданиями и контроль выполнения</p>
                         </div>
                     </div>
@@ -2029,7 +2030,7 @@ foreach ($allTasks as &$task) {
                     <!-- Полный список всех заказов - большой блок в начале страницы -->
                     <div class="all-orders-section" style="margin-bottom: 32px;">
                         <div class="all-orders-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                            <h3 style="font-size: 20px; font-weight: 700; color: var(--text-primary);">📋 Все активные заказы в производстве</h3>
+                            <h3 style="font-size: 20px; font-weight: 700; color: var(--text-primary);"><i class="bi bi-clipboard-list"></i> Все активные заказы в производстве</h3>
                             <button class="btn btn-sm btn-outline" onclick="toggleAllOrdersList()" style="padding: 8px 16px; font-size: 14px;">
                                 <span id="toggleAllOrdersText">Свернуть</span>
                             </button>

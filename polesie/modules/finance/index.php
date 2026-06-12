@@ -109,6 +109,7 @@ $pageTitle = 'Финансы и платежи';
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= e($pageTitle) ?> - <?= e(APP_NAME) ?></title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="<?= asset('assets/css/style.css') ?>">
     <style>
         .finance-dashboard {
@@ -250,17 +251,17 @@ $pageTitle = 'Финансы и платежи';
                     <!-- Заголовок страницы -->
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px;">
                         <div>
-                            <h1 style="font-size: 28px; font-weight: 700; color: #1f2937; margin: 0;"><i class="fas fa-wallet"></i> Финансы и платежи</h1>
+                            <h1 style="font-size: 28px; font-weight: 700; color: #1f2937; margin: 0;"><i class="bi bi-wallet2"></i> Финансы и платежи</h1>
                             <p style="color: #6b7280; margin: 8px 0 0 0;">Управление платежами и финансовыми документами</p>
                         </div>
                         <div style="display: flex; gap: 12px;">
                             <?php if (canCreateInModule('finance')): ?>
                             <a href="payment_create.php" class="btn btn-primary">
-                                <i class="fas fa-plus-circle"></i> Новый платеж
+                                <i class="bi bi-plus-lg"></i> Новый платеж
                             </a>
                             <?php endif; ?>
                             <a href="reports.php" class="btn btn-secondary">
-                                <i class="fas fa-chart-bar"></i> Отчеты
+                                <i class="bi bi-bar-chart-fill"></i> Отчеты
                             </a>
                         </div>
                     </div>
@@ -273,7 +274,7 @@ $pageTitle = 'Финансы и платежи';
                                     <div class="finance-stat-title">Всего платежей за месяц</div>
                                     <div class="finance-stat-value"><?= number_format($stats['month']['count'] ?? 0, 0, ',', ' ') ?></div>
                                 </div>
-                                <div class="finance-stat-icon">📄</div>
+                                <div class="finance-stat-icon"><i class="bi bi-file-earmark-text"></i></div>
                             </div>
                             <div style="font-size: 13px; color: #6b7280;">
                                 На сумму <?= formatMoney($stats['month']['total'] ?? 0) ?>
@@ -286,7 +287,7 @@ $pageTitle = 'Финансы и платежи';
                                     <div class="finance-stat-title">Доходы за месяц</div>
                                     <div class="finance-stat-value" style="color: #27ae60;"><?= formatMoney($stats['income']['total'] ?? 0) ?></div>
                                 </div>
-                                <div class="finance-stat-icon income">⬆️</div>
+                                <div class="finance-stat-icon income"><i class="bi bi-arrow-up-circle-fill"></i></div>
                             </div>
                             <div style="font-size: 13px; color: #6b7280;">
                                 <?= $stats['income']['count'] ?? 0 ?> платежей
@@ -299,7 +300,7 @@ $pageTitle = 'Финансы и платежи';
                                     <div class="finance-stat-title">Расходы за месяц</div>
                                     <div class="finance-stat-value" style="color: #e74c3c;"><?= formatMoney($stats['expense']['total'] ?? 0) ?></div>
                                 </div>
-                                <div class="finance-stat-icon expense">⬇️</div>
+                                <div class="finance-stat-icon expense"><i class="bi bi-arrow-down-circle-fill"></i></div>
                             </div>
                             <div style="font-size: 13px; color: #6b7280;">
                                 <?= $stats['expense']['count'] ?? 0 ?> платежей
@@ -314,7 +315,7 @@ $pageTitle = 'Финансы и платежи';
                                         <?= formatMoney($stats['balance']['total'] ?? 0) ?>
                                     </div>
                                 </div>
-                                <div class="finance-stat-icon balance">⚖️</div>
+                                <div class="finance-stat-icon balance"><i class="bi bi-balancing-scale"></i></div>
                             </div>
                             <div style="font-size: 13px; color: #6b7280;">
                                 Разница доходов и расходов
@@ -379,7 +380,7 @@ $pageTitle = 'Финансы и платежи';
                         <!-- Счета -->
                         <div class="accounts-list">
                             <div style="padding: 16px; border-bottom: 1px solid #e5e7eb;">
-                                <h3 style="margin: 0; font-size: 16px;">💳 Счета организации</h3>
+                                <h3 style="margin: 0; font-size: 16px;"><i class="bi bi-credit-card"></i> Счета организации</h3>
                             </div>
                             <?php foreach ($accountsBalance as $account): ?>
                             <div class="account-item">

@@ -855,6 +855,7 @@ $categories = $pdo->query($catQuery)->fetchAll();
             cursor: pointer;
             margin: 0;
             flex-shrink: 0;
+            margin-right: 14px;
         }
         .spec-value.editable {
             display: flex;

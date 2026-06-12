@@ -348,31 +348,34 @@ require_once BASE_PATH . '/includes/topbar.php';
 </style>
 
 <div class="main-content">
-    <div class="page-header">
-        <div class="page-header-title">
-            <h2>
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 8px;">
-                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                    <circle cx="9" cy="7" r="4"></circle>
-                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-                </svg>
-                Контрагенты
-            </h2>
-            <p>База заказчиков и поставщиков</p>
-        </div>
-        <div class="page-header-actions">
-            <?php if (hasPermission('contractors.create')): ?>
-                <a href="create.php" class="btn btn-primary">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px;">
-                        <line x1="12" y1="5" x2="12" y2="19"></line>
-                        <line x1="5" y1="12" x2="19" y2="12"></line>
+    <?php require_once BASE_PATH . '/includes/topbar.php'; ?>
+
+    <div class="content-area">
+        <div class="page-header">
+            <div class="page-header-title">
+                <h2>
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 8px;">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="9" cy="7" r="4"></circle>
+                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
                     </svg>
-                    Добавить контрагента
-                </a>
-            <?php endif; ?>
+                    Контрагенты
+                </h2>
+                <p>База заказчиков и поставщиков</p>
+            </div>
+            <div class="page-header-actions">
+                <?php if (hasPermission('contractors.create')): ?>
+                    <a href="create.php" class="btn btn-primary">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px;">
+                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                        </svg>
+                        Добавить контрагента
+                    </a>
+                <?php endif; ?>
+            </div>
         </div>
-    </div>
 
     <!-- Статистика -->
     <div class="contractors-stats">
@@ -529,6 +532,7 @@ require_once BASE_PATH . '/includes/topbar.php';
                 </div>
             <?php endif; ?>
         </div>
+    </div>
     </div>
 </div>
 

@@ -63,14 +63,28 @@ $statsSql = "SELECT
     FROM contractors";
 $statsStmt = $pdo->query($statsSql);
 $stats = $statsStmt->fetch();
-
-require_once BASE_PATH . '/includes/sidebar.php';
-require_once BASE_PATH . '/includes/topbar.php';
 ?>
 
-<link rel="stylesheet" href="<?= asset('assets/css/style.css') ?>">
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><?= e($pageTitle) ?> - <?= e(APP_NAME) ?></title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="<?= asset('assets/css/style.css') ?>">
+</head>
+<body>
+    <div class="app-container">
+        <?php require_once BASE_PATH . '/includes/sidebar.php'; ?>
 
-<style>
+        <div class="main-content">
+            <?php require_once BASE_PATH . '/includes/topbar.php'; ?>
+
+            <div class="content-area">
+                <link rel="stylesheet" href="<?= asset('assets/css/style.css') ?>">
+
+                <style>
 /* Page Header */
 .page-header {
     display: flex;
@@ -347,57 +361,53 @@ require_once BASE_PATH . '/includes/topbar.php';
 }
 </style>
 
-<div class="main-content">
-    <?php require_once BASE_PATH . '/includes/topbar.php'; ?>
+                                <div class="page-header">
+                    <div class="page-header-title">
+                        <h2>
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 8px;">
+                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="9" cy="7" r="4"></circle>
+                                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                            </svg>
+                            Контрагенты
+                        </h2>
+                        <p>База заказчиков и поставщиков</p>
+                    </div>
+                    <div class="page-header-actions">
+                        <?php if (hasPermission('contractors.create')): ?>
+                            <a href="create.php" class="btn btn-primary">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px;">
+                                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                                </svg>
+                                Добавить контрагента
+                            </a>
+                        <?php endif; ?>
+                    </div>
+                </div>
 
-    <div class="content-area">
-        <div class="page-header">
-            <div class="page-header-title">
-                <h2>
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 8px;">
-                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                        <circle cx="9" cy="7" r="4"></circle>
-                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-                    </svg>
-                    Контрагенты
-                </h2>
-                <p>База заказчиков и поставщиков</p>
-            </div>
-            <div class="page-header-actions">
-                <?php if (hasPermission('contractors.create')): ?>
-                    <a href="create.php" class="btn btn-primary">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px;">
-                            <line x1="12" y1="5" x2="12" y2="19"></line>
-                            <line x1="5" y1="12" x2="19" y2="12"></line>
-                        </svg>
-                        Добавить контрагента
-                    </a>
-                <?php endif; ?>
-            </div>
-        </div>
+                                <!-- Статистика -->
+                <div class="contractors-stats">
+                    <div class="stat-card-mini total">
+                        <div class="stat-card-mini-value"><?= $stats['total'] ?? 0 ?></div>
+                        <div class="stat-card-mini-label">Всего контрагентов</div>
+                    </div>
+                    <div class="stat-card-mini customers">
+                        <div class="stat-card-mini-value"><?= $stats['customers'] ?? 0 ?></div>
+                        <div class="stat-card-mini-label">Заказчиков</div>
+                    </div>
+                    <div class="stat-card-mini suppliers">
+                        <div class="stat-card-mini-value"><?= $stats['suppliers'] ?? 0 ?></div>
+                        <div class="stat-card-mini-label">Поставщиков</div>
+                    </div>
+                </div>
 
-    <!-- Статистика -->
-    <div class="contractors-stats">
-        <div class="stat-card-mini total">
-            <div class="stat-card-mini-value"><?= $stats['total'] ?? 0 ?></div>
-            <div class="stat-card-mini-label">Всего контрагентов</div>
-        </div>
-        <div class="stat-card-mini customers">
-            <div class="stat-card-mini-value"><?= $stats['customers'] ?? 0 ?></div>
-            <div class="stat-card-mini-label">Заказчиков</div>
-        </div>
-        <div class="stat-card-mini suppliers">
-            <div class="stat-card-mini-value"><?= $stats['suppliers'] ?? 0 ?></div>
-            <div class="stat-card-mini-label">Поставщиков</div>
-        </div>
-    </div>
-
-    <div class="card">
-        <div class="card-body">
-            <!-- Фильтры -->
-            <form method="GET" class="filter-form">
-                <div class="filter-row">
+                <div class="card">
+                    <div class="card-body">
+                        <!-- Фильтры -->
+                        <form method="GET" class="filter-form">
+                            <div class="filter-row">
                     <!-- Поиск -->
                     <div style="position: relative; flex: 1; min-width: 250px;">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-secondary);">
@@ -531,8 +541,8 @@ require_once BASE_PATH . '/includes/topbar.php';
                     <p>Добавьте первого контрагента для начала работы</p>
                 </div>
             <?php endif; ?>
+            </div>
         </div>
-    </div>
     </div>
 </div>
 

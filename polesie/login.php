@@ -80,14 +80,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             
             <div class="form-group">
                 <label class="form-label" for="password">Пароль</label>
-                <input 
-                    type="password" 
-                    id="password" 
-                    name="password" 
-                    class="form-control" 
-                    placeholder="Введите пароль"
-                    required
-                >
+                <div style="position: relative;">
+                    <input 
+                        type="password" 
+                        id="password" 
+                        name="password" 
+                        class="form-control" 
+                        placeholder="Введите пароль"
+                        required
+                        style="padding-right: 40px;"
+                    >
+                    <button type="button" onclick="togglePassword()" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; padding: 4px; font-size: 16px;">👁️</button>
+                </div>
             </div>
             
             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px;">
@@ -95,7 +99,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <input type="checkbox" name="remember" style="width: 16px; height: 16px;">
                     <span style="font-size: 13px; color: var(--text-secondary);">Запомнить меня</span>
                 </label>
-                <a href="#" style="font-size: 13px; color: var(--primary-color);">Забыли пароль?</a>
             </div>
             
             <button type="submit" class="btn btn-primary" style="width: 100%; padding: 14px; font-size: 15px;">
@@ -135,5 +138,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </div>
     
     <script src="<?= asset('assets/js/main.js') ?>"></script>
+    <script>
+        function togglePassword() {
+            const passwordInput = document.getElementById('password');
+            const toggleButton = event.currentTarget;
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleButton.textContent = '🔒';
+            } else {
+                passwordInput.type = 'password';
+                toggleButton.textContent = '👁️';
+            }
+        }
+    </script>
 </body>
 </html>

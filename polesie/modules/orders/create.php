@@ -250,6 +250,42 @@ $pageTitle = 'Новый заказ';
                                 </select>
                             </div>
                             
+                            <!-- Реквизиты заказчика (автозаполнение) -->
+                            <h4 style="margin: 32px 0 16px; color: var(--text-primary);">📋 Реквизиты заказчика</h4>
+                            <div id="customerDetails" style="background: #f8f9fa; padding: 16px; border-radius: 8px; margin-bottom: 24px;">
+                                <p style="color: var(--text-secondary); font-size: 14px;">Выберите заказчика выше - реквизиты заполнятся автоматически</p>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label class="form-label">Наименование</label>
+                                        <input type="text" id="customerName" class="form-control" readonly style="background: #fff;">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">ИНН/УНП</label>
+                                        <input type="text" id="customerInn" class="form-control" readonly style="background: #fff;">
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label class="form-label">Адрес</label>
+                                        <input type="text" id="customerAddress" class="form-control" readonly style="background: #fff;">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Контактное лицо</label>
+                                        <input type="text" id="customerContact" class="form-control" readonly style="background: #fff;">
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label class="form-label">Телефон</label>
+                                        <input type="text" id="customerPhone" class="form-control" readonly style="background: #fff;">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">E-mail</label>
+                                        <input type="email" id="customerEmail" class="form-control" readonly style="background: #fff;">
+                                    </div>
+                                </div>
+                            </div>
+                            
                             <!-- Позиции заказа -->
                             <h4 style="margin: 32px 0 16px; color: var(--text-primary);">Позиции заказа</h4>
                             
@@ -331,7 +367,44 @@ $pageTitle = 'Новый заказ';
     
     <script src="<?= asset('assets/js/main.js') ?>"></script>
     <script>
+        // Данные контрагентов для автозаполнения
+        const contractorsData = {
+            <?php foreach ($contractors as $c): ?>
+            <?= $c['id'] ?>: {
+                name: '<?= addslashes($c['name']) ?>',
+                inn: '<?= addslashes($c['inn'] ?? '') ?>',
+                address: '<?= addslashes($c['address'] ?? '') ?>',
+                contact_person: '<?= addslashes($c['contact_person'] ?? '') ?>',
+                phone: '<?= addslashes($c['phone'] ?? '') ?>',
+                email: '<?= addslashes($c['email'] ?? '') ?>'
+            },
+            <?php endforeach; ?>
+        };
+        
         let itemCount = 1;
+        
+        // Автозаполнение реквизитов заказчика
+        document.querySelector('select[name="contractor_id"]').addEventListener('change', function() {
+            const contractorId = this.value;
+            const details = contractorsData[contractorId];
+            
+            if (details) {
+                document.getElementById('customerName').value = details.name;
+                document.getElementById('customerInn').value = details.inn;
+                document.getElementById('customerAddress').value = details.address;
+                document.getElementById('customerContact').value = details.contact_person;
+                document.getElementById('customerPhone').value = details.phone;
+                document.getElementById('customerEmail').value = details.email;
+            } else {
+                // Очистка полей
+                document.getElementById('customerName').value = '';
+                document.getElementById('customerInn').value = '';
+                document.getElementById('customerAddress').value = '';
+                document.getElementById('customerContact').value = '';
+                document.getElementById('customerPhone').value = '';
+                document.getElementById('customerEmail').value = '';
+            }
+        });
         
         function addItem() {
             const container = document.getElementById('orderItems');

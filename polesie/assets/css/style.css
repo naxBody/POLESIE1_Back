@@ -823,9 +823,13 @@ textarea.form-control {
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 28px;
     color: white;
     margin: 0 auto 16px;
+}
+
+.login-logo svg {
+    width: 32px;
+    height: 32px;
 }
 
 .login-title {

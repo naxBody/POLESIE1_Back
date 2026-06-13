@@ -44,14 +44,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <body class="login-page">
     <div class="login-card">
         <div class="login-header">
-            <div class="login-logo">⚡</div>
+            <div class="login-logo">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path>
+                </svg>
+            </div>
             <h1 class="login-title">ОАО "Полесьеэлектромаш"</h1>
             <p class="login-subtitle">Система управления производством</p>
         </div>
         
         <?php if ($error): ?>
         <div class="alert alert-danger">
-            <span>⚠️</span>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="8" x2="12" y2="12"></line>
+                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
             <?= e($error) ?>
         </div>
         <?php endif; ?>

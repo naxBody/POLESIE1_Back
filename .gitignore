@@ -1,1 +1,1 @@
-Nothing should be ignored in this case, as the changes only include PHP source files (.php) which are core project files and not build artifacts, dependencies, or temporary files.
+Nothing needs to be added to the .gitignore file based on the provided changes. The modified file 'polesie/modules/orders/print_order.php' is a PHP source file and should not be ignored. There are no build artifacts, dependency directories, or temporary files in the change list that require ignoring.

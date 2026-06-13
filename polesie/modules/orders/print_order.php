@@ -58,7 +58,6 @@ $itemsStmt = $pdo->prepare("
         oi.*,
         p.article,
         p.name as product_name,
-        p.description,
         bu.symbol as unit_name
     FROM order_items oi
     LEFT JOIN products p ON oi.product_id = p.id

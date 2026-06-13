@@ -337,7 +337,7 @@ require_once BASE_PATH . '/includes/sidebar.php';
         <div class="content-area">
             <div class="page-header">
                 <div class="page-header-title">
-                    <h2>👥 Сотрудники</h2>
+                    <h2><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="vertical-align: middle; margin-right: 8px;"><path d="M17 21V19C17 16.7909 15.2091 15 13 15H5C2.79086 15 1 16.7909 1 19V21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="7" r="4" stroke="currentColor" stroke-width="2"/><path d="M23 21V19C22.9986 17.1771 21.765 15.5805 20 15.13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M16 3.13C17.7699 3.57562 19.0078 5.17661 19.0078 7.005C19.0078 8.83339 17.7699 10.4344 16 10.88" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Сотрудники</h2>
                     <p>Управление персоналом предприятия</p>
                 </div>
                 <div class="page-header-actions">

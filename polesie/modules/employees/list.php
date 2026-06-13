@@ -327,20 +327,9 @@ require_once BASE_PATH . '/includes/topbar.php';
         grid-template-columns: 1fr;
     }
 }
-
-/* Исправление для страницы сотрудников - корректное позиционирование */
-.employees-page.main-content {
-    margin-left: 260px; /* Стандартный отступ как у всех страниц */
-}
-
-@media (max-width: 768px) {
-    .employees-page.main-content {
-        margin-left: 0;
-    }
-}
 </style>
 
-<div class="main-content employees-page">
+<div class="main-content">
     <div class="page-header">
         <div class="page-header-title">
             <h2>👥 Сотрудники</h2>

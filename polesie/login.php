@@ -104,28 +104,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </form>
         
         <div style="margin-top: 24px; text-align: center; font-size: 13px; color: var(--text-secondary);">
-            <p>Тестовые учетные записи:</p>
-            <div style="margin-top: 12px; display: grid; gap: 8px; max-width: 500px; margin-left: auto; margin-right: auto;">
+            <p>Тестовые учетные записи (актуальные данные из БД):</p>
+            <div style="margin-top: 12px; display: grid; gap: 8px; max-width: 600px; margin-left: auto; margin-right: auto;">
                 <div style="background: #f0f9ff; padding: 10px; border-radius: 6px; border-left: 3px solid #2563eb;">
-                    <p style="margin: 0;"><strong>admin / admin123</strong> — Администратор (полный доступ)</p>
+                    <p style="margin: 0;"><strong>admin / admin123</strong> — Администратор Системы (полный доступ)</p>
                 </div>
                 <div style="background: #fdf4f0; padding: 10px; border-radius: 6px; border-left: 3px solid #ea580c;">
-                    <p style="margin: 0;"><strong>director / director123</strong> — Директор (просмотр всех разделов)</p>
+                    <p style="margin: 0;"><strong>director / director123</strong> — Директор Предприятия (просмотр всех разделов)</p>
                 </div>
                 <div style="background: #fef3c7; padding: 10px; border-radius: 6px; border-left: 3px solid #d97706;">
-                    <p style="margin: 0;"><strong>ivanov / manager123</strong> — Менеджер по продажам (заказы, контрагенты)</p>
+                    <p style="margin: 0;"><strong>ivanov / manager123</strong> — Иванов Иван, Менеджер по продажам (заказы, контрагенты)</p>
                 </div>
                 <div style="background: #dcfce7; padding: 10px; border-radius: 6px; border-left: 3px solid #16a34a;">
-                    <p style="margin: 0;"><strong>petrov / tech123</strong> — Технолог (производство, продукция)</p>
+                    <p style="margin: 0;"><strong>petrov / tech123</strong> — Петров Петр, Технолог (производство, продукция)</p>
                 </div>
                 <div style="background: #dbeafe; padding: 10px; border-radius: 6px; border-left: 3px solid #2563eb;">
-                    <p style="margin: 0;"><strong>sidorov / store123</strong> — Кладовщик (склад, материалы)</p>
+                    <p style="margin: 0;"><strong>sidorov / store123</strong> — Сидоров Сидор, Кладовщик (склад, материалы)</p>
                 </div>
                 <div style="background: #f3e8ff; padding: 10px; border-radius: 6px; border-left: 3px solid #9333ea;">
-                    <p style="margin: 0;"><strong>worker1 / worker123</strong> — Рабочий (производственные задания)</p>
+                    <p style="margin: 0;"><strong>worker1 / worker123</strong> — Рабочий Алексей (производственные задания)</p>
                 </div>
                 <div style="background: #fce7f3; padding: 10px; border-radius: 6px; border-left: 3px solid #db2777;">
-                    <p style="margin: 0;"><strong>quality1 / quality123</strong> — Контроль качества (проверки ОТК)</p>
+                    <p style="margin: 0;"><strong>quality1 / quality123</strong> — Контролер Ольга, Инспектор по качеству (проверки ОТК)</p>
+                </div>
+                <div style="background: #fef9c3; padding: 10px; border-radius: 6px; border-left: 3px solid #ca8a04;">
+                    <p style="margin: 0;"><strong>accountant1 / account123</strong> — Бухгалтер Елена (финансы, отчеты)</p>
                 </div>
             </div>
         </div>

@@ -116,7 +116,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </form>
         
         <div style="margin-top: 24px; text-align: center; font-size: 13px; color: var(--text-secondary);">
-            <p>Тестовые учетные записи (актуальные данные из БД):</p>
+            <p>Тестовые учетные записи:</p>
             <div style="margin-top: 12px; display: grid; gap: 8px; max-width: 600px; margin-left: auto; margin-right: auto;">
                 <div style="background: #f0f9ff; padding: 10px; border-radius: 6px; border-left: 3px solid #2563eb;">
                     <p style="margin: 0;"><strong>admin / admin123</strong> — Администратор Системы (полный доступ)</p>

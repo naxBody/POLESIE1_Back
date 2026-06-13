@@ -58,7 +58,6 @@ $statsStmt = $pdo->query($statsSql);
 $stats = $statsStmt->fetch();
 
 require_once BASE_PATH . '/includes/sidebar.php';
-require_once BASE_PATH . '/includes/topbar.php';
 ?>
 
 <link rel="stylesheet" href="<?= asset('assets/css/style.css') ?>">
@@ -329,83 +328,89 @@ require_once BASE_PATH . '/includes/topbar.php';
 }
 </style>
 
-<div class="main-content">
-    <div class="page-header">
-        <div class="page-header-title">
-            <h2>👥 Сотрудники</h2>
-            <p>Управление персоналом предприятия</p>
-        </div>
-        <div class="page-header-actions">
-            <?php if (hasPermission('employees.create')): ?>
-                <a href="add.php" class="btn btn-primary">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                    Добавить сотрудника
-                </a>
-            <?php endif; ?>
-        </div>
-    </div>
-
-    <!-- Статистика -->
-    <div class="employees-stats">
-        <div class="stat-card-mini total">
-            <div class="stat-card-mini-value"><?= $stats['total'] ?? 0 ?></div>
-            <div class="stat-card-mini-label">Всего сотрудников</div>
-        </div>
-        <div class="stat-card-mini active">
-            <div class="stat-card-mini-value"><?= $stats['active'] ?? 0 ?></div>
-            <div class="stat-card-mini-label">Работают</div>
-        </div>
-        <div class="stat-card-mini inactive">
-            <div class="stat-card-mini-value"><?= $stats['inactive'] ?? 0 ?></div>
-            <div class="stat-card-mini-label">Уволены</div>
-        </div>
-    </div>
-
-    <div class="card">
-        <div class="card-body">
-            <!-- Фильтры -->
-            <form method="GET" class="filter-form">
-                <div class="filter-row">
-                    <input type="text" name="search" placeholder="🔍 Поиск по ФИО, должности, email..." value="<?= e($search) ?>">
-                    <select name="department">
-                        <option value="">Все отделы</option>
-                        <option value="production" <?= $department === 'production' ? 'selected' : '' ?>>🏭 Производство</option>
-                        <option value="quality" <?= $department === 'quality' ? 'selected' : '' ?>>✅ ОТК</option>
-                        <option value="warehouse" <?= $department === 'warehouse' ? 'selected' : '' ?>>📦 Склад</option>
-                        <option value="management" <?= $department === 'management' ? 'selected' : '' ?>>👔 Руководство</option>
-                        <option value="sales" <?= $department === 'sales' ? 'selected' : '' ?>>📞 Отдел продаж</option>
-                        <option value="it" <?= $department === 'it' ? 'selected' : '' ?>>💻 IT отдел</option>
-                        <option value="hr" <?= $department === 'hr' ? 'selected' : '' ?>>👥 HR отдел</option>
-                        <option value="accounting" <?= $department === 'accounting' ? 'selected' : '' ?>>📊 Бухгалтерия</option>
-                    </select>
-                    <select name="status">
-                        <option value="">Все статусы</option>
-                        <option value="active" <?= $status === 'active' ? 'selected' : '' ?>>Работают</option>
-                        <option value="inactive" <?= $status === 'inactive' ? 'selected' : '' ?>>Уволены</option>
-                    </select>
-                    <button type="submit" class="btn btn-secondary">Найти</button>
-                    <a href="list.php" class="btn btn-outline">Сброс</a>
+<div class="app-container">
+    <?php require_once BASE_PATH . '/includes/sidebar.php'; ?>
+    
+    <div class="main-content">
+        <?php require_once BASE_PATH . '/includes/topbar.php'; ?>
+        
+        <div class="content-area">
+            <div class="page-header">
+                <div class="page-header-title">
+                    <h2>👥 Сотрудники</h2>
+                    <p>Управление персоналом предприятия</p>
                 </div>
-            </form>
+                <div class="page-header-actions">
+                    <?php if (hasPermission('employees.create')): ?>
+                        <a href="add.php" class="btn btn-primary">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            Добавить сотрудника
+                        </a>
+                    <?php endif; ?>
+                </div>
+            </div>
 
-            <!-- Таблица сотрудников -->
-            <div class="table-responsive">
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th style="width: 40px;">#</th>
-                            <th>Сотрудник</th>
-                            <th>Должность</th>
-                            <th>Отдел</th>
-                            <th>Контакты</th>
-                            <th>Роль в системе</th>
-                            <th>Статус</th>
-                            <th style="width: 120px;">Действия</th>
-                        </tr>
-                    </thead>
-                    <tbody>
+            <!-- Статистика -->
+            <div class="employees-stats">
+                <div class="stat-card-mini total">
+                    <div class="stat-card-mini-value"><?= $stats['total'] ?? 0 ?></div>
+                    <div class="stat-card-mini-label">Всего сотрудников</div>
+                </div>
+                <div class="stat-card-mini active">
+                    <div class="stat-card-mini-value"><?= $stats['active'] ?? 0 ?></div>
+                    <div class="stat-card-mini-label">Работают</div>
+                </div>
+                <div class="stat-card-mini inactive">
+                    <div class="stat-card-mini-value"><?= $stats['inactive'] ?? 0 ?></div>
+                    <div class="stat-card-mini-label">Уволены</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-body">
+                    <!-- Фильтры -->
+                    <form method="GET" class="filter-form">
+                        <div class="filter-row">
+                            <input type="text" name="search" placeholder="🔍 Поиск по ФИО, должности, email..." value="<?= e($search) ?>">
+                            <select name="department">
+                                <option value="">Все отделы</option>
+                                <option value="production" <?= $department === 'production' ? 'selected' : '' ?>>🏭 Производство</option>
+                                <option value="quality" <?= $department === 'quality' ? 'selected' : '' ?>>✅ ОТК</option>
+                                <option value="warehouse" <?= $department === 'warehouse' ? 'selected' : '' ?>>📦 Склад</option>
+                                <option value="management" <?= $department === 'management' ? 'selected' : '' ?>>👔 Руководство</option>
+                                <option value="sales" <?= $department === 'sales' ? 'selected' : '' ?>>📞 Отдел продаж</option>
+                                <option value="it" <?= $department === 'it' ? 'selected' : '' ?>>💻 IT отдел</option>
+                                <option value="hr" <?= $department === 'hr' ? 'selected' : '' ?>>👥 HR отдел</option>
+                                <option value="accounting" <?= $department === 'accounting' ? 'selected' : '' ?>>📊 Бухгалтерия</option>
+                            </select>
+                            <select name="status">
+                                <option value="">Все статусы</option>
+                                <option value="active" <?= $status === 'active' ? 'selected' : '' ?>>Работают</option>
+                                <option value="inactive" <?= $status === 'inactive' ? 'selected' : '' ?>>Уволены</option>
+                            </select>
+                            <button type="submit" class="btn btn-secondary">Найти</button>
+                            <a href="list.php" class="btn btn-outline">Сброс</a>
+                        </div>
+                    </form>
+
+                    <!-- Таблица сотрудников -->
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 40px;">#</th>
+                                    <th>Сотрудник</th>
+                                    <th>Должность</th>
+                                    <th>Отдел</th>
+                                    <th>Контакты</th>
+                                    <th>Роль в системе</th>
+                                    <th>Статус</th>
+                                    <th style="width: 120px;">Действия</th>
+                                </tr>
+                            </thead>
+                            <tbody>
                         <?php 
                         $counter = 1;
                         foreach ($employees as $e): 
@@ -515,6 +520,7 @@ require_once BASE_PATH . '/includes/topbar.php';
             <?php endif; ?>
         </div>
     </div>
+</div>
 </div>
 
 <script src="<?= asset('assets/js/main.js') ?>"></script>

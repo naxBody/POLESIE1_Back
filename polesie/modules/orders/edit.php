@@ -536,7 +536,13 @@ $pageTitle = 'Редактирование заказа #' . $order['order_numbe
                                         </thead>
                                         <tbody id="productTableBody">
                                             <?php foreach ($products as $p): ?>
-                                            <tr class="product-row" data-category="<?= $p['category_id'] ?>" data-unit="<?= $p['base_unit_id'] ?>" data-name="<?= strtolower(e($p['name'])) ?>" data-article="<?= strtolower(e($p['article'])) ?>" style="border-bottom: 1px solid #f3f4f6;">
+                                            <tr class="product-row" 
+                                                data-category-id="<?= $p['category_id'] ?>" 
+                                                data-unit="<?= $p['base_unit_id'] ?>" 
+                                                data-name="<?= strtolower(e($p['name'])) ?>" 
+                                                data-article="<?= strtolower(e($p['article'])) ?>"
+                                                data-category-name="<?= strtolower(e($p['category_name'] ?? '')) ?>"
+                                                style="border-bottom: 1px solid #f3f4f6;">
                                                 <td style="padding: 12px 16px; font-size: 13px; color: var(--text-primary);"><?= e($p['article']) ?></td>
                                                 <td style="padding: 12px 16px; font-size: 13px; color: var(--text-primary);"><?= e($p['name']) ?></td>
                                                 <td style="padding: 12px 16px; font-size: 13px; color: var(--text-secondary);"><?= e($p['category_name'] ?? '-') ?></td>
@@ -661,8 +667,9 @@ $pageTitle = 'Редактирование заказа #' . $order['order_numbe
             rows.forEach(row => {
                 const matchesSearch = !searchTerm || 
                     row.dataset.name.includes(searchTerm) || 
-                    row.dataset.article.includes(searchTerm);
-                const matchesCategory = !categoryFilter || row.dataset.category == categoryFilter;
+                    row.dataset.article.includes(searchTerm) ||
+                    row.dataset.categoryName.includes(searchTerm);
+                const matchesCategory = !categoryFilter || row.dataset.categoryId == categoryFilter;
                 const matchesUnit = !unitFilter || row.dataset.unit == unitFilter;
                 
                 row.style.display = (matchesSearch && matchesCategory && matchesUnit) ? '' : 'none';

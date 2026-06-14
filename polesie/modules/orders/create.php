@@ -463,22 +463,19 @@ $pageTitle = 'Новый заказ';
                             </div>
                             
                             <!-- Кнопка добавления товара под списком -->
-                            <div class="order-item" style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 1fr auto; gap: 12px; margin-bottom: 0; align-items: center; opacity: 0.6;">
-                                <div class="form-group" style="margin-bottom: 0; display: flex; align-items: center; justify-content: center; border: 2px dashed #d1d5db; border-radius: 8px; padding: 12px; background: #f9fafb;">
-                                    <button type="button" onclick="addItem()" 
-                                            style="background: none; border: none; cursor: pointer; color: #9ca3af; transition: all 0.2s ease; display: flex; align-items: center; justify-content: center;"
-                                            onmouseover="this.style.color='#3b82f6'"
-                                            onmouseout="this.style.color='#9ca3af'">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                                            <line x1="12" y1="5" x2="12" y2="19"></line>
-                                            <line x1="5" y1="12" x2="19" y2="12"></line>
-                                        </svg>
-                                    </button>
+                            <div class="order-item" style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 1fr auto; gap: 12px; margin-bottom: 0; align-items: center; opacity: 0.5;" 
+                                 onmouseover="this.style.opacity='1'; this.style.background='#f0f7ff'" 
+                                 onmouseout="this.style.opacity='0.5'; this.style.background='transparent'">
+                                <div class="form-group" style="margin-bottom: 0; display: flex; align-items: center; justify-content: center; border: 2px dashed #d1d5db; border-radius: 8px; padding: 16px; background: transparent; cursor: pointer;" onclick="addItem()">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="transition: all 0.2s;">
+                                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                                    </svg>
                                 </div>
-                                <div style="border: 2px dashed #e5e7eb; border-radius: 8px; padding: 12px; background: #f9fafb;"></div>
-                                <div style="border: 2px dashed #e5e7eb; border-radius: 8px; padding: 12px; background: #f9fafb;"></div>
-                                <div style="border: 2px dashed #e5e7eb; border-radius: 8px; padding: 12px; background: #f9fafb;"></div>
-                                <div style="border: 2px dashed #e5e7eb; border-radius: 8px; padding: 12px; background: #f9fafb;"></div>
+                                <div style="border: 2px dashed #e5e7eb; border-radius: 8px; padding: 16px; background: transparent;"></div>
+                                <div style="border: 2px dashed #e5e7eb; border-radius: 8px; padding: 16px; background: transparent;"></div>
+                                <div style="border: 2px dashed #e5e7eb; border-radius: 8px; padding: 16px; background: transparent;"></div>
+                                <div style="border: 2px dashed #e5e7eb; border-radius: 8px; padding: 16px; background: transparent;"></div>
                                 <div style="padding-top: 0;"></div>
                             </div>
                             

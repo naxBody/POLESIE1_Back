@@ -462,6 +462,20 @@ $pageTitle = 'Новый заказ';
                                 </div>
                             </div>
                             
+                            <!-- Кнопка добавления товара под списком -->
+                            <div style="margin-top: 12px; padding: 16px; border: 2px dashed #e5e7eb; border-radius: 8px; text-align: center; background: #fafbfc; transition: all 0.2s ease;" 
+                                 onmouseover="this.style.borderColor='#3b82f6'; this.style.background='#eff6ff'" 
+                                 onmouseout="this.style.borderColor='#e5e7eb'; this.style.background='#fafbfc'">
+                                <button type="button" class="btn btn-primary" onclick="addItem()" style="font-size: 14px; padding: 10px 24px; display: inline-flex; align-items: center; gap: 8px;">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                                    </svg>
+                                    Добавить ещё один товар
+                                </button>
+                                <p style="margin: 8px 0 0 0; color: var(--text-secondary); font-size: 13px;">или нажмите "Выбрать продукцию" выше для удобного поиска</p>
+                            </div>
+                            
                             <!-- Итого -->
                             <div style="margin-top: 24px; padding: 20px; background: #f8f9fa; border-radius: 12px; color: var(--text-primary); border: 1px solid #e5e7eb;">
                                 <div style="display: flex; justify-content: space-between; align-items: center;">

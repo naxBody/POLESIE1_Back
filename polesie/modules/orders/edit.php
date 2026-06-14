@@ -499,9 +499,9 @@ $pageTitle = 'Редактирование заказа #' . $order['order_numbe
                                 </div>
                                 
                                 <div style="padding: 20px 24px; border-bottom: 1px solid #e5e7eb; background: #f9fafb;">
-                                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 12px;">
-                                        <input type="text" id="productSearchInput" class="form-control" placeholder="Поиск по названию или артикулу..." style="font-size: 14px;">
-                                        <select id="productCategoryFilter" class="form-control" style="font-size: 14px;">
+                                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px;">
+                                        <input type="text" id="productSearchInput" class="form-control" placeholder="Поиск по названию или артикулу..." style="font-size: 14px;" oninput="applyProductFilters()">
+                                        <select id="productCategoryFilter" class="form-control" style="font-size: 14px;" onchange="applyProductFilters()">
                                             <option value="">Все категории</option>
                                             <?php 
                                             $categories = $pdo->query("SELECT DISTINCT pc.id, pc.name FROM product_categories pc INNER JOIN products p ON p.category_id = pc.id ORDER BY pc.name")->fetchAll();
@@ -510,7 +510,7 @@ $pageTitle = 'Редактирование заказа #' . $order['order_numbe
                                             <option value="<?= $cat['id'] ?>"><?= e($cat['name']) ?></option>
                                             <?php endforeach; ?>
                                         </select>
-                                        <select id="productUnitFilter" class="form-control" style="font-size: 14px;">
+                                        <select id="productUnitFilter" class="form-control" style="font-size: 14px;" onchange="applyProductFilters()">
                                             <option value="">Все единицы измерения</option>
                                             <?php 
                                             $units = $pdo->query("SELECT DISTINCT u.id, u.symbol FROM base_units u INNER JOIN products p ON p.base_unit_id = u.id ORDER BY u.symbol")->fetchAll();
@@ -519,7 +519,6 @@ $pageTitle = 'Редактирование заказа #' . $order['order_numbe
                                             <option value="<?= $unit['id'] ?>"><?= e($unit['symbol']) ?></option>
                                             <?php endforeach; ?>
                                         </select>
-                                        <button type="button" onclick="applyProductFilters()" class="btn btn-primary" style="padding: 10px 20px;">Применить</button>
                                     </div>
                                 </div>
                                 
@@ -738,13 +737,6 @@ $pageTitle = 'Редактирование заказа #' . $order['order_numbe
             closeProductSelector();
             showNotification('Позиция добавлена в заказ', 'success');
         }
-        
-        // Поиск по Enter
-        document.getElementById('productSearchInput')?.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                applyProductFilters();
-            }
-        });
         
         // Закрытие модального окна по клику вне его
         document.getElementById('productSelectorOverlay')?.addEventListener('click', function(e) {

@@ -463,17 +463,16 @@ $pageTitle = 'Новый заказ';
                             </div>
                             
                             <!-- Кнопка добавления товара под списком -->
-                            <div style="margin-top: 12px; padding: 16px; border: 2px dashed #e5e7eb; border-radius: 8px; text-align: center; background: #fafbfc; transition: all 0.2s ease;" 
-                                 onmouseover="this.style.borderColor='#3b82f6'; this.style.background='#eff6ff'" 
-                                 onmouseout="this.style.borderColor='#e5e7eb'; this.style.background='#fafbfc'">
-                                <button type="button" class="btn btn-primary" onclick="addItem()" style="font-size: 14px; padding: 10px 24px; display: inline-flex; align-items: center; gap: 8px;">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <div style="margin-top: 12px; text-align: center;">
+                                <button type="button" onclick="addItem()" 
+                                        style="background: #f3f4f6; border: 2px dashed #d1d5db; border-radius: 50%; width: 40px; height: 40px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; color: #6b7280; transition: all 0.2s ease;"
+                                        onmouseover="this.style.background='#eff6ff'; this.style.borderColor='#3b82f6'; this.style.color='#3b82f6'"
+                                        onmouseout="this.style.background='#f3f4f6'; this.style.borderColor='#d1d5db'; this.style.color='#6b7280'">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                         <line x1="12" y1="5" x2="12" y2="19"></line>
                                         <line x1="5" y1="12" x2="19" y2="12"></line>
                                     </svg>
-                                    Добавить ещё один товар
                                 </button>
-                                <p style="margin: 8px 0 0 0; color: var(--text-secondary); font-size: 13px;">или нажмите "Выбрать продукцию" выше для удобного поиска</p>
                             </div>
                             
                             <!-- Итого -->

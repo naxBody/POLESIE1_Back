@@ -367,6 +367,17 @@ $pageTitle = 'Редактирование заказа #' . $order['order_numbe
                                     Позиции заказа
                                 </h4>
                                 
+                                <div style="margin-bottom: 16px; display: flex; gap: 12px; align-items: center;">
+                                    <button type="button" class="btn btn-primary" onclick="openProductSelector()" style="font-size: 14px; padding: 10px 20px;">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px;">
+                                            <circle cx="11" cy="11" r="8"></circle>
+                                            <path d="m21 21-4.35-4.35"></path>
+                                        </svg>
+                                        Выбрать продукцию
+                                    </button>
+                                    <span style="color: var(--text-secondary); font-size: 14px;">или добавьте позицию вручную ниже</span>
+                                </div>
+                                
                                 <div id="orderItems">
                                     <?php 
                                     $itemIndex = 0;
@@ -464,12 +475,87 @@ $pageTitle = 'Редактирование заказа #' . $order['order_numbe
                                         <line x1="12" y1="5" x2="12" y2="19"></line>
                                         <line x1="5" y1="12" x2="19" y2="12"></line>
                                     </svg>
-                                    Добавить позицию
+                                    Добавить позицию вручную
                                 </button>
                                 
                                 <div class="form-group" style="margin-top: 24px;">
                                     <label class="form-label">Примечание</label>
                                     <textarea name="notes" class="form-control" rows="3"><?= e($order['notes'] ?? '') ?></textarea>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Модальное окно выбора продукции -->
+                        <div id="productSelectorOverlay" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 10000; align-items: center; justify-content: center;">
+                            <div style="background: white; border-radius: 12px; width: 90%; max-width: 900px; max-height: 80vh; overflow: hidden; display: flex; flex-direction: column;">
+                                <div style="padding: 20px 24px; border-bottom: 1px solid #e5e7eb; display: flex; justify-content: space-between; align-items: center;">
+                                    <h3 style="margin: 0; font-size: 18px; font-weight: 600; color: var(--text-primary);">Выбор продукции</h3>
+                                    <button type="button" onclick="closeProductSelector()" style="background: none; border: none; cursor: pointer; padding: 8px; color: var(--text-secondary);">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                                        </svg>
+                                    </button>
+                                </div>
+                                
+                                <div style="padding: 20px 24px; border-bottom: 1px solid #e5e7eb; background: #f9fafb;">
+                                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 12px;">
+                                        <input type="text" id="productSearchInput" class="form-control" placeholder="Поиск по названию или артикулу..." style="font-size: 14px;">
+                                        <select id="productCategoryFilter" class="form-control" style="font-size: 14px;">
+                                            <option value="">Все категории</option>
+                                            <?php 
+                                            $categories = $pdo->query("SELECT DISTINCT pc.id, pc.name FROM product_categories pc INNER JOIN products p ON p.category_id = pc.id ORDER BY pc.name")->fetchAll();
+                                            foreach ($categories as $cat): 
+                                            ?>
+                                            <option value="<?= $cat['id'] ?>"><?= e($cat['name']) ?></option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                        <select id="productUnitFilter" class="form-control" style="font-size: 14px;">
+                                            <option value="">Все единицы измерения</option>
+                                            <?php 
+                                            $units = $pdo->query("SELECT DISTINCT u.id, u.symbol FROM base_units u INNER JOIN products p ON p.base_unit_id = u.id ORDER BY u.symbol")->fetchAll();
+                                            foreach ($units as $unit): 
+                                            ?>
+                                            <option value="<?= $unit['id'] ?>"><?= e($unit['symbol']) ?></option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                        <button type="button" onclick="applyProductFilters()" class="btn btn-primary" style="padding: 10px 20px;">Применить</button>
+                                    </div>
+                                </div>
+                                
+                                <div style="flex: 1; overflow-y: auto; padding: 0;">
+                                    <table style="width: 100%; border-collapse: collapse;">
+                                        <thead style="position: sticky; top: 0; background: #f9fafb; z-index: 1;">
+                                            <tr>
+                                                <th style="padding: 12px 16px; text-align: left; font-size: 13px; font-weight: 600; color: var(--text-secondary); border-bottom: 1px solid #e5e7eb;">Артикул</th>
+                                                <th style="padding: 12px 16px; text-align: left; font-size: 13px; font-weight: 600; color: var(--text-secondary); border-bottom: 1px solid #e5e7eb;">Наименование</th>
+                                                <th style="padding: 12px 16px; text-align: left; font-size: 13px; font-weight: 600; color: var(--text-secondary); border-bottom: 1px solid #e5e7eb;">Категория</th>
+                                                <th style="padding: 12px 16px; text-align: left; font-size: 13px; font-weight: 600; color: var(--text-secondary); border-bottom: 1px solid #e5e7eb;">Ед. изм.</th>
+                                                <th style="padding: 12px 16px; text-align: right; font-size: 13px; font-weight: 600; color: var(--text-secondary); border-bottom: 1px solid #e5e7eb;">Цена</th>
+                                                <th style="padding: 12px 16px; text-align: center; font-size: 13px; font-weight: 600; color: var(--text-secondary); border-bottom: 1px solid #e5e7eb;">Действие</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="productTableBody">
+                                            <?php foreach ($products as $p): ?>
+                                            <tr class="product-row" data-category="<?= $p['category_id'] ?>" data-unit="<?= $p['base_unit_id'] ?>" data-name="<?= strtolower(e($p['name'])) ?>" data-article="<?= strtolower(e($p['article'])) ?>" style="border-bottom: 1px solid #f3f4f6;">
+                                                <td style="padding: 12px 16px; font-size: 13px; color: var(--text-primary);"><?= e($p['article']) ?></td>
+                                                <td style="padding: 12px 16px; font-size: 13px; color: var(--text-primary);"><?= e($p['name']) ?></td>
+                                                <td style="padding: 12px 16px; font-size: 13px; color: var(--text-secondary);"><?= e($p['category_name'] ?? '-') ?></td>
+                                                <td style="padding: 12px 16px; font-size: 13px; color: var(--text-secondary);"><?= e($p['unit_name'] ?? '-') ?></td>
+                                                <td style="padding: 12px 16px; font-size: 13px; color: var(--text-primary); text-align: right; font-weight: 500;"><?= $p['base_price'] > 0 ? number_format($p['base_price'], 2, ',', ' ') : '-' ?> BYN</td>
+                                                <td style="padding: 12px 16px; text-align: center;">
+                                                    <button type="button" class="btn btn-primary btn-sm" onclick="addProductToOrder(<?= $p['id'] ?>, '<?= addslashes(e($p['name'])) ?>', <?= $p['base_price'] ?>, '<?= e($p['unit_name'] ?? 'шт') ?>')" style="padding: 6px 12px; font-size: 12px;">
+                                                        Добавить
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                            <?php endforeach; ?>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                
+                                <div style="padding: 16px 24px; border-top: 1px solid #e5e7eb; background: #f9fafb; text-align: right;">
+                                    <button type="button" onclick="closeProductSelector()" class="btn btn-secondary" style="padding: 10px 24px;">Закрыть</button>
                                 </div>
                             </div>
                         </div>
@@ -554,6 +640,116 @@ $pageTitle = 'Редактирование заказа #' . $order['order_numbe
                         priceInput.value = price;
                     }
                 }
+            }
+        });
+        
+        // Функции для модального окна выбора продукции
+        function openProductSelector() {
+            document.getElementById('productSelectorOverlay').style.display = 'flex';
+            document.getElementById('productSearchInput').focus();
+        }
+        
+        function closeProductSelector() {
+            document.getElementById('productSelectorOverlay').style.display = 'none';
+        }
+        
+        function applyProductFilters() {
+            const searchTerm = document.getElementById('productSearchInput').value.toLowerCase().trim();
+            const categoryFilter = document.getElementById('productCategoryFilter').value;
+            const unitFilter = document.getElementById('productUnitFilter').value;
+            
+            const rows = document.querySelectorAll('.product-row');
+            rows.forEach(row => {
+                const matchesSearch = !searchTerm || 
+                    row.dataset.name.includes(searchTerm) || 
+                    row.dataset.article.includes(searchTerm);
+                const matchesCategory = !categoryFilter || row.dataset.category == categoryFilter;
+                const matchesUnit = !unitFilter || row.dataset.unit == unitFilter;
+                
+                row.style.display = (matchesSearch && matchesCategory && matchesUnit) ? '' : 'none';
+            });
+        }
+        
+        function addProductToOrder(productId, productName, basePrice, unitName) {
+            const container = document.getElementById('orderItems');
+            const newItem = document.createElement('div');
+            newItem.className = 'order-item';
+            newItem.style.cssText = 'display: grid; grid-template-columns: 2fr 1fr 1fr 1fr auto; gap: 12px; margin-bottom: 12px; align-items: start;';
+            
+            // Создаем select элемент и заполняем его опциями
+            const productSelect = document.createElement('select');
+            productSelect.name = `items[${itemCount}][product_id]`;
+            productSelect.className = 'form-control product-select';
+            productSelect.required = true;
+            
+            const defaultOption = document.createElement('option');
+            defaultOption.value = '';
+            defaultOption.textContent = 'Выберите продукцию';
+            productSelect.appendChild(defaultOption);
+            
+            <?php foreach ($products as $p): ?>
+            const option<?= $p['id'] ?> = document.createElement('option');
+            option<?= $p['id'] ?>.value = '<?= $p['id'] ?>';
+            option<?= $p['id'] ?>.dataset.price = '<?= $p['base_price'] ?>';
+            option<?= $p['id'] ?>.dataset.unit = '<?= e($p['unit_name']) ?>';
+            option<?= $p['id'] ?>.textContent = '<?= e($p['article']) ?> - <?= e($p['name']) ?>';
+            if (option<?= $p['id'] ?>.value == productId) {
+                option<?= $p['id'] ?>.selected = true;
+            }
+            productSelect.appendChild(option<?= $p['id'] ?>);
+            <?php endforeach; ?>
+            
+            newItem.innerHTML = `
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label class="form-label">Продукция</label>
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label class="form-label">Количество</label>
+                    <input type="number" name="items[${itemCount}][quantity]" class="form-control quantity" step="1" min="1" value="1" required>
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label class="form-label">Цена (BYN)</label>
+                    <input type="number" name="items[${itemCount}][unit_price]" class="form-control unit-price" step="0.01" min="0" value="${basePrice || 0}">
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label class="form-label">Скидка (%)</label>
+                    <input type="number" name="items[${itemCount}][discount]" class="form-control discount" step="0.1" min="0" max="100" value="0">
+                </div>
+                <div style="padding-top: 28px;">
+                    <button type="button" class="btn btn-danger btn-sm remove-item" onclick="this.closest('.order-item').remove()">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M3 6h18"></path>
+                            <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
+                            <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
+                            <line x1="10" y1="11" x2="10" y2="17"></line>
+                            <line x1="14" y1="11" x2="14" y2="17"></line>
+                        </svg>
+                    </button>
+                </div>
+            `;
+            
+            // Вставляем select в первый div
+            newItem.querySelector('.form-group:first-child').appendChild(productSelect);
+            
+            container.appendChild(newItem);
+            itemCount++;
+            
+            // Закрываем модальное окно и показываем уведомление
+            closeProductSelector();
+            showNotification('Позиция добавлена в заказ', 'success');
+        }
+        
+        // Поиск по Enter
+        document.getElementById('productSearchInput')?.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                applyProductFilters();
+            }
+        });
+        
+        // Закрытие модального окна по клику вне его
+        document.getElementById('productSelectorOverlay')?.addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeProductSelector();
             }
         });
     </script>

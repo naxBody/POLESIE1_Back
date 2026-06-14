@@ -29,15 +29,35 @@ $products = $pdo->query("SELECT p.*, pc.name as category_name, u.symbol as unit_
                          LEFT JOIN base_units u ON p.base_unit_id = u.id 
                          WHERE 1=1 ORDER BY p.name")->fetchAll();
 $statuses = $pdo->query("SELECT DISTINCT status, 
-                                CASE status
-                                    WHEN 'new' THEN 'Новый'
-                                    WHEN 'processing' THEN 'В работе'
-                                    WHEN 'ready' THEN 'Готов'
-                                    WHEN 'shipped' THEN 'Отгружен'
-                                    WHEN 'cancelled' THEN 'Отменен'
-                                    ELSE status
-                                END as name
-                         FROM orders ORDER BY name")->fetchAll();
+                               CASE status
+                                   WHEN 'new' THEN 'Новый'
+                                   WHEN 'processing' THEN 'В работе'
+                                   WHEN 'ready' THEN 'Готов'
+                                   WHEN 'shipped' THEN 'Отгружен'
+                                   WHEN 'cancelled' THEN 'Отменен'
+                                   ELSE status
+                               END as name
+                        FROM orders ORDER BY name")->fetchAll();
+
+// Генерация предлагаемого номера договора на основе последнего созданного заказа
+$suggestedContractNumber = '';
+$suggestedContractDate = date('Y-m-d');
+$stmt = $pdo->query("SELECT contract_number, contract_date FROM orders WHERE contract_number IS NOT NULL AND contract_number != '' ORDER BY id DESC LIMIT 1");
+$lastOrder = $stmt->fetch();
+if ($lastOrder && !empty($lastOrder['contract_number'])) {
+    // Извлекаем базовую часть номера (без цифр в конце) и увеличиваем номер
+    if (preg_match('/^(.*?)(\d+)$/', $lastOrder['contract_number'], $matches)) {
+        $basePart = $matches[1];
+        $numPart = intval($matches[2]) + 1;
+        $suggestedContractNumber = $basePart . str_pad($numPart, strlen($matches[2]), '0', STR_PAD_LEFT);
+    } else {
+        // Если номер не содержит цифр в конце, просто добавляем /1
+        $suggestedContractNumber = $lastOrder['contract_number'] . '/1';
+    }
+} else {
+    // Если заказов еще нет, предлагаем формат ДД.ММ.ГГГГ/1
+    $suggestedContractNumber = date('d.m.Y') . '/1';
+}
 
 // Обработка формы
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -333,14 +353,14 @@ $pageTitle = 'Новый заказ';
                                     <div class="form-group">
                                         <label class="form-label">Номер договора</label>
                                         <input type="text" name="contract_number" class="form-control" 
-                                               value="<?= e($_POST['contract_number'] ?? '') ?>" 
-                                               placeholder="№ договора" style="font-size: 14px;">
+                                               value="<?= e($_POST['contract_number'] ?? $suggestedContractNumber) ?>" 
+                                               placeholder="№ договора (предлагается автоматически)" style="font-size: 14px;">
                                     </div>
                                     
                                     <div class="form-group">
                                         <label class="form-label">Дата договора</label>
                                         <input type="date" name="contract_date" class="form-control" 
-                                               value="<?= $_POST['contract_date'] ?? '' ?>" style="font-size: 14px;">
+                                               value="<?= $_POST['contract_date'] ?? $suggestedContractDate ?>" style="font-size: 14px;">
                                     </div>
                                 </div>
                                 

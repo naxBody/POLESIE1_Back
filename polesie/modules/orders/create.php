@@ -164,8 +164,16 @@ $pageTitle = 'Новый заказ';
                 <!-- Заголовок страницы -->
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
                     <div>
-                        <h2 style="font-size: 24px; font-weight: 600; color: var(--text-primary); margin: 0;">📦 Новый заказ</h2>
-                        <p style="color: var(--text-secondary); margin: 4px 0 0 0;">Заполните информацию для создания заказа</p>
+                        <div style="display: flex; align-items: center; margin-bottom: 4px;">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 12px; color: var(--text-primary);">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                <polyline points="14 2 14 8 20 8"></polyline>
+                                <line x1="12" y1="18" x2="12" y2="12"></line>
+                                <line x1="9" y1="15" x2="15" y2="15"></line>
+                            </svg>
+                            <h2 style="font-size: 24px; font-weight: 600; color: var(--text-primary); margin: 0;">Новый заказ</h2>
+                        </div>
+                        <p style="color: var(--text-secondary); margin: 0; padding-left: 40px;">Заполните информацию для создания заказа</p>
                     </div>
                     <a href="list.php" class="btn btn-secondary">← Назад к списку</a>
                 </div>
@@ -175,7 +183,11 @@ $pageTitle = 'Новый заказ';
                     <div class="card" style="margin-bottom: 24px;">
                         <div class="card-header">
                             <h3 class="card-title">
-                                <span style="font-size: 18px;">👤</span> Информация о заказчике
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px; vertical-align: middle;">
+                                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                    <circle cx="12" cy="7" r="4"></circle>
+                                </svg>
+                                Информация о заказчике
                             </h3>
                         </div>
                         <div class="card-body">
@@ -216,42 +228,48 @@ $pageTitle = 'Новый заказ';
                             </div>
                             
                             <!-- Реквизиты заказчика (автозаполнение) -->
-                            <div style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); padding: 20px; border-radius: 12px; margin-top: 20px; border: 1px solid #dee2e6;">
+                            <div style="background: #f8f9fa; padding: 20px; border-radius: 12px; margin-top: 20px; border: 1px solid #e5e7eb;">
                                 <div style="display: flex; align-items: center; margin-bottom: 16px;">
-                                    <span style="font-size: 20px; margin-right: 8px;">📋</span>
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px; color: var(--text-secondary);">
+                                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                        <polyline points="14 2 14 8 20 8"></polyline>
+                                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                                        <polyline points="10 9 9 9 8 9"></polyline>
+                                    </svg>
                                     <h4 style="margin: 0; font-size: 16px; font-weight: 600; color: var(--text-primary);">Реквизиты заказчика</h4>
                                 </div>
                                 <p style="color: var(--text-secondary); font-size: 13px; margin: 0 0 16px 0;">
-                                    Выберите заказчика выше — реквизиты заполнятся автоматически
+                                    Выберите заказчика выше — реквизиты заполнятся автоматически (можно редактировать)
                                 </p>
                                 <div class="form-row">
                                     <div class="form-group">
                                         <label class="form-label" style="font-size: 13px; color: var(--text-secondary);">Наименование</label>
-                                        <input type="text" id="customerName" class="form-control" readonly style="background: #fff; font-weight: 500;">
+                                        <input type="text" id="customerName" class="form-control" style="background: #fff;" placeholder="Наименование организации">
                                     </div>
                                     <div class="form-group">
                                         <label class="form-label" style="font-size: 13px; color: var(--text-secondary);">ИНН/УНП</label>
-                                        <input type="text" id="customerInn" class="form-control" readonly style="background: #fff;">
+                                        <input type="text" id="customerInn" class="form-control" style="background: #fff;" placeholder="Идентификационный номер">
                                     </div>
                                 </div>
                                 <div class="form-row">
                                     <div class="form-group">
                                         <label class="form-label" style="font-size: 13px; color: var(--text-secondary);">Юридический адрес</label>
-                                        <input type="text" id="customerAddress" class="form-control" readonly style="background: #fff;">
+                                        <input type="text" id="customerAddress" class="form-control" style="background: #fff;" placeholder="Адрес регистрации">
                                     </div>
                                     <div class="form-group">
                                         <label class="form-label" style="font-size: 13px; color: var(--text-secondary);">Контактное лицо</label>
-                                        <input type="text" id="customerContact" class="form-control" readonly style="background: #fff;">
+                                        <input type="text" id="customerContact" class="form-control" style="background: #fff;" placeholder="ФИО контактного лица">
                                     </div>
                                 </div>
                                 <div class="form-row">
                                     <div class="form-group">
                                         <label class="form-label" style="font-size: 13px; color: var(--text-secondary);">Телефон</label>
-                                        <input type="text" id="customerPhone" class="form-control" readonly style="background: #fff;">
+                                        <input type="text" id="customerPhone" class="form-control" style="background: #fff;" placeholder="+375 (XX) XXX-XX-XX">
                                     </div>
                                     <div class="form-group">
                                         <label class="form-label" style="font-size: 13px; color: var(--text-secondary);">E-mail</label>
-                                        <input type="email" id="customerEmail" class="form-control" readonly style="background: #fff;">
+                                        <input type="email" id="customerEmail" class="form-control" style="background: #fff;" placeholder="email@example.com">
                                     </div>
                                 </div>
                             </div>
@@ -262,7 +280,11 @@ $pageTitle = 'Новый заказ';
                     <div class="card" style="margin-bottom: 24px;">
                         <div class="card-header">
                             <h3 class="card-title">
-                                <span style="font-size: 18px;">⚙️</span> Параметры заказа
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px; vertical-align: middle;">
+                                    <circle cx="12" cy="12" r="3"></circle>
+                                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                                </svg>
+                                Параметры заказа
                             </h3>
                         </div>
                         <div class="card-body">
@@ -298,8 +320,14 @@ $pageTitle = 'Новый заказ';
                             </div>
                             
                             <div style="border-top: 1px solid #e5e7eb; margin: 20px 0; padding-top: 20px;">
-                                <h4 style="font-size: 15px; font-weight: 600; color: var(--text-primary); margin: 0 0 16px 0;">
-                                    📄 Договорные документы
+                                <h4 style="font-size: 15px; font-weight: 600; color: var(--text-primary); margin: 0 0 16px 0; display: flex; align-items: center;">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px;">
+                                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                        <polyline points="14 2 14 8 20 8"></polyline>
+                                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                                    </svg>
+                                    Договорные документы
                                 </h4>
                                 <div class="form-row">
                                     <div class="form-group">
@@ -329,7 +357,12 @@ $pageTitle = 'Новый заказ';
                     <div class="card" style="margin-bottom: 24px;">
                         <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
                             <h3 class="card-title" style="margin: 0;">
-                                <span style="font-size: 18px;">🛒</span> Состав заказа
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px; vertical-align: middle;">
+                                    <circle cx="9" cy="21" r="1"></circle>
+                                    <circle cx="20" cy="21" r="1"></circle>
+                                    <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                                </svg>
+                                Состав заказа
                             </h3>
                             <button type="button" class="btn btn-secondary" onclick="addItem()" style="font-size: 13px; padding: 8px 16px;">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px;">
@@ -365,15 +398,15 @@ $pageTitle = 'Новый заказ';
                                     </div>
                                     
                                     <div class="form-group" style="margin-bottom: 0;">
-                                        <input type="number" name="items[0][quantity]" class="form-control quantity" step="1" min="1" value="1" required style="font-size: 13px;">
+                                        <input type="number" name="items[0][quantity]" class="form-control quantity" step="1" min="1" value="1" required style="font-size: 13px;" oninput="calculateItemTotal(this.closest('.order-item')); calculateTotal();">
                                     </div>
                                     
                                     <div class="form-group" style="margin-bottom: 0;">
-                                        <input type="number" name="items[0][unit_price]" class="form-control unit-price" step="0.01" min="0" style="font-size: 13px;">
+                                        <input type="number" name="items[0][unit_price]" class="form-control unit-price" step="0.01" min="0" style="font-size: 13px;" oninput="calculateItemTotal(this.closest('.order-item')); calculateTotal();">
                                     </div>
                                     
                                     <div class="form-group" style="margin-bottom: 0;">
-                                        <input type="number" name="items[0][discount]" class="form-control discount" step="0.1" min="0" max="100" value="0" style="font-size: 13px;">
+                                        <input type="number" name="items[0][discount]" class="form-control discount" step="0.1" min="0" max="100" value="0" style="font-size: 13px;" oninput="calculateItemTotal(this.closest('.order-item')); calculateTotal();">
                                     </div>
                                     
                                     <div class="form-group" style="margin-bottom: 0;">
@@ -395,15 +428,20 @@ $pageTitle = 'Новый заказ';
                             </div>
                             
                             <!-- Итого -->
-                            <div style="margin-top: 24px; padding: 20px; background: linear-gradient(135deg, #10b981 0%, #059669 100%); border-radius: 12px; color: white;">
+                            <div style="margin-top: 24px; padding: 20px; background: #f8f9fa; border-radius: 12px; color: var(--text-primary); border: 1px solid #e5e7eb;">
                                 <div style="display: flex; justify-content: space-between; align-items: center;">
-                                    <span style="font-size: 16px; font-weight: 500;">💰 Общая сумма заказа:</span>
-                                    <span id="orderTotal" style="font-size: 28px; font-weight: 700;">0.00 BYN</span>
+                                    <span style="font-size: 16px; font-weight: 600;">Общая сумма заказа:</span>
+                                    <span id="orderTotal" style="font-size: 24px; font-weight: 700;">0.00 BYN</span>
                                 </div>
                             </div>
                             
                             <div class="form-group" style="margin-top: 24px;">
-                                <label class="form-label">💬 Примечание к заказу</label>
+                                <label class="form-label">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px; vertical-align: middle;">
+                                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                                    </svg>
+                                    Примечание к заказу
+                                </label>
                                 <textarea name="notes" class="form-control" rows="3" 
                                           placeholder="Дополнительная информация по заказу"><?= e($_POST['notes'] ?? '') ?></textarea>
                             </div>
@@ -413,10 +451,14 @@ $pageTitle = 'Новый заказ';
                     <!-- Кнопки действий -->
                     <div style="display: flex; justify-content: flex-end; gap: 12px; padding: 20px; background: #fff; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
                         <a href="list.php" class="btn btn-secondary" style="padding: 12px 24px;">
-                            ✕ Отмена
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px; vertical-align: middle;">
+                                <line x1="18" y1="6" x2="6" y2="18"></line>
+                                <line x1="6" y1="6" x2="18" y2="18"></line>
+                            </svg>
+                            Отмена
                         </a>
                         <button type="submit" class="btn btn-primary" style="padding: 12px 32px; font-size: 15px; font-weight: 600;">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px;">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px; vertical-align: middle;">
                                 <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
                                 <polyline points="17 21 17 13 7 13 7 21"></polyline>
                                 <polyline points="7 3 7 8 15 8"></polyline>
@@ -479,6 +521,26 @@ $pageTitle = 'Новый заказ';
                 document.getElementById('customerContact').value = '';
                 document.getElementById('customerPhone').value = '';
                 document.getElementById('customerEmail').value = '';
+            }
+        });
+        
+        // Инициализация при загрузке страницы - заполнение первой позиции
+        document.addEventListener('DOMContentLoaded', function() {
+            const firstProductSelect = document.querySelector('.product-select');
+            if (firstProductSelect && firstProductSelect.value) {
+                const option = firstProductSelect.options[firstProductSelect.selectedIndex];
+                const price = option.dataset.price;
+                const row = firstProductSelect.closest('.order-item');
+                
+                if (price && price > 0) {
+                    const priceInput = row.querySelector('.unit-price');
+                    if (priceInput && !priceInput.value) {
+                        priceInput.value = price;
+                    }
+                }
+                
+                calculateItemTotal(row);
+                calculateTotal();
             }
         });
         

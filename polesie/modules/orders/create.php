@@ -605,13 +605,18 @@ $pageTitle = 'Новый заказ';
             
             const rows = document.querySelectorAll('.product-row');
             rows.forEach(row => {
-                // Поиск по названию, артикулу и категории (по тексту)
+                // Получаем значения из data-атрибутов
+                const name = row.getAttribute('data-name') || '';
+                const article = row.getAttribute('data-article') || '';
+                const categoryName = row.getAttribute('data-category-name') || '';
+                
+                // Поиск по названию, артикулу и категории
                 const matchesSearch = !searchTerm || 
-                    row.dataset.name.includes(searchTerm) || 
-                    row.dataset.article.includes(searchTerm) ||
-                    row.dataset.categoryName.includes(searchTerm);
-                const matchesCategory = !categoryFilter || row.dataset.categoryId == categoryFilter;
-                const matchesUnit = !unitFilter || row.dataset.unit == unitFilter;
+                    name.includes(searchTerm) || 
+                    article.includes(searchTerm) ||
+                    categoryName.includes(searchTerm);
+                const matchesCategory = !categoryFilter || row.getAttribute('data-category-id') == categoryFilter;
+                const matchesUnit = !unitFilter || row.getAttribute('data-unit') == unitFilter;
                 
                 row.style.display = (matchesSearch && matchesCategory && matchesUnit) ? '' : 'none';
             });

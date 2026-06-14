@@ -624,6 +624,45 @@ $pageTitle = 'Новый заказ';
         
         function addProductToOrder(productId, productName, basePrice, unitName) {
             const container = document.getElementById('orderItems');
+            
+            // Проверяем, есть ли уже добавленные позиции и является ли первая пустой
+            const existingItems = container.querySelectorAll('.order-item');
+            let targetItem = null;
+            
+            if (existingItems.length > 0) {
+                const firstItem = existingItems[0];
+                const firstSelect = firstItem.querySelector('.product-select');
+                
+                // Если первый элемент имеет пустое значение (дефолтный "Выберите продукцию")
+                if (firstSelect && firstSelect.value === '') {
+                    targetItem = firstItem;
+                }
+            }
+            
+            // Если нашли пустую первую позицию, заполняем её
+            if (targetItem) {
+                const productSelect = targetItem.querySelector('.product-select');
+                if (productSelect) {
+                    productSelect.value = productId;
+                    
+                    // Обновляем цену по умолчанию
+                    const priceInput = targetItem.querySelector('.unit-price');
+                    if (priceInput && basePrice) {
+                        priceInput.value = basePrice;
+                    }
+                    
+                    // Пересчитываем итоги
+                    calculateItemTotal(targetItem);
+                    calculateTotal();
+                    
+                    // Закрываем модальное окно и показываем уведомление
+                    closeProductSelector();
+                    showNotification('Позиция добавлена в заказ', 'success');
+                    return;
+                }
+            }
+            
+            // Если нет пустой позиции или не удалось найти select, создаём новую
             const newItem = document.createElement('div');
             newItem.className = 'order-item';
             newItem.style.cssText = 'display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 1fr auto; gap: 12px; margin-bottom: 12px; align-items: start;';

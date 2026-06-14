@@ -516,9 +516,9 @@ $pageTitle = 'Новый заказ';
                             </button>
                         </div>
                         
-                        <div style="padding: 20px 24px; border-bottom: 1px solid #e5e7eb; background: #f9fafb;">
+                        <div style="padding: 20px 32px; border-bottom: 1px solid #e5e7eb; background: #f9fafb;">
                             <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px;">
-                                <input type="text" id="productSearchInput" class="form-control" placeholder="Поиск по названию или артикулу..." style="font-size: 14px;" oninput="applyProductFilters()">
+                                <input type="text" id="productSearchInput" class="form-control" placeholder="Поиск по названию, артикулу или категории..." style="font-size: 14px;" oninput="applyProductFilters()">
                                 <select id="productCategoryFilter" class="form-control" style="font-size: 14px;" onchange="applyProductFilters()">
                                     <option value="">Все категории</option>
                                     <?php 
@@ -544,12 +544,12 @@ $pageTitle = 'Новый заказ';
                             <table style="width: 100%; border-collapse: collapse;">
                                 <thead style="position: sticky; top: 0; background: #f9fafb; z-index: 1;">
                                     <tr>
-                                        <th style="padding: 12px 16px; text-align: left; font-size: 13px; font-weight: 600; color: var(--text-secondary); border-bottom: 1px solid #e5e7eb;">Артикул</th>
-                                        <th style="padding: 12px 16px; text-align: left; font-size: 13px; font-weight: 600; color: var(--text-secondary); border-bottom: 1px solid #e5e7eb;">Наименование</th>
-                                        <th style="padding: 12px 16px; text-align: left; font-size: 13px; font-weight: 600; color: var(--text-secondary); border-bottom: 1px solid #e5e7eb;">Категория</th>
-                                        <th style="padding: 12px 16px; text-align: left; font-size: 13px; font-weight: 600; color: var(--text-secondary); border-bottom: 1px solid #e5e7eb;">Ед. изм.</th>
-                                        <th style="padding: 12px 16px; text-align: right; font-size: 13px; font-weight: 600; color: var(--text-secondary); border-bottom: 1px solid #e5e7eb;">Цена</th>
-                                        <th style="padding: 12px 16px; text-align: center; font-size: 13px; font-weight: 600; color: var(--text-secondary); border-bottom: 1px solid #e5e7eb;">Действие</th>
+                                        <th style="padding: 12px 32px; text-align: left; font-size: 13px; font-weight: 600; color: var(--text-secondary); border-bottom: 1px solid #e5e7eb;">Артикул</th>
+                                        <th style="padding: 12px 32px; text-align: left; font-size: 13px; font-weight: 600; color: var(--text-secondary); border-bottom: 1px solid #e5e7eb;">Наименование</th>
+                                        <th style="padding: 12px 32px; text-align: left; font-size: 13px; font-weight: 600; color: var(--text-secondary); border-bottom: 1px solid #e5e7eb;">Категория</th>
+                                        <th style="padding: 12px 32px; text-align: left; font-size: 13px; font-weight: 600; color: var(--text-secondary); border-bottom: 1px solid #e5e7eb;">Ед. изм.</th>
+                                        <th style="padding: 12px 32px; text-align: right; font-size: 13px; font-weight: 600; color: var(--text-secondary); border-bottom: 1px solid #e5e7eb;">Цена</th>
+                                        <th style="padding: 12px 32px; text-align: center; font-size: 13px; font-weight: 600; color: var(--text-secondary); border-bottom: 1px solid #e5e7eb;">Действие</th>
                                     </tr>
                                 </thead>
                                 <tbody id="productTableBody">
@@ -561,12 +561,12 @@ $pageTitle = 'Новый заказ';
                                         data-article="<?= htmlspecialchars(mb_strtolower($p['article'] ?? '', 'UTF-8'), ENT_QUOTES, 'UTF-8') ?>"
                                         data-category-name="<?= htmlspecialchars(mb_strtolower($p['category_name'] ?? '', 'UTF-8'), ENT_QUOTES, 'UTF-8') ?>"
                                         style="border-bottom: 1px solid #f3f4f6;">
-                                        <td style="padding: 12px 24px; font-size: 13px; color: var(--text-primary);"><?= e($p['article']) ?></td>
-                                        <td style="padding: 12px 24px; font-size: 13px; color: var(--text-primary);"><?= e($p['name']) ?></td>
-                                        <td style="padding: 12px 24px; font-size: 13px; color: var(--text-secondary);"><?= e($p['category_name'] ?? '-') ?></td>
-                                        <td style="padding: 12px 24px; font-size: 13px; color: var(--text-secondary);"><?= e($p['unit_name'] ?? '-') ?></td>
-                                        <td style="padding: 12px 24px; font-size: 13px; color: var(--text-primary); text-align: right; font-weight: 500;"><?= $p['base_price'] > 0 ? number_format($p['base_price'], 2, ',', ' ') : '-' ?> BYN</td>
-                                        <td style="padding: 12px 24px; text-align: center;">
+                                        <td style="padding: 12px 32px; font-size: 13px; color: var(--text-primary);"><?= e($p['article']) ?></td>
+                                        <td style="padding: 12px 32px; font-size: 13px; color: var(--text-primary);"><?= e($p['name']) ?></td>
+                                        <td style="padding: 12px 32px; font-size: 13px; color: var(--text-secondary);"><?= e($p['category_name'] ?? '-') ?></td>
+                                        <td style="padding: 12px 32px; font-size: 13px; color: var(--text-secondary);"><?= e($p['unit_name'] ?? '-') ?></td>
+                                        <td style="padding: 12px 32px; font-size: 13px; color: var(--text-primary); text-align: right; font-weight: 500;"><?= $p['base_price'] > 0 ? number_format($p['base_price'], 2, ',', ' ') : '-' ?> BYN</td>
+                                        <td style="padding: 12px 32px; text-align: center;">
                                             <button type="button" class="btn btn-primary btn-sm" onclick="addProductToOrder(<?= $p['id'] ?>, '<?= addslashes(e($p['name'])) ?>', <?= $p['base_price'] ?>, '<?= e($p['unit_name'] ?? 'шт') ?>')" style="padding: 6px 12px; font-size: 12px;">
                                                 Добавить
                                             </button>

@@ -557,16 +557,16 @@ $pageTitle = 'Новый заказ';
                                     <tr class="product-row" 
                                         data-category-id="<?= $p['category_id'] ?>" 
                                         data-unit="<?= $p['base_unit_id'] ?>" 
-                                        data-name="<?= strtolower(e($p['name'])) ?>" 
-                                        data-article="<?= strtolower(e($p['article'])) ?>"
-                                        data-category-name="<?= strtolower(e($p['category_name'] ?? '')) ?>"
+                                        data-name="<?= htmlspecialchars(mb_strtolower($p['name'] ?? '', 'UTF-8'), ENT_QUOTES, 'UTF-8') ?>" 
+                                        data-article="<?= htmlspecialchars(mb_strtolower($p['article'] ?? '', 'UTF-8'), ENT_QUOTES, 'UTF-8') ?>"
+                                        data-category-name="<?= htmlspecialchars(mb_strtolower($p['category_name'] ?? '', 'UTF-8'), ENT_QUOTES, 'UTF-8') ?>"
                                         style="border-bottom: 1px solid #f3f4f6;">
-                                        <td style="padding: 12px 16px; font-size: 13px; color: var(--text-primary);"><?= e($p['article']) ?></td>
-                                        <td style="padding: 12px 16px; font-size: 13px; color: var(--text-primary);"><?= e($p['name']) ?></td>
-                                        <td style="padding: 12px 16px; font-size: 13px; color: var(--text-secondary);"><?= e($p['category_name'] ?? '-') ?></td>
-                                        <td style="padding: 12px 16px; font-size: 13px; color: var(--text-secondary);"><?= e($p['unit_name'] ?? '-') ?></td>
-                                        <td style="padding: 12px 16px; font-size: 13px; color: var(--text-primary); text-align: right; font-weight: 500;"><?= $p['base_price'] > 0 ? number_format($p['base_price'], 2, ',', ' ') : '-' ?> BYN</td>
-                                        <td style="padding: 12px 16px; text-align: center;">
+                                        <td style="padding: 12px 24px; font-size: 13px; color: var(--text-primary);"><?= e($p['article']) ?></td>
+                                        <td style="padding: 12px 24px; font-size: 13px; color: var(--text-primary);"><?= e($p['name']) ?></td>
+                                        <td style="padding: 12px 24px; font-size: 13px; color: var(--text-secondary);"><?= e($p['category_name'] ?? '-') ?></td>
+                                        <td style="padding: 12px 24px; font-size: 13px; color: var(--text-secondary);"><?= e($p['unit_name'] ?? '-') ?></td>
+                                        <td style="padding: 12px 24px; font-size: 13px; color: var(--text-primary); text-align: right; font-weight: 500;"><?= $p['base_price'] > 0 ? number_format($p['base_price'], 2, ',', ' ') : '-' ?> BYN</td>
+                                        <td style="padding: 12px 24px; text-align: center;">
                                             <button type="button" class="btn btn-primary btn-sm" onclick="addProductToOrder(<?= $p['id'] ?>, '<?= addslashes(e($p['name'])) ?>', <?= $p['base_price'] ?>, '<?= e($p['unit_name'] ?? 'шт') ?>')" style="padding: 6px 12px; font-size: 12px;">
                                                 Добавить
                                             </button>

@@ -2,15 +2,15 @@
 # Compiled and build artifacts
 *.pyc
 __pycache__/
-
-# Dependencies
-vendor/
-composer.lock
-
-# Logs and temp files
+*.o
+*.obj
 *.log
 *.tmp
 *.swp
+
+# Dependencies
+venv/
+.venv/
 
 # Environment
 .env
@@ -21,7 +21,6 @@ composer.lock
 .vscode/
 .idea/
 
-# OS generated files
-.DS_Store
-Thumbs.db
+# Logs
+*.log
 ```

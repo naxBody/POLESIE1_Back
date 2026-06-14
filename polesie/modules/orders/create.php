@@ -198,12 +198,12 @@ $pageTitle = 'Новый заказ';
                                         <option value="">Выберите заказчика из списка</option>
                                         <?php foreach ($contractors as $c): ?>
                                         <option value="<?= $c['id'] ?>" 
-                                                data-name="<?= addslashes($c['name']) ?>"
-                                                data-inn="<?= addslashes($c['inn'] ?? '') ?>"
-                                                data-address="<?= addslashes($c['address'] ?? '') ?>"
-                                                data-contact="<?= addslashes($c['contact_person'] ?? '') ?>"
-                                                data-phone="<?= addslashes($c['phone'] ?? '') ?>"
-                                                data-email="<?= addslashes($c['email'] ?? '') ?>"
+                                                data-name="<?= e($c['name']) ?>"
+                                                data-inn="<?= e($c['inn'] ?? '') ?>"
+                                                data-address="<?= e($c['address'] ?? '') ?>"
+                                                data-contact="<?= e($c['contact_person'] ?? '') ?>"
+                                                data-phone="<?= e($c['phone'] ?? '') ?>"
+                                                data-email="<?= e($c['email'] ?? '') ?>"
                                                 <?= (($_POST['contractor_id'] ?? 0) == $c['id']) ? 'selected' : '' ?>>
                                             <?= e($c['name']) ?> (ИНН: <?= e($c['inn']) ?>)
                                         </option>

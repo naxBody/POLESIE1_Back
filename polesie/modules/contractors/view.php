@@ -30,6 +30,7 @@ if (!$contractor) {
 }
 
 $pageTitle = $contractor['name'];
+$showBreadcrumb = true;
 
 require_once BASE_PATH . '/includes/sidebar.php';
 require_once BASE_PATH . '/includes/topbar.php';
@@ -282,15 +283,6 @@ require_once BASE_PATH . '/includes/topbar.php';
 
 <div class="main-content">
     <div class="contractor-detail-container">
-        <!-- Breadcrumb -->
-        <nav class="contractor-breadcrumb">
-            <a href="<?= pageUrl('index.php') ?>">Главная</a>
-            <span class="contractor-breadcrumb-separator">/</span>
-            <a href="<?= pageUrl('modules/contractors/list.php') ?>">Контрагенты</a>
-            <span class="contractor-breadcrumb-separator">/</span>
-            <span class="contractor-breadcrumb-current"><?= e($contractor['name']) ?></span>
-        </nav>
-        
         <!-- Header -->
         <div class="card contractor-detail-header" style="margin: 0; border-radius: var(--border-radius-lg); box-shadow: var(--shadow);">
         <div class="contractor-title">

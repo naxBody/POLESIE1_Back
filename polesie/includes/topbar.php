@@ -18,6 +18,7 @@
             </div>
             <h1 class="topbar-title"><?= e($pageTitle) ?></h1>
         </div>
+        <?php if (isset($showBreadcrumb) && $showBreadcrumb): ?>
         <div class="topbar-breadcrumb-wrapper">
             <div class="topbar-breadcrumb">
                 <a href="<?= pageUrl('index.php') ?>">Главная</a>
@@ -25,6 +26,7 @@
                 <span><?= e($pageTitle) ?></span>
             </div>
         </div>
+        <?php endif; ?>
     </div>
     
     <div class="topbar-right">

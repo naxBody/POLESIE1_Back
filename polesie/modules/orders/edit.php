@@ -96,12 +96,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt = $pdo->prepare("
                 UPDATE orders 
                 SET customer_id = ?, status = ?, order_date = ?, delivery_date = ?, 
+                    delivery_address = ?, payment_terms = ?, contract_number = ?, contract_date = ?,
                     notes = ?, responsible_user_id = ?, total_amount = ?, updated_at = NOW()
                 WHERE id = ?
             ");
             
             $stmt->execute([
                 $contractorId, $status, $orderDate, $deliveryDate,
+                $deliveryAddress, $paymentTerms, $contractNumber, $contractDate,
                 $notes, $responsibleUserId, $totalAmount, $orderId
             ]);
             
@@ -214,28 +216,97 @@ $pageTitle = 'Редактирование заказа #' . $order['order_numbe
                     <form method="POST" action="" id="orderForm">
                         <div class="card-body">
                             
-                            <!-- Блок 1: Данные о заказчике -->
+                            <!-- Блок 1: Информация о заказчике -->
                             <div class="section-block">
                                 <h4>
                                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                                        <circle cx="9" cy="7" r="4"></circle>
-                                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                        <circle cx="12" cy="7" r="4"></circle>
                                     </svg>
-                                    Данные о заказчике
+                                    Информация о заказчике
                                 </h4>
                                 
-                                <div class="form-group">
-                                    <label class="form-label">Заказчик *</label>
-                                    <select name="contractor_id" class="form-control" required>
-                                        <option value="">Выберите заказчика</option>
-                                        <?php foreach ($contractors as $c): ?>
-                                        <option value="<?= $c['id'] ?>" <?= ($order['customer_id'] == $c['id']) ? 'selected' : '' ?>>
-                                            <?= e($c['name']) ?> (ИНН: <?= e($c['inn']) ?>)
-                                        </option>
-                                        <?php endforeach; ?>
-                                    </select>
+                                <div class="form-row">
+                                    <div class="form-group" style="flex: 2;">
+                                        <label class="form-label">Заказчик <span style="color: #ef4444;">*</span></label>
+                                        <select name="contractor_id" id="contractorSelect" class="form-control" required style="font-size: 14px;">
+                                            <option value="">Выберите заказчика из списка</option>
+                                            <?php foreach ($contractors as $c): ?>
+                                            <option value="<?= $c['id'] ?>" 
+                                                    data-name="<?= e($c['name']) ?>"
+                                                    data-inn="<?= e($c['inn'] ?? '') ?>"
+                                                    data-address="<?= e($c['address'] ?? '') ?>"
+                                                    data-contact="<?= e($c['contact_person'] ?? '') ?>"
+                                                    data-phone="<?= e($c['phone'] ?? '') ?>"
+                                                    data-email="<?= e($c['email'] ?? '') ?>"
+                                                    <?= ($order['customer_id'] == $c['id']) ? 'selected' : '' ?>>
+                                                <?= e($c['name']) ?> (ИНН: <?= e($c['inn']) ?>)
+                                            </option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="form-group" style="flex: 1;">
+                                        <label class="form-label">Ответственный</label>
+                                        <select name="responsible_user_id" class="form-control" style="font-size: 14px;">
+                                            <option value="">Не назначен</option>
+                                            <?php
+                                            $users = $pdo->query("SELECT id, full_name FROM users WHERE is_active = TRUE ORDER BY full_name")->fetchAll();
+                                            foreach ($users as $u):
+                                            ?>
+                                            <option value="<?= $u['id'] ?>" <?= ($order['responsible_user_id'] == $u['id']) ? 'selected' : '' ?>>
+                                                <?= e($u['full_name']) ?>
+                                            </option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                    </div>
+                                </div>
+                                
+                                <!-- Реквизиты заказчика (автозаполнение) -->
+                                <div style="background: #f8f9fa; padding: 20px; border-radius: 12px; margin-top: 20px; border: 1px solid #e5e7eb;">
+                                    <div style="display: flex; align-items: center; margin-bottom: 16px;">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px; color: var(--text-secondary);">
+                                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                            <polyline points="14 2 14 8 20 8"></polyline>
+                                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                                            <polyline points="10 9 9 9 8 9"></polyline>
+                                        </svg>
+                                        <h4 style="margin: 0; font-size: 16px; font-weight: 600; color: var(--text-primary);">Реквизиты заказчика</h4>
+                                    </div>
+                                    <p style="color: var(--text-secondary); font-size: 13px; margin: 0 0 16px 0;">
+                                        Выберите заказчика выше — реквизиты заполнятся автоматически (можно редактировать)
+                                    </p>
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label class="form-label" style="font-size: 13px; color: var(--text-secondary);">Наименование</label>
+                                            <input type="text" id="customerName" class="form-control" style="background: #fff;" placeholder="Наименование организации">
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label" style="font-size: 13px; color: var(--text-secondary);">ИНН/УНП</label>
+                                            <input type="text" id="customerInn" class="form-control" style="background: #fff;" placeholder="Идентификационный номер">
+                                        </div>
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label class="form-label" style="font-size: 13px; color: var(--text-secondary);">Юридический адрес</label>
+                                            <input type="text" id="customerAddress" class="form-control" style="background: #fff;" placeholder="Адрес регистрации">
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label" style="font-size: 13px; color: var(--text-secondary);">Контактное лицо</label>
+                                            <input type="text" id="customerContact" class="form-control" style="background: #fff;" placeholder="ФИО контактного лица">
+                                        </div>
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label class="form-label" style="font-size: 13px; color: var(--text-secondary);">Телефон</label>
+                                            <input type="text" id="customerPhone" class="form-control" style="background: #fff;" placeholder="+375 (XX) XXX-XX-XX">
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label" style="font-size: 13px; color: var(--text-secondary);">Email</label>
+                                            <input type="email" id="customerEmail" class="form-control" style="background: #fff;" placeholder="example@mail.com">
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                             
@@ -330,34 +401,7 @@ $pageTitle = 'Редактирование заказа #' . $order['order_numbe
                                 </div>
                             </div>
                             
-                            <!-- Блок 5: Ответственные -->
-                            <div class="section-block">
-                                <h4>
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
-                                        <circle cx="9" cy="7" r="4"></circle>
-                                        <polyline points="16 11 18 13 22 9"></polyline>
-                                    </svg>
-                                    Ответственные
-                                </h4>
-                                
-                                <div class="form-group">
-                                    <label class="form-label">Ответственный менеджер</label>
-                                    <select name="responsible_user_id" class="form-control">
-                                        <option value="">Не назначен</option>
-                                        <?php
-                                        $users = $pdo->query("SELECT id, full_name FROM users WHERE is_active = TRUE ORDER BY full_name")->fetchAll();
-                                        foreach ($users as $u):
-                                        ?>
-                                        <option value="<?= $u['id'] ?>" <?= ($order['responsible_user_id'] == $u['id']) ? 'selected' : '' ?>>
-                                            <?= e($u['full_name']) ?>
-                                        </option>
-                                        <?php endforeach; ?>
-                                    </select>
-                                </div>
-                            </div>
-                            
-                            <!-- Блок 6: Позиции заказа -->
+                            <!-- Блок 5: Позиции заказа -->
                             <div class="section-block">
                                 <h4>
                                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -587,6 +631,34 @@ $pageTitle = 'Редактирование заказа #' . $order['order_numbe
     <script src="<?= asset('assets/js/main.js') ?>"></script>
     <script>
         let itemCount = <?= max($itemIndex, 1) ?>;
+        
+        // Автозаполнение реквизитов заказчика из data-атрибутов
+        document.getElementById('contractorSelect').addEventListener('change', function() {
+            const selectedOption = this.options[this.selectedIndex];
+            
+            if (this.value) {
+                document.getElementById('customerName').value = selectedOption.dataset.name || '';
+                document.getElementById('customerInn').value = selectedOption.dataset.inn || '';
+                document.getElementById('customerAddress').value = selectedOption.dataset.address || '';
+                document.getElementById('customerContact').value = selectedOption.dataset.contact || '';
+                document.getElementById('customerPhone').value = selectedOption.dataset.phone || '';
+                document.getElementById('customerEmail').value = selectedOption.dataset.email || '';
+                
+                // Автозаполнение адреса доставки
+                const deliveryAddressField = document.querySelector('[name="delivery_address"]');
+                if (deliveryAddressField && !deliveryAddressField.value.trim()) {
+                    deliveryAddressField.value = selectedOption.dataset.address || '';
+                }
+            } else {
+                // Очистка полей
+                document.getElementById('customerName').value = '';
+                document.getElementById('customerInn').value = '';
+                document.getElementById('customerAddress').value = '';
+                document.getElementById('customerContact').value = '';
+                document.getElementById('customerPhone').value = '';
+                document.getElementById('customerEmail').value = '';
+            }
+        });
         
         function addItem() {
             const container = document.getElementById('orderItems');

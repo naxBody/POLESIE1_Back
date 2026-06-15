@@ -43,25 +43,22 @@ require_once BASE_PATH . '/includes/topbar.php';
     width: 100%;
     max-width: none;
     margin: 0;
-    padding: 24px;
+    padding: 0 24px 24px 24px;
 }
 
 .contractor-detail-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 20px;
-    padding-bottom: 15px;
-    border-bottom: 2px solid var(--border-color);
-    padding-left: 0;
-    padding-right: 0;
-    padding-top: 0;
+    margin-bottom: 0;
+    padding: 24px;
+    border-bottom: none;
 }
 
 .contractor-title h2 {
     font-size: 24px;
     font-weight: 700;
-    margin: 0 0 5px 0;
+    margin: 0 0 8px 0;
     color: var(--text-primary);
 }
 
@@ -258,9 +255,9 @@ require_once BASE_PATH . '/includes/topbar.php';
 <div class="main-content">
     <div class="contractor-detail-container">
         <!-- Header -->
-        <div class="card contractor-detail-header" style="margin: 0; margin-bottom: 24px; border-radius: var(--border-radius-lg); box-shadow: var(--shadow);">
+        <div class="card contractor-detail-header" style="margin: 0; border-radius: var(--border-radius-lg); box-shadow: var(--shadow);">
         <div class="contractor-title">
-            <h2><?= e($contractor['name']) ?></h2>
+            <h2 style="margin: 0 0 8px 0;"><?= e($contractor['name']) ?></h2>
             <?php if ($contractor['type'] === 'customer'): ?>
                 <span class="contractor-type-badge customer">Заказчик</span>
             <?php elseif ($contractor['type'] === 'supplier'): ?>
@@ -291,7 +288,7 @@ require_once BASE_PATH . '/includes/topbar.php';
     </div>
 
     <!-- Main Table -->
-    <div class="card" style="margin: 0; border-radius: var(--border-radius-lg); box-shadow: var(--shadow);">
+    <div class="card" style="margin: 24px 0 0 0; border-radius: var(--border-radius-lg); box-shadow: var(--shadow);">
     <table class="contractor-table" style="margin: 0;">
         <thead>
             <tr>
@@ -469,7 +466,6 @@ require_once BASE_PATH . '/includes/topbar.php';
             <?php endif; ?>
         </tbody>
     </table>
-    </div>
     </div>
     </div>
 </div>

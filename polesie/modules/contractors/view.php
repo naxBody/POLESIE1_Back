@@ -45,6 +45,7 @@ require_once BASE_PATH . '/includes/topbar.php';
     max-width: none;
     margin: 0;
     padding: 24px 24px 24px 24px;
+    box-sizing: border-box;
 }
 
 .contractor-breadcrumb {
@@ -54,12 +55,16 @@ require_once BASE_PATH . '/includes/topbar.php';
     font-size: 14px;
     color: var(--text-secondary);
     margin-bottom: 16px;
+    flex-wrap: wrap;
+    width: 100%;
+    overflow: hidden;
 }
 
 .contractor-breadcrumb a {
     color: var(--text-secondary);
     text-decoration: none;
     transition: color 0.2s;
+    white-space: nowrap;
 }
 
 .contractor-breadcrumb a:hover {
@@ -68,11 +73,16 @@ require_once BASE_PATH . '/includes/topbar.php';
 
 .contractor-breadcrumb-separator {
     color: var(--gray-400);
+    flex-shrink: 0;
 }
 
 .contractor-breadcrumb-current {
     color: var(--text-primary);
     font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 300px;
 }
 
 .contractor-detail-header {
@@ -283,6 +293,15 @@ require_once BASE_PATH . '/includes/topbar.php';
 
 <div class="main-content">
     <div class="contractor-detail-container">
+        <!-- Breadcrumb (внутри контента, не в хедере) -->
+        <div class="contractor-breadcrumb" style="display: none;">
+            <a href="<?= pageUrl('index.php') ?>">Главная</a>
+            <span class="contractor-breadcrumb-separator">/</span>
+            <a href="<?= pageUrl('modules/contractors/list.php') ?>">Контрагенты</a>
+            <span class="contractor-breadcrumb-separator">/</span>
+            <span class="contractor-breadcrumb-current"><?= e($contractor['name']) ?></span>
+        </div>
+        
         <!-- Header -->
         <div class="card contractor-detail-header" style="margin: 0; border-radius: var(--border-radius-lg); box-shadow: var(--shadow);">
         <div class="contractor-title">

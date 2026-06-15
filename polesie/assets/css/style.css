@@ -273,7 +273,7 @@ a[href^="tel:"]:hover, a[href^="mailto:"]:hover {
     min-width: 0;
     overflow: hidden;
     max-width: calc(100% - 200px);
-    padding-left: 24px;
+    padding-left: 32px;
 }
 
 .topbar-breadcrumb {
@@ -283,8 +283,8 @@ a[href^="tel:"]:hover, a[href^="mailto:"]:hover {
     font-size: 14px;
     color: var(--text-secondary);
     white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    overflow: visible;
+    text-overflow: clip;
     min-width: 0;
     flex-shrink: 1;
 }

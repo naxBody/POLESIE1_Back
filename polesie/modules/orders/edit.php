@@ -62,6 +62,34 @@ $statuses = $pdo->query("SELECT DISTINCT status,
                                END as name
                         FROM orders ORDER BY name")->fetchAll();
 
+// Генерация предлагаемого номера договора на основе последнего созданного заказа (если номер договора пуст)
+$suggestedContractNumber = '';
+$suggestedContractDate = date('Y-m-d');
+
+if (empty($order['contract_number'])) {
+    try {
+        $stmt = $pdo->query("SELECT contract_number, contract_date FROM orders WHERE contract_number IS NOT NULL AND contract_number != '' ORDER BY id DESC LIMIT 1");
+        $lastOrder = $stmt->fetch();
+        if ($lastOrder && !empty($lastOrder['contract_number'])) {
+            // Извлекаем базовую часть номера (без цифр в конце) и увеличиваем номер
+            if (preg_match('/^(.*?)(\d+)$/', $lastOrder['contract_number'], $matches)) {
+                $basePart = $matches[1];
+                $numPart = intval($matches[2]) + 1;
+                $suggestedContractNumber = $basePart . str_pad($numPart, strlen($matches[2]), '0', STR_PAD_LEFT);
+            } else {
+                // Если номер не содержит цифр в конце, просто добавляем /1
+                $suggestedContractNumber = $lastOrder['contract_number'] . '/1';
+            }
+        } else {
+            // Если заказов еще нет, предлагаем формат ДД.ММ.ГГГГ/1
+            $suggestedContractNumber = date('d.m.Y') . '/1';
+        }
+    } catch (PDOException $e) {
+        // Если поле contract_number еще не существует в базе, используем дефолтное значение
+        $suggestedContractNumber = date('d.m.Y') . '/1';
+    }
+}
+
 // Обработка формы
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
@@ -385,13 +413,13 @@ $pageTitle = 'Редактирование заказа #' . $order['order_numbe
                                     <div class="form-group">
                                         <label class="form-label">Номер договора</label>
                                         <input type="text" name="contract_number" class="form-control" 
-                                               value="<?= e($order['contract_number'] ?? '') ?>" placeholder="№ договора">
+                                               value="<?= e($order['contract_number'] ?? $suggestedContractNumber) ?>" placeholder="№ договора (предлагается автоматически)">
                                     </div>
                                     
                                     <div class="form-group">
                                         <label class="form-label">Дата договора</label>
                                         <input type="date" name="contract_date" class="form-control" 
-                                               value="<?= $order['contract_date'] ?? '' ?>">
+                                               value="<?= $order['contract_date'] ?? $suggestedContractDate ?>">
                                     </div>
                                 </div>
                                 

@@ -1,23 +1,22 @@
-```gitignore
 # Compiled and build artifacts
 *.pyc
 __pycache__/
 *.o
 *.obj
-dist/
-build/
-target/
+*.class
+*.exe
+*.dll
+*.so
+*.a
+*.out
 
 # Dependencies
-.venv/
-venv/
 node_modules/
-.pip-tools/
-.mypy_cache/
-.pytest_cache/
-.coverage
-coverage/
-htmlcov/
+venv/
+.venv/
+.env
+.env.local
+.env.*
 
 # Logs and temp files
 *.log
@@ -25,22 +24,20 @@ htmlcov/
 *.swp
 *.swo
 
-# Environment
-.env
-.env.local
-.env.*
-
 # Editors
 .vscode/
 .idea/
-*.swp
-*.swo
 
-# OS specific
+# System files
 .DS_Store
 Thumbs.db
 
-# Compression
+# Coverage
+coverage/
+htmlcov/
+.coverage
+
+# Compressed files
 *.zip
 *.gz
 *.tar
@@ -63,4 +60,470 @@ Thumbs.db
 *.tar.bz2
 *.tar.xz
 *.tar.zst
-```
+
+# Python specific
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+.eggs/
+
+# Build directories
+dist/
+build/
+target/
+.gradle/
+
+# Cache directories
+.mypy_cache/
+.pytest_cache/
+.cargo/
+.npm/
+.yarn/
+
+# Documentation builds
+docs/_build/
+
+# OS generated files
+.DS_Store
+ehthumbs.db
+Icon?
+Thumbs.db
+desktop.ini
+
+# IDE specific
+.vs/
+*.swp
+*.swo
+*~
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.backup
+
+# Environment variables
+.env
+.env.local
+.env.*
+!env.example
+!env.sample
+
+# Database
+*.db
+*.db-journal
+
+# Log files
+*.log
+**/logs/
+!logs/.gitkeep
+
+# Process pid files
+*.pid
+
+# Coverage reports
+coverage.xml
+*.gcov
+*.lcov
+
+# Distribution / packaging
+*.egg
+*.whl
+pip-log.txt
+pip-delete-this-directory.txt
+.tox/
+.coverage*
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.log
+.gitattributes
+
+# Translations
+*.mo
+*.pot
+
+# Django
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+
+# Flask
+instance/
+.webassets-cache
+
+# Scrapy
+.scrapy
+
+# Sphinx documentation
+docs/_build/
+
+# PyBuilder
+.pybuilder/
+target/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# IPython
+profile_default/
+ipython_config.py
+
+# pyenv
+.python-version
+
+# pipenv
+Pipfile.lock
+
+# PEP 582
+__pypackages__/
+
+# Celery
+celerybeat-schedule
+celerybeat.pid
+
+# Sage
+*.sage.py
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Spyder project settings
+.spyderproject
+.spyproject
+
+# Rope project settings
+.ropeproject
+
+# mkdocs documentation
+/site
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Pyre
+.pyre/
+
+# Pylance
+.vscode/.ropeproject
+
+# FastAPI
+*.html
+!index.html
+!static/
+!templates/
+
+# Vue
+dist/
+node_modules/
+*.log
+
+# React
+build/
+node_modules/
+*.log
+
+# Angular
+dist/
+node_modules/
+*.log
+
+# TypeScript
+*.tsbuildinfo
+dist/
+node_modules/
+*.log
+
+# Webpack
+dist/
+node_modules/
+*.log
+
+# Babel
+dist/
+node_modules/
+*.log
+
+# Gulp
+dist/
+node_modules/
+*.log
+
+# Grunt
+dist/
+node_modules/
+*.log
+
+# SASS/SCSS
+.sass-cache/
+*.css.map
+dist/
+node_modules/
+*.log
+
+# Ruby
+*.gem
+*.rbc
+.rakeopts
+.pkg/
+test/tmp/
+test/version_tmp/
+tmp/
+
+# Rails
+*.rbc
+capybara-*.html
+.rake_opts
+.rid
+log/
+nbproject/
+profile
+tmtmp/
+.rvmrc
+*.orig
+REVISION
+TAG
+config/database.yml
+db/schema.rb
+db/seeds.rb
+db/structure.sql
+db/data.sql
+public/system/
+coverage/
+spec/reports/
+spec/examples.txt
+test/tmp/
+test/version_tmp/
+tmp/
+.rake_opts
+.rvmrc
+*.orig
+.dump
+*.sql
+*.sqlite
+*.sqlite3
+.rake_opts
+.rvmrc
+*.orig
+.rid
+.profile.d/
+vendor/bundle/
+.bundle/
+.rbenv-vars
+*.gem
+*.rbc
+capybara-*.html
+.rake_opts
+.rid
+log/*
+nbproject/
+profile
+tmtmp/
+.rvmrc
+*.orig
+REVISION
+TAG
+config/database.yml
+db/schema.rb
+db/seeds.rb
+db/structure.sql
+db/data.sql
+public/system/
+coverage/
+spec/reports/
+spec/examples.txt
+test/tmp/
+test/version_tmp/
+tmp/
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.snyk
+.nyc_output
+.nyc_output/
+coverage/
+.nyc_output
+.nyc_output/
+.tap
+.tap/
+.test
+.test/
+test-report.xml
+test-results.xml
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.snyk
+.nyc_output
+.nyc_output/
+coverage/
+.nyc_output
+.nyc_output/
+.tap
+.tap/
+.test
+.test/
+test-report.xml
+test-results.xml
+
+# Java
+*.class
+*.jar
+*.war
+*.ear
+*.nar
+hs_err_pid*
+replay_pid*
+
+# Gradle
+.gradle/
+build/
+
+# Maven
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.nextUpdate
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+bin/
+
+# Scala
+*.class
+*.jar
+*.war
+*.ear
+*.nar
+.hs_err_pid*
+replay_pid*
+lib_managed/
+src_managed/
+target/
+boot.properties
+project/boot.properties
+project/target/
+project/project/target/
+*.sbt
+.sbt/
+.sbt.boot/
+.sbt.ivy/
+.ivy2/
+.scala_dependencies
+.scala_history
+.history
+.libs/
+.libs
+project/.sbtirridoc
+project/.sbtirridoc/
+project/.sbtirridoc/*
+project/.sbtirridoc/*/*
+project/.sbtirridoc/*/*/*
+project/.sbtirridoc/*/*/*/*
+project/.sbtirridoc/*/*/*/*/*
+project/.sbtirridoc/*/*/*/*/*/*
+project/.sbtirridoc/*/*/*/*/*/*/*
+project/.sbtirridoc/*/*/*/*/*/*/*/*
+project/.sbtirridoc/*/*/*/*/*/*/*/*/*
+project/.sbtirridoc/*/*/*/*/*/*/*/*/*
+project/.sbtirridoc/*/*/*/*/*/*/*/*/*
+project/.sbtirridoc/*/*/*/*/*/*/*/*/*
+project/.sbtirridoc/*/*/*/*/*/*/*/*/*
+project/.sbtirridoc/*/*/*/*/*/*/*/*/*
+project/.sbtirridoc/*/*/*/*/*/*/*/*/*
+project/.sbtirridoc/*/*/*/*/*/*/*/*/*
+project/.sbtirridoc/*/*/*/*/*/*/*/*/*
+project/.sbtirridoc/*/*/*/*/*/*/*/*/*
+project/.sbtirridoc/*/*/*/*/*/*/*/*/*
+project/.sbtirridoc/*/*/*/*/*/*/*/*/*
+project/.sbtirridoc/*/*/*/*/*/*/*/*/*
+project/.sbtirridoc/*/*/*/*/*/*/*/*/*
+project/.sbtirridoc/*/*/*/*/*/*/*/*/*
+project/.sbtirridoc/*/*/*/*/*/*/*/*/*
+project/.sbtirridoc/*/*/*/*/*/*/*/*/*
+project/.sbtirridoc/*/*/*/*/*/*/*/*/*
+project/.sbtirridoc/*/*/*/*/*/*/*/*/*
+project/.sbtirridoc/*/*/*/*/*/*/*/*/*
+project/.sbtirridoc/*/*/*/*/*/*/*/*/*
+project/.sbtirridoc/*/*/*/*/*/*/*/*/*
+project/.sbtirridoc/*/*/*/*/*/*/*/*/*
+project/.sbtirridoc/*/*/*/*/*/*/*/*/*
+project/.sbtirridoc/*/*/*/*/*/*/*/*/*
+project/.sbtirridoc/*/*/*/*/*/*/*/*/*
+project/.sbtirridoc/*/*/*/*/*/*/*/*/*
+project/.sbtirridoc/*/*/*/*/*/*/*/*/*
+project/.sbtirridoc/*/*/*/*/*/*/*/*/*
+project/.sbtirridoc/*/*/*/*/*/*/*/*/*
+project/.sbtirridoc/*/*/*/*/*/*/*/*/*
+project/.sbtirridoc/*....../*/*/*/*/*/*/*/*/*
+project/.sbtirridoc/*....../*/*/*/*/*/*/*/*/*/*
+project/.sbtirridoc/*....../*/*/*/*/*/*/*/*/*/*/*
+project/.sbtirridoc/*....../*/*/*/*/*/*/*/*/*/*/*/*
+project/.sbtirridoc/*....../*/*/*/*/*/*/*/*/*/*/*/*/*
+project/.sbtirridoc/*....../*/*/*/*/*/*/*/*/*/*/*/*/*/*
+project/.sbtirridoc/*....../*/*/*/*/*/*/*/*/*/*/*/*/*/*
+project/.sbtirridoc/*....../*/*/*/*/*/*/*/*/*/*/*/*/*/*
+project/.sbtirridoc/*....../*/*/*/*/*/*/*/*/*/*/*/*/*/*
+project/.sbtirridoc/*....../*/*/*/*/*/*/*/*/*/*/*/*/*/*
+project/.sbtirridoc/*....../*/*/*/*/*/*/*/*/*/*/*/*/*/*
+project/.sbtirridoc/*....../*/*/*/*/*/*/*/*/*/*/*/*/*/*
+project/.sbtirridoc/*....../*/*/*/*/*/*/*/*/*/*/*/*/*/*
+project/.sbtirridoc/*....../*/*/*/*/*/*/*/*/*/*/*/*/*/*
+project/.sbtirridoc/*....../*/*/*/*/*/*/*/*/*/*/*/*/*/*
+project/.sbtirridoc/*....../*/*/*/*/*/*/*/*/*/*/*/*/*/*
+project/.sbtirridoc/*....../*/*/*/*/*/*/*/*/*/*/*/*/*/*
+project/.sbtirridoc/*....../*/*/*/*/*/*/*/*/*/*/*/*/*/*
+project/.sbtirridoc/*....../*/*/*/*/*/*/*/*/*/*/*/*/*/*
+project/.sbtirridoc/*....../*/*/*/*/*/*/*/*/*/*/*/*/*/*
+project/.sbtirridoc/*....../*/*/*/*/*/*/*/*/*/*/*/*/*/*
+project/.sbtirridoc/*....../*/*/*/*/*/*/*/*/*/*/*/*/*/*
+project/.sbtirridoc/*....../*/*/*/*/*/*/*/*/*/*/*/*/*/*
+project/.sbtirridoc/*....../*/*/*/*/*/*/*/*/*/*/*/*/*/*
+project/.sbtirridoc/*....../*/*/*/*/*/*/*/*/*/*/*/*/*/*
+project/.sbtirridoc/*....../*/*/*/*/*/*/*/*/*/*/*/*/*/*
+project/.sbtirridoc/*....../*/*/*/*/*/*/*/*/*/*/*/*....../*/*/*/*/*/*/*/*/*
+project/.sbtirridoc/*....../*/*/*/*/*/*/*/*/*/*/*/*....../*/*/*/*/*/*/*/*/*
+project/.sbtirridoc/*....../*/*/*/*/*/*/*/*/*/*/*/*....../*/*/*/*/*/*/*/*/*
+project/.sbtirridoc/*....../*/*/*/*/*/*/*/*/*/*/*/*....../*/*/*/*/*/*/*/*/*
+project/.sbtirridoc/*....../*/*/*/*/*/*/*/*/*/*/*/*....../*/*/*/*/*/*/*/*/*
+project/.sbtirridoc/*....../*/*/*/*/*/*/*/*/*/*/*/*....../*/*/*/*/*/*/*/*/*
+project/.sbtirridoc/*....../*/*/*/*/*/*/*/*/*/*/*/*....../*/*/*/*/*/*/*/*/*
+project/.sbtirridoc/*....../*/*/*/*/*/*/*/*/*/*/*/*....../*/*/*/*/*/*/*/*/*
+project/.sbtirridoc/*....../*/*/*/*/*/*/*/*/*/*/*/*....../*/*/*/*/*/*/*/*/*
+project/.sbtirridoc/*....../*/*/*/*/*/*/*/*/*/*/*/*....../*/*/*/*/*/*/*/*/*
+project/.sbtirridoc/*....../*/*/*/*/*/*/*/*/*/*/*/*....../*/*/*/*/*/*/*/*/*
+project/.sbtirridoc/*....../*/*/*/*/*/*/*/*/*/*/*/*....../*/*/*/*/*/*/*/*/*
+project/.sbtirridoc/*....../*/*/*/*/*/*/*/*/*/*/*/*....../*/*/*/*/*/*/*/*/*
+project/.sbtirridoc/*....../*/*/*/*/*/*/*/*/*/*/*/*....../*/*/*/*/*/*/*/*/*
+project/.sbtirridoc/*....../*/*/*/*/*/*/*/*/*/*/*/*....../*/*/*/*/*/*/*/*/*
+project/.sbtirridoc/*....../*/*/*/*/*/*/*/*/*/*/*/*....../*/*/*/*/*/*/*/*/*
+project/.sbtirridoc/*....../*/*/*/*/*/*/*/*/*/*/*/*....../*/*/*/*/*/*/*/*/*
+project/.sbtirridoc/*....../*/*/*/*/*/*/*/*/*/*/*/*......

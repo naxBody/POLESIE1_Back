@@ -112,6 +112,7 @@ a[href^="tel:"]:hover, a[href^="mailto:"]:hover {
     overflow-y: auto;
     z-index: 1000;
     transition: transform var(--transition-base);
+    top: 0;
 }
 
 .sidebar-header {
@@ -242,6 +243,7 @@ a[href^="tel:"]:hover, a[href^="mailto:"]:hover {
     flex: 1;
     margin-left: 260px;
     min-height: 100vh;
+    padding-top: 70px;
 }
 
 /* Верхняя панель */
@@ -256,6 +258,7 @@ a[href^="tel:"]:hover, a[href^="mailto:"]:hover {
     top: 0;
     z-index: 100;
     box-shadow: var(--shadow-sm);
+    height: 70px;
 }
 
 .topbar-left {
@@ -263,12 +266,15 @@ a[href^="tel:"]:hover, a[href^="mailto:"]:hover {
     align-items: center;
     gap: 20px;
     flex: 1;
+    min-width: 0;
+    overflow: hidden;
 }
 
 .topbar-title-wrapper {
     display: flex;
     align-items: center;
     gap: 12px;
+    flex-shrink: 0;
 }
 
 .topbar-breadcrumb-wrapper {
@@ -277,6 +283,9 @@ a[href^="tel:"]:hover, a[href^="mailto:"]:hover {
     margin-left: 20px;
     padding-left: 20px;
     border-left: 1px solid var(--border-color);
+    max-width: calc(100% - 300px);
+    overflow: hidden;
+    flex-shrink: 1;
 }
 
 .topbar-icon {
@@ -284,6 +293,7 @@ a[href^="tel:"]:hover, a[href^="mailto:"]:hover {
     align-items: center;
     justify-content: center;
     color: var(--primary-color);
+    flex-shrink: 0;
 }
 
 .topbar-title {
@@ -291,6 +301,9 @@ a[href^="tel:"]:hover, a[href^="mailto:"]:hover {
     font-weight: 600;
     color: var(--text-primary);
     letter-spacing: -0.3px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .topbar-breadcrumb {
@@ -299,6 +312,9 @@ a[href^="tel:"]:hover, a[href^="mailto:"]:hover {
     gap: 8px;
     font-size: 13px;
     color: var(--text-secondary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .topbar-breadcrumb a {

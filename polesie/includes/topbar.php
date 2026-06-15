@@ -18,10 +18,12 @@
             </div>
             <h1 class="topbar-title"><?= e($pageTitle) ?></h1>
         </div>
-        <div class="topbar-breadcrumb">
-            <a href="<?= pageUrl('index.php') ?>">Главная</a>
-            <span class="topbar-breadcrumb-separator">/</span>
-            <span><?= e($pageTitle) ?></span>
+        <div class="topbar-breadcrumb-wrapper">
+            <div class="topbar-breadcrumb">
+                <a href="<?= pageUrl('index.php') ?>">Главная</a>
+                <span class="topbar-breadcrumb-separator">/</span>
+                <span><?= e($pageTitle) ?></span>
+            </div>
         </div>
     </div>
     

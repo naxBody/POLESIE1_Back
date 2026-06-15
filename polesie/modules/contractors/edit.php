@@ -109,8 +109,13 @@ require_once BASE_PATH . '/includes/topbar.php';
 <link rel="stylesheet" href="<?= asset('assets/css/style.css') ?>">
 
 <style>
+.contractor-edit-container {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
 .form-container {
-    max-width: 800px;
+    width: 100%;
 }
 
 .form-grid {
@@ -139,6 +144,7 @@ require_once BASE_PATH . '/includes/topbar.php';
     font-size: 14px;
     background: var(--bg-primary);
     transition: all var(--transition-fast);
+    box-sizing: border-box;
 }
 
 .form-control:focus {
@@ -198,29 +204,30 @@ select.form-control {
 </style>
 
 <div class="main-content">
-    <div class="page-header">
-        <div class="page-header-title">
-            <h2>
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 8px;">
-                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                </svg>
-                Редактирование контрагента
-            </h2>
-            <p>Изменение данных контрагента</p>
+    <div class="contractor-edit-container">
+        <div class="page-header">
+            <div class="page-header-title">
+                <h2>
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 8px;">
+                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                    </svg>
+                    Редактирование контрагента
+                </h2>
+                <p>Изменение данных контрагента</p>
+            </div>
+            <div class="page-header-actions">
+                <a href="list.php" class="btn btn-outline">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px;">
+                        <line x1="19" y1="12" x2="5" y2="12"></line>
+                        <polyline points="12 19 5 12 12 5"></polyline>
+                    </svg>
+                    Назад к списку
+                </a>
+            </div>
         </div>
-        <div class="page-header-actions">
-            <a href="list.php" class="btn btn-outline">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px;">
-                    <line x1="19" y1="12" x2="5" y2="12"></line>
-                    <polyline points="12 19 5 12 12 5"></polyline>
-                </svg>
-                Назад к списку
-            </a>
-        </div>
-    </div>
 
-    <div class="card form-container">
+        <div class="card form-container">
         <div class="card-body">
             <?php if ($success): ?>
                 <div class="alert alert-success">
@@ -297,6 +304,7 @@ select.form-control {
                     <a href="list.php" class="btn btn-secondary">Отмена</a>
                 </div>
             </form>
+        </div>
         </div>
     </div>
 </div>

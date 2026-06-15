@@ -787,6 +787,12 @@ $pageTitle = 'Новый заказ';
                 document.getElementById('customerContact').value = selectedOption.dataset.contact || '';
                 document.getElementById('customerPhone').value = selectedOption.dataset.phone || '';
                 document.getElementById('customerEmail').value = selectedOption.dataset.email || '';
+                
+                // Автозаполнение адреса доставки
+                const deliveryAddressField = document.querySelector('[name="delivery_address"]');
+                if (deliveryAddressField && !deliveryAddressField.value.trim()) {
+                    deliveryAddressField.value = selectedOption.dataset.address || '';
+                }
             } else {
                 // Очистка полей
                 document.getElementById('customerName').value = '';

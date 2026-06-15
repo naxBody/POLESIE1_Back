@@ -39,6 +39,12 @@ require_once BASE_PATH . '/includes/topbar.php';
 
 <style>
 /* Contractor Detail Page - Simple Table Layout */
+.contractor-detail-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
 .contractor-detail-header {
     display: flex;
     align-items: center;
@@ -245,8 +251,9 @@ require_once BASE_PATH . '/includes/topbar.php';
 </style>
 
 <div class="main-content">
-    <!-- Header -->
-    <div class="contractor-detail-header">
+    <div class="contractor-detail-container">
+        <!-- Header -->
+        <div class="contractor-detail-header">
         <div class="contractor-title">
             <h2><?= e($contractor['name']) ?></h2>
             <?php if ($contractor['type'] === 'customer'): ?>
@@ -456,6 +463,7 @@ require_once BASE_PATH . '/includes/topbar.php';
             <?php endif; ?>
         </tbody>
     </table>
+    </div>
 </div>
 
 <script src="<?= asset('assets/js/main.js') ?>"></script>

@@ -1,6 +1,15 @@
 <!-- Верхняя панель -->
 <div class="topbar">
     <div class="topbar-left">
+        <?php if (isset($showBreadcrumb) && $showBreadcrumb): ?>
+        <div class="topbar-breadcrumb-wrapper">
+            <div class="topbar-breadcrumb">
+                <a href="<?= pageUrl('index.php') ?>">Главная</a>
+                <span class="topbar-breadcrumb-separator">/</span>
+                <span><?= e($pageTitle) ?></span>
+            </div>
+        </div>
+        <?php else: ?>
         <div class="topbar-title-wrapper">
             <div class="topbar-icon">
                 <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" width="30" height="30">
@@ -17,14 +26,6 @@
                 </svg>
             </div>
             <h1 class="topbar-title"><?= e($pageTitle) ?></h1>
-        </div>
-        <?php if (isset($showBreadcrumb) && $showBreadcrumb): ?>
-        <div class="topbar-breadcrumb-wrapper">
-            <div class="topbar-breadcrumb">
-                <a href="<?= pageUrl('index.php') ?>">Главная</a>
-                <span class="topbar-breadcrumb-separator">/</span>
-                <span><?= e($pageTitle) ?></span>
-            </div>
         </div>
         <?php endif; ?>
     </div>

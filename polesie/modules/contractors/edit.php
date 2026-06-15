@@ -112,12 +112,13 @@ require_once BASE_PATH . '/includes/topbar.php';
 .contractor-edit-container {
     max-width: 100%;
     margin: 0;
-    padding: 0;
+    padding: 24px;
 }
 
 .form-container {
     width: 100%;
     max-width: none;
+    margin: 0;
 }
 
 .form-grid {

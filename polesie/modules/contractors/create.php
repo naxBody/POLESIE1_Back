@@ -112,13 +112,15 @@ require_once BASE_PATH . '/includes/topbar.php';
 
 <style>
 .form-container {
-    max-width: 800px;
+    width: 100%;
+    max-width: none;
 }
 
 .form-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 20px;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 24px;
+    padding: 24px;
 }
 
 .form-group-full {
@@ -141,6 +143,7 @@ require_once BASE_PATH . '/includes/topbar.php';
     font-size: 14px;
     background: var(--bg-primary);
     transition: all var(--transition-fast);
+    box-sizing: border-box;
 }
 
 .form-control:focus {
@@ -162,8 +165,9 @@ select.form-control {
     display: flex;
     gap: 12px;
     margin-top: 24px;
-    padding-top: 24px;
+    padding: 24px;
     border-top: 1px solid var(--border-color);
+    background: var(--bg-secondary);
 }
 
 .alert {
@@ -193,6 +197,12 @@ select.form-control {
 @media (max-width: 768px) {
     .form-grid {
         grid-template-columns: 1fr;
+        padding: 16px;
+    }
+    
+    .form-actions {
+        padding: 16px;
+        flex-direction: column;
     }
 }
 </style>

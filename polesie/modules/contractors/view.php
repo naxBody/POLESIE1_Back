@@ -43,7 +43,35 @@ require_once BASE_PATH . '/includes/topbar.php';
     width: 100%;
     max-width: none;
     margin: 0;
-    padding: 0 24px 24px 24px;
+    padding: 24px 24px 24px 24px;
+}
+
+.contractor-breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin-bottom: 16px;
+}
+
+.contractor-breadcrumb a {
+    color: var(--text-secondary);
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.contractor-breadcrumb a:hover {
+    color: var(--primary-color);
+}
+
+.contractor-breadcrumb-separator {
+    color: var(--gray-400);
+}
+
+.contractor-breadcrumb-current {
+    color: var(--text-primary);
+    font-weight: 500;
 }
 
 .contractor-detail-header {
@@ -254,6 +282,15 @@ require_once BASE_PATH . '/includes/topbar.php';
 
 <div class="main-content">
     <div class="contractor-detail-container">
+        <!-- Breadcrumb -->
+        <nav class="contractor-breadcrumb">
+            <a href="<?= pageUrl('index.php') ?>">Главная</a>
+            <span class="contractor-breadcrumb-separator">/</span>
+            <a href="<?= pageUrl('modules/contractors/list.php') ?>">Контрагенты</a>
+            <span class="contractor-breadcrumb-separator">/</span>
+            <span class="contractor-breadcrumb-current"><?= e($contractor['name']) ?></span>
+        </nav>
+        
         <!-- Header -->
         <div class="card contractor-detail-header" style="margin: 0; border-radius: var(--border-radius-lg); box-shadow: var(--shadow);">
         <div class="contractor-title">

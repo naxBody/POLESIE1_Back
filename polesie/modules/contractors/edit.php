@@ -110,18 +110,21 @@ require_once BASE_PATH . '/includes/topbar.php';
 
 <style>
 .contractor-edit-container {
-    max-width: 900px;
-    margin: 0 auto;
+    max-width: 100%;
+    margin: 0;
+    padding: 0;
 }
 
 .form-container {
     width: 100%;
+    max-width: none;
 }
 
 .form-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 20px;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 24px;
+    padding: 24px;
 }
 
 .form-group-full {
@@ -149,10 +152,10 @@ require_once BASE_PATH . '/includes/topbar.php';
 
 .form-control:focus {
     outline: none !important;
-    border-color: var(--border-color) !important;
-    box-shadow: none !important;
-    -webkit-box-shadow: none !important;
-    -moz-box-shadow: none !important;
+    border-color: var(--primary-color) !important;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1) !important;
+    -webkit-box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1) !important;
+    -moz-box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1) !important;
 }
 
 textarea.form-control {
@@ -168,8 +171,9 @@ select.form-control {
     display: flex;
     gap: 12px;
     margin-top: 24px;
-    padding-top: 24px;
+    padding: 24px;
     border-top: 1px solid var(--border-color);
+    background: var(--bg-secondary);
 }
 
 .alert {
@@ -199,6 +203,12 @@ select.form-control {
 @media (max-width: 768px) {
     .form-grid {
         grid-template-columns: 1fr;
+        padding: 16px;
+    }
+    
+    .form-actions {
+        padding: 16px;
+        flex-direction: column;
     }
 }
 </style>

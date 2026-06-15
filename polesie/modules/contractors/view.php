@@ -40,9 +40,10 @@ require_once BASE_PATH . '/includes/topbar.php';
 <style>
 /* Contractor Detail Page - Simple Table Layout */
 .contractor-detail-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    padding: 0;
 }
 
 .contractor-detail-header {
@@ -52,6 +53,7 @@ require_once BASE_PATH . '/includes/topbar.php';
     margin-bottom: 20px;
     padding-bottom: 15px;
     border-bottom: 2px solid var(--border-color);
+    padding: 24px;
 }
 
 .contractor-title h2 {
@@ -131,11 +133,12 @@ require_once BASE_PATH . '/includes/topbar.php';
     border-radius: 8px;
     overflow: hidden;
     box-shadow: var(--shadow-sm);
+    margin-bottom: 24px;
 }
 
 .contractor-table th {
     background: var(--gray-100);
-    padding: 14px 20px;
+    padding: 16px 24px;
     text-align: left;
     font-size: 14px;
     font-weight: 700;
@@ -146,7 +149,7 @@ require_once BASE_PATH . '/includes/topbar.php';
 }
 
 .contractor-table td {
-    padding: 12px 20px;
+    padding: 14px 24px;
     vertical-align: top;
     border-bottom: 1px solid var(--border-color);
     font-size: 14px;
@@ -253,7 +256,7 @@ require_once BASE_PATH . '/includes/topbar.php';
 <div class="main-content">
     <div class="contractor-detail-container">
         <!-- Header -->
-        <div class="contractor-detail-header">
+        <div class="card contractor-detail-header" style="margin: 0; border-radius: 0; box-shadow: none; border-bottom: 1px solid var(--border-color);">
         <div class="contractor-title">
             <h2><?= e($contractor['name']) ?></h2>
             <?php if ($contractor['type'] === 'customer'): ?>
@@ -286,7 +289,8 @@ require_once BASE_PATH . '/includes/topbar.php';
     </div>
 
     <!-- Main Table -->
-    <table class="contractor-table">
+    <div class="card" style="margin: 24px; border-radius: var(--border-radius-lg);">
+    <table class="contractor-table" style="margin: 0;">
         <thead>
             <tr>
                 <th colspan="2">Информация о контрагенте</th>
@@ -463,6 +467,7 @@ require_once BASE_PATH . '/includes/topbar.php';
             <?php endif; ?>
         </tbody>
     </table>
+    </div>
     </div>
 </div>
 

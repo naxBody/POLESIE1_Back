@@ -111,9 +111,16 @@ require_once BASE_PATH . '/includes/topbar.php';
 <link rel="stylesheet" href="<?= asset('assets/css/style.css') ?>">
 
 <style>
+.contractor-create-container {
+    max-width: 100%;
+    margin: 0;
+    padding: 24px;
+}
+
 .form-container {
     width: 100%;
     max-width: none;
+    margin: 0;
 }
 
 .form-grid {
@@ -208,7 +215,8 @@ select.form-control {
 </style>
 
 <div class="main-content">
-    <div class="page-header">
+    <div class="contractor-create-container">
+        <div class="page-header">
         <div class="page-header-title">
             <h2>
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 8px;">
@@ -309,6 +317,7 @@ select.form-control {
                 </div>
             </form>
         </div>
+    </div>
     </div>
 </div>
 

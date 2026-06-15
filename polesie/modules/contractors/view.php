@@ -43,7 +43,7 @@ require_once BASE_PATH . '/includes/topbar.php';
     width: 100%;
     max-width: none;
     margin: 0;
-    padding: 0;
+    padding: 24px;
 }
 
 .contractor-detail-header {
@@ -53,7 +53,9 @@ require_once BASE_PATH . '/includes/topbar.php';
     margin-bottom: 20px;
     padding-bottom: 15px;
     border-bottom: 2px solid var(--border-color);
-    padding: 24px;
+    padding-left: 0;
+    padding-right: 0;
+    padding-top: 0;
 }
 
 .contractor-title h2 {
@@ -256,7 +258,7 @@ require_once BASE_PATH . '/includes/topbar.php';
 <div class="main-content">
     <div class="contractor-detail-container">
         <!-- Header -->
-        <div class="card contractor-detail-header" style="margin: 0; border-radius: 0; box-shadow: none; border-bottom: 1px solid var(--border-color);">
+        <div class="card contractor-detail-header" style="margin: 0; margin-bottom: 24px; border-radius: var(--border-radius-lg); box-shadow: var(--shadow);">
         <div class="contractor-title">
             <h2><?= e($contractor['name']) ?></h2>
             <?php if ($contractor['type'] === 'customer'): ?>
@@ -289,7 +291,7 @@ require_once BASE_PATH . '/includes/topbar.php';
     </div>
 
     <!-- Main Table -->
-    <div class="card" style="margin: 24px; border-radius: var(--border-radius-lg);">
+    <div class="card" style="margin: 0; border-radius: var(--border-radius-lg); box-shadow: var(--shadow);">
     <table class="contractor-table" style="margin: 0;">
         <thead>
             <tr>
@@ -467,6 +469,7 @@ require_once BASE_PATH . '/includes/topbar.php';
             <?php endif; ?>
         </tbody>
     </table>
+    </div>
     </div>
     </div>
 </div>

@@ -1,1 +1,1 @@
-Nothing needs to be added to the .gitignore file based on the provided changes. The only modified file is a PHP source code file (`polesie/modules/orders/edit.php`), which should not be ignored. There are no build artifacts, dependency directories, temporary files, or other items that need to be added to the .gitignore.
+Nothing needs to be added to the .gitignore file based on the provided changes. The modified file 'polesie/modules/orders/edit.php' is a source code file that should not be ignored.

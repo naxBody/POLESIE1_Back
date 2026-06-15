@@ -660,6 +660,23 @@ $pageTitle = 'Редактирование заказа #' . $order['order_numbe
             }
         });
         
+
+        // Автозаполнение всех полей данными заказа при загрузке страницы
+        document.addEventListener('DOMContentLoaded', function() {
+            // Заполняем реквизиты заказчика из выбранного контрагента
+            const contractorSelect = document.getElementById('contractorSelect');
+            if (contractorSelect && contractorSelect.value) {
+                const selectedOption = contractorSelect.options[contractorSelect.selectedIndex];
+                if (selectedOption.value) {
+                    document.getElementById('customerName').value = selectedOption.dataset.name || '';
+                    document.getElementById('customerInn').value = selectedOption.dataset.inn || '';
+                    document.getElementById('customerAddress').value = selectedOption.dataset.address || '';
+                    document.getElementById('customerContact').value = selectedOption.dataset.contact || '';
+                    document.getElementById('customerPhone').value = selectedOption.dataset.phone || '';
+                    document.getElementById('customerEmail').value = selectedOption.dataset.email || '';
+                }
+            }
+        });
         function addItem() {
             const container = document.getElementById('orderItems');
             const newItem = document.createElement('div');

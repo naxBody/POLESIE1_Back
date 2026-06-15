@@ -1,4 +1,4 @@
-```
+```gitignore
 # Compiled and build artifacts
 *.pyc
 __pycache__/
@@ -12,9 +12,12 @@ target/
 .venv/
 venv/
 node_modules/
+.pip-tools/
 .mypy_cache/
 .pytest_cache/
-.gradle/
+.coverage
+coverage/
+htmlcov/
 
 # Logs and temp files
 *.log
@@ -25,22 +28,19 @@ node_modules/
 # Environment
 .env
 .env.local
-*.env.*
+.env.*
 
 # Editors
 .vscode/
 .idea/
+*.swp
+*.swo
 
-# OS generated files
+# OS specific
 .DS_Store
 Thumbs.db
 
-# Coverage reports
-coverage/
-htmlcov/
-.coverage
-
-# Compressed files
+# Compression
 *.zip
 *.gz
 *.tar

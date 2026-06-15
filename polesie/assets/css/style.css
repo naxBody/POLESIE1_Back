@@ -275,23 +275,24 @@ a[href^="tel:"]:hover, a[href^="mailto:"]:hover {
     max-width: calc(100% - 200px);
 }
 
+.topbar-breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    color: var(--text-secondary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
+    flex-shrink: 1;
+}
+
 .topbar-title-wrapper {
     display: flex;
     align-items: center;
     gap: 12px;
     flex-shrink: 0;
-}
-
-.topbar-breadcrumb-wrapper {
-    display: flex;
-    align-items: center;
-    margin-left: 20px;
-    padding-left: 20px;
-    border-left: 1px solid var(--border-color);
-    overflow: hidden;
-    flex-shrink: 1;
-    min-width: 0;
-    max-width: 60%;
 }
 
 .topbar-icon {
@@ -312,27 +313,21 @@ a[href^="tel:"]:hover, a[href^="mailto:"]:hover {
     text-overflow: ellipsis;
 }
 
-.topbar-breadcrumb {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 13px;
-    color: var(--text-secondary);
-    white-space: nowrap;
-    overflow: visible;
-    text-overflow: clip;
-    min-width: 0;
-    flex-shrink: 1;
-}
-
 .topbar-breadcrumb a {
     color: var(--text-secondary);
+    text-decoration: none;
     white-space: nowrap;
+    transition: color 0.2s;
+}
+
+.topbar-breadcrumb a:hover {
+    color: var(--primary-color);
 }
 
 .topbar-breadcrumb-separator {
     color: var(--gray-400);
     flex-shrink: 0;
+    margin: 0 4px;
 }
 
 .topbar-right {

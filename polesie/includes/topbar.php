@@ -2,12 +2,10 @@
 <div class="topbar">
     <div class="topbar-left">
         <?php if (isset($showBreadcrumb) && $showBreadcrumb): ?>
-        <div class="topbar-breadcrumb-wrapper">
-            <div class="topbar-breadcrumb">
-                <a href="<?= pageUrl('index.php') ?>">Главная</a>
-                <span class="topbar-breadcrumb-separator">/</span>
-                <span><?= e($pageTitle) ?></span>
-            </div>
+        <div class="topbar-breadcrumb">
+            <a href="<?= pageUrl('index.php') ?>">Главная</a>
+            <span class="topbar-breadcrumb-separator">/</span>
+            <span><?= e($pageTitle) ?></span>
         </div>
         <?php else: ?>
         <div class="topbar-title-wrapper">

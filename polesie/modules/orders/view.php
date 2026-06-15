@@ -93,11 +93,6 @@ $stmt = $pdo->prepare($tasksSql);
 $stmt->execute([$orderId]);
 $tasks = $stmt->fetchAll();
 
-// Статистика по заказу
-$totalItems = count($items);
-$totalQuantity = array_sum(array_column($items, 'quantity'));
-$totalAmount = $order['total_amount'];
-
 $pageTitle = 'Заказ №' . e($order['order_number']);
 ?>
 <!DOCTYPE html>
@@ -179,29 +174,6 @@ $pageTitle = 'Заказ №' . e($order['order_number']);
         .info-value {
             font-weight: 500;
         }
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 16px;
-            margin-bottom: 24px;
-        }
-        .stat-card {
-            background: white;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-            text-align: center;
-        }
-        .stat-value {
-            font-size: 28px;
-            font-weight: 700;
-            color: var(--primary-color);
-            margin-bottom: 4px;
-        }
-        .stat-label {
-            font-size: 13px;
-            color: var(--text-secondary);
-        }
         .section-title {
             font-size: 20px;
             font-weight: 600;
@@ -271,30 +243,6 @@ $pageTitle = 'Заказ №' . e($order['order_number']);
                             <div class="meta-label">Ответственный</div>
                             <div class="meta-value"><?= e($order['responsible_name'] ?? '—') ?></div>
                         </div>
-                        <div class="meta-item">
-                            <div class="meta-label">Позиций</div>
-                            <div class="meta-value"><?= $totalItems ?> шт.</div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Статистика -->
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-value"><?= $totalItems ?></div>
-                        <div class="stat-label">Позиций в заказе</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value"><?= number_format($totalQuantity, 0, ',', ' ') ?></div>
-                        <div class="stat-label">Общее количество</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value"><?= count($tasks) ?></div>
-                        <div class="stat-label">Производственных заданий</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value"><?= formatMoney($totalAmount) ?></div>
-                        <div class="stat-label">Общая сумма</div>
                     </div>
                 </div>
                 
@@ -411,7 +359,7 @@ $pageTitle = 'Заказ №' . e($order['order_number']);
                                 <tfoot style="background: #f8f9fa; font-weight: 600;">
                                     <tr>
                                         <td colspan="6" style="text-align: right; padding: 12px;">Итого:</td>
-                                        <td style="text-align: right; padding: 12px; color: var(--primary-color);"><?= formatMoney($totalAmount) ?></td>
+                                        <td style="text-align: right; padding: 12px; color: var(--primary-color);"><?= formatMoney($order['total_amount']) ?></td>
                                     </tr>
                                 </tfoot>
                             </table>

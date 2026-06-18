@@ -245,7 +245,7 @@ $pageTitle = 'Новый заказ';
                                         $users = $pdo->query("SELECT u.id, u.full_name 
                                                              FROM users u 
                                                              JOIN user_roles r ON u.role_id = r.id 
-                                                             WHERE u.is_active = TRUE AND r.code = 'manager' 
+                                                             WHERE u.is_active = TRUE AND r.code IN ('sales_manager', 'manager') 
                                                              ORDER BY u.full_name")->fetchAll();
                                         foreach ($users as $u):
                                         ?>

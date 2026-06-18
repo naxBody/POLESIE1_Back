@@ -279,7 +279,11 @@ $pageTitle = 'Редактирование заказа #' . $order['order_numbe
                                         <select name="responsible_user_id" class="form-control" style="font-size: 14px;">
                                             <option value="">Не назначен</option>
                                             <?php
-                                            $users = $pdo->query("SELECT id, full_name FROM users WHERE is_active = TRUE ORDER BY full_name")->fetchAll();
+                                            $users = $pdo->query("SELECT u.id, u.full_name 
+                                                                 FROM users u 
+                                                                 JOIN user_roles r ON u.role_id = r.id 
+                                                                 WHERE u.is_active = TRUE AND r.code = 'manager' 
+                                                                 ORDER BY u.full_name")->fetchAll();
                                             foreach ($users as $u):
                                             ?>
                                             <option value="<?= $u['id'] ?>" <?= ($order['responsible_user_id'] == $u['id']) ? 'selected' : '' ?>>

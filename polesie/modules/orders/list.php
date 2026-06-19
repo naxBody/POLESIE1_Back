@@ -196,34 +196,6 @@ $stmt = $pdo->prepare("SELECT SUM(total_amount) FROM orders WHERE status IN ('ne
 $stmt->execute();
 $activeOrdersAmount = $stmt->fetchColumn() ?? 0;
 
-// Последние 5 активных заказов для быстрого доступа
-$stmt = $pdo->prepare("
-    SELECT o.*, c.name as contractor_name, 
-           CASE o.status
-               WHEN 'new' THEN 'Новый'
-               WHEN 'processing' THEN 'В работе'
-               WHEN 'ready' THEN 'Готов'
-               WHEN 'shipped' THEN 'Отгружен'
-               WHEN 'cancelled' THEN 'Отменен'
-               ELSE o.status
-           END as status_name,
-           CASE o.status
-               WHEN 'new' THEN '#3498db'
-               WHEN 'processing' THEN '#f39c12'
-               WHEN 'ready' THEN '#27ae60'
-               WHEN 'shipped' THEN '#9b59b6'
-               WHEN 'cancelled' THEN '#e74c3c'
-               ELSE '#95a5a6'
-           END as status_color
-    FROM orders o
-    JOIN contractors c ON o.customer_id = c.id
-    WHERE o.status IN ('new', 'processing', 'ready')
-    ORDER BY o.created_at DESC
-    LIMIT 5
-");
-$stmt->execute();
-$recentActiveOrders = $stmt->fetchAll();
-
 // Распределение по статусам для прогресс-баров
 $totalAllOrders = array_sum($statusCounts);
 $statusPercentages = [];
@@ -418,67 +390,6 @@ $pageTitle = 'Заказы';
                         </div>
                     </div>
                 </div>
-
-                <!-- Последние активные заказы -->
-                <?php if (!empty($recentActiveOrders)): ?>
-                <div class="card" style="margin-bottom: 24px;">
-                    <div class="card-body" style="padding: 20px;">
-                        <h3 style="font-size: 16px; font-weight: 600; margin: 0 0 16px 0; color: var(--text-primary);">Последние активные заказы</h3>
-                        <div style="overflow-x: auto;">
-                            <table style="width: 100%; border-collapse: collapse;">
-                                <thead>
-                                    <tr style="border-bottom: 2px solid var(--border-color);">
-                                        <th style="text-align: left; padding: 12px 16px; font-size: 12px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px;">№ заказа</th>
-                                        <th style="text-align: left; padding: 12px 16px; font-size: 12px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px;">Контрагент</th>
-                                        <th style="text-align: left; padding: 12px 16px; font-size: 12px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px;">Дата</th>
-                                        <th style="text-align: left; padding: 12px 16px; font-size: 12px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px;">Статус</th>
-                                        <th style="text-align: right; padding: 12px 16px; font-size: 12px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px;">Действие</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <?php foreach ($recentActiveOrders as $order): ?>
-                                    <tr style="border-bottom: 1px solid var(--border-color); transition: background 0.2s;">
-                                        <td style="padding: 12px 16px; font-size: 14px; font-weight: 500; color: var(--text-primary);">
-                                            <?= e($order['order_number']) ?>
-                                        </td>
-                                        <td style="padding: 12px 16px; font-size: 14px; color: var(--text-secondary);">
-                                            <?= e($order['contractor_name']) ?>
-                                        </td>
-                                        <td style="padding: 12px 16px; font-size: 14px; color: var(--text-secondary);">
-                                            <?= date('d.m.Y', strtotime($order['order_date'])) ?>
-                                        </td>
-                                        <td style="padding: 12px 16px;">
-                                            <span style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 6px; font-size: 13px; font-weight: 500; background: <?= $order['status_color'] ?>20; color: <?= $order['status_color'] ?>;">
-                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                    <?php if ($order['status'] === 'new'): ?>
-                                                        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
-                                                        <path d="M12 6V12L16 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                                                    <?php elseif ($order['status'] === 'processing'): ?>
-                                                        <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/>
-                                                        <path d="M12 1V3M12 21V23M23 12H21M3 12H1" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                                                    <?php else: ?>
-                                                        <path d="M20 6L9 17L4 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                                    <?php endif; ?>
-                                                </svg>
-                                                <?= e($order['status_name']) ?>
-                                            </span>
-                                        </td>
-                                        <td style="padding: 12px 16px; text-align: right;">
-                                            <a href="<?= pageUrl('modules/orders/view.php?id=' . $order['id']) ?>" class="btn-icon" style="width: 32px; height: 32px;" title="Просмотр">
-                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                    <path d="M1 12S5 4 12 4S23 12 23 12S19 20 12 20S1 12 1 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                                    <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/>
-                                                </svg>
-                                            </a>
-                                        </td>
-                                    </tr>
-                                    <?php endforeach; ?>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-                <?php endif; ?>
                 
                 <!-- Фильтры -->
                 <div class="card" style="margin-bottom: 24px;">

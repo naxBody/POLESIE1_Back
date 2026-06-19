@@ -798,7 +798,7 @@ $pageTitle = 'Заказ №' . e($order['order_number']);
                         Назад к списку
                     </a>
                     <a href="print_order.php?id=<?= $order['id'] ?>" target="_blank" class="btn btn-success">
-                        <i class="bi bi-file-earmark-arrow-down" style="margin-right: 6px;"></i>
+                        <i class="bi bi-file-earmark-arrow-down-fill" style="margin-right: 6px;"></i>
                         Экспорт
                     </a>
                     <a href="../production/execute.php?order_id=<?= $order['id'] ?>" class="btn btn-success">

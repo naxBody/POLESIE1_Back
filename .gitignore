@@ -1,1 +1,1 @@
-Nothing should be ignored based on the provided file changes, as they only include source PHP files without any build artifacts, dependencies, or temporary files.
+Nothing should be ignored based on the provided file changes. The modification of 'polesie/modules/orders/print_order.php' is a source code file and does not require any .gitignore entries.

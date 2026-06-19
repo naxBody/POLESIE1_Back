@@ -438,22 +438,46 @@ $deliveryDateDisplay = !empty($order['delivery_date']) ? date('d.m.Y', strtotime
     <div class="control-panel">
         <button class="btn btn-secondary" onclick="window.close()">Закрыть</button>
         <button class="btn btn-secondary" onclick="window.history.back()">← Назад</button>
-        <button class="btn btn-success" onclick="downloadAsPDF()">
-            <i class="bi bi-file-earmark-pdf" style="margin-right: 6px;"></i>
+        <button class="btn btn-info" onclick="downloadPDF()">
+            <i class="bi bi-file-earmark-pdf-fill" style="margin-right: 6px;"></i>
             Скачать PDF
         </button>
+        <button class="btn btn-success" onclick="printDocument()">
+            <i class="bi bi-printer-fill" style="margin-right: 6px;"></i>
+            Печать
+        </button>
     </div>
-    
+
+    <!-- Подключаем библиотеку html2pdf -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
     <script>
-        // Функция для скачивания в формате PDF через печать
-        function downloadAsPDF() {
+        // Функция для скачивания документа в формате PDF с сохранением разметки
+        function downloadPDF() {
+            const element = document.querySelector('.document-container');
+            const orderNumber = '<?= htmlspecialchars($order['order_number']) ?>';
+
+            const opt = {
+                margin:       [10, 10, 10, 10], // отступы: верх, лево, низ, право (в мм)
+                filename:     `Zakaz_${orderNumber}.pdf`,
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2, useCORS: true },
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+
+            // Генерируем PDF и скачиваем
+            html2pdf().set(opt).from(element).save();
+        }
+
+        // Функция для печати документа
+        function printDocument() {
             window.print();
         }
-        
+
         // Автоматическая подсказка при загрузке страницы
         window.addEventListener('DOMContentLoaded', function() {
             setTimeout(() => {
-                alert('Документ готов к экспорту!\n\nНажмите "Скачать PDF" и выберите "Сохранить как PDF" в диалоге печати браузера.\n\nФайл будет сохранён с полной разметкой документа.');
+                alert('Документ готов к экспорту!\n\n• Нажмите "Скачать PDF" чтобы сохранить файл с полной разметкой.\n• Или нажмите "Печать" для быстрой печати.');
             }, 500);
         });
     </script>

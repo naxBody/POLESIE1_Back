@@ -723,7 +723,7 @@ $pageTitle = 'Заказ №' . e($order['order_number']);
                                     <?php if (!empty($productMaterials)): ?>
                                     <tr class="material-row" data-product-index="<?= $productIdx ?>" style="display: none;">
                                         <td colspan="6" style="background: #fff3e0; font-weight: 600; color: #ef6c00; text-align: center; padding: 12px;">
-                                            📦 Материалы для: <?= e($product['product_name']) ?> (<?= rtrim(rtrim(number_format($product['quantity'], 0, ',', ' '), '0'), ',') ?> <?= e($product['unit_name'] ?? 'шт.') ?>)
+                                            <i class="bi bi-box-seam" style="margin-right: 8px;"></i>Материалы для: <?= e($product['product_name']) ?> (<?= rtrim(rtrim(number_format($product['quantity'], 0, ',', ' '), '0'), ',') ?> <?= e($product['unit_name'] ?? 'шт.') ?>)
                                         </td>
                                     </tr>
                                     <?php 

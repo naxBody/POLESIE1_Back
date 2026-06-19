@@ -338,7 +338,7 @@ if ($isAjaxRequest && $selectedTaskId) {
                                         </button>
                                     <?php elseif ($stage['status'] === 'in_progress'): ?>
                                         <button class="btn btn-sm btn-success" onclick="completeStage(<?= $stage['id'] ?>, <?= $selectedTask['id'] ?>)">
-                                            <i class="bi bi-check-lg"></i> Завершить
+                                            <i class="bi bi-check-circle-fill"></i> Завершить
                                         </button>
                                     <?php endif; ?>
                                 </div>
@@ -2215,7 +2215,7 @@ foreach ($allTasks as &$task) {
                             <div class="tasks-list" id="ordersListContainer">
                                 <?php if (empty($ordersList)): ?>
                                     <div class="empty-state">
-                                        <div class="empty-state-icon"><i class="bi bi-kanban"></i></div>
+                                        <div class="empty-state-icon"><i class="bi bi-kanban-fill"></i></div>
                                         <h4>Нет активных заказов</h4>
                                         <p style="font-size: 13px;">Все заказы выполнены или отсутствуют</p>
                                     </div>
@@ -2332,7 +2332,7 @@ foreach ($allTasks as &$task) {
                                                         <?php elseif ($stage['status'] === 'in_progress'): ?>
                                                             <button class="btn btn-sm btn-success" 
                                                                     onclick="completeStage(<?= $stage['id'] ?>, <?= $selectedTask['id'] ?>)">
-                                                                <i class="bi bi-check-lg"></i> Завершить
+                                                                <i class="bi bi-check-circle-fill"></i> Завершить
                                                             </button>
                                                         <?php endif; ?>
                                                     </div>
@@ -2388,7 +2388,7 @@ foreach ($allTasks as &$task) {
                                     <?php if (!empty($selectedTask['materials'])): ?>
                                         <div class="btn-group">
                                             <button class="btn btn-primary" onclick="consumeMaterials(<?= $selectedTask['id'] ?>)">
-                                                <i class="bi bi-box-arrow-in-down"></i> Списать материалы
+                                                <i class="bi bi-box-arrow-in-down-fill"></i> Списать материалы
                                             </button>
                                         </div>
                                     <?php endif; ?>
@@ -2408,7 +2408,7 @@ foreach ($allTasks as &$task) {
                                     
                                     <?php if (empty($selectedTask['serial_numbers'])): ?>
                                         <div class="empty-state" style="padding: 40px 20px;">
-                                            <div class="empty-state-icon"><i class="bi bi-upc-scan"></i></div>
+                                            <div class="empty-state-icon"><i class="bi bi-upc-scan-fill"></i></div>
                                             <h5>Серийные номера не созданы</h5>
                                             <p style="font-size: 13px;">Создайте серийные номера для произведенной продукции</p>
                                         </div>
@@ -2502,7 +2502,7 @@ foreach ($allTasks as &$task) {
                                 <!-- Пустое состояние для вкладки Этапы -->
                                 <div class="tab-content active" id="tab-stages" data-tab="stages" data-task-id="">
                                     <div class="empty-state">
-                                        <div class="empty-state-icon"><i class="bi bi-clipboard-data"></i></div>
+                                        <div class="empty-state-icon"><i class="bi bi-clipboard-data-fill"></i></div>
                                         <h3>Этапы производства</h3>
                                         <p>Выберите производственное задание из списка слева чтобы увидеть этапы производства</p>
                                     </div>
@@ -2511,7 +2511,7 @@ foreach ($allTasks as &$task) {
                                 <!-- Пустое состояние для вкладки Материалы -->
                                 <div class="tab-content" id="tab-materials" data-tab="materials" data-task-id="">
                                     <div class="empty-state">
-                                        <div class="empty-state-icon"><i class="bi bi-box-seam"></i></div>
+                                        <div class="empty-state-icon"><i class="bi bi-box-seam-fill"></i></div>
                                         <h3>Материалы</h3>
                                         <p>Выберите производственное задание из списка слева чтобы увидеть список необходимых материалов</p>
                                     </div>
@@ -2520,7 +2520,7 @@ foreach ($allTasks as &$task) {
                                 <!-- Пустое состояние для вкладки Серийные номера -->
                                 <div class="tab-content" id="tab-serial" data-tab="serial" data-task-id="">
                                     <div class="empty-state">
-                                        <div class="empty-state-icon"><i class="bi bi-upc-scan"></i></div>
+                                        <div class="empty-state-icon"><i class="bi bi-upc-scan-fill"></i></div>
                                         <h3>Серийные номера</h3>
                                         <p>Выберите производственное задание из списка слева чтобы управлять серийными номерами</p>
                                     </div>
@@ -2529,7 +2529,7 @@ foreach ($allTasks as &$task) {
                                 <!-- Пустое состояние для вкладки Информация -->
                                 <div class="tab-content" id="tab-info" data-tab="info" data-task-id="">
                                     <div class="empty-state">
-                                        <div class="empty-state-icon"><i class="bi bi-info-circle"></i></div>
+                                        <div class="empty-state-icon"><i class="bi bi-info-circle-fill"></i></div>
                                         <h3>Информация о задании</h3>
                                         <p>Выберите производственное задание из списка слева чтобы просмотреть подробную информацию</p>
                                     </div>
@@ -2800,7 +2800,7 @@ foreach ($allTasks as &$task) {
                                             <div style="font-size: 11px; color: var(--text-secondary);">Арт. ${product.product_article} • План: ${product.order_item_quantity} ${product.unit_name}</div>
                                         </div>
                                     </div>
-                                    <span style="font-size: 11px; color: var(--primary-color); font-weight: 500;"><i class="bi bi-chevron-right"></i> Открыть</span>
+                                    <span style="font-size: 11px; color: var(--primary-color); font-weight: 500;"><i class="bi bi-chevron-circle-right"></i> Открыть</span>
                                 </div>
                             </div>
                         `;
@@ -2810,7 +2810,7 @@ foreach ($allTasks as &$task) {
                 } else {
                     container.innerHTML = `
                         <div class="empty-state">
-                            <div class="empty-state-icon"><i class="bi bi-box-seam"></i></div>
+                            <div class="empty-state-icon"><i class="bi bi-box-seam-fill"></i></div>
                             <h4>Товары не найдены</h4>
                             <p style="font-size: 13px;">В этом заказе нет товаров с производственными заданиями</p>
                         </div>
@@ -2849,10 +2849,10 @@ foreach ($allTasks as &$task) {
             if (group && icon) {
                 if (group.style.display === 'none') {
                     group.style.display = 'block';
-                    icon.innerHTML = '<i class="bi bi-chevron-down"></i>';
+                    icon.innerHTML = '<i class="bi bi-chevron-circle-down"></i>';
                 } else {
                     group.style.display = 'none';
-                    icon.innerHTML = '<i class="bi bi-chevron-right"></i>';
+                    icon.innerHTML = '<i class="bi bi-chevron-circle-right"></i>';
                 }
             }
         }
@@ -2864,10 +2864,10 @@ foreach ($allTasks as &$task) {
             if (group && icon) {
                 if (group.style.display === 'none') {
                     group.style.display = 'block';
-                    icon.innerHTML = '<i class="bi bi-chevron-down"></i>';
+                    icon.innerHTML = '<i class="bi bi-chevron-circle-down"></i>';
                 } else {
                     group.style.display = 'none';
-                    icon.innerHTML = '<i class="bi bi-chevron-right"></i>';
+                    icon.innerHTML = '<i class="bi bi-chevron-circle-right"></i>';
                 }
             }
         }

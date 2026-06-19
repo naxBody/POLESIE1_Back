@@ -438,11 +438,11 @@ $deliveryDateDisplay = !empty($order['delivery_date']) ? date('d.m.Y', strtotime
     <div class="control-panel">
         <button class="btn btn-secondary" onclick="window.close()">Закрыть</button>
         <button class="btn btn-secondary" onclick="window.history.back()">← Назад</button>
-        <button class="btn btn-success" onclick="window.print()">🖨 Печать / Скачать PDF</button>
+        <button class="btn btn-success" onclick="downloadAsWord()">📥 Скачать DOC</button>
+        <button class="btn btn-info" onclick="window.print()">🖨 Печать / PDF</button>
     </div>
     
     <script>
-        
         // Функция для скачивания в формате Word (.doc)
         function downloadAsWord() {
             const content = document.querySelector('.document-container').innerHTML;
@@ -464,7 +464,7 @@ $deliveryDateDisplay = !empty($order['delivery_date']) ? date('d.m.Y', strtotime
         window.addEventListener('DOMContentLoaded', function() {
             // Показываем подсказку пользователю
             setTimeout(() => {
-                alert('Для сохранения или печати документа:\n\n• Нажмите кнопку "Печать / Скачать PDF"\n• В окне печати выберите принтер:\n  - "Сохранить как PDF" — для скачивания файла\n  - Ваш принтер — для печати на бумаге\n• Нажмите "Сохранить" или "Печать"');
+                alert('Документ готов к экспорту!\n\n• Нажмите "📥 Скачать DOC" для скачивания в формате Word\n• Или нажмите "🖨 Печать / PDF" чтобы:\n  - Сохранить как PDF (выберите в списке принтеров)\n  - Распечатать на принтере');
             }, 500);
         });
     </script>

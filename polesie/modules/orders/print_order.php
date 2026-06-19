@@ -438,15 +438,44 @@ $deliveryDateDisplay = !empty($order['delivery_date']) ? date('d.m.Y', strtotime
     <div class="control-panel">
         <button class="btn btn-secondary" onclick="window.close()">Закрыть</button>
         <button class="btn btn-secondary" onclick="window.history.back()">← Назад</button>
+        <button class="btn btn-info" onclick="downloadAsPDF()">📥 Скачать PDF</button>
         <button class="btn btn-success" onclick="window.print()">🖨 Печать</button>
     </div>
     
     <script>
-        // Функция экспорта теперь вызывается автоматически при загрузке страницы
+        // Функция для скачивания документа в PDF через print dialog
+        function downloadAsPDF() {
+            // Показываем инструкцию пользователю
+            alert('Для сохранения документа в формате PDF:\n\n1. Откроется окно печати\n2. В качестве принтера выберите "Сохранить как PDF"\n3. Укажите место сохранения и нажмите "Сохранить"\n\nДокумент будет сохранён на вашем компьютере.');
+            
+            // Вызываем диалог печати
+            setTimeout(() => {
+                window.print();
+            }, 100);
+        }
+        
+        // Функция для скачивания в формате Word (.doc)
+        function downloadAsWord() {
+            const content = document.querySelector('.document-container').innerHTML;
+            const header = '<html xmlns:o="urn:schemas-microsoft-com:office:office" ' +
+                          'xmlns:w="urn:schemas-microsoft-com:office:word" ' +
+                          'xmlns="http://www.w3.org/TR/REC-html40">' +
+                          '<head><meta charset="UTF-8"><title>Заказ <?= htmlspecialchars($order["order_number"]) ?></title></head><body>';
+            const footer = '</body></html>';
+            const sourceHTML = header + content + footer;
+            
+            const source = 'data:application/vnd.ms-word;charset=utf-8,' + encodeURIComponent(sourceHTML);
+            const link = document.createElement('a');
+            link.href = source;
+            link.download = 'Заказ_<?= htmlspecialchars($order["order_number"]) ?>.doc';
+            link.click();
+        }
+        
+        // Автоматическая подсказка при загрузке страницы
         window.addEventListener('DOMContentLoaded', function() {
             // Показываем подсказку пользователю
             setTimeout(() => {
-                alert('Для сохранения документа:\n\n1. Нажмите кнопку "Печать" или Ctrl+P (Cmd+P на Mac)\n2. В качестве принтера выберите "Сохранить как PDF"\n3. Нажмите "Сохранить"\n\nФайл будет сохранён на вашем компьютере для последующей печати.');
+                alert('Для сохранения документа:\n\n• Нажмите "Скачать PDF" для сохранения в PDF\n• Или нажмите "Печать" или Ctrl+P (Cmd+P на Mac)\n• В качестве принтера выберите "Сохранить как PDF"\n• Нажмите "Сохранить"\n\nФайл будет сохранён на вашем компьютере для последующей печати.');
             }, 500);
         });
     </script>

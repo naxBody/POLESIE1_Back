@@ -72,12 +72,22 @@ $items = $stmt->fetchAll();
 $itemsWithMaterials = [];
 $allMaterials = [];
 $totalMaterialRows = 0;
+$productsForFilter = [];
 
 foreach ($items as $item) {
     $itemData = $item;
     $itemData['materials'] = [];
     
     if (!empty($item['product_id'])) {
+        // Добавляем товар в список для фильтра
+        $productsForFilter[] = [
+            'product_id' => $item['product_id'],
+            'product_name' => $item['product_name'],
+            'article' => $item['article'],
+            'quantity' => $item['quantity'],
+            'unit_name' => $item['unit_name']
+        ];
+        
         // Получаем материалы из паспорта продукта
         $matStmt = $pdo->prepare("
             SELECT 
@@ -115,6 +125,24 @@ foreach ($items as $item) {
     }
     
     $itemsWithMaterials[] = $itemData;
+}
+
+// Группировка материалов по коду для суммарной таблицы
+$groupedMaterials = [];
+foreach ($allMaterials as $mat) {
+    $key = $mat['material_id'];
+    if (!isset($groupedMaterials[$key])) {
+        $groupedMaterials[$key] = [
+            'material_id' => $mat['material_id'],
+            'material_code' => $mat['material_code'],
+            'material_name' => $mat['material_name'],
+            'material_short' => $mat['material_short'],
+            'material_category' => $mat['material_category'],
+            'unit' => $mat['unit'],
+            'total_quantity' => 0
+        ];
+    }
+    $groupedMaterials[$key]['total_quantity'] += $mat['total_quantity'];
 }
 
 $pageTitle = 'Заказ №' . e($order['order_number']);
@@ -613,19 +641,17 @@ $pageTitle = 'Заказ №' . e($order['order_number']);
                     <div class="materials-filter-section">
                         <span class="materials-filter-label">📦 Показать материалы для:</span>
                         <select class="materials-filter-select" id="productFilter" onchange="filterMaterials()">
-                            <option value="all">Все товары (<?= count($itemsWithMaterials) ?>)</option>
-                            <?php foreach ($itemsWithMaterials as $idx => $item): ?>
-                                <?php if (!empty($item['product_id'])): ?>
+                            <option value="all">Все товары (суммарно)</option>
+                            <?php foreach ($productsForFilter as $idx => $product): ?>
                                 <option value="<?= $idx ?>">
-                                    <?= e($item['product_name']) ?> (арт. <?= e($item['article'] ?? '—') ?>) - <?= number_format($item['quantity'], 0, ',', ' ') ?> <?= e($item['unit_name'] ?? 'шт.') ?>
+                                    <?= e($product['product_name']) ?> (арт. <?= e($product['article'] ?? '—') ?>) - <?= number_format($product['quantity'], 0, ',', ' ') ?> <?= e($product['unit_name'] ?? 'шт.') ?>
                                 </option>
-                                <?php endif; ?>
                             <?php endforeach; ?>
                         </select>
                         
-                        <?php if ($totalMaterialRows > 0): ?>
+                        <?php if (count($groupedMaterials) > 0): ?>
                         <div class="total-materials-summary">
-                            <span class="summary-badge">Всего позиций: <?= $totalMaterialRows ?></span>
+                            <span class="summary-badge">Всего уникальных материалов: <?= count($groupedMaterials) ?></span>
                         </div>
                         <?php endif; ?>
                     </div>
@@ -636,39 +662,82 @@ $pageTitle = 'Заказ №' . e($order['order_number']);
                             <polyline points="3.27 6.96 12 12.01 20.73 6.96" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                             <line x1="12" y1="22.08" x2="12" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                         </svg>
-                        Общая таблица расходов материалов
+                        Расход материалов
                     </div>
                     
-                    <?php if ($totalMaterialRows > 0): ?>
+                    <?php if (count($groupedMaterials) > 0): ?>
                     <div class="materials-table-wrapper" style="padding: 0 20px;">
                         <table class="materials-table-custom">
                             <thead>
                                 <tr>
                                     <th style="width: 40px;">№</th>
-                                    <th style="width: 140px;">Товар</th>
-                                    <th style="width: 120px;">Артикул материала</th>
+                                    <th style="width: 120px;">Артикул</th>
                                     <th>Наименование материала</th>
                                     <th style="width: 150px;">Категория</th>
-                                    <th style="width: 100px; text-align: right;">На ед.</th>
                                     <th style="width: 100px; text-align: right;">Всего</th>
                                     <th style="width: 60px;">Ед.</th>
                                 </tr>
                             </thead>
                             <tbody id="materialsTableBody">
+                                <!-- Суммарная таблица (все товары) -->
+                                <tr class="material-row" data-product-index="all">
+                                    <td colspan="6" style="background: #e8f5e9; font-weight: 600; color: #2e7d32; text-align: center; padding: 12px;">
+                                        📊 Общие затраты материалов на весь заказ
+                                    </td>
+                                </tr>
                                 <?php 
                                 $globalIndex = 0;
-                                foreach ($itemsWithMaterials as $itemIndex => $item): 
-                                    if (empty($item['materials'])) continue;
+                                foreach ($groupedMaterials as $material): 
+                                    $globalIndex++;
                                 ?>
-                                    <?php foreach ($item['materials'] as $matIndex => $material): 
-                                        $globalIndex++;
+                                <tr class="material-row" data-product-index="all" onclick="window.location.href='../warehouse/materials.php?material=<?= $material['material_id'] ?>'" style="cursor: pointer;">
+                                    <td><?= $globalIndex ?></td>
+                                    <td class="material-code-cell">
+                                        <span class="material-code-badge-inline"><?= e($material['material_code']) ?></span>
+                                    </td>
+                                    <td>
+                                        <div class="material-name-cell"><?= e($material['material_name']) ?></div>
+                                        <?php if (!empty($material['material_short'])): ?>
+                                        <div style="font-size: 11px; color: var(--text-secondary); margin-top: 2px;"><?= e($material['material_short']) ?></div>
+                                        <?php endif; ?>
+                                    </td>
+                                    <td>
+                                        <span class="material-category-cell"><?= e($material['material_category'] ?? '—') ?></span>
+                                    </td>
+                                    <td style="text-align: right; font-weight: 700; color: var(--primary-color);">
+                                        <?= number_format($material['total_quantity'], 3, ',', ' ') ?>
+                                    </td>
+                                    <td class="material-unit-cell">
+                                        <?= e($material['unit'] ?? 'шт.') ?>
+                                    </td>
+                                </tr>
+                                <?php endforeach; ?>
+                                
+                                <!-- Таблица по конкретным товарам -->
+                                <?php foreach ($productsForFilter as $productIdx => $product): ?>
+                                    <?php 
+                                    // Находим материалы для этого продукта
+                                    $productMaterials = [];
+                                    foreach ($itemsWithMaterials as $item) {
+                                        if ($item['product_id'] == $product['product_id']) {
+                                            $productMaterials = $item['materials'];
+                                            break;
+                                        }
+                                    }
                                     ?>
-                                    <tr class="material-row" data-product-index="<?= $itemIndex ?>" onclick="window.location.href='../warehouse/materials.php?material=<?= $material['material_id'] ?>'" style="cursor: pointer;">
-                                        <td><?= $globalIndex ?></td>
-                                        <td>
-                                            <div style="font-size: 11px; font-weight: 600; color: var(--text-primary);"><?= e($material['product_name']) ?></div>
-                                            <div style="font-size: 10px; color: var(--text-secondary);"><?= number_format($item['quantity'], 0, ',', ' ') ?> <?= e($item['unit_name'] ?? 'шт.') ?></div>
+                                    <?php if (!empty($productMaterials)): ?>
+                                    <tr class="material-row" data-product-index="<?= $productIdx ?>" style="display: none;">
+                                        <td colspan="6" style="background: #fff3e0; font-weight: 600; color: #ef6c00; text-align: center; padding: 12px;">
+                                            📦 Материалы для: <?= e($product['product_name']) ?> (<?= number_format($product['quantity'], 0, ',', ' ') ?> <?= e($product['unit_name'] ?? 'шт.') ?>)
                                         </td>
+                                    </tr>
+                                    <?php 
+                                    $prodIndex = 0;
+                                    foreach ($productMaterials as $material): 
+                                        $prodIndex++;
+                                    ?>
+                                    <tr class="material-row" data-product-index="<?= $productIdx ?>" style="display: none;" onclick="window.location.href='../warehouse/materials.php?material=<?= $material['material_id'] ?>'">
+                                        <td><?= $prodIndex ?></td>
                                         <td class="material-code-cell">
                                             <span class="material-code-badge-inline"><?= e($material['material_code']) ?></span>
                                         </td>
@@ -681,9 +750,6 @@ $pageTitle = 'Заказ №' . e($order['order_number']);
                                         <td>
                                             <span class="material-category-cell"><?= e($material['material_category'] ?? '—') ?></span>
                                         </td>
-                                        <td style="text-align: right; font-weight: 500; color: var(--text-secondary);">
-                                            <?= number_format($material['unit_quantity'], 3, ',', ' ') ?>
-                                        </td>
                                         <td style="text-align: right; font-weight: 700; color: var(--primary-color);">
                                             <?= number_format($material['total_quantity'], 3, ',', ' ') ?>
                                         </td>
@@ -692,6 +758,7 @@ $pageTitle = 'Заказ №' . e($order['order_number']);
                                         </td>
                                     </tr>
                                     <?php endforeach; ?>
+                                    <?php endif; ?>
                                 <?php endforeach; ?>
                             </tbody>
                         </table>
@@ -709,10 +776,21 @@ $pageTitle = 'Заказ №' . e($order['order_number']);
                     const rows = document.querySelectorAll('.material-row');
                     
                     rows.forEach(row => {
-                        if (filterValue === 'all' || row.dataset.productIndex === filterValue) {
-                            row.style.display = '';
+                        const productIndex = row.dataset.productIndex;
+                        if (filterValue === 'all') {
+                            // Показываем только строки с data-product-index="all"
+                            if (productIndex === 'all') {
+                                row.style.display = '';
+                            } else {
+                                row.style.display = 'none';
+                            }
                         } else {
-                            row.style.display = 'none';
+                            // Показываем заголовок общей таблицы и строки выбранного продукта
+                            if (productIndex === 'all' || productIndex === filterValue) {
+                                row.style.display = '';
+                            } else {
+                                row.style.display = 'none';
+                            }
                         }
                     });
                 }

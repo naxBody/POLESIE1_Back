@@ -95,6 +95,7 @@ foreach ($items as $item) {
         // Добавляем товар в список для фильтра
         $productsForFilter[] = [
             'product_id' => $item['product_id'],
+            'passport_product_id' => $item['product_id'],
             'product_name' => $item['product_name'],
             'article' => $item['article'],
             'quantity' => $item['quantity'],
@@ -113,6 +114,7 @@ foreach ($items as $item) {
                 m.name_short as material_short,
                 mc.name as material_category,
                 oi.product_id,
+                p.id as passport_product_id,
                 p.name as product_name,
                 p.article as product_article
             FROM order_items oi
@@ -611,19 +613,14 @@ $pageTitle = 'Заказ №' . e($order['order_number']);
                                                 <?php endif; ?>
                                             </td>
                                             <td>
-                                                <strong><?= e($item['product_name']) ?></strong>
+                                                <a href="<?= pageUrl('modules/products/passports.php?product=' . $item['product_id']) ?>" 
+                                                   style="color: var(--text-primary); text-decoration: none; font-weight: 500;"
+                                                   onmouseover="this.style.color='var(--primary-color)'; this.style.textDecoration='underline'" 
+                                                   onmouseout="this.style.color='var(--text-primary)'; this.style.textDecoration='none'">
+                                                    <strong><?= e($item['product_name']) ?></strong>
+                                                </a>
                                                 <?php if (!empty($item['description'])): ?>
                                                 <div style="font-size: 12px; color: var(--text-secondary);"><?= e($item['description']) ?></div>
-                                                <?php endif; ?>
-                                                <?php if ($hasPassport): ?>
-                                                <div style="font-size: 11px; margin-top: 4px;">
-                                                    <a href="<?= pageUrl('modules/products/passports.php?product=' . $item['product_id']) ?>" 
-                                                       style="color: var(--primary-color); text-decoration: underline;"
-                                                       onmouseover="this.style.color='var(--primary-dark)'" 
-                                                       onmouseout="this.style.color='var(--primary-color)'">
-                                                        <i class="bi bi-passport"></i> Паспорт изделия
-                                                    </a>
-                                                </div>
                                                 <?php endif; ?>
                                             </td>
                                             <td><?= e($item['unit_name'] ?? 'шт.') ?></td>
@@ -724,7 +721,7 @@ $pageTitle = 'Заказ №' . e($order['order_number']);
                                     // Находим материалы для этого продукта
                                     $productMaterials = [];
                                     foreach ($itemsWithMaterials as $item) {
-                                        if ($item['product_id'] == $product['product_id']) {
+                                        if ($item['product_id'] == $product['passport_product_id']) {
                                             $productMaterials = $item['materials'];
                                             break;
                                         }
@@ -734,8 +731,8 @@ $pageTitle = 'Заказ №' . e($order['order_number']);
                                     <tr class="material-row" data-product-index="<?= $productIdx ?>" style="display: none;">
                                         <td colspan="6" style="background: #fff3e0; font-weight: 600; color: #ef6c00; text-align: center; padding: 12px;">
                                             <i class="bi bi-box-seam-fill" style="margin-right: 8px;"></i>Материалы для: 
-                                            <a href="<?= pageUrl('modules/products/passports.php?product=' . $product['product_id']) ?>" style="color: #ef6c00; text-decoration: underline;"><?= e($product['product_name']) ?></a> 
-                                            (<a href="<?= pageUrl('modules/products/passports.php?product=' . $product['product_id']) ?>" style="color: #ef6c00; text-decoration: underline;">арт. <?= e($product['article'] ?? '—') ?></a>, <?= rtrim(rtrim(number_format($product['quantity'], 0, ',', ' '), '0'), ',') ?> <?= e($product['unit_name'] ?? 'шт.') ?>)
+                                            <a href="<?= pageUrl('modules/products/passports.php?product=' . $product['passport_product_id']) ?>" style="color: #ef6c00; text-decoration: underline;"><?= e($product['product_name']) ?></a> 
+                                            (<a href="<?= pageUrl('modules/products/passports.php?product=' . $product['passport_product_id']) ?>" style="color: #ef6c00; text-decoration: underline;">арт. <?= e($product['article'] ?? '—') ?></a>, <?= rtrim(rtrim(number_format($product['quantity'], 0, ',', ' '), '0'), ',') ?> <?= e($product['unit_name'] ?? 'шт.') ?>)
                                         </td>
                                     </tr>
                                     <?php 

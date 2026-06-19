@@ -438,33 +438,22 @@ $deliveryDateDisplay = !empty($order['delivery_date']) ? date('d.m.Y', strtotime
     <div class="control-panel">
         <button class="btn btn-secondary" onclick="window.close()">Закрыть</button>
         <button class="btn btn-secondary" onclick="window.history.back()">← Назад</button>
-        <button class="btn btn-success" onclick="downloadAsWord()">📥 Скачать DOC</button>
-        <button class="btn btn-info" onclick="window.print()">🖨 Печать</button>
+        <button class="btn btn-success" onclick="downloadAsPDF()">
+            <i class="bi bi-file-earmark-pdf" style="margin-right: 6px;"></i>
+            Скачать PDF
+        </button>
     </div>
     
     <script>
-        // Функция для скачивания в формате Word (.doc)
-        function downloadAsWord() {
-            const content = document.querySelector('.document-container').innerHTML;
-            const header = '<html xmlns:o="urn:schemas-microsoft-com:office:office" ' +
-                          'xmlns:w="urn:schemas-microsoft-com:office:word" ' +
-                          'xmlns="http://www.w3.org/TR/REC-html40">' +
-                          '<head><meta charset="UTF-8"><title>Заказ <?= htmlspecialchars($order["order_number"]) ?></title></head><body>';
-            const footer = '</body></html>';
-            const sourceHTML = header + content + footer;
-            
-            const source = 'data:application/vnd.ms-word;charset=utf-8,' + encodeURIComponent(sourceHTML);
-            const link = document.createElement('a');
-            link.href = source;
-            link.download = 'Заказ_<?= htmlspecialchars($order["order_number"]) ?>.doc';
-            link.click();
+        // Функция для скачивания в формате PDF через печать
+        function downloadAsPDF() {
+            window.print();
         }
         
         // Автоматическая подсказка при загрузке страницы
         window.addEventListener('DOMContentLoaded', function() {
-            // Показываем подсказку пользователю
             setTimeout(() => {
-                alert('Документ готов к экспорту!\n\n• Нажмите "📥 Скачать DOC" для скачивания в формате Word (сохраняет разметку документа)\n• Или нажмите "🖨 Печать" чтобы:\n  - Сохранить как PDF (выберите "Сохранить как PDF" в списке принтеров)\n  - Распечатать на принтере');
+                alert('Документ готов к экспорту!\n\nНажмите "Скачать PDF" и выберите "Сохранить как PDF" в диалоге печати браузера.\n\nФайл будет сохранён с полной разметкой документа.');
             }, 500);
         });
     </script>

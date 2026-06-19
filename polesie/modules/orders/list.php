@@ -203,6 +203,54 @@ foreach ($statusCounts as $status => $count) {
     $statusPercentages[$status] = $totalAllOrders > 0 ? round(($count / $totalAllOrders) * 100) : 0;
 }
 
+// === ЗАКАЗЫ ТРЕБУЮЩИЕ ВНИМАНИЯ (с проблемами) ===
+// Получаем заказы с проблемами материалов
+$problemOrdersSql = "
+    SELECT DISTINCT 
+        o.id,
+        o.order_number,
+        c.name as contractor_name,
+        pt.id as task_id,
+        pt.task_number,
+        pt.status as task_status,
+        GROUP_CONCAT(
+            CONCAT(
+                m.name, 
+                ': недостает ', 
+                (ptm.quantity_required - COALESCE(ptm.quantity_reserved, 0) - COALESCE(ptm.quantity_used, 0))
+            ) 
+            SEPARATOR '; '
+        ) as material_issues,
+        COUNT(DISTINCT ptm.id) as material_issues_count
+    FROM orders o
+    JOIN contractors c ON o.customer_id = c.id
+    JOIN production_tasks pt ON pt.order_id = o.id
+    JOIN production_tasks_materials ptm ON ptm.task_id = pt.id
+    JOIN materials m ON ptm.material_id = m.id
+    WHERE o.status IN ('new', 'processing')
+      AND pt.status IN ('planned', 'in_progress')
+      AND ptm.status IN ('pending', 'reserved')
+      AND (ptm.quantity_required > COALESCE(ptm.quantity_reserved, 0) + COALESCE(ptm.quantity_used, 0))
+    GROUP BY o.id, pt.id
+    ORDER BY pt.priority DESC, o.created_at DESC
+    LIMIT 10
+";
+$problemOrders = $pdo->query($problemOrdersSql)->fetchAll();
+
+// Подсчет общего количества проблемных заказов
+$stmt = $pdo->prepare("
+    SELECT COUNT(DISTINCT o.id) 
+    FROM orders o
+    JOIN production_tasks pt ON pt.order_id = o.id
+    JOIN production_tasks_materials ptm ON ptm.task_id = pt.id
+    WHERE o.status IN ('new', 'processing')
+      AND pt.status IN ('planned', 'in_progress')
+      AND ptm.status IN ('pending', 'reserved')
+      AND (ptm.quantity_required > COALESCE(ptm.quantity_reserved, 0) + COALESCE(ptm.quantity_used, 0))
+");
+$stmt->execute();
+$problemOrdersTotal = $stmt->fetchColumn();
+
 $pageTitle = 'Заказы';
 ?>
 <!DOCTYPE html>
@@ -390,6 +438,79 @@ $pageTitle = 'Заказы';
                         </div>
                     </div>
                 </div>
+                
+                <!-- Секция: Заказы требующие внимания (с проблемами) -->
+                <?php if (!empty($problemOrders)): ?>
+                <div class="card" style="margin-bottom: 24px; border: 2px solid #e74c3c; background: linear-gradient(135deg, #fff5f5 0%, #ffffff 100%);">
+                    <div class="card-body" style="padding: 0;">
+                        <div style="padding: 20px; border-bottom: 1px solid #ffe0e0; background: #e74c3c; color: white;">
+                            <div style="display: flex; align-items: center; justify-content: space-between;">
+                                <h3 style="font-size: 18px; font-weight: 600; margin: 0; display: flex; align-items: center; gap: 12px;">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M12 9V11M12 15H12.01M5.07183 19H18.9282C19.5306 19 20.0223 18.5415 19.9369 17.9462L18.0001 4.41602C17.9086 3.77896 17.3621 3.30485 16.7188 3.30485H7.2812C6.63795 3.30485 6.09138 3.77896 6.00002 4.41602L4.06316 17.9462C3.97783 18.5415 4.46948 19 5.07183 19Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                    Требуют внимания: проблемы с материалами
+                                    <span style="background: white; color: #e74c3c; padding: 4px 12px; border-radius: 20px; font-size: 14px; font-weight: 700;"><?= $problemOrdersTotal ?></span>
+                                </h3>
+                                <a href="#problems" class="btn btn-sm" style="background: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.3);" onclick="document.getElementById('problemsList').scrollIntoView({behavior: 'smooth'}); return false;">
+                                    Показать все
+                                </a>
+                            </div>
+                        </div>
+                        <div id="problemsList" style="padding: 0;">
+                            <?php foreach ($problemOrders as $order): ?>
+                            <div style="display: flex; align-items: stretch; border-bottom: 1px solid #ffe0e0; transition: background 0.2s;" onmouseover="this.style.background='#fff0f0'" onmouseout="this.style.background='white'">
+                                <!-- Левая часть: информация о заказе -->
+                                <div style="flex: 1; padding: 20px; display: flex; flex-direction: column; justify-content: center;">
+                                    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
+                                        <a href="view.php?id=<?= $order['id'] ?>" style="font-size: 18px; font-weight: 700; color: #e74c3c; text-decoration: none;">
+                                            <?= e($order['order_number']) ?>
+                                        </a>
+                                        <span style="font-size: 12px; color: var(--text-secondary);">·</span>
+                                        <span style="font-size: 14px; color: var(--text-secondary);"><?= e($order['contractor_name']) ?></span>
+                                    </div>
+                                    <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                                        <span class="badge" style="background: #f39c1220; color: #f39c12; font-size: 12px; padding: 4px 10px; border-radius: 4px;">
+                                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 4px;">
+                                                <circle cx="12" cy="12" r="3"/>
+                                                <path d="M12 1V3M12 21V23M23 12H21M3 12H1"/>
+                                            </svg>
+                                            <?= e($order['task_status'] === 'planned' ? 'Запланировано' : 'В работе') ?>
+                                        </span>
+                                        <span class="badge" style="background: #3498db20; color: #3498db; font-size: 12px; padding: 4px 10px; border-radius: 4px;">
+                                            <?= e($order['task_number']) ?>
+                                        </span>
+                                        <span style="font-size: 12px; color: #e74c3c; font-weight: 600;">
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 4px;">
+                                                <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                                            </svg>
+                                            Проблем: <?= $order['material_issues_count'] ?>
+                                        </span>
+                                    </div>
+                                </div>
+                                <!-- Правая часть: список проблем с кнопкой действия -->
+                                <div style="width: 400px; padding: 20px; background: #fafafa; border-left: 1px solid #ffe0e0; display: flex; flex-direction: column; justify-content: center;">
+                                    <div style="font-size: 13px; color: var(--text-secondary); margin-bottom: 8px; font-weight: 600;">Недостает материалов:</div>
+                                    <div style="font-size: 13px; color: #e74c3c; line-height: 1.6; margin-bottom: 12px; max-height: 80px; overflow-y: auto;">
+                                        <?= e($order['material_issues']) ?>
+                                    </div>
+                                    <a href="<?= pageUrl('modules/warehouse/materials.php') ?>?order=<?= $order['id'] ?>&task=<?= $order['task_id'] ?>" 
+                                       class="btn btn-sm" 
+                                       style="background: #e74c3c; color: white; border: none; display: inline-flex; align-items: center; gap: 8px; width: fit-content;">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+                                            <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
+                                            <line x1="12" y1="22.08" x2="12" y2="12"/>
+                                        </svg>
+                                        Решить проблему
+                                    </a>
+                                </div>
+                            </div>
+                            <?php endforeach; ?>
+                        </div>
+                    </div>
+                </div>
+                <?php endif; ?>
                 
                 <!-- Фильтры -->
                 <div class="card" style="margin-bottom: 24px;">

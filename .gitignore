@@ -1,1 +1,27 @@
-Nothing needs to be added to the .gitignore file based on the provided file changes. The only modified file is a PHP source code file (`polesie/modules/employees/add.php`), which should not be ignored.
+```
+# Compiled and build artifacts
+*.pyc
+__pycache__/
+
+# Dependencies
+vendor/
+composer.lock
+
+# Logs and temp files
+*.log
+*.tmp
+*.swp
+
+# Environment
+.env
+.env.local
+*.env.*
+
+# Editors
+.vscode/
+.idea/
+
+# OS generated files
+.DS_Store
+Thumbs.db
+```

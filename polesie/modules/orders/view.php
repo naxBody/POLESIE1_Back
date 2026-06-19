@@ -597,28 +597,13 @@ $pageTitle = 'Заказ №' . e($order['order_number']);
                                         <?php foreach ($items as $index => $item): 
                                             $hasPassport = !empty($item['product_id']);
                                         ?>
-                                        <tr style="<?= $hasPassport ? 'cursor: pointer;' : '' ?>" 
-                                            onclick="<?= $hasPassport ? "window.location.href='" . pageUrl('modules/products/passports.php?product=' . $item['product_id']) . "'" : '' ?>">
+                                        <tr>
                                             <td><?= $index + 1 ?></td>
                                             <td>
-                                                <?php if ($hasPassport): ?>
-                                                    <a href="<?= pageUrl('modules/products/passports.php?product=' . $item['product_id']) ?>" 
-                                                       style="color: var(--primary-color); text-decoration: none; font-weight: 600;"
-                                                       onmouseover="this.style.textDecoration='underline'" 
-                                                       onmouseout="this.style.textDecoration='none'">
-                                                        <?= e($item['article'] ?? '—') ?>
-                                                    </a>
-                                                <?php else: ?>
-                                                    <?= e($item['article'] ?? '—') ?>
-                                                <?php endif; ?>
+                                                <?= e($item['article'] ?? '—') ?>
                                             </td>
                                             <td>
-                                                <a href="<?= pageUrl('modules/products/passports.php?product=' . $item['product_id']) ?>" 
-                                                   style="color: var(--text-primary); text-decoration: none; font-weight: 500;"
-                                                   onmouseover="this.style.color='var(--primary-color)'; this.style.textDecoration='underline'" 
-                                                   onmouseout="this.style.color='var(--text-primary)'; this.style.textDecoration='none'">
-                                                    <strong><?= e($item['product_name']) ?></strong>
-                                                </a>
+                                                <strong><?= e($item['product_name']) ?></strong>
                                                 <?php if (!empty($item['description'])): ?>
                                                 <div style="font-size: 12px; color: var(--text-secondary);"><?= e($item['description']) ?></div>
                                                 <?php endif; ?>

@@ -734,8 +734,8 @@ $pageTitle = 'Заказ №' . e($order['order_number']);
                                     <tr class="material-row" data-product-index="<?= $productIdx ?>" style="display: none;">
                                         <td colspan="6" style="background: #fff3e0; font-weight: 600; color: #ef6c00; text-align: center; padding: 12px;">
                                             <i class="bi bi-box-seam-fill" style="margin-right: 8px;"></i>Материалы для: 
-                                            <a href="../modules/products/view.php?id=<?= $product['product_id'] ?>" style="color: #ef6c00; text-decoration: underline;"><?= e($product['product_name']) ?></a> 
-                                            (арт. <?= e($product['article'] ?? '—') ?>, <?= rtrim(rtrim(number_format($product['quantity'], 0, ',', ' '), '0'), ',') ?> <?= e($product['unit_name'] ?? 'шт.') ?>)
+                                            <a href="<?= pageUrl('modules/products/passports.php?product=' . $product['product_id']) ?>" style="color: #ef6c00; text-decoration: underline;"><?= e($product['product_name']) ?></a> 
+                                            (<a href="<?= pageUrl('modules/products/passports.php?product=' . $product['product_id']) ?>" style="color: #ef6c00; text-decoration: underline;">арт. <?= e($product['article'] ?? '—') ?></a>, <?= rtrim(rtrim(number_format($product['quantity'], 0, ',', ' '), '0'), ',') ?> <?= e($product['unit_name'] ?? 'шт.') ?>)
                                         </td>
                                     </tr>
                                     <?php 

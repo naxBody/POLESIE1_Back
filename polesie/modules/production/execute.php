@@ -334,11 +334,11 @@ if ($isAjaxRequest && $selectedTaskId) {
                                 <div class="stage-actions">
                                     <?php if ($stage['status'] === 'pending'): ?>
                                         <button class="btn btn-sm btn-primary" onclick="startStage(<?= $stage['id'] ?>, <?= $selectedTask['id'] ?>)">
-                                            ▶ Начать
+                                            <i class="bi bi-play-fill"></i> Начать
                                         </button>
                                     <?php elseif ($stage['status'] === 'in_progress'): ?>
                                         <button class="btn btn-sm btn-success" onclick="completeStage(<?= $stage['id'] ?>, <?= $selectedTask['id'] ?>)">
-                                            ✓ Завершить
+                                            <i class="bi bi-check-lg"></i> Завершить
                                         </button>
                                     <?php endif; ?>
                                 </div>
@@ -2120,7 +2120,7 @@ foreach ($allTasks as &$task) {
                         <div class="orders-modal-overlay" id="ordersModalOverlay" onclick="if(event.target === this) closeOrdersModal()">
                             <div class="orders-modal">
                                 <div class="orders-modal-header">
-                                    <h2 class="orders-modal-title">📋 Выбор заказа для исполнения</h2>
+                                    <h2 class="orders-modal-title"><i class="bi bi-kanban-fill"></i> Выбор заказа для исполнения</h2>
                                     <button class="orders-modal-close" onclick="closeOrdersModal()">×</button>
                                 </div>
                                 
@@ -2184,7 +2184,7 @@ foreach ($allTasks as &$task) {
                         <div class="tasks-panel">
                             <!-- Фильтры заказов -->
                             <div style="padding: 20px; border-bottom: 1px solid var(--border-color); background: var(--gray-50);">
-                                <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 12px;">📋 Выбор заказа</h3>
+                                <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 12px;"><i class="bi bi-kanban-fill"></i> Выбор заказа</h3>
                                 
                                 <!-- Поиск по заказам -->
                                 <div style="margin-bottom: 12px;">
@@ -2215,7 +2215,7 @@ foreach ($allTasks as &$task) {
                             <div class="tasks-list" id="ordersListContainer">
                                 <?php if (empty($ordersList)): ?>
                                     <div class="empty-state">
-                                        <div class="empty-state-icon">📋</div>
+                                        <div class="empty-state-icon"><i class="bi bi-kanban"></i></div>
                                         <h4>Нет активных заказов</h4>
                                         <p style="font-size: 13px;">Все заказы выполнены или отсутствуют</p>
                                     </div>
@@ -2327,12 +2327,12 @@ foreach ($allTasks as &$task) {
                                                         <?php if ($stage['status'] === 'pending'): ?>
                                                             <button class="btn btn-sm btn-primary" 
                                                                     onclick="startStage(<?= $stage['id'] ?>, <?= $selectedTask['id'] ?>)">
-                                                                ▶ Начать
+                                                                <i class="bi bi-play-fill"></i> Начать
                                                             </button>
                                                         <?php elseif ($stage['status'] === 'in_progress'): ?>
                                                             <button class="btn btn-sm btn-success" 
                                                                     onclick="completeStage(<?= $stage['id'] ?>, <?= $selectedTask['id'] ?>)">
-                                                                ✓ Завершить
+                                                                <i class="bi bi-check-lg"></i> Завершить
                                                             </button>
                                                         <?php endif; ?>
                                                     </div>
@@ -2376,8 +2376,8 @@ foreach ($allTasks as &$task) {
                                                     <td><?= (int)$mat['current_stock'] ?> <?= e($mat['unit_symbol']) ?></td>
                                                     <td>
                                                         <span class="availability-badge availability-<?= $mat['availability'] ?>">
-                                                            <?= $mat['availability'] === 'sufficient' ? '✓ Достаточно' : 
-                                                                ($mat['availability'] === 'partial' ? '⚠ Частично' : '✗ Недостаточно') ?>
+                                                            <?= $mat['availability'] === 'sufficient' ? '<i class="bi bi-check-circle-fill" style="color: var(--success-color);"></i> Достаточно' : 
+                                                                ($mat['availability'] === 'partial' ? '<i class="bi bi-exclamation-triangle-fill" style="color: #f59e0b;"></i> Частично' : '<i class="bi bi-x-circle-fill" style="color: var(--error-color);"></i> Недостаточно') ?>
                                                         </span>
                                                     </td>
                                                 </tr>
@@ -2388,7 +2388,7 @@ foreach ($allTasks as &$task) {
                                     <?php if (!empty($selectedTask['materials'])): ?>
                                         <div class="btn-group">
                                             <button class="btn btn-primary" onclick="consumeMaterials(<?= $selectedTask['id'] ?>)">
-                                                📦 Списать материалы
+                                                <i class="bi bi-box-arrow-in-down"></i> Списать материалы
                                             </button>
                                         </div>
                                     <?php endif; ?>
@@ -2408,7 +2408,7 @@ foreach ($allTasks as &$task) {
                                     
                                     <?php if (empty($selectedTask['serial_numbers'])): ?>
                                         <div class="empty-state" style="padding: 40px 20px;">
-                                            <div class="empty-state-icon">🏷️</div>
+                                            <div class="empty-state-icon"><i class="bi bi-upc-scan"></i></div>
                                             <h5>Серийные номера не созданы</h5>
                                             <p style="font-size: 13px;">Создайте серийные номера для произведенной продукции</p>
                                         </div>
@@ -2502,7 +2502,7 @@ foreach ($allTasks as &$task) {
                                 <!-- Пустое состояние для вкладки Этапы -->
                                 <div class="tab-content active" id="tab-stages" data-tab="stages" data-task-id="">
                                     <div class="empty-state">
-                                        <div class="empty-state-icon">📋</div>
+                                        <div class="empty-state-icon"><i class="bi bi-clipboard-data"></i></div>
                                         <h3>Этапы производства</h3>
                                         <p>Выберите производственное задание из списка слева чтобы увидеть этапы производства</p>
                                     </div>
@@ -2511,7 +2511,7 @@ foreach ($allTasks as &$task) {
                                 <!-- Пустое состояние для вкладки Материалы -->
                                 <div class="tab-content" id="tab-materials" data-tab="materials" data-task-id="">
                                     <div class="empty-state">
-                                        <div class="empty-state-icon">📦</div>
+                                        <div class="empty-state-icon"><i class="bi bi-box-seam"></i></div>
                                         <h3>Материалы</h3>
                                         <p>Выберите производственное задание из списка слева чтобы увидеть список необходимых материалов</p>
                                     </div>
@@ -2520,7 +2520,7 @@ foreach ($allTasks as &$task) {
                                 <!-- Пустое состояние для вкладки Серийные номера -->
                                 <div class="tab-content" id="tab-serial" data-tab="serial" data-task-id="">
                                     <div class="empty-state">
-                                        <div class="empty-state-icon">🏷️</div>
+                                        <div class="empty-state-icon"><i class="bi bi-upc-scan"></i></div>
                                         <h3>Серийные номера</h3>
                                         <p>Выберите производственное задание из списка слева чтобы управлять серийными номерами</p>
                                     </div>
@@ -2529,7 +2529,7 @@ foreach ($allTasks as &$task) {
                                 <!-- Пустое состояние для вкладки Информация -->
                                 <div class="tab-content" id="tab-info" data-tab="info" data-task-id="">
                                     <div class="empty-state">
-                                        <div class="empty-state-icon">ℹ️</div>
+                                        <div class="empty-state-icon"><i class="bi bi-info-circle"></i></div>
                                         <h3>Информация о задании</h3>
                                         <p>Выберите производственное задание из списка слева чтобы просмотреть подробную информацию</p>
                                     </div>
@@ -2800,7 +2800,7 @@ foreach ($allTasks as &$task) {
                                             <div style="font-size: 11px; color: var(--text-secondary);">Арт. ${product.product_article} • План: ${product.order_item_quantity} ${product.unit_name}</div>
                                         </div>
                                     </div>
-                                    <span style="font-size: 11px; color: var(--primary-color); font-weight: 500;">▶ Открыть</span>
+                                    <span style="font-size: 11px; color: var(--primary-color); font-weight: 500;"><i class="bi bi-chevron-right"></i> Открыть</span>
                                 </div>
                             </div>
                         `;
@@ -2810,7 +2810,7 @@ foreach ($allTasks as &$task) {
                 } else {
                     container.innerHTML = `
                         <div class="empty-state">
-                            <div class="empty-state-icon">📦</div>
+                            <div class="empty-state-icon"><i class="bi bi-box-seam"></i></div>
                             <h4>Товары не найдены</h4>
                             <p style="font-size: 13px;">В этом заказе нет товаров с производственными заданиями</p>
                         </div>
@@ -2849,10 +2849,10 @@ foreach ($allTasks as &$task) {
             if (group && icon) {
                 if (group.style.display === 'none') {
                     group.style.display = 'block';
-                    icon.textContent = '▼';
+                    icon.innerHTML = '<i class="bi bi-chevron-down"></i>';
                 } else {
                     group.style.display = 'none';
-                    icon.textContent = '▶';
+                    icon.innerHTML = '<i class="bi bi-chevron-right"></i>';
                 }
             }
         }
@@ -2864,10 +2864,10 @@ foreach ($allTasks as &$task) {
             if (group && icon) {
                 if (group.style.display === 'none') {
                     group.style.display = 'block';
-                    icon.textContent = '▼';
+                    icon.innerHTML = '<i class="bi bi-chevron-down"></i>';
                 } else {
                     group.style.display = 'none';
-                    icon.textContent = '▶';
+                    icon.innerHTML = '<i class="bi bi-chevron-right"></i>';
                 }
             }
         }
@@ -3245,7 +3245,7 @@ foreach ($allTasks as &$task) {
                             <div class="order-detail-modal-overlay" id="orderDetailModalOverlay" onclick="if(event.target === this) closeOrderDetailModal()">
                                 <div class="order-detail-modal">
                                     <div class="order-detail-modal-header">
-                                        <h2>📦 Заказ ${order.order_number}</h2>
+                                        <h2><i class="bi bi-box-seam-fill"></i> Заказ ${order.order_number}</h2>
                                         <button class="order-detail-modal-close" onclick="closeOrderDetailModal()">×</button>
                                     </div>
                                     <div class="order-detail-modal-body">

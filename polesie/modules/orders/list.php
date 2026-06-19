@@ -215,7 +215,7 @@ $problemOrdersSql = "
         pt.status as task_status,
         GROUP_CONCAT(
             CONCAT(
-                m.name, 
+                m.name_full, 
                 ': недостает ', 
                 (ptm.quantity_required - COALESCE(ptm.quantity_reserved, 0) - COALESCE(ptm.quantity_used, 0))
             ) 

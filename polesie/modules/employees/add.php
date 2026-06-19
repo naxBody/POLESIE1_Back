@@ -26,8 +26,16 @@ $formData = [
     'phone' => '',
     'hire_date' => date('Y-m-d'),
     'salary' => '',
-    'status' => 'active'
+    'status' => 'active',
+    'create_user' => 0,
+    'username' => '',
+    'password' => '',
+    'role_id' => ''
 ];
+
+// Получаем роли для выпадающего списка
+$rolesStmt = $pdo->query("SELECT id, name, code FROM user_roles WHERE is_active = 1 ORDER BY name");
+$roles = $rolesStmt->fetchAll();
 
 // Обработка формы
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -39,7 +47,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'phone' => trim($_POST['phone'] ?? ''),
         'hire_date' => $_POST['hire_date'] ?? '',
         'salary' => trim($_POST['salary'] ?? ''),
-        'status' => $_POST['status'] ?? 'active'
+        'status' => $_POST['status'] ?? 'active',
+        'create_user' => isset($_POST['create_user']) ? 1 : 0,
+        'username' => trim($_POST['username'] ?? ''),
+        'password' => $_POST['password'] ?? '',
+        'role_id' => $_POST['role_id'] ?? ''
     ];
 
     // Валидация
@@ -70,9 +82,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $errors[] = 'Выберите дату приема на работу';
     }
 
+    // Валидация для создания пользователя
+    if ($formData['create_user']) {
+        if (empty($formData['username'])) {
+            $errors[] = 'Введите логин для пользователя системы';
+        }
+        
+        if (empty($formData['password'])) {
+            $errors[] = 'Введите пароль для пользователя системы';
+        } elseif (strlen($formData['password']) < 6) {
+            $errors[] = 'Пароль должен быть не менее 6 символов';
+        }
+        
+        if (empty($formData['role_id'])) {
+            $errors[] = 'Выберите роль для пользователя системы';
+        }
+    }
+
     // Если нет ошибок, сохраняем в БД
     if (empty($errors)) {
         try {
+            $pdo->beginTransaction();
+            
+            // Сначала создаем запись сотрудника
             $stmt = $pdo->prepare("
                 INSERT INTO employees 
                 (full_name, position, department, email, phone, hire_date, salary, is_active, created_at) 
@@ -91,6 +123,48 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 ':is_active' => $formData['status'] !== 'terminated' ? 1 : 0
             ]);
             
+            $employeeId = $pdo->lastInsertId();
+            
+            // Если нужно создать пользователя системы
+            if ($formData['create_user']) {
+                // Проверяем, не занят ли username
+                $checkStmt = $pdo->prepare("SELECT id FROM users WHERE username = :username");
+                $checkStmt->execute([':username' => $formData['username']]);
+                
+                if ($checkStmt->fetch()) {
+                    throw new Exception('Пользователь с таким логином уже существует');
+                }
+                
+                // Создаем пользователя
+                $userStmt = $pdo->prepare("
+                    INSERT INTO users 
+                    (username, password_hash, full_name, email, phone, role_id, department, position, is_active, created_at) 
+                    VALUES 
+                    (:username, :password_hash, :full_name, :email, :phone, :role_id, :department, :position, 1, NOW())
+                ");
+                
+                $userStmt->execute([
+                    ':username' => $formData['username'],
+                    ':password_hash' => password_hash($formData['password'], PASSWORD_DEFAULT),
+                    ':full_name' => $formData['full_name'],
+                    ':email' => $formData['email'] ?: null,
+                    ':phone' => $formData['phone'] ?: null,
+                    ':role_id' => $formData['role_id'],
+                    ':department' => $formData['department'],
+                    ':position' => $formData['position']
+                ]);
+                
+                $userId = $pdo->lastInsertId();
+                
+                // Связываем сотрудника с пользователем
+                $linkStmt = $pdo->prepare("UPDATE employees SET user_id = :user_id WHERE id = :id");
+                $linkStmt->execute([
+                    ':user_id' => $userId,
+                    ':id' => $employeeId
+                ]);
+            }
+            
+            $pdo->commit();
             $success = true;
             $formData = [
                 'full_name' => '',
@@ -100,13 +174,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'phone' => '',
                 'hire_date' => date('Y-m-d'),
                 'salary' => '',
-                'status' => 'active'
+                'status' => 'active',
+                'create_user' => 0,
+                'username' => '',
+                'password' => '',
+                'role_id' => ''
             ];
             
             // Перенаправление через 2 секунды
             header("Refresh: 2; URL=" . pageUrl('modules/employees/list.php'));
             
-        } catch (PDOException $e) {
+        } catch (Exception $e) {
+            $pdo->rollBack();
             $errors[] = 'Ошибка при сохранении: ' . $e->getMessage();
         }
     }
@@ -381,11 +460,16 @@ $pageTitle = 'Добавление сотрудника';
                     <div class="page-header">
                         <div>
                             <h1 class="page-title">
-                                <span style="font-size: 1.75rem;">👤</span>
+                                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle;">
+                                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                    <circle cx="9" cy="7" r="4"></circle>
+                                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                                </svg>
                                 Добавление сотрудника
                             </h1>
                             <ol class="breadcrumb">
-                                <li class="breadcrumb-item"><a href="<?= pageUrl('index.php') ?>">Главная</a></li>
+                                <li class="breadcrumb-item"><a href="<?= pageUrl('index.php') ?>"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 4px;"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>Главная</a></li>
                                 <li class="breadcrumb-item"><a href="<?= pageUrl('modules/employees/list.php') ?>">Сотрудники</a></li>
                                 <li class="breadcrumb-item active">Добавление</li>
                             </ol>
@@ -395,7 +479,10 @@ $pageTitle = 'Добавление сотрудника';
                     <!-- Сообщения об успехе/ошибках -->
                     <?php if ($success): ?>
                         <div class="alert alert-success">
-                            <span style="font-size: 1.25rem;">✅</span>
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink: 0;">
+                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                            </svg>
                             <div>
                                 <strong>Успешно!</strong> Сотрудник добавлен. Перенаправление в список сотрудников...
                             </div>
@@ -404,7 +491,11 @@ $pageTitle = 'Добавление сотрудника';
 
                     <?php if (!empty($errors)): ?>
                         <div class="alert alert-danger">
-                            <span style="font-size: 1.25rem;">⚠️</span>
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink: 0;">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <line x1="12" y1="8" x2="12" y2="12"></line>
+                                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                            </svg>
                             <div>
                                 <strong>Ошибки:</strong>
                                 <ul>
@@ -417,21 +508,31 @@ $pageTitle = 'Добавление сотрудника';
                     <?php endif; ?>
 
                     <!-- Форма добавления сотрудника -->
-                    <div class="card">
-                        <div class="card-header">
-                            <h3 class="card-title">
-                                <span>📋</span>
-                                Информация о сотруднике
-                            </h3>
-                        </div>
-                        
-                        <form method="POST" action="">
+                    <form method="POST" action="">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                        <polyline points="14 2 14 8 20 8"></polyline>
+                                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                                        <polyline points="10 9 9 9 8 9"></polyline>
+                                    </svg>
+                                    Информация о сотруднике
+                                </h3>
+                            </div>
+                            
                             <div class="card-body">
                                 <!-- ФИО -->
                                 <div class="row">
                                     <div class="col-md-12">
                                         <div class="form-group">
                                             <label class="form-label" for="full_name">
+                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 6px;">
+                                                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                                    <circle cx="12" cy="7" r="4"></circle>
+                                                </svg>
                                                 ФИО <span class="required">*</span>
                                             </label>
                                             <input type="text" 
@@ -451,6 +552,10 @@ $pageTitle = 'Добавление сотрудника';
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label class="form-label" for="position">
+                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 6px;">
+                                                    <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+                                                    <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+                                                </svg>
                                                 Должность <span class="required">*</span>
                                             </label>
                                             <input type="text" 
@@ -466,6 +571,9 @@ $pageTitle = 'Добавление сотрудника';
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label class="form-label" for="department">
+                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 6px;">
+                                                    <path d="M3 21h18M5 21V7l8-4 8 4v14M8 21v-4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v4"></path>
+                                                </svg>
                                                 Отдел <span class="required">*</span>
                                             </label>
                                             <select class="form-select" id="department" name="department" required>
@@ -488,6 +596,10 @@ $pageTitle = 'Добавление сотрудника';
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label class="form-label" for="email">
+                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 6px;">
+                                                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                                                    <polyline points="22,6 12,13 2,6"></polyline>
+                                                </svg>
                                                 Email
                                             </label>
                                             <input type="email" 
@@ -502,6 +614,9 @@ $pageTitle = 'Добавление сотрудника';
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label class="form-label" for="phone">
+                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 6px;">
+                                                    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                                                </svg>
                                                 Телефон
                                             </label>
                                             <input type="tel" 
@@ -520,6 +635,12 @@ $pageTitle = 'Добавление сотрудника';
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label class="form-label" for="hire_date">
+                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 6px;">
+                                                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                                                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                                                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                                                </svg>
                                                 Дата приема <span class="required">*</span>
                                             </label>
                                             <input type="date" 
@@ -534,6 +655,10 @@ $pageTitle = 'Добавление сотрудника';
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label class="form-label" for="salary">
+                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 6px;">
+                                                    <line x1="12" y1="1" x2="12" y2="23"></line>
+                                                    <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                                                </svg>
                                                 Зарплата (BYN)
                                             </label>
                                             <input type="number" 
@@ -553,6 +678,9 @@ $pageTitle = 'Добавление сотрудника';
                                     <div class="col-md-12">
                                         <div class="form-group">
                                             <label class="form-label" for="status">
+                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 6px;">
+                                                    <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                                                </svg>
                                                 Статус
                                             </label>
                                             <select class="form-select" id="status" name="status">
@@ -565,22 +693,158 @@ $pageTitle = 'Добавление сотрудника';
                                     </div>
                                 </div>
                             </div>
+                        </div>
 
-                            <div class="card-footer">
-                                <a href="<?= pageUrl('modules/employees/list.php') ?>" class="btn btn-secondary">
-                                    ← Назад к списку
-                                </a>
-                                <button type="submit" class="btn btn-primary">
-                                    💾 Сохранить сотрудника
-                                </button>
+                        <!-- Секция создания пользователя системы -->
+                        <div class="card" style="margin-top: 1.5rem;">
+                            <div class="card-header">
+                                <h3 class="card-title">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                                        <path d="M8 11h8"></path>
+                                        <path d="M12 7v8"></path>
+                                    </svg>
+                                    Доступ к системе
+                                </h3>
                             </div>
-                        </form>
-                    </div>
+                            
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                                <input type="checkbox" 
+                                                       id="create_user" 
+                                                       name="create_user" 
+                                                       value="1"
+                                                       <?= $formData['create_user'] ? 'checked' : '' ?>
+                                                       onchange="toggleUserFields()"
+                                                       style="width: 18px; height: 18px; cursor: pointer;">
+                                                <span style="font-weight: 500; font-size: 0.95rem;">
+                                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 6px;">
+                                                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                                                        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                                                    </svg>
+                                                    Создать учетную запись пользователя системы
+                                                </span>
+                                            </label>
+                                            <small class="form-text">Отметьте, если сотрудник должен иметь доступ к системе</small>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div id="userFields" style="<?= $formData['create_user'] ? '' : 'display: none;' ?>">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label class="form-label" for="username">
+                                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 6px;">
+                                                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                                        <circle cx="12" cy="7" r="4"></circle>
+                                                    </svg>
+                                                    Логин <span class="required">*</span>
+                                                </label>
+                                                <input type="text" 
+                                                       class="form-control" 
+                                                       id="username" 
+                                                       name="username" 
+                                                       value="<?= htmlspecialchars($formData['username']) ?>"
+                                                       placeholder="ivanov.i">
+                                                <small class="form-text">Уникальное имя пользователя для входа</small>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label class="form-label" for="password">
+                                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 6px;">
+                                                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                                                        <circle cx="12" cy="16" r="1"></circle>
+                                                    </svg>
+                                                    Пароль <span class="required">*</span>
+                                                </label>
+                                                <input type="password" 
+                                                       class="form-control" 
+                                                       id="password" 
+                                                       name="password" 
+                                                       value=""
+                                                       placeholder="••••••••"
+                                                       minlength="6">
+                                                <small class="form-text">Минимум 6 символов</small>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div class="form-group">
+                                                <label class="form-label" for="role_id">
+                                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 6px;">
+                                                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                                                    </svg>
+                                                    Роль в системе <span class="required">*</span>
+                                                </label>
+                                                <select class="form-select" id="role_id" name="role_id">
+                                                    <option value="">Выберите роль</option>
+                                                    <?php foreach ($roles as $role): ?>
+                                                        <option value="<?= $role['id'] ?>" <?= $formData['role_id'] == $role['id'] ? 'selected' : '' ?>>
+                                                            <?= htmlspecialchars($role['name']) ?>
+                                                        </option>
+                                                    <?php endforeach; ?>
+                                                </select>
+                                                <small class="form-text">Определяет права доступа пользователя</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card-footer" style="margin-top: 1.5rem;">
+                            <a href="<?= pageUrl('modules/employees/list.php') ?>" class="btn btn-secondary">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <line x1="19" y1="12" x2="5" y2="12"></line>
+                                    <polyline points="12 19 5 12 12 5"></polyline>
+                                </svg>
+                                Назад к списку
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                                    <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                                    <polyline points="7 3 7 8 15 8"></polyline>
+                                </svg>
+                                Сохранить сотрудника
+                            </button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
     </div>
 
+    <script>
+    function toggleUserFields() {
+        const checkbox = document.getElementById('create_user');
+        const fields = document.getElementById('userFields');
+        fields.style.display = checkbox.checked ? 'block' : 'none';
+        
+        // Делаем поля обязательными только если чекбокс отмечен
+        const username = document.getElementById('username');
+        const password = document.getElementById('password');
+        const roleId = document.getElementById('role_id');
+        
+        if (checkbox.checked) {
+            username.setAttribute('required', 'required');
+            password.setAttribute('required', 'required');
+            roleId.setAttribute('required', 'required');
+        } else {
+            username.removeAttribute('required');
+            password.removeAttribute('required');
+            roleId.removeAttribute('required');
+        }
+    }
+    </script>
     <script src="<?= asset('assets/js/main.js') ?>"></script>
 </body>
 </html>

@@ -15,6 +15,19 @@ if (!isLoggedIn()) {
 $user = getCurrentUser();
 $pdo = getDbConnection();
 
+// Функция для перевода категории материала на русский язык
+function getCategoryName($category) {
+    $translations = [
+        'raw' => 'Сырьё',
+        'packaging' => 'Упаковка',
+        'label' => 'Этикетка',
+        'box' => 'Коробка',
+        'component' => 'Компонент',
+        'other' => 'Прочее'
+    ];
+    return $translations[$category] ?? ($category ?: '—');
+}
+
 // Получение ID заказа
 $orderId = (int)($_GET['id'] ?? 0);
 if ($orderId <= 0) {
@@ -683,7 +696,7 @@ $pageTitle = 'Заказ №' . e($order['order_number']);
                                         <?php endif; ?>
                                     </td>
                                     <td>
-                                        <span class="material-category-cell"><?= e($material['material_category'] ?? '—') ?></span>
+                                        <span class="material-category-cell"><?= getCategoryName($material['material_category'] ?? '') ?></span>
                                     </td>
                                     <td style="text-align: right; font-weight: 700; color: var(--primary-color);">
                                         <?= rtrim(rtrim(number_format($material['total_quantity'], 3, ',', ' '), '0'), ',') ?>
@@ -729,7 +742,7 @@ $pageTitle = 'Заказ №' . e($order['order_number']);
                                             <?php endif; ?>
                                         </td>
                                         <td>
-                                            <span class="material-category-cell"><?= e($material['material_category'] ?? '—') ?></span>
+                                            <span class="material-category-cell"><?= getCategoryName($material['material_category'] ?? '') ?></span>
                                         </td>
                                         <td style="text-align: right; font-weight: 700; color: var(--primary-color);">
                                             <?= rtrim(rtrim(number_format($material['total_quantity'], 3, ',', ' '), '0'), ',') ?>

@@ -705,7 +705,7 @@ $pageTitle = 'Заказ №' . e($order['order_number']);
                                         <span class="material-category-cell"><?= e($material['material_category'] ?? '—') ?></span>
                                     </td>
                                     <td style="text-align: right; font-weight: 700; color: var(--primary-color);">
-                                        <?= number_format($material['total_quantity'], 3, ',', ' ') ?>
+                                        <?= rtrim(rtrim(number_format($material['total_quantity'], 3, ',', ' '), '0'), ',') ?>
                                     </td>
                                     <td class="material-unit-cell">
                                         <?= e($material['unit'] ?? 'шт.') ?>
@@ -728,7 +728,7 @@ $pageTitle = 'Заказ №' . e($order['order_number']);
                                     <?php if (!empty($productMaterials)): ?>
                                     <tr class="material-row" data-product-index="<?= $productIdx ?>" style="display: none;">
                                         <td colspan="6" style="background: #fff3e0; font-weight: 600; color: #ef6c00; text-align: center; padding: 12px;">
-                                            📦 Материалы для: <?= e($product['product_name']) ?> (<?= number_format($product['quantity'], 0, ',', ' ') ?> <?= e($product['unit_name'] ?? 'шт.') ?>)
+                                            📦 Материалы для: <?= e($product['product_name']) ?> (<?= rtrim(rtrim(number_format($product['quantity'], 0, ',', ' '), '0'), ',') ?> <?= e($product['unit_name'] ?? 'шт.') ?>)
                                         </td>
                                     </tr>
                                     <?php 
@@ -751,7 +751,7 @@ $pageTitle = 'Заказ №' . e($order['order_number']);
                                             <span class="material-category-cell"><?= e($material['material_category'] ?? '—') ?></span>
                                         </td>
                                         <td style="text-align: right; font-weight: 700; color: var(--primary-color);">
-                                            <?= number_format($material['total_quantity'], 3, ',', ' ') ?>
+                                            <?= rtrim(rtrim(number_format($material['total_quantity'], 3, ',', ' '), '0'), ',') ?>
                                         </td>
                                         <td class="material-unit-cell">
                                             <?= e($material['unit'] ?? 'шт.') ?>
@@ -785,8 +785,8 @@ $pageTitle = 'Заказ №' . e($order['order_number']);
                                 row.style.display = 'none';
                             }
                         } else {
-                            // Показываем заголовок общей таблицы и строки выбранного продукта
-                            if (productIndex === 'all' || productIndex === filterValue) {
+                            // Скрываем общую таблицу и показываем только строки выбранного продукта
+                            if (productIndex === filterValue) {
                                 row.style.display = '';
                             } else {
                                 row.style.display = 'none';

@@ -229,6 +229,7 @@ $problemOrdersSql = "
     JOIN production_tasks pt ON pt.order_id = o.id
     JOIN production_tasks_materials ptm ON ptm.task_id = pt.id
     JOIN materials m ON ptm.material_id = m.id
+    LEFT JOIN base_units bu ON m.base_unit_id = bu.id
     WHERE o.status IN ('new', 'processing')
       AND pt.status IN ('planned', 'in_progress')
       AND ptm.status IN ('pending', 'reserved')

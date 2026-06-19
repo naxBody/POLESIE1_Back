@@ -216,8 +216,10 @@ $problemOrdersSql = "
         GROUP_CONCAT(
             CONCAT(
                 m.name_full, 
-                ': недостает ', 
-                (ptm.quantity_required - COALESCE(ptm.quantity_reserved, 0) - COALESCE(ptm.quantity_used, 0))
+                '|',
+                (ptm.quantity_required - COALESCE(ptm.quantity_reserved, 0) - COALESCE(ptm.quantity_used, 0)),
+                '|',
+                m.unit
             ) 
             SEPARATOR '; '
         ) as material_issues,
@@ -356,10 +358,19 @@ $pageTitle = 'Заказы';
                                     $issues = explode('; ', $order['material_issues']);
                                     foreach ($issues as $issue): 
                                         if (trim($issue)):
+                                            $parts = explode('|', $issue);
+                                            $materialName = $parts[0] ?? '';
+                                            $missingQty = isset($parts[1]) ? floatval($parts[1]) : 0;
+                                            $unit = $parts[2] ?? 'шт';
+                                            
+                                            // Форматируем число: без десятичных, если целое
+                                            $formattedQty = ($missingQty == floor($missingQty)) 
+                                                ? number_format($missingQty, 0, '.', ' ') 
+                                                : number_format($missingQty, 2, '.', ' ');
                                     ?>
-                                    <div style="font-size: 13px; color: #e74c3c; margin-bottom: 3px;">
-                                        <span style="display: inline-block; width: 6px; height: 6px; background: #e74c3c; border-radius: 50%; margin-right: 6px;"></span>
-                                        <?= e($issue) ?>
+                                    <div style="font-size: 13px; color: var(--text-primary); margin-bottom: 3px;">
+                                        <span style="display: inline-block; width: 6px; height: 6px; background: #f39c12; border-radius: 50%; margin-right: 6px;"></span>
+                                        <?= e($materialName) ?> — не хватает <strong><?= $formattedQty ?> <?= e($unit) ?></strong>
                                     </div>
                                     <?php 
                                         endif;

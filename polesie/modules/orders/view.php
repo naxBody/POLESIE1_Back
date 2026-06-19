@@ -79,13 +79,12 @@ foreach ($items as $item) {
         $matStmt = $pdo->prepare("
             SELECT 
                 ppm.quantity,
-                bu.name as unit,
+                bu.symbol as unit,
                 m.id as material_id,
                 m.code as material_code,
                 m.name_full as material_name,
                 m.name_short as material_short,
-                mc.name as material_category,
-                m.material_type
+                mc.name as material_category
             FROM product_passport_materials ppm
             JOIN materials m ON ppm.material_id = m.id
             LEFT JOIN material_categories mc ON m.category_id = mc.id

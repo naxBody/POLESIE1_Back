@@ -637,6 +637,11 @@ $pageTitle = 'Заказ №' . e($order['order_number']);
                 
                 <!-- Материалы для производства -->
                 <div class="materials-section">
+                    <div class="materials-section-header" style="border-bottom: none;">
+                        <i class="bi bi-pie-chart-fill" style="margin-right: 8px;"></i>
+                        Расход материалов
+                    </div>
+                    
                     <div class="materials-filter-section">
                         <span class="materials-filter-label"><i class="bi bi-funnel" style="margin-right: 8px; font-size: 1.2em;"></i> Показать материалы для:</span>
                         <select class="materials-filter-select" id="productFilter" onchange="filterMaterials()">
@@ -653,11 +658,6 @@ $pageTitle = 'Заказ №' . e($order['order_number']);
                             <span class="summary-badge"><i class="bi bi-box-seam" style="margin-right: 6px;"></i>Всего уникальных материалов: <?= count($groupedMaterials) ?></span>
                         </div>
                         <?php endif; ?>
-                    </div>
-                    
-                    <div class="materials-section-header" style="border-bottom: none;">
-                        <i class="bi bi-pie-chart-fill" style="margin-right: 8px;"></i>
-                        Расход материалов
                     </div>
                     
                     <?php if (count($groupedMaterials) > 0): ?>

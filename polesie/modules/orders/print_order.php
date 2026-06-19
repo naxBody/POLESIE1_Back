@@ -437,13 +437,11 @@ $deliveryDateDisplay = !empty($order['delivery_date']) ? date('d.m.Y', strtotime
 <body>
     <div class="control-panel">
         <button class="btn btn-secondary" onclick="window.close()">Закрыть</button>
-        <button class="btn btn-secondary" onclick="window.history.back()">← Назад</button>
+        <button class="btn btn-secondary" onclick="window.history.back()">Назад</button>
         <button class="btn btn-info" onclick="downloadPDF()">
-            <i class="bi bi-file-earmark-pdf-fill" style="margin-right: 6px;"></i>
-            Скачать PDF
+            Скачать файл
         </button>
         <button class="btn btn-success" onclick="printDocument()">
-            <i class="bi bi-printer-fill" style="margin-right: 6px;"></i>
             Печать
         </button>
     </div>
@@ -477,7 +475,7 @@ $deliveryDateDisplay = !empty($order['delivery_date']) ? date('d.m.Y', strtotime
         // Автоматическая подсказка при загрузке страницы
         window.addEventListener('DOMContentLoaded', function() {
             setTimeout(() => {
-                alert('Документ готов к экспорту!\n\n• Нажмите "Скачать PDF" чтобы сохранить файл с полной разметкой.\n• Или нажмите "Печать" для быстрой печати.');
+                alert('Документ готов к экспорту!\n\n• Нажмите "Скачать файл" чтобы сохранить документ с полной разметкой.\n• Или нажмите "Печать" для быстрой печати.');
             }, 500);
         });
     </script>
@@ -506,7 +504,7 @@ $deliveryDateDisplay = !empty($order['delivery_date']) ? date('d.m.Y', strtotime
         
         <!-- Информация о заказчике -->
         <div class="customer-block">
-            <div class="block-title">📋 Заказчик</div>
+            <div class="block-title">Заказчик</div>
             <div class="info-grid">
                 <div class="info-row">
                     <span class="info-label">Наименование:</span>
@@ -545,7 +543,7 @@ $deliveryDateDisplay = !empty($order['delivery_date']) ? date('d.m.Y', strtotime
         
         <!-- Информация о заказе -->
         <div class="delivery-block">
-            <div class="delivery-title">📦 Информация о поставке</div>
+            <div class="delivery-title">Информация о поставке</div>
             <div class="info-grid">
                 <div class="info-row">
                     <span class="info-label">Дата заказа:</span>

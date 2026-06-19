@@ -615,6 +615,16 @@ $pageTitle = 'Заказ №' . e($order['order_number']);
                                                 <?php if (!empty($item['description'])): ?>
                                                 <div style="font-size: 12px; color: var(--text-secondary);"><?= e($item['description']) ?></div>
                                                 <?php endif; ?>
+                                                <?php if ($hasPassport): ?>
+                                                <div style="font-size: 11px; margin-top: 4px;">
+                                                    <a href="<?= pageUrl('modules/products/passports.php?product=' . $item['product_id']) ?>" 
+                                                       style="color: var(--primary-color); text-decoration: underline;"
+                                                       onmouseover="this.style.color='var(--primary-dark)'" 
+                                                       onmouseout="this.style.color='var(--primary-color)'">
+                                                        <i class="bi bi-passport"></i> Паспорт изделия
+                                                    </a>
+                                                </div>
+                                                <?php endif; ?>
                                             </td>
                                             <td><?= e($item['unit_name'] ?? 'шт.') ?></td>
                                             <td style="text-align: right;"><strong><?= number_format($item['quantity'], 0, ',', ' ') ?></strong></td>
@@ -723,7 +733,9 @@ $pageTitle = 'Заказ №' . e($order['order_number']);
                                     <?php if (!empty($productMaterials)): ?>
                                     <tr class="material-row" data-product-index="<?= $productIdx ?>" style="display: none;">
                                         <td colspan="6" style="background: #fff3e0; font-weight: 600; color: #ef6c00; text-align: center; padding: 12px;">
-                                            <i class="bi bi-box-seam" style="margin-right: 8px;"></i>Материалы для: <?= e($product['product_name']) ?> (<?= rtrim(rtrim(number_format($product['quantity'], 0, ',', ' '), '0'), ',') ?> <?= e($product['unit_name'] ?? 'шт.') ?>)
+                                            <i class="bi bi-box-seam-fill" style="margin-right: 8px;"></i>Материалы для: 
+                                            <a href="../modules/products/view.php?id=<?= $product['product_id'] ?>" style="color: #ef6c00; text-decoration: underline;"><?= e($product['product_name']) ?></a> 
+                                            (арт. <?= e($product['article'] ?? '—') ?>, <?= rtrim(rtrim(number_format($product['quantity'], 0, ',', ' '), '0'), ',') ?> <?= e($product['unit_name'] ?? 'шт.') ?>)
                                         </td>
                                     </tr>
                                     <?php 

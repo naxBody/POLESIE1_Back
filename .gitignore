@@ -1,1 +1,1 @@
-Nothing should be ignored based on the provided file changes. The only modified file is 'polesie/modules/orders/view.php', which is a source code file and should not be added to .gitignore. There are no build artifacts, dependencies, or temporary files in the changes list.
+Nothing should be ignored in this case, as the only change is adding a source asset file (.svg) without any build artifacts, dependencies, or temporary files.

@@ -690,10 +690,10 @@ $pageTitle = 'Заказ №' . e($order['order_number']);
                                 foreach ($groupedMaterials as $material): 
                                     $globalIndex++;
                                 ?>
-                                <tr class="material-row" data-product-index="all" onclick="window.location.href='../warehouse/materials.php?material=<?= $material['material_id'] ?>'" style="cursor: pointer;">
+                                <tr class="material-row" data-product-index="all">
                                     <td><?= $globalIndex ?></td>
                                     <td class="material-code-cell">
-                                        <span class="material-code-badge-inline"><?= e($material['material_code']) ?></span>
+                                        <span class="material-code-badge-inline" onclick="event.stopPropagation(); window.location.href='../warehouse/materials.php?material=<?= $material['material_id'] ?>'"><?= e($material['material_code']) ?></span>
                                     </td>
                                     <td>
                                         <div class="material-name-cell"><?= e($material['material_name']) ?></div>
@@ -736,10 +736,10 @@ $pageTitle = 'Заказ №' . e($order['order_number']);
                                     foreach ($productMaterials as $material): 
                                         $prodIndex++;
                                     ?>
-                                    <tr class="material-row" data-product-index="<?= $productIdx ?>" style="display: none;" onclick="window.location.href='../warehouse/materials.php?material=<?= $material['material_id'] ?>'">
+                                    <tr class="material-row" data-product-index="<?= $productIdx ?>" style="display: none;">
                                         <td><?= $prodIndex ?></td>
                                         <td class="material-code-cell">
-                                            <span class="material-code-badge-inline"><?= e($material['material_code']) ?></span>
+                                            <span class="material-code-badge-inline" onclick="event.stopPropagation(); window.location.href='../warehouse/materials.php?material=<?= $material['material_id'] ?>'"><?= e($material['material_code']) ?></span>
                                         </td>
                                         <td>
                                             <div class="material-name-cell"><?= e($material['material_name']) ?></div>

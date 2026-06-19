@@ -600,7 +600,7 @@ $pageTitle = 'Заказ №' . e($order['order_number']);
                                         <tr>
                                             <td><?= $index + 1 ?></td>
                                             <td>
-                                                <?= e($item['article'] ?? '—') ?>
+                                                <a href="<?= pageUrl('modules/products/passports.php?product=' . $item['product_id']) ?>" style="color: var(--primary-color); text-decoration: none; font-weight: 500;" title="Открыть паспорт изделия"><?= e($item['article'] ?? '—') ?></a>
                                             </td>
                                             <td>
                                                 <strong><?= e($item['product_name']) ?></strong>

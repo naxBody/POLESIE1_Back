@@ -34,7 +34,7 @@ $formData = [
 ];
 
 // Получаем роли для выпадающего списка
-$rolesStmt = $pdo->query("SELECT id, name, code FROM user_roles WHERE is_active = 1 ORDER BY name");
+$rolesStmt = $pdo->query("SELECT id, name, code FROM user_roles ORDER BY name");
 $roles = $rolesStmt->fetchAll();
 
 // Обработка формы

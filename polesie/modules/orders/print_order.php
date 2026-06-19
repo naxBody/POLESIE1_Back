@@ -438,21 +438,10 @@ $deliveryDateDisplay = !empty($order['delivery_date']) ? date('d.m.Y', strtotime
     <div class="control-panel">
         <button class="btn btn-secondary" onclick="window.close()">Закрыть</button>
         <button class="btn btn-secondary" onclick="window.history.back()">← Назад</button>
-        <button class="btn btn-info" onclick="downloadAsPDF()">📥 Скачать PDF</button>
-        <button class="btn btn-success" onclick="window.print()">🖨 Печать</button>
+        <button class="btn btn-success" onclick="window.print()">🖨 Печать / Скачать PDF</button>
     </div>
     
     <script>
-        // Функция для скачивания документа в PDF через print dialog
-        function downloadAsPDF() {
-            // Показываем инструкцию пользователю
-            alert('Для сохранения документа в формате PDF:\n\n1. Откроется окно печати\n2. В качестве принтера выберите "Сохранить как PDF"\n3. Укажите место сохранения и нажмите "Сохранить"\n\nДокумент будет сохранён на вашем компьютере.');
-            
-            // Вызываем диалог печати
-            setTimeout(() => {
-                window.print();
-            }, 100);
-        }
         
         // Функция для скачивания в формате Word (.doc)
         function downloadAsWord() {
@@ -475,7 +464,7 @@ $deliveryDateDisplay = !empty($order['delivery_date']) ? date('d.m.Y', strtotime
         window.addEventListener('DOMContentLoaded', function() {
             // Показываем подсказку пользователю
             setTimeout(() => {
-                alert('Для сохранения документа:\n\n• Нажмите "Скачать PDF" для сохранения в PDF\n• Или нажмите "Печать" или Ctrl+P (Cmd+P на Mac)\n• В качестве принтера выберите "Сохранить как PDF"\n• Нажмите "Сохранить"\n\nФайл будет сохранён на вашем компьютере для последующей печати.');
+                alert('Для сохранения или печати документа:\n\n• Нажмите кнопку "Печать / Скачать PDF"\n• В окне печати выберите принтер:\n  - "Сохранить как PDF" — для скачивания файла\n  - Ваш принтер — для печати на бумаге\n• Нажмите "Сохранить" или "Печать"');
             }, 500);
         });
     </script>

@@ -54,7 +54,7 @@ if (!$order) {
     die('Заказ не найден');
 }
 
-// Получение позиций заказа
+// Получение позиций заказа с материалами
 $itemsSql = "
     SELECT oi.*, p.id as product_id, p.name as product_name, p.article,
            bu.symbol as unit_name
@@ -68,30 +68,39 @@ $stmt = $pdo->prepare($itemsSql);
 $stmt->execute([$orderId]);
 $items = $stmt->fetchAll();
 
-// Получение производственных заданий по заказу
-$tasksSql = "
-    SELECT pt.*, 
-           CASE pt.status
-               WHEN 'pending' THEN 'Ожидает'
-               WHEN 'in_progress' THEN 'В работе'
-               WHEN 'completed' THEN 'Завершено'
-               ELSE pt.status
-           END as task_status_name,
-           CASE pt.status
-               WHEN 'pending' THEN '#95a5a6'
-               WHEN 'in_progress' THEN '#f39c12'
-               WHEN 'completed' THEN '#27ae60'
-               ELSE '#95a5a6'
-           END as task_status_color
-    FROM production_tasks pt
-    WHERE pt.order_item_id IN (
-        SELECT id FROM order_items WHERE order_id = ?
-    )
-    ORDER BY pt.created_at DESC
-";
-$stmt = $pdo->prepare($tasksSql);
-$stmt->execute([$orderId]);
-$tasks = $stmt->fetchAll();
+// Получение материалов для каждой позиции заказа
+$itemsWithMaterials = [];
+foreach ($items as $item) {
+    $itemData = $item;
+    $itemData['materials'] = [];
+    
+    if (!empty($item['product_id'])) {
+        // Получаем материалы из паспорта продукта
+        $matStmt = $pdo->prepare("
+            SELECT 
+                ppm.quantity,
+                bu.name as unit,
+                m.id as material_id,
+                m.code as material_code,
+                m.name_full as material_name,
+                m.name_short as material_short,
+                mc.name as material_category,
+                m.material_type
+            FROM product_passport_materials ppm
+            JOIN materials m ON ppm.material_id = m.id
+            LEFT JOIN material_categories mc ON m.category_id = mc.id
+            LEFT JOIN base_units bu ON ppm.unit_id = bu.id
+            WHERE ppm.passport_id = (
+                SELECT id FROM product_passports WHERE product_id = ?
+            )
+            ORDER BY ppm.sort_order, m.name_full
+        ");
+        $matStmt->execute([$item['product_id']]);
+        $itemData['materials'] = $matStmt->fetchAll();
+    }
+    
+    $itemsWithMaterials[] = $itemData;
+}
 
 $pageTitle = 'Заказ №' . e($order['order_number']);
 ?>
@@ -210,6 +219,118 @@ $pageTitle = 'Заказ №' . e($order['order_number']);
             display: flex;
             gap: 12px;
             margin-top: 24px;
+        }
+        .materials-section {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            margin-bottom: 24px;
+            overflow: hidden;
+        }
+        .materials-section-header {
+            background: #f8f9fa;
+            padding: 16px 20px;
+            border-bottom: 1px solid #e9ecef;
+            font-weight: 600;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .product-materials-block {
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            margin: 16px 20px;
+            overflow: hidden;
+        }
+        .product-materials-header {
+            background: linear-gradient(135deg, #f8f9fa, #ffffff);
+            padding: 14px 16px;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .product-materials-title {
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--text-primary);
+        }
+        .product-materials-info {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+        .materials-table-wrapper {
+            padding: 0;
+            overflow-x: auto;
+        }
+        .materials-table-custom {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+        .materials-table-custom th {
+            background: #fafbfc;
+            padding: 10px 12px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--text-secondary);
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid #e9ecef;
+        }
+        .materials-table-custom td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #f1f3f4;
+            vertical-align: middle;
+        }
+        .materials-table-custom tr:last-child td {
+            border-bottom: none;
+        }
+        .materials-table-custom tr:hover {
+            background: #f8f9fa;
+        }
+        .material-code-badge {
+            background: #e3f2fd;
+            color: #1976d2;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .material-code-badge:hover {
+            background: #1976d2;
+            color: white;
+        }
+        .material-name-cell {
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+        .material-category-cell {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+        .material-qty-cell {
+            text-align: right;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+        .material-unit-cell {
+            text-align: left;
+            color: var(--text-secondary);
+            font-size: 12px;
+        }
+        .no-materials-notice {
+            padding: 20px;
+            text-align: center;
+            color: var(--text-secondary);
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin: 16px 20px;
         }
     </style>
 </head>
@@ -389,59 +510,94 @@ $pageTitle = 'Заказ №' . e($order['order_number']);
                     </div>
                 </div>
                 
-                <!-- Производственные задания -->
-                <?php if (!empty($tasks)): ?>
-                <div class="card" style="margin-bottom: 24px;">
-                    <div class="card-body" style="padding: 0;">
-                        <h3 style="padding: 20px 20px 0; margin: 0;" class="section-title">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-right: 8px;">
-                                <rect x="2" y="7" width="20" height="13" rx="2" ry="2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                <path d="M16 21V5C16 4.46957 15.7893 3.96086 15.4142 3.58579C15.0391 3.21071 14.5304 3 14 3H10C9.46957 3 8.96086 3.21071 8.58579 3.58579C8.21071 3.96086 8 4.46957 8 5V21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                <line x1="6" y1="11" x2="18" y2="11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                <line x1="6" y1="15" x2="18" y2="15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                            Производственные задания
-                        </h3>
-                        <div style="padding: 20px;">
-                            <?php foreach ($tasks as $task): ?>
-                            <div class="task-card">
-                                <div class="task-header">
-                                    <div>
-                                        <strong>Задание №<?= $task['id'] ?></strong>
-                                        <span style="margin-left: 12px; color: var(--text-secondary);">
-                                            от <?= formatDate($task['created_at']) ?>
-                                        </span>
-                                    </div>
-                                    <span class="badge" style="background: <?= e($task['task_status_color']) ?>20; color: <?= e($task['task_status_color']) ?>">
-                                        <?= e($task['task_status_name']) ?>
-                                    </span>
-                                </div>
-                                <div class="task-body">
-                                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
-                                        <div>
-                                            <div class="meta-label">Продукция</div>
-                                            <div class="meta-value"><?= e($task['product_name'] ?? '—') ?></div>
-                                        </div>
-                                        <div>
-                                            <div class="meta-label">Количество</div>
-                                            <div class="meta-value"><?= $task['quantity'] ?? '—' ?> <?= e($task['unit_name'] ?? 'шт.') ?></div>
-                                        </div>
-                                        <div>
-                                            <div class="meta-label">Срок выполнения</div>
-                                            <div class="meta-value"><?= e($task['due_date'] ?? '—') ?></div>
-                                        </div>
-                                        <div>
-                                            <div class="meta-label">Цех/Участок</div>
-                                            <div class="meta-value"><?= e($task['work_center'] ?? '—') ?></div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <?php endforeach; ?>
-                        </div>
+                <!-- Материалы для производства -->
+                <div class="materials-section">
+                    <div class="materials-section-header">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-right: 8px;">
+                            <path d="M21 16V8C20.9996 7.64927 20.9071 7.30481 20.7315 7.00116C20.556 6.69751 20.3037 6.44536 20 6.27L13 2.27C12.696 2.09446 12.3511 2.00205 12 2.00205C11.6489 2.00205 11.304 2.09446 11 2.27L4 6.27C3.69626 6.44536 3.44398 6.69751 3.26846 7.00116C3.09294 7.30481 3.00036 7.64927 3 8V16C3.00036 16.3507 3.09294 16.6952 3.26846 16.9988C3.44398 17.3025 3.69626 17.5546 4 17.73L11 21.73C11.304 21.9055 11.6489 21.9979 12 21.9979C12.3511 21.9979 12.696 21.9055 13 21.73L20 17.73C20.3037 17.5546 20.556 17.3025 20.7315 16.9988C20.9071 16.6952 20.9996 16.3507 21 16Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <polyline points="3.27 6.96 12 12.01 20.73 6.96" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <line x1="12" y1="22.08" x2="12" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        📦 Материалы для производства по заказу
                     </div>
+                    
+                    <?php foreach ($itemsWithMaterials as $itemIndex => $item): ?>
+                        <?php if (!empty($item['materials'])): ?>
+                        <div class="product-materials-block">
+                            <div class="product-materials-header">
+                                <div>
+                                    <div class="product-materials-title">
+                                        <?= e($item['product_name']) ?>
+                                        <?php if (!empty($item['article'])): ?>
+                                            <span style="font-weight: normal; color: var(--text-secondary); margin-left: 8px;">(арт. <?= e($item['article']) ?>)</span>
+                                        <?php endif; ?>
+                                    </div>
+                                    <div class="product-materials-info">
+                                        Кол-во в заказе: <strong><?= number_format($item['quantity'], 0, ',', ' ') ?></strong> <?= e($item['unit_name'] ?? 'шт.') ?>
+                                    </div>
+                                </div>
+                                <span style="background: var(--primary-color); color: white; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600;">
+                                    <?= count($item['materials']) ?> поз. материалов
+                                </span>
+                            </div>
+                            <div class="materials-table-wrapper">
+                                <table class="materials-table-custom">
+                                    <thead>
+                                        <tr>
+                                            <th style="width: 40px;">№</th>
+                                            <th style="width: 120px;">Артикул</th>
+                                            <th>Наименование материала</th>
+                                            <th style="width: 150px;">Категория</th>
+                                            <th style="width: 100px; text-align: right;">Количество</th>
+                                            <th style="width: 60px;">Ед.</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php foreach ($item['materials'] as $matIndex => $material): ?>
+                                        <tr onclick="window.location.href='../warehouse/materials.php?material=<?= $material['material_id'] ?>'" style="cursor: pointer;">
+                                            <td><?= $matIndex + 1 ?></td>
+                                            <td>
+                                                <span class="material-code-badge"><?= e($material['material_code']) ?></span>
+                                            </td>
+                                            <td>
+                                                <div class="material-name-cell"><?= e($material['material_name']) ?></div>
+                                                <?php if (!empty($material['material_short'])): ?>
+                                                <div style="font-size: 11px; color: var(--text-secondary); margin-top: 2px;"><?= e($material['material_short']) ?></div>
+                                                <?php endif; ?>
+                                            </td>
+                                            <td>
+                                                <span class="material-category-cell"><?= e($material['material_category'] ?? '—') ?></span>
+                                            </td>
+                                            <td class="material-qty-cell">
+                                                <?= number_format($material['quantity'], 3, ',', ' ') ?>
+                                            </td>
+                                            <td class="material-unit-cell">
+                                                <?= e($material['unit'] ?? 'шт.') ?>
+                                            </td>
+                                        </tr>
+                                        <?php endforeach; ?>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <?php endif; ?>
+                    <?php endforeach; ?>
+                    
+                    <?php 
+                    $hasAnyMaterials = false;
+                    foreach ($itemsWithMaterials as $item) {
+                        if (!empty($item['materials'])) {
+                            $hasAnyMaterials = true;
+                            break;
+                        }
+                    }
+                    if (!$hasAnyMaterials): 
+                    ?>
+                    <div class="no-materials-notice">
+                        ℹ️ Для товаров в этом заказе не указаны материалы в паспортах продукции
+                    </div>
+                    <?php endif; ?>
                 </div>
-                <?php endif; ?>
                 
                 <!-- Кнопки действий -->
                 <div class="action-buttons">

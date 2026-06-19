@@ -219,7 +219,7 @@ $problemOrdersSql = "
                 '|',
                 (ptm.quantity_required - COALESCE(ptm.quantity_reserved, 0) - COALESCE(ptm.quantity_used, 0)),
                 '|',
-                bu.symbol
+                m.unit
             ) 
             SEPARATOR '; '
         ) as material_issues,

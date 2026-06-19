@@ -438,70 +438,17 @@ $deliveryDateDisplay = !empty($order['delivery_date']) ? date('d.m.Y', strtotime
     <div class="control-panel">
         <button class="btn btn-secondary" onclick="window.close()">Закрыть</button>
         <button class="btn btn-secondary" onclick="window.history.back()">← Назад</button>
-        <button class="btn btn-info" onclick="exportToPDF()">📥 Экспорт в PDF</button>
         <button class="btn btn-success" onclick="window.print()">🖨 Печать</button>
     </div>
     
     <script>
-        function exportToPDF() {
-            // Создаем новую версию страницы без кнопок управления
-            const printContent = document.querySelector('.document-container').cloneNode(true);
-            const newWindow = window.open('', '_blank');
-            
-            if (!newWindow) {
-                alert('Пожалуйста, разрешите открытие всплывающих окон для экспорта');
-                return;
-            }
-            
-            // Получаем все стили
-            const styles = Array.from(document.styleSheets)
-                .map(sheet => {
-                    try {
-                        return Array.from(sheet.cssRules)
-                            .map(rule => rule.cssText)
-                            .join('\n');
-                    } catch (e) {
-                        return '';
-                    }
-                })
-                .join('\n');
-            
-            // Формируем HTML для экспорта
-            const html = `
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <title>Заказ № <?= htmlspecialchars($order['order_number']) ?></title>
-    <style>
-        ${styles}
-        .control-panel { display: none !important; }
-        @page { size: A4; margin: 15mm; }
-        body { font-family: "Times New Roman", Times, serif; }
-    </style>
-</head>
-<body>
-    <div style="max-width: 210mm; margin: 0 auto;">
-        ${printContent.innerHTML}
-    </div>
-    <script>
-        // Автоматически сохраняем как PDF при загрузке
-        window.onload = function() {
-            // Оставляем страницу открытой для ручной печати/сохранения
-            console.log('Документ готов к экспорту');
-        };
-    <\/script>
-</body>
-</html>`;
-            
-            newWindow.document.write(html);
-            newWindow.document.close();
-            
-            // Показываем инструкцию
+        // Функция экспорта теперь вызывается автоматически при загрузке страницы
+        window.addEventListener('DOMContentLoaded', function() {
+            // Показываем подсказку пользователю
             setTimeout(() => {
-                alert('Для сохранения в PDF:\n\n1. Нажмите Ctrl+P (или Cmd+P на Mac)\n2. В качестве принтера выберите "Сохранить как PDF"\n3. Нажмите "Сохранить"\n\nФайл будет сохранён на вашем компьютере для последующей печати.');
+                alert('Для сохранения документа:\n\n1. Нажмите кнопку "Печать" или Ctrl+P (Cmd+P на Mac)\n2. В качестве принтера выберите "Сохранить как PDF"\n3. Нажмите "Сохранить"\n\nФайл будет сохранён на вашем компьютере для последующей печати.');
             }, 500);
-        }
+        });
     </script>
     
     <div class="document-container">

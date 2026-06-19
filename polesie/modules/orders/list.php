@@ -324,185 +324,58 @@ $pageTitle = 'Заказы';
                     </a>
                 </div>
 
-                <!-- KPI метрики и дашборд -->
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-bottom: 24px;">
-                    <!-- Карточка: Сегодня -->
-                    <div class="card" style="border-left: 4px solid #3498db; margin: 0;">
-                        <div class="card-body" style="padding: 20px;">
-                            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
-                                <span style="font-size: 13px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">Заказов сегодня</span>
-                                <div style="width: 40px; height: 40px; background: rgba(52, 152, 219, 0.1); border-radius: 10px; display: flex; align-items: center; justify-content: center;">
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <rect x="3" y="4" width="18" height="18" rx="2" stroke="#3498db" stroke-width="2"/>
-                                        <path d="M16 2V6M8 2V6M3 10H21" stroke="#3498db" stroke-width="2" stroke-linecap="round"/>
-                                    </svg>
-                                </div>
-                            </div>
-                            <div style="font-size: 32px; font-weight: 700; color: var(--text-primary); line-height: 1.2;"><?= $todayOrdersCount ?></div>
-                            <div style="font-size: 12px; color: var(--text-secondary); margin-top: 8px;">
-                                За неделю: <strong style="color: var(--text-primary);"><?= $weekOrdersCount ?></strong>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Карточка: Активные заказы -->
-                    <div class="card" style="border-left: 4px solid #f39c12; margin: 0;">
-                        <div class="card-body" style="padding: 20px;">
-                            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
-                                <span style="font-size: 13px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">В работе</span>
-                                <div style="width: 40px; height: 40px; background: rgba(243, 156, 18, 0.1); border-radius: 10px; display: flex; align-items: center; justify-content: center;">
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <circle cx="12" cy="12" r="3" stroke="#f39c12" stroke-width="2"/>
-                                        <path d="M12 1V3M12 21V23M23 12H21M3 12H1" stroke="#f39c12" stroke-width="2" stroke-linecap="round"/>
-                                    </svg>
-                                </div>
-                            </div>
-                            <div style="font-size: 32px; font-weight: 700; color: var(--text-primary); line-height: 1.2;"><?= $inWorkCount ?></div>
-                            <div style="font-size: 12px; color: var(--text-secondary); margin-top: 8px;">
-                                Новый: <strong style="color: #3498db;"><?= $newOrdersCount ?></strong> · Готов: <strong style="color: #27ae60;"><?= $readyCount ?></strong>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Карточка: Просроченные -->
-                    <div class="card" style="border-left: 4px solid #e74c3c; margin: 0;">
-                        <div class="card-body" style="padding: 20px;">
-                            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
-                                <span style="font-size: 13px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">Требуют внимания</span>
-                                <div style="width: 40px; height: 40px; background: rgba(231, 76, 60, 0.1); border-radius: 10px; display: flex; align-items: center; justify-content: center;">
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M12 9V11M12 15H12.01M5.07183 19H18.9282C19.5306 19 20.0223 18.5415 19.9369 17.9462L18.0001 4.41602C17.9086 3.77896 17.3621 3.30485 16.7188 3.30485H7.2812C6.63795 3.30485 6.09138 3.77896 6.00002 4.41602L4.06316 17.9462C3.97783 18.5415 4.46948 19 5.07183 19Z" stroke="#e74c3c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                    </svg>
-                                </div>
-                            </div>
-                            <div style="font-size: 32px; font-weight: 700; color: #e74c3c; line-height: 1.2;"><?= $overdueOrdersCount ?></div>
-                            <div style="font-size: 12px; color: var(--text-secondary); margin-top: 8px;">
-                                В работе > 7 дней
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Карточка: Готовы к отгрузке -->
-                    <div class="card" style="border-left: 4px solid #27ae60; margin: 0;">
-                        <div class="card-body" style="padding: 20px;">
-                            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
-                                <span style="font-size: 13px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">Готовы к отгрузке</span>
-                                <div style="width: 40px; height: 40px; background: rgba(39, 174, 96, 0.1); border-radius: 10px; display: flex; align-items: center; justify-content: center;">
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M20 6L9 17L4 12" stroke="#27ae60" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                    </svg>
-                                </div>
-                            </div>
-                            <div style="font-size: 32px; font-weight: 700; color: var(--text-primary); line-height: 1.2;"><?= $readyForShipment ?></div>
-                            <div style="font-size: 12px; color: var(--text-secondary); margin-top: 8px;">
-                                Отгружено: <strong style="color: #9b59b6;"><?= $shippedCount ?></strong>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Прогресс бар распределения по статусам -->
-                <div class="card" style="margin-bottom: 24px;">
-                    <div class="card-body" style="padding: 20px;">
-                        <h3 style="font-size: 16px; font-weight: 600; margin: 0 0 16px 0; color: var(--text-primary);">Распределение заказов по статусам</h3>
-                        <div style="display: flex; gap: 4px; height: 12px; border-radius: 6px; overflow: hidden; background: #ecf0f1; margin-bottom: 16px;">
-                            <?php if ($totalAllOrders > 0): ?>
-                                <div style="flex: <?= $statusPercentages['new'] ?? 0 ?>%; background: #3498db;" title="Новые: <?= $statusCounts['new'] ?? 0 ?>"></div>
-                                <div style="flex: <?= $statusPercentages['processing'] ?? 0 ?>%; background: #f39c12;" title="В работе: <?= $statusCounts['processing'] ?? 0 ?>"></div>
-                                <div style="flex: <?= $statusPercentages['ready'] ?? 0 ?>%; background: #27ae60;" title="Готовы: <?= $statusCounts['ready'] ?? 0 ?>"></div>
-                                <div style="flex: <?= $statusPercentages['shipped'] ?? 0 ?>%; background: #9b59b6;" title="Отгружены: <?= $statusCounts['shipped'] ?? 0 ?>"></div>
-                                <div style="flex: <?= $statusPercentages['cancelled'] ?? 0 ?>%; background: #e74c3c;" title="Отменены: <?= $statusCounts['cancelled'] ?? 0 ?>"></div>
-                            <?php endif; ?>
-                        </div>
-                        <div style="display: flex; flex-wrap: wrap; gap: 16px;">
-                            <div style="display: flex; align-items: center; gap: 8px;">
-                                <div style="width: 12px; height: 12px; border-radius: 3px; background: #3498db;"></div>
-                                <span style="font-size: 13px; color: var(--text-secondary);">Новые: <strong><?= $statusCounts['new'] ?? 0 ?></strong></span>
-                            </div>
-                            <div style="display: flex; align-items: center; gap: 8px;">
-                                <div style="width: 12px; height: 12px; border-radius: 3px; background: #f39c12;"></div>
-                                <span style="font-size: 13px; color: var(--text-secondary);">В работе: <strong><?= $statusCounts['processing'] ?? 0 ?></strong></span>
-                            </div>
-                            <div style="display: flex; align-items: center; gap: 8px;">
-                                <div style="width: 12px; height: 12px; border-radius: 3px; background: #27ae60;"></div>
-                                <span style="font-size: 13px; color: var(--text-secondary);">Готовы: <strong><?= $statusCounts['ready'] ?? 0 ?></strong></span>
-                            </div>
-                            <div style="display: flex; align-items: center; gap: 8px;">
-                                <div style="width: 12px; height: 12px; border-radius: 3px; background: #9b59b6;"></div>
-                                <span style="font-size: 13px; color: var(--text-secondary);">Отгружены: <strong><?= $statusCounts['shipped'] ?? 0 ?></strong></span>
-                            </div>
-                            <div style="display: flex; align-items: center; gap: 8px;">
-                                <div style="width: 12px; height: 12px; border-radius: 3px; background: #e74c3c;"></div>
-                                <span style="font-size: 13px; color: var(--text-secondary);">Отменены: <strong><?= $statusCounts['cancelled'] ?? 0 ?></strong></span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
                 <!-- Секция: Заказы требующие внимания (с проблемами) -->
                 <?php if (!empty($problemOrders)): ?>
-                <div class="card" style="margin-bottom: 24px; border: 2px solid #e74c3c; background: linear-gradient(135deg, #fff5f5 0%, #ffffff 100%);">
-                    <div class="card-body" style="padding: 0;">
-                        <div style="padding: 20px; border-bottom: 1px solid #ffe0e0; background: #e74c3c; color: white;">
-                            <div style="display: flex; align-items: center; justify-content: space-between;">
-                                <h3 style="font-size: 18px; font-weight: 600; margin: 0; display: flex; align-items: center; gap: 12px;">
-                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M12 9V11M12 15H12.01M5.07183 19H18.9282C19.5306 19 20.0223 18.5415 19.9369 17.9462L18.0001 4.41602C17.9086 3.77896 17.3621 3.30485 16.7188 3.30485H7.2812C6.63795 3.30485 6.09138 3.77896 6.00002 4.41602L4.06316 17.9462C3.97783 18.5415 4.46948 19 5.07183 19Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                    </svg>
-                                    Требуют внимания: проблемы с материалами
-                                    <span style="background: white; color: #e74c3c; padding: 4px 12px; border-radius: 20px; font-size: 14px; font-weight: 700;"><?= $problemOrdersTotal ?></span>
-                                </h3>
-                                <a href="#problems" class="btn btn-sm" style="background: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.3);" onclick="document.getElementById('problemsList').scrollIntoView({behavior: 'smooth'}); return false;">
-                                    Показать все
-                                </a>
-                            </div>
+                <div class="card" style="margin-bottom: 24px; border-left: 3px solid #f39c12;">
+                    <div class="card-body" style="padding: 15px 20px;">
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px;">
+                            <h3 style="font-size: 16px; font-weight: 600; margin: 0; color: var(--text-primary); display: flex; align-items: center; gap: 8px;">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#f39c12" stroke-width="2">
+                                    <path d="M12 9V11M12 15H12.01M5.07183 19H18.9282C19.5306 19 20.0223 18.5415 19.9369 17.9462L18.0001 4.41602C17.9086 3.77896 17.3621 3.30485 16.7188 3.30485H7.2812C6.63795 3.30485 6.09138 3.77896 6.00002 4.41602L4.06316 17.9462C3.97783 18.5415 4.46948 19 5.07183 19Z"/>
+                                </svg>
+                                Требуют внимания: <?= count($problemOrders) ?> из <?= $problemOrdersTotal ?> заказов с проблемами материалов
+                            </h3>
                         </div>
-                        <div id="problemsList" style="padding: 0;">
+                        
+                        <div style="display: grid; gap: 10px;">
                             <?php foreach ($problemOrders as $order): ?>
-                            <div style="display: flex; align-items: stretch; border-bottom: 1px solid #ffe0e0; transition: background 0.2s;" onmouseover="this.style.background='#fff0f0'" onmouseout="this.style.background='white'">
-                                <!-- Левая часть: информация о заказе -->
-                                <div style="flex: 1; padding: 20px; display: flex; flex-direction: column; justify-content: center;">
-                                    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
-                                        <a href="view.php?id=<?= $order['id'] ?>" style="font-size: 18px; font-weight: 700; color: #e74c3c; text-decoration: none;">
+                            <div style="display: flex; align-items: flex-start; gap: 15px; padding: 12px; background: #fff; border: 1px solid #e0e0e0; border-radius: 6px;">
+                                <!-- Информация о заказе -->
+                                <div style="min-width: 200px; flex-shrink: 0;">
+                                    <div style="margin-bottom: 4px;">
+                                        <a href="view.php?id=<?= $order['id'] ?>" style="font-size: 14px; font-weight: 600; color: var(--primary-color); text-decoration: none;">
                                             <?= e($order['order_number']) ?>
                                         </a>
-                                        <span style="font-size: 12px; color: var(--text-secondary);">·</span>
-                                        <span style="font-size: 14px; color: var(--text-secondary);"><?= e($order['contractor_name']) ?></span>
                                     </div>
-                                    <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
-                                        <span class="badge" style="background: #f39c1220; color: #f39c12; font-size: 12px; padding: 4px 10px; border-radius: 4px;">
-                                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 4px;">
-                                                <circle cx="12" cy="12" r="3"/>
-                                                <path d="M12 1V3M12 21V23M23 12H21M3 12H1"/>
-                                            </svg>
-                                            <?= e($order['task_status'] === 'planned' ? 'Запланировано' : 'В работе') ?>
-                                        </span>
-                                        <span class="badge" style="background: #3498db20; color: #3498db; font-size: 12px; padding: 4px 10px; border-radius: 4px;">
-                                            <?= e($order['task_number']) ?>
-                                        </span>
-                                        <span style="font-size: 12px; color: #e74c3c; font-weight: 600;">
-                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 4px;">
-                                                <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
-                                            </svg>
-                                            Проблем: <?= $order['material_issues_count'] ?>
-                                        </span>
-                                    </div>
+                                    <div style="font-size: 12px; color: var(--text-secondary);"><?= e($order['contractor_name']) ?></div>
                                 </div>
-                                <!-- Правая часть: список проблем с кнопкой действия -->
-                                <div style="width: 400px; padding: 20px; background: #fafafa; border-left: 1px solid #ffe0e0; display: flex; flex-direction: column; justify-content: center;">
-                                    <div style="font-size: 13px; color: var(--text-secondary); margin-bottom: 8px; font-weight: 600;">Недостает материалов:</div>
-                                    <div style="font-size: 13px; color: #e74c3c; line-height: 1.6; margin-bottom: 12px; max-height: 80px; overflow-y: auto;">
-                                        <?= e($order['material_issues']) ?>
+                                
+                                <!-- Проблемы с материалами -->
+                                <div style="flex: 1;">
+                                    <?php 
+                                    $issues = explode('; ', $order['material_issues']);
+                                    foreach ($issues as $issue): 
+                                        if (trim($issue)):
+                                    ?>
+                                    <div style="font-size: 13px; color: #e74c3c; margin-bottom: 3px;">
+                                        <span style="display: inline-block; width: 6px; height: 6px; background: #e74c3c; border-radius: 50%; margin-right: 6px;"></span>
+                                        <?= e($issue) ?>
                                     </div>
+                                    <?php 
+                                        endif;
+                                    endforeach; 
+                                    ?>
+                                </div>
+                                
+                                <!-- Кнопка действия -->
+                                <div style="flex-shrink: 0;">
                                     <a href="<?= pageUrl('modules/warehouse/materials.php') ?>?order=<?= $order['id'] ?>&task=<?= $order['task_id'] ?>" 
-                                       class="btn btn-sm" 
-                                       style="background: #e74c3c; color: white; border: none; display: inline-flex; align-items: center; gap: 8px; width: fit-content;">
-                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
-                                            <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
-                                            <line x1="12" y1="22.08" x2="12" y2="12"/>
+                                       class="btn btn-sm btn-secondary"
+                                       style="font-size: 12px; padding: 6px 12px;">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 4px; vertical-align: middle;">
+                                            <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
                                         </svg>
-                                        Решить проблему
+                                        Решить
                                     </a>
                                 </div>
                             </div>

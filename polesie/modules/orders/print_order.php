@@ -104,6 +104,7 @@ $deliveryDateDisplay = !empty($order['delivery_date']) ? date('d.m.Y', strtotime
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Заказ № <?= htmlspecialchars($order['order_number']) ?></title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <style>
         @page {
             size: A4;
@@ -436,13 +437,17 @@ $deliveryDateDisplay = !empty($order['delivery_date']) ? date('d.m.Y', strtotime
 </head>
 <body>
     <div class="control-panel">
-        <button class="btn btn-secondary" onclick="window.close()">Закрыть</button>
-        <button class="btn btn-secondary" onclick="window.history.back()">Назад</button>
-        <button class="btn btn-info" onclick="downloadPDF()">
-            Скачать файл
+        <button class="btn btn-secondary" onclick="window.close()">
+            <i class="bi bi-x-lg"></i> Закрыть
+        </button>
+        <button class="btn btn-secondary" onclick="window.history.back()">
+            <i class="bi bi-arrow-left-short"></i> Назад
+        </button>
+        <button class="btn btn-primary" onclick="downloadPDF()">
+            <i class="bi bi-file-earmark-arrow-down-fill"></i> Скачать файл
         </button>
         <button class="btn btn-success" onclick="printDocument()">
-            Печать
+            <i class="bi bi-printer-fill"></i> Печать
         </button>
     </div>
 

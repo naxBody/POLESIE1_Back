@@ -439,7 +439,7 @@ $deliveryDateDisplay = !empty($order['delivery_date']) ? date('d.m.Y', strtotime
         <button class="btn btn-secondary" onclick="window.close()">Закрыть</button>
         <button class="btn btn-secondary" onclick="window.history.back()">← Назад</button>
         <button class="btn btn-success" onclick="downloadAsWord()">📥 Скачать DOC</button>
-        <button class="btn btn-info" onclick="window.print()">🖨 Печать / PDF</button>
+        <button class="btn btn-info" onclick="window.print()">🖨 Печать</button>
     </div>
     
     <script>
@@ -464,7 +464,7 @@ $deliveryDateDisplay = !empty($order['delivery_date']) ? date('d.m.Y', strtotime
         window.addEventListener('DOMContentLoaded', function() {
             // Показываем подсказку пользователю
             setTimeout(() => {
-                alert('Документ готов к экспорту!\n\n• Нажмите "📥 Скачать DOC" для скачивания в формате Word\n• Или нажмите "🖨 Печать / PDF" чтобы:\n  - Сохранить как PDF (выберите в списке принтеров)\n  - Распечатать на принтере');
+                alert('Документ готов к экспорту!\n\n• Нажмите "📥 Скачать DOC" для скачивания в формате Word (сохраняет разметку документа)\n• Или нажмите "🖨 Печать" чтобы:\n  - Сохранить как PDF (выберите "Сохранить как PDF" в списке принтеров)\n  - Распечатать на принтере');
             }, 500);
         });
     </script>

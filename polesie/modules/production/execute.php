@@ -246,7 +246,7 @@ if ($isAjaxRequest && $selectedTaskId) {
             </div>
             <div class="work-area-actions">
                 <button class="btn btn-primary" onclick="openProductionModal(<?= $selectedTask['id'] ?>)">
-                    <i class="bi bi-check-lg"></i> Завершить производство
+                    <i class="bi bi-check-circle-fill"></i> Завершить производство
                 </button>
             </div>
         </div>
@@ -352,7 +352,7 @@ if ($isAjaxRequest && $selectedTaskId) {
                 </div>
             <?php else: ?>
                 <div class="empty-state">
-                    <div class="empty-state-icon"><i class="bi bi-clipboard-check"></i></div>
+                    <div class="empty-state-icon"><i class="bi bi-clipboard-data-fill"></i></div>
                     <h3>Этапы не найдены</h3>
                     <p>Для данного продукта не настроена маршрутная карта</p>
                 </div>
@@ -458,7 +458,7 @@ if ($isAjaxRequest && $selectedTaskId) {
                 </table>
             <?php else: ?>
                 <div class="empty-state">
-                    <div class="empty-state-icon"><i class="bi bi-box-seam"></i></div>
+                    <div class="empty-state-icon"><i class="bi bi-box-seam-fill"></i></div>
                     <h3>Материалы не найдены</h3>
                     <p>Для данного задания не указаны материалы</p>
                 </div>
@@ -477,7 +477,7 @@ if ($isAjaxRequest && $selectedTaskId) {
                 </div>
             <?php else: ?>
                 <div class="empty-state">
-                    <div class="empty-state-icon"><i class="bi bi-upc-scan"></i></div>
+                    <div class="empty-state-icon"><i class="bi bi-upc-scan-fill"></i></div>
                     <h3>Серийные номера не найдены</h3>
                     <p>Серийные номера будут созданы при завершении производства</p>
                 </div>
@@ -2022,7 +2022,7 @@ foreach ($allTasks as &$task) {
                 <div class="content">
                     <div class="page-header">
                         <div class="page-header-title">
-                            <h2><i class="bi bi-gear-wide"></i> Исполнение производства</h2>
+                            <h2><i class="bi bi-gear-wide-connected"></i> Исполнение производства</h2>
                             <p>Управление производственными заданиями и контроль выполнения</p>
                         </div>
                     </div>
@@ -2030,7 +2030,7 @@ foreach ($allTasks as &$task) {
                     <!-- Полный список всех заказов - большой блок в начале страницы -->
                     <div class="all-orders-section" style="margin-bottom: 32px;">
                         <div class="all-orders-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                            <h3 style="font-size: 20px; font-weight: 700; color: var(--text-primary);"><i class="bi bi-kanban"></i> Все активные заказы в производстве</h3>
+                            <h3 style="font-size: 20px; font-weight: 700; color: var(--text-primary);"><i class="bi bi-kanban-fill"></i> Все активные заказы в производстве</h3>
                             <button class="btn btn-sm btn-outline" onclick="toggleAllOrdersList()" style="padding: 8px 16px; font-size: 14px;">
                                 <span id="toggleAllOrdersText">Свернуть</span>
                             </button>
@@ -2105,7 +2105,7 @@ foreach ($allTasks as &$task) {
                                         </td>
                                         <td style="text-align: right;">
                                             <button class="btn btn-sm btn-outline" onclick="event.stopPropagation(); openOrderDetailModal(<?= $order['id'] ?>)" style="padding: 8px 16px; font-size: 13px;">
-                                                <i class="bi bi-eye"></i> Подробнее
+                                                <i class="bi bi-eye-fill"></i> Подробнее
                                             </button>
                                         </td>
                                     </tr>

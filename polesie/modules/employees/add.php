@@ -710,8 +710,10 @@ $pageTitle = 'Добавление сотрудника';
                                         <div class="form-group">
                                             <label class="form-label" for="salary">
                                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 6px;">
-                                                    <line x1="12" y1="1" x2="12" y2="23"></line>
-                                                    <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                                                    <path d="M20 7h-3a2 2 0 0 1-2-2V2"></path>
+                                                    <path d="M9 2v3a2 2 0 0 1-2 2H4"></path>
+                                                    <rect x="2" y="7" width="20" height="14" rx="2"></rect>
+                                                    <circle cx="12" cy="14" r="2"></circle>
                                                 </svg>
                                                 Зарплата (BYN)
                                             </label>

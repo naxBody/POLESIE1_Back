@@ -777,9 +777,9 @@ $pageTitle = 'Добавление сотрудника';
                         </div>
 
                         <!-- Секция создания пользователя системы -->
-                        <div class="card" style="margin-top: 1.5rem;">
-                            <div class="card-header">
-                                <h3 class="card-title">
+                        <div class="card" style="margin-top: 1.5rem; border: 2px solid #007bff;">
+                            <div class="card-header" style="background: #e7f3ff; border-bottom: 2px solid #007bff;">
+                                <h3 class="card-title" style="color: #0056b3;">
                                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                         <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
                                         <path d="M8 11h8"></path>
@@ -790,9 +790,21 @@ $pageTitle = 'Добавление сотрудника';
                             </div>
                             
                             <div class="card-body">
+                                <div class="alert" style="background: #e7f3ff; border: 1px solid #b3d9ff; color: #0056b3; margin-bottom: 1.25rem;">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink: 0; margin-right: 0.5rem;">
+                                        <circle cx="12" cy="12" r="10"></circle>
+                                        <line x1="12" y1="16" x2="12" y2="12"></line>
+                                        <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                                    </svg>
+                                    <div>
+                                        <strong>Обратите внимание:</strong> Заполните данные сотрудника выше. 
+                                        Если сотрудник должен иметь доступ к системе, отметьте чекбокс ниже и заполните поля для создания учетной записи.
+                                    </div>
+                                </div>
+                                
                                 <div class="row">
                                     <div class="col-md-12">
-                                        <div class="form-group">
+                                        <div class="form-group" style="padding: 1rem; background: #f8f9fa; border-radius: 6px; border: 1px solid #dee2e6;">
                                             <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
                                                 <input type="checkbox" 
                                                        id="create_user" 
@@ -800,21 +812,25 @@ $pageTitle = 'Добавление сотрудника';
                                                        value="1"
                                                        <?= $formData['create_user'] ? 'checked' : '' ?>
                                                        onchange="toggleUserFields()"
-                                                       style="width: 18px; height: 18px; cursor: pointer;">
-                                                <span style="font-weight: 500; font-size: 0.95rem;">
-                                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 6px;">
+                                                       style="width: 20px; height: 20px; cursor: pointer;">
+                                                <span style="font-weight: 600; font-size: 1rem; color: #1a1a1a;">
+                                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 8px;">
                                                         <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
                                                         <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
                                                     </svg>
                                                     Создать учетную запись пользователя системы
                                                 </span>
                                             </label>
-                                            <small class="form-text">Отметьте, если сотрудник должен иметь доступ к системе</small>
+                                            <small class="form-text" style="margin-left: 28px; display: block;">
+                                                Отметьте этот пункт, если сотрудник должен иметь логин и пароль для входа в систему
+                                            </small>
                                         </div>
                                     </div>
                                 </div>
 
                                 <div id="userFields" style="<?= $formData['create_user'] ? '' : 'display: none;' ?>">
+                                    <hr style="margin: 1.5rem 0; border: none; border-top: 2px dashed #dee2e6;">
+                                    
                                     <div class="row">
                                         <div class="col-md-6">
                                             <div class="form-group">
@@ -831,7 +847,7 @@ $pageTitle = 'Добавление сотрудника';
                                                        name="username" 
                                                        value="<?= htmlspecialchars($formData['username']) ?>"
                                                        placeholder="ivanov.i">
-                                                <small class="form-text">Уникальное имя пользователя для входа</small>
+                                                <small class="form-text">Уникальное имя пользователя для входа в систему</small>
                                             </div>
                                         </div>
                                         
@@ -851,7 +867,7 @@ $pageTitle = 'Добавление сотрудника';
                                                        value=""
                                                        placeholder="••••••••"
                                                        minlength="6">
-                                                <small class="form-text">Минимум 6 символов</small>
+                                                <small class="form-text">Минимум 6 символов. Рекомендуется использовать заглавные буквы и цифры</small>
                                             </div>
                                         </div>
                                     </div>
@@ -873,7 +889,7 @@ $pageTitle = 'Добавление сотрудника';
                                                         </option>
                                                     <?php endforeach; ?>
                                                 </select>
-                                                <small class="form-text">Определяет права доступа пользователя</small>
+                                                <small class="form-text">Роль определяет права доступа пользователя в системе (например, менеджер, администратор, бухгалтер)</small>
                                             </div>
                                         </div>
                                     </div>

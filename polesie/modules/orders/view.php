@@ -90,9 +90,10 @@ foreach ($items as $item) {
                 m.name_short as material_short,
                 mc.name as material_category,
                 oi.product_id,
-                oi.product_name,
-                oi.article
+                p.name as product_name,
+                p.article as product_article
             FROM order_items oi
+            JOIN products p ON oi.product_id = p.id
             JOIN product_passport_materials ppm ON ppm.passport_id = (
                 SELECT id FROM product_passports WHERE product_id = oi.product_id
             )
@@ -665,7 +666,7 @@ $pageTitle = 'Заказ №' . e($order['order_number']);
                                     <tr class="material-row" data-product-index="<?= $itemIndex ?>" onclick="window.location.href='../warehouse/materials.php?material=<?= $material['material_id'] ?>'" style="cursor: pointer;">
                                         <td><?= $globalIndex ?></td>
                                         <td>
-                                            <div style="font-size: 11px; font-weight: 600; color: var(--text-primary);"><?= e($item['product_name']) ?></div>
+                                            <div style="font-size: 11px; font-weight: 600; color: var(--text-primary);"><?= e($material['product_name']) ?></div>
                                             <div style="font-size: 10px; color: var(--text-secondary);"><?= number_format($item['quantity'], 0, ',', ' ') ?> <?= e($item['unit_name'] ?? 'шт.') ?></div>
                                         </td>
                                         <td class="material-code-cell">

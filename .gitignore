@@ -4,8 +4,8 @@
 __pycache__/
 
 # Dependencies
-vendor/
-composer.lock
+venv/
+.venv/
 
 # Logs and temp files
 *.log

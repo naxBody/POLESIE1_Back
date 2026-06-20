@@ -482,6 +482,10 @@ $pageTitle = 'Платеж №' . $payment['document_number'];
                 <?php endif; ?>
                 
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;" class="no-print">
+                    <div>
+                        <h1 style="font-size: 24px; font-weight: 700; color: #1f2937; margin: 0;"><i class="bi bi-credit-card"></i> Платеж № <?= e($payment['document_number']) ?></h1>
+                        <p style="color: #6b7280; margin: 4px 0 0 0;"><i class="bi bi-file-earmark-text"></i> Просмотр документа</p>
+                    </div>
                         <a href="list.php" class="btn btn-secondary"><i class="bi bi-arrow-left"></i> Назад к списку</a>
                         <div style="display: flex; gap: 10px;">
                             <?php if (canEditInModule('finance')): ?>

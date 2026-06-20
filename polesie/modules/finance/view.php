@@ -96,7 +96,7 @@ $pageTitle = 'Платеж №' . $payment['document_number'];
         .view-container {
             max-width: 900px;
             margin: 0 auto;
-            padding: 0;
+            padding: 20px;
         }
         .info-card {
             background: white;
@@ -545,7 +545,7 @@ $pageTitle = 'Платеж №' . $payment['document_number'];
                         </div>
                     </div>
                     
-                    <div class="view-container" style="padding: 20px;">
+                    <div class="view-container">
                         <!-- Основная информация о платеже - как в документе -->
                         <div class="info-card">
                             <div class="info-card-title"><i class="bi bi-file-earmark-text"></i> Основная информация</div>

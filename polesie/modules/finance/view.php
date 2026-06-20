@@ -477,12 +477,11 @@ $pageTitle = 'Платеж №' . $payment['document_number'];
             <?php include BASE_PATH . '/includes/topbar.php'; ?>
             
             <div class="content-area">
-                <div style="padding: 24px;">
-                    <?php if ($message): ?>
-                    <div class="alert alert-<?= $messageType ?>"><?= e($message) ?></div>
-                    <?php endif; ?>
-                    
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;" class="no-print">
+                <?php if ($message): ?>
+                <div class="alert alert-<?= $messageType ?>"><?= e($message) ?></div>
+                <?php endif; ?>
+                
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;" class="no-print">
                         <a href="list.php" class="btn btn-secondary"><i class="bi bi-arrow-left"></i> Назад к списку</a>
                         <div style="display: flex; gap: 10px;">
                             <?php if (canEditInModule('finance')): ?>
@@ -500,7 +499,7 @@ $pageTitle = 'Платеж №' . $payment['document_number'];
                                 <?php elseif ($payment['status'] === 'approved'): ?>
                                 <form method="POST" style="display: inline;">
                                     <input type="hidden" name="action" value="post">
-                                    <button type="submit" class="btn btn-success" onclick="return confirm('Провести платеж?')"><i class="bi bi-cash-stack"></i> Провести</button>
+                                    <button type="submit" class="btn btn-success" onclick="return confirm('Провести платеж?')"><i class="bi bi-credit-card"></i> Провести</button>
                                 </form>
                                 <?php elseif ($payment['status'] === 'posted'): ?>
                                 <form method="POST" style="display: inline;">
@@ -631,7 +630,7 @@ $pageTitle = 'Платеж №' . $payment['document_number'];
                         <!-- Заголовок документа -->
                         <div class="document-header">
                             <div>
-                                <div class="document-number"><i class="bi bi-cash-stack"></i> <?= e($payment['document_number']) ?></div>
+                                <div class="document-number"><i class="bi bi-credit-card"></i> <?= e($payment['document_number']) ?></div>
                                 <div style="color: #6b7280; margin-top: 4px;">
                                     <span class="badge" style="background: <?= e($payment['status_color']) ?>20; color: <?= e($payment['status_color']) ?>; font-size: 13px; padding: 6px 12px; border-radius: 6px;">
                                         <i class="fas <?= $payment['status'] === 'posted' ? 'fa-circle-check' : ($payment['status'] === 'approved' ? 'fa-user-check' : ($payment['status'] === 'pending' ? 'fa-clock' : ($payment['status'] === 'cancelled' ? 'fa-circle-xmark' : 'fa-file'))) ?>"></i>
@@ -816,7 +815,6 @@ $pageTitle = 'Платеж №' . $payment['document_number'];
                             <?php endforeach; ?>
                         </div>
                     </div>
-                </div>
             </div>
         </div>
     </div>

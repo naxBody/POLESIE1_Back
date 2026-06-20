@@ -129,13 +129,14 @@ a[href^="tel:"]:hover, a[href^="mailto:"]:hover {
 }
 
 .sidebar-logo-icon {
-    width: 44px;
-    height: 44px;
+    width: 60px;
+    height: 60px;
     background: linear-gradient(135deg, var(--primary-light) 0%, var(--primary-color) 100%);
     border-radius: var(--border-radius);
     display: flex;
     align-items: center;
     justify-content: center;
+    color: white;
     box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
     transition: transform var(--transition-fast), box-shadow var(--transition-fast);
 }
@@ -143,6 +144,11 @@ a[href^="tel:"]:hover, a[href^="mailto:"]:hover {
 .sidebar-logo:hover .sidebar-logo-icon {
     transform: scale(1.05);
     box-shadow: 0 6px 16px rgba(37, 99, 235, 0.4);
+}
+
+.sidebar-logo-icon svg {
+    width: 32px;
+    height: 32px;
 }
 
 .sidebar-logo-text {

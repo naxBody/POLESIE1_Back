@@ -852,13 +852,20 @@ textarea.form-control {
 .login-logo {
     width: 60px;
     height: 60px;
-    background: var(--primary-color);
-    border-radius: var(--border-radius-lg);
+    background: linear-gradient(135deg, var(--primary-light) 0%, var(--primary-color) 100%);
+    border-radius: var(--border-radius);
     display: flex;
     align-items: center;
     justify-content: center;
     color: white;
     margin: 0 auto 16px;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+    transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.login-logo:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 16px rgba(37, 99, 235, 0.4);
 }
 
 .login-logo svg {

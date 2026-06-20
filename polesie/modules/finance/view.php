@@ -632,7 +632,7 @@ $pageTitle = 'Платеж №' . $payment['document_number'];
                         <!-- Основная информация о платеже - как в документе -->
                         <div class="info-card" style="margin-bottom: 24px;">
                             <div class="info-card-title"><i class="bi bi-file-earmark-text"></i> Основная информация</div>
-                            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;">
+                            <div style="display: flex; flex-direction: column; gap: 16px;">
                                 <div>
                                     <div class="info-label">Номер документа</div>
                                     <div style="font-size: 16px; font-weight: 600; color: var(--text-primary);"><?= e($payment['document_number']) ?></div>
@@ -681,7 +681,7 @@ $pageTitle = 'Платеж №' . $payment['document_number'];
                         <div class="info-card" style="margin-bottom: 24px;">
                             <div class="info-card-title">Контрагент</div>
                             <?php if ($payment['contractor_name']): ?>
-                            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px;">
+                            <div style="display: flex; flex-direction: column; gap: 16px;">
                                 <div>
                                     <div class="info-label">Название</div>
                                     <div style="font-size: 15px; font-weight: 500; color: var(--text-primary);"><?= e($payment['contractor_name']) ?></div>
@@ -713,7 +713,7 @@ $pageTitle = 'Платеж №' . $payment['document_number'];
                         <!-- Банковские реквизиты -->
                         <div class="info-card" style="margin-bottom: 24px;">
                             <div class="info-card-title">Банковские реквизиты</div>
-                            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px;">
+                            <div style="display: flex; flex-direction: column; gap: 16px;">
                                 <div>
                                     <div class="info-label">Владелец счета</div>
                                     <div style="font-size: 15px; font-weight: 500; color: var(--text-primary);"><?= e($payment['account_holder']) ?></div>
@@ -738,7 +738,7 @@ $pageTitle = 'Платеж №' . $payment['document_number'];
                         <!-- Классификация -->
                         <div class="info-card" style="margin-bottom: 24px;">
                             <div class="info-card-title">Классификация</div>
-                            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;">
+                            <div style="display: flex; flex-direction: column; gap: 16px;">
                                 <div>
                                     <div class="info-label">Тип платежа</div>
                                     <div style="font-size: 15px; font-weight: 500; color: var(--text-primary);"><?= e($payment['payment_type_name']) ?></div>
@@ -760,7 +760,7 @@ $pageTitle = 'Платеж №' . $payment['document_number'];
                         <div class="info-card" style="margin-bottom: 24px;">
                             <div class="info-card-title">Связанные документы</div>
                             <?php if ($payment['order_number'] || $payment['document_reference']): ?>
-                            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px;">
+                            <div style="display: flex; flex-direction: column; gap: 16px;">
                                 <?php if ($payment['order_number']): ?>
                                 <div>
                                     <div class="info-label">Заказ</div>
@@ -782,7 +782,7 @@ $pageTitle = 'Платеж №' . $payment['document_number'];
                         <!-- Авторы и даты -->
                         <div class="info-card" style="margin-bottom: 24px;">
                             <div class="info-card-title">Авторы и даты</div>
-                            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;">
+                            <div style="display: flex; flex-direction: column; gap: 16px;">
                                 <div>
                                     <div class="info-label">Создан</div>
                                     <div style="font-size: 15px; font-weight: 500; color: var(--text-primary);"><?= formatDate($payment['created_at']) ?></div>

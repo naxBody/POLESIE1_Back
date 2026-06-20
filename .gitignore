@@ -1,1 +1,1 @@
-Nothing should be ignored based on the provided file changes. The modification of 'polesie/modules/finance/view.php' is a source code file and does not require any new ignore rules.
+Nothing should be ignored based on the provided file changes. The only modified file is a PHP source file (`polesie/modules/finance/view.php`), which is a legitimate source code file that should not be ignored.

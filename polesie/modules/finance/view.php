@@ -71,84 +71,15 @@ if (!$payment) {
     redirect(pageUrl('modules/finance/list.php'));
 }
 
-// История изменений статуса
-$statusHistory = $pdo->prepare("
-    SELECT psh.*, u.full_name as changed_by_name
-    FROM payment_status_history psh
-    JOIN users u ON psh.changed_by = u.id
-    WHERE psh.payment_document_id = ?
-    ORDER BY psh.changed_at DESC
-");
-$statusHistory->execute([$paymentId]);
-$history = $statusHistory->fetchAll();
-
-// Обработка действий
-$message = '';
-$messageType = '';
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && canEditInModule('finance')) {
-    $action = $_POST['action'] ?? '';
-    
-    try {
-        $pdo->beginTransaction();
-        
-        if ($action === 'approve' && $payment['status'] === 'pending') {
-            $stmt = $pdo->prepare("UPDATE payment_documents SET status = 'approved' WHERE id = ?");
-            $stmt->execute([$paymentId]);
-            
-            $stmt = $pdo->prepare("
-                INSERT INTO payment_status_history (payment_document_id, old_status, new_status, changed_by, comment)
-                VALUES (?, 'pending', 'approved', ?, 'Платеж утвержден')
-            ");
-            $stmt->execute([$paymentId, $user['id']]);
-            
-            $message = 'Платеж утвержден';
-            $messageType = 'success';
-            
-        } elseif ($action === 'post' && $payment['status'] === 'approved') {
-            // Вызов хранимой процедуры для проведения
-            $stmt = $pdo->prepare("CALL post_payment(?, ?)");
-            $stmt->execute([$paymentId, $user['id']]);
-            
-            $message = 'Платеж проведен';
-            $messageType = 'success';
-            
-        } elseif ($action === 'unpost' && $payment['status'] === 'posted') {
-            // Вызов хранимой процедуры для отмены проведения
-            $stmt = $pdo->prepare("CALL unpost_payment(?, ?)");
-            $stmt->execute([$paymentId, $user['id']]);
-            
-            $message = 'Проведение платежа отменено';
-            $messageType = 'success';
-            
-        } elseif ($action === 'cancel') {
-            $stmt = $pdo->prepare("UPDATE payment_documents SET status = 'cancelled' WHERE id = ?");
-            $stmt->execute([$paymentId]);
-            
-            $stmt = $pdo->prepare("
-                INSERT INTO payment_status_history (payment_document_id, old_status, new_status, changed_by, comment)
-                VALUES (?, ?, 'cancelled', ?, 'Платеж отменен: ' . ?)
-            ");
-            $comment = $_POST['cancel_comment'] ?? 'Без комментария';
-            $stmt->execute([$paymentId, $payment['status'], $user['id'], $comment]);
-            
-            $message = 'Платеж отменен';
-            $messageType = 'success';
-        }
-        
-        $pdo->commit();
-        
-        // Обновление данных
-        $stmt = $pdo->prepare("SELECT status FROM payment_documents WHERE id = ?");
-        $stmt->execute([$paymentId]);
-        $payment = array_merge($payment, $stmt->fetch());
-        
-    } catch (Exception $e) {
-        $pdo->rollBack();
-        $message = 'Ошибка: ' . $e->getMessage();
-        $messageType = 'error';
-    }
+// Функция для суммы прописью (упрощенная)
+function sumInWordsBYN($sum) {
+    $sum = floatval($sum);
+    $wholePart = floor($sum);
+    $fractionalPart = round(($sum - $wholePart) * 100);
+    return number_format($sum, 2, ',', ' ') . ' (' . $wholePart . ' руб. ' . $fractionalPart . ' коп.)';
 }
+
+$totalInWords = sumInWordsBYN($payment['amount']);
 
 $pageTitle = 'Платеж №' . $payment['document_number'];
 ?>
@@ -163,101 +94,34 @@ $pageTitle = 'Платеж №' . $payment['document_number'];
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <style>
         .view-container {
-            max-width: 1200px;
+            max-width: 900px;
             margin: 0 auto;
-        }
-        .document-header {
-            background: white;
-            border-radius: 12px;
-            padding: 24px;
-            margin-bottom: 24px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .document-number {
-            font-size: 28px;
-            font-weight: 700;
-            color: #1f2937;
-        }
-        .document-meta {
-            text-align: right;
-        }
-        .info-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 24px;
-            margin-bottom: 24px;
         }
         .info-card {
             background: white;
             border-radius: 12px;
             padding: 20px;
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            margin-bottom: 24px;
         }
         .info-card-title {
             font-size: 14px;
             font-weight: 600;
             color: #6b7280;
-            margin-bottom: 12px;
+            margin-bottom: 16px;
             text-transform: uppercase;
-        }
-        .info-row {
             display: flex;
-            justify-content: space-between;
-            padding: 8px 0;
-            border-bottom: 1px solid #f3f4f6;
-        }
-        .info-row:last-child {
-            border-bottom: none;
+            align-items: center;
+            gap: 8px;
         }
         .info-label {
             color: #6b7280;
             font-size: 13px;
+            margin-bottom: 4px;
         }
         .info-value {
             font-weight: 500;
             color: #1f2937;
-            text-align: right;
-        }
-        .amount-display {
-            font-size: 32px;
-            font-weight: 700;
-            color: var(--text-primary);
-            margin: 16px 0;
-        }
-        .timeline {
-            background: white;
-            border-radius: 12px;
-            padding: 20px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-        }
-        .timeline-item {
-            display: flex;
-            gap: 16px;
-            padding: 12px 0;
-            border-left: 2px solid #e5e7eb;
-            padding-left: 20px;
-            position: relative;
-        }
-        .timeline-item::before {
-            content: '';
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            background: #3498db;
-            position: absolute;
-            left: -7px;
-            top: 16px;
-        }
-        .timeline-date {
-            font-size: 12px;
-            color: #6b7280;
-            min-width: 140px;
-        }
-        .timeline-content {
-            flex: 1;
         }
         .alert {
             padding: 12px 16px;
@@ -274,6 +138,24 @@ $pageTitle = 'Платеж №' . $payment['document_number'];
         }
         
         /* Стили для печати */
+        @page {
+            size: A4;
+            margin: 15mm;
+        }
+        
+        .print-area {
+            background: white;
+            padding: 5mm;
+            margin-bottom: 24px;
+            display: none;
+            max-width: 210mm;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .print-area.show {
+            display: block;
+        }
+        
         @media print {
             body * {
                 visibility: hidden;
@@ -286,186 +168,220 @@ $pageTitle = 'Платеж №' . $payment['document_number'];
                 left: 0;
                 top: 0;
                 width: 100%;
-                background: white;
-                padding: 20mm;
+                margin: 0;
+                padding: 0;
             }
             .no-print {
                 display: none !important;
             }
-            .print-header {
-                border-bottom: 2px solid #000;
-                padding-bottom: 10px;
-                margin-bottom: 20px;
-            }
-            .print-company-info {
-                font-size: 10pt;
-                line-height: 1.4;
-            }
-            .print-document-title {
-                text-align: center;
-                font-size: 14pt;
-                font-weight: bold;
-                margin: 20px 0;
-            }
-            .print-table {
-                width: 100%;
-                border-collapse: collapse;
-                margin: 15px 0;
-            }
-            .print-table td, .print-table th {
-                border: 1px solid #000;
-                padding: 8px;
-                font-size: 10pt;
-            }
-            .print-signatures {
-                margin-top: 40px;
-                display: flex;
-                justify-content: space-between;
-            }
-            .print-signature-block {
-                width: 45%;
-                border-top: 1px solid #000;
-                padding-top: 5px;
-                font-size: 10pt;
-            }
-            .print-stamp {
-                width: 100px;
-                height: 100px;
-                border: 2px dashed #999;
-                border-radius: 50%;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                color: #999;
-                font-size: 8pt;
-                text-align: center;
-                margin: 20px auto;
-            }
         }
         
-        .print-area {
-            background: white;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            margin-bottom: 24px;
-            display: none;
-        }
-        .print-area.show {
-            display: block;
-        }
         .print-header {
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
+            border-bottom: 2px solid #000;
+            padding-bottom: 15px;
         }
-        .print-company-logo {
-            width: 80px;
-            height: 80px;
-            background: #f3f4f6;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 32px;
-        }
-        .print-company-info h3 {
-            margin: 0 0 5px 0;
-            font-size: 16px;
-            color: #1f2937;
-        }
-        .print-company-info p {
-            margin: 0;
-            font-size: 12px;
-            color: #6b7280;
-        }
-        .print-document-title {
-            text-align: center;
-            font-size: 18px;
-            font-weight: 700;
-            color: #1f2937;
-            margin: 20px 0;
-            text-transform: uppercase;
-        }
-        .print-details-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 15px 0;
-        }
-        .print-details-table td {
-            padding: 8px;
-            border-bottom: 1px solid #e5e7eb;
-            font-size: 13px;
-        }
-        .print-details-table td.label {
-            font-weight: 600;
-            color: #6b7280;
-            width: 40%;
-        }
-        .print-amount-box {
-            background: #f9fafb;
-            padding: 15px;
-            border-radius: 8px;
-            text-align: center;
-            margin: 20px 0;
-        }
-        .print-amount-box .amount {
-            font-size: 24px;
-            font-weight: 700;
-            color: #1f2937;
-        }
-        .print-amount-box .words {
-            font-size: 12px;
-            color: #6b7280;
-            margin-top: 5px;
-            font-style: italic;
-        }
-        .print-signatures {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 40px;
-            gap: 30px;
-        }
-        .print-signature-block {
+        
+        .print-company-info {
             flex: 1;
-            border-top: 1px solid #9ca3af;
-            padding-top: 8px;
         }
-        .print-signature-block .label {
-            font-size: 11px;
-            color: #6b7280;
+        
+        .print-company-name {
+            font-size: 14pt;
+            font-weight: bold;
             margin-bottom: 5px;
         }
-        .print-signature-block .name {
-            font-size: 13px;
-            font-weight: 600;
-            color: #1f2937;
+        
+        .print-company-details {
+            font-size: 9pt;
+            line-height: 1.3;
+            color: #555;
         }
-        .print-signature-block .position {
-            font-size: 11px;
-            color: #6b7280;
+        
+        .print-document-title {
+            text-align: right;
         }
-        .print-stamp-area {
+        
+        .print-title-text {
+            font-size: 18pt;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+        
+        .print-document-number {
+            font-size: 11pt;
+            margin-bottom: 5px;
+        }
+        
+        .print-section {
+            margin-bottom: 25px;
+            padding: 15px;
+            border: 1px solid #000;
+            background: #fafafa;
+        }
+        
+        .print-section-title {
+            font-weight: bold;
+            font-size: 10pt;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+        
+        .print-info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+        }
+        
+        .print-info-row {
+            display: flex;
+        }
+        
+        .print-info-label {
+            font-weight: bold;
+            width: 140px;
+            flex-shrink: 0;
+        }
+        
+        .print-info-value {
+            flex: 1;
+        }
+        
+        .print-amount-block {
+            margin: 25px 0;
+            padding: 15px;
+            border: 2px solid #000;
+            background: #fafafa;
+        }
+        
+        .print-amount-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        
+        .print-amount-row:last-child {
+            margin-bottom: 0;
+        }
+        
+        .print-amount-value {
+            font-size: 12pt;
+            font-weight: bold;
+        }
+        
+        .print-amount-words {
+            margin-top: 12px;
+            font-style: italic;
+            font-size: 9pt;
+            color: #555;
+        }
+        
+        .print-signatures {
+            margin: 35px 0;
+        }
+        
+        .print-signature-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 25px;
+        }
+        
+        .print-signature-column {
+            width: 48%;
+        }
+        
+        .print-signature-title {
+            font-weight: bold;
+            margin-bottom: 8px;
+            font-size: 10pt;
+        }
+        
+        .print-signature-line {
+            display: flex;
+            align-items: flex-end;
+            margin-bottom: 5px;
+        }
+        
+        .print-signature-position {
+            flex: 1;
+            border-bottom: 1px solid #000;
+            padding-right: 10px;
+            font-size: 9pt;
+        }
+        
+        .print-signature-space {
             width: 120px;
-            height: 120px;
-            border: 2px dashed #d1d5db;
-            border-radius: 8px;
+            border-bottom: 1px solid #000;
+            margin-left: 10px;
+            height: 30px;
+        }
+        
+        .print-stamp-area {
+            width: 100px;
+            height: 100px;
+            border: 2px dashed #999;
+            border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #9ca3af;
-            font-size: 10px;
+            color: #999;
+            font-size: 8pt;
             text-align: center;
-            flex-shrink: 0;
+            margin: 20px auto;
         }
+        
         .print-footer {
             margin-top: 30px;
             padding-top: 15px;
-            border-top: 1px solid #e5e7eb;
+            border-top: 1px solid #ccc;
             text-align: center;
-            font-size: 10px;
-            color: #9ca3af;
+            font-size: 8pt;
+            color: #999;
+        }
+        
+        /* Кнопки управления */
+        .control-panel {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+            z-index: 1000;
+        }
+        
+        .btn-print {
+            padding: 10px 18px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+            transition: all 0.2s;
+        }
+        
+        .btn-print:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.25);
+        }
+        
+        .btn-print-primary {
+            background: #2563eb;
+            color: white;
+        }
+        
+        .btn-print-secondary {
+            background: #6b7280;
+            color: white;
+        }
+        
+        .btn-print-success {
+            background: #059669;
+            color: white;
         }
     </style>
 </head>

@@ -244,52 +244,81 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
-    // Сохранение состояния боковой навигации
-    const currentPath = window.location.pathname;
+    // === УЛУЧШЕННОЕ СОХРАНЕНИЕ СОСТОЯНИЯ БОКОВОЙ НАВИГАЦИИ ===
+    
+    // Функция для получения уникального идентификатора секции
+    function getSectionId(sectionElement) {
+        const title = sectionElement.querySelector('.sidebar-nav-title');
+        if (title) {
+            return 'section_' + title.textContent.trim().toLowerCase().replace(/\s+/g, '_');
+        }
+        return null;
+    }
     
     // Находим активную ссылку и сохраняем её родительскую секцию
     const activeLink = document.querySelector('.sidebar-nav-item.active');
     if (activeLink) {
         const parentSection = activeLink.closest('.sidebar-nav-section');
         if (parentSection) {
-            const sectionTitle = parentSection.querySelector('.sidebar-nav-title');
-            if (sectionTitle) {
-                // Сохраняем текст секции в localStorage
-                localStorage.setItem('sidebar_active_section', sectionTitle.textContent.trim());
+            const sectionId = getSectionId(parentSection);
+            if (sectionId) {
+                // Сохраняем ID секции в localStorage
+                localStorage.setItem('sidebar_active_section_id', sectionId);
+                
+                // Также сохраняем индекс секции для надежности
+                const allSections = Array.from(document.querySelectorAll('.sidebar-nav-section'));
+                const sectionIndex = allSections.indexOf(parentSection);
+                localStorage.setItem('sidebar_active_section_index', sectionIndex.toString());
             }
         }
     }
     
     // Восстанавливаем состояние при загрузке страницы
-    const savedSection = localStorage.getItem('sidebar_active_section');
-    if (savedSection) {
+    const savedSectionId = localStorage.getItem('sidebar_active_section_id');
+    const savedSectionIndex = localStorage.getItem('sidebar_active_section_index');
+    
+    if (savedSectionId || savedSectionIndex !== null) {
         const allSections = document.querySelectorAll('.sidebar-nav-section');
-        allSections.forEach(section => {
-            const title = section.querySelector('.sidebar-nav-title');
-            if (title && title.textContent.trim() === savedSection) {
-                // Добавляем класс active для подсветки
-                section.classList.add('active');
+        
+        allSections.forEach((section, index) => {
+            const sectionId = getSectionId(section);
+            
+            // Проверяем соответствие по ID или индексу
+            const isMatch = (savedSectionId && sectionId === savedSectionId) || 
+                           (savedSectionIndex !== null && index.toString() === savedSectionIndex);
+            
+            if (isMatch) {
+                // Не добавляем класс active самой секции (его нет в CSS),
+                // просто убеждаемся, что активная ссылка внутри неё подсвечена
+                // Класс active уже есть у .sidebar-nav-item.active благодаря PHP
             }
         });
     }
     
-    // Обработка кликов по ссылкам навигации
+    // Обработка кликов по ссылкам навигации - БЕЗ preventDefault
     const navLinks = document.querySelectorAll('.sidebar-nav-item');
     navLinks.forEach(link => {
         link.addEventListener('click', function() {
             // Удаляем активные классы у всех ссылок
             navLinks.forEach(l => l.classList.remove('active'));
+            
             // Добавляем активный класс текущей ссылке
             this.classList.add('active');
             
             // Сохраняем секцию
             const parentSection = this.closest('.sidebar-nav-section');
             if (parentSection) {
-                const sectionTitle = parentSection.querySelector('.sidebar-nav-title');
-                if (sectionTitle) {
-                    localStorage.setItem('sidebar_active_section', sectionTitle.textContent.trim());
+                const sectionId = getSectionId(parentSection);
+                if (sectionId) {
+                    localStorage.setItem('sidebar_active_section_id', sectionId);
+                    
+                    const allSections = Array.from(document.querySelectorAll('.sidebar-nav-section'));
+                    const sectionIndex = allSections.indexOf(parentSection);
+                    localStorage.setItem('sidebar_active_section_index', sectionIndex.toString());
                 }
             }
+            
+            // НЕ вызываем preventDefault - позволяем переходу произойти естественно
         });
     });
 });

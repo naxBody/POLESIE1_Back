@@ -34,11 +34,9 @@ function renderSidebarIcon($iconCode) {
 <div class="sidebar">
     <div class="sidebar-header">
         <div class="sidebar-logo">
-            <div class="sidebar-logo-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path>
-                </svg>
-            </div>
+            <svg class="sidebar-company-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path>
+            </svg>
             <span class="sidebar-logo-text">Полесьеэлектромаш</span>
         </div>
     </div>

@@ -243,6 +243,55 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
+    
+    // Сохранение состояния боковой навигации
+    const currentPath = window.location.pathname;
+    
+    // Находим активную ссылку и сохраняем её родительскую секцию
+    const activeLink = document.querySelector('.sidebar-nav-item.active');
+    if (activeLink) {
+        const parentSection = activeLink.closest('.sidebar-nav-section');
+        if (parentSection) {
+            const sectionTitle = parentSection.querySelector('.sidebar-nav-title');
+            if (sectionTitle) {
+                // Сохраняем текст секции в localStorage
+                localStorage.setItem('sidebar_active_section', sectionTitle.textContent.trim());
+            }
+        }
+    }
+    
+    // Восстанавливаем состояние при загрузке страницы
+    const savedSection = localStorage.getItem('sidebar_active_section');
+    if (savedSection) {
+        const allSections = document.querySelectorAll('.sidebar-nav-section');
+        allSections.forEach(section => {
+            const title = section.querySelector('.sidebar-nav-title');
+            if (title && title.textContent.trim() === savedSection) {
+                // Добавляем класс active для подсветки
+                section.classList.add('active');
+            }
+        });
+    }
+    
+    // Обработка кликов по ссылкам навигации
+    const navLinks = document.querySelectorAll('.sidebar-nav-item');
+    navLinks.forEach(link => {
+        link.addEventListener('click', function() {
+            // Удаляем активные классы у всех ссылок
+            navLinks.forEach(l => l.classList.remove('active'));
+            // Добавляем активный класс текущей ссылке
+            this.classList.add('active');
+            
+            // Сохраняем секцию
+            const parentSection = this.closest('.sidebar-nav-section');
+            if (parentSection) {
+                const sectionTitle = parentSection.querySelector('.sidebar-nav-title');
+                if (sectionTitle) {
+                    localStorage.setItem('sidebar_active_section', sectionTitle.textContent.trim());
+                }
+            }
+        });
+    });
 });
 
 /**

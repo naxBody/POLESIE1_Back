@@ -118,6 +118,34 @@ $pageTitle = 'Все платежи';
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="<?= asset('assets/css/style.css') ?>">
     <style>
+        /* Page Header */
+        .page-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+            gap: 20px;
+            padding: 20px 0;
+        }
+        
+        .page-header-title h2 {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+        
+        .page-header-title p {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+        
+        .page-header-actions {
+            display: flex;
+            gap: 12px;
+        }
+        
+        /* Filters Panel */
         .filters-panel {
             background: white;
             border-radius: 12px;
@@ -135,7 +163,7 @@ $pageTitle = 'Все платежи';
             display: block;
             font-size: 13px;
             font-weight: 500;
-            color: #374151;
+            color: var(--text-primary);
             margin-bottom: 6px;
         }
         .filter-group input,
@@ -151,6 +179,100 @@ $pageTitle = 'Все платежи';
             gap: 8px;
             padding-top: 24px;
         }
+        
+        /* Data Table */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--bg-primary);
+            border-radius: var(--border-radius);
+            overflow: hidden;
+        }
+        
+        .data-table thead th {
+            padding: 14px 16px;
+            text-align: left;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-secondary);
+            background: linear-gradient(180deg, var(--gray-50) 0%, var(--gray-100) 100%);
+            border-bottom: 2px solid var(--border-color);
+        }
+        
+        .data-table tbody td {
+            padding: 16px;
+            border-bottom: 1px solid var(--border-color);
+            vertical-align: middle;
+            font-size: 14px;
+        }
+        
+        .data-table tbody tr {
+            transition: background var(--transition-fast);
+        }
+        
+        .data-table tbody tr:hover {
+            background: linear-gradient(90deg, rgba(37, 99, 235, 0.03) 0%, transparent 100%);
+        }
+        
+        .data-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+        
+        /* Buttons */
+        .btn-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--gray-100);
+            border: 1px solid var(--border-color);
+            cursor: pointer;
+            text-decoration: none;
+            color: var(--text-secondary);
+            transition: all var(--transition-fast);
+        }
+        
+        .btn-icon:hover {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+            transform: scale(1.1);
+        }
+        
+        .btn-icon.delete:hover {
+            background: var(--danger-color);
+            border-color: var(--danger-color);
+        }
+        
+        /* Table action buttons - larger icons */
+        .data-table .btn-icon {
+            width: 40px;
+            height: 40px;
+        }
+        
+        .data-table .btn-icon svg {
+            width: 20px;
+            height: 20px;
+        }
+        
+        .btn-group-sm {
+            display: flex;
+            gap: 8px;
+        }
+        
+        /* Badges */
+        .badge::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: currentColor;
+            margin-right: 6px;
+        }
     </style>
 </head>
 <body>
@@ -162,15 +284,34 @@ $pageTitle = 'Все платежи';
             
             <div class="content-area">
                 <!-- Заголовок -->
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-                    <div>
-                        <p style="color: #6b7280; margin: 0;"><i class="bi bi-list-ul"></i> Реестр платежных документов</p>
+                <div class="page-header">
+                    <div class="page-header-title">
+                        <h2>
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 8px;">
+                                <rect x="2" y="5" width="20" height="14" rx="2"></rect>
+                                <line x1="2" y1="10" x2="22" y2="10"></line>
+                            </svg>
+                            Все платежи
+                        </h2>
+                        <p>Реестр платежных документов</p>
                     </div>
-                    <div style="display: flex; gap: 10px;">
+                    <div class="page-header-actions">
                         <?php if (canCreateInModule('finance')): ?>
-                        <a href="payment_create.php" class="btn btn-primary"><i class="bi bi-plus-lg"></i> Новый платеж</a>
+                        <a href="payment_create.php" class="btn btn-primary">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px;">
+                                <line x1="12" y1="5" x2="12" y2="19"></line>
+                                <line x1="5" y1="12" x2="19" y2="12"></line>
+                            </svg>
+                            Новый платеж
+                        </a>
                         <?php endif; ?>
-                        <a href="index.php" class="btn btn-secondary"><i class="bi bi-house"></i> На главную</a>
+                        <a href="index.php" class="btn btn-secondary">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px;">
+                                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                                <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                            </svg>
+                            На главную
+                        </a>
                     </div>
                 </div>
                 
@@ -234,9 +375,9 @@ $pageTitle = 'Все платежи';
                                     <thead>
                                         <tr>
                                             <th style="width: 12%;"><i class="bi bi-file-earmark-text"></i> Номер</th>
-                                            <th style="width: 10%;"><i class="bi bi-calendar3"></i> Дата</th>
+                                            <th style="width: 10%;">Дата</th>
                                             <th style="width: 18%;"><i class="bi bi-tags"></i> Тип / Категория</th>
-                                            <th style="width: 20%;"><i class="bi bi-building"></i> Контрагент</th>
+                                            <th style="width: 20%;">Контрагент</th>
                                             <th style="width: 15%; text-align: right;"><i class="bi bi-credit-card"></i> Сумма</th>
                                             <th style="width: 15%;"><i class="bi bi-patch-check"></i> Статус</th>
                                             <th style="width: 10%; text-align: center;"><i class="bi bi-gear"></i> Действия</th>
@@ -254,13 +395,13 @@ $pageTitle = 'Все платежи';
                                         <?php foreach ($payments as $payment): ?>
                                         <tr>
                                             <td style="vertical-align: middle;">
-                                                <a href="view.php?id=<?= $payment['id'] ?>" style="color: #3498db; text-decoration: none;">
+                                                <a href="view.php?id=<?= $payment['id'] ?>" style="color: var(--primary-color); text-decoration: none; font-weight: 600;">
                                                     <strong><i class="bi bi-file-earmark-text"></i> <?= e($payment['document_number']) ?></strong>
                                                 </a>
                                             </td>
                                             <td style="vertical-align: middle;">
-                                                <span style="font-size: 13px; font-weight: 500; color: #374151;">
-                                                    <i class="bi bi-calendar3"></i> <?= formatDate($payment['document_date']) ?>
+                                                <span style="font-size: 13px; font-weight: 500; color: var(--text-primary);">
+                                                    <?= formatDate($payment['document_date']) ?>
                                                 </span>
                                             </td>
                                             <td style="vertical-align: middle;">
@@ -268,28 +409,28 @@ $pageTitle = 'Все платежи';
                                                     <span style="font-size: 11px; padding: 4px 10px; border-radius: 6px; background: <?= $payment['flow_type'] === 'income' ? '#d1fae5' : '#fee2e2' ?>; color: <?= $payment['flow_type'] === 'income' ? '#065f46' : '#991b1b' ?>; font-weight: 600; white-space: nowrap;">
                                                         <i class="fas <?= $payment['flow_type'] === 'income' ? 'fa-arrow-down' : 'fa-arrow-up' ?>"></i> <?= $payment['flow_type'] === 'income' ? 'Доход' : 'Расход' ?>
                                                     </span>
-                                                    <span style="font-size: 13px; color: #4b5563; font-weight: 500;">
-                                                        <i class="bi bi-tag"></i> <?= e($payment['payment_type_name']) ?>
+                                                    <span style="font-size: 13px; color: var(--text-secondary); font-weight: 500;">
+                                                        <?= e($payment['payment_type_name']) ?>
                                                     </span>
                                                 </div>
                                                 <?php if ($payment['category']): ?>
-                                                <div style="font-size: 11px; color: #9ca3af; margin-top: 2px;">
-                                                    <i class="bi bi-folder"></i> <?= e($payment['category']) ?>
+                                                <div style="font-size: 11px; color: var(--text-secondary); opacity: 0.7; margin-top: 2px;">
+                                                    <?= e($payment['category']) ?>
                                                 </div>
                                                 <?php endif; ?>
                                             </td>
                                             <td style="vertical-align: middle;">
-                                                <div style="font-weight: 600; color: #1f2937; font-size: 13px;">
-                                                    <i class="bi bi-building"></i> <?= e($payment['contractor_name'] ?? '—') ?>
+                                                <div style="font-weight: 600; color: var(--text-primary); font-size: 13px;">
+                                                    <?= e($payment['contractor_name'] ?? '—') ?>
                                                 </div>
                                                 <?php if ($payment['contractor_inn']): ?>
-                                                <div style="font-size: 11px; color: #9ca3af; margin-top: 2px;">
-                                                    <i class="bi bi-person-badge"></i> ИНН: <?= e($payment['contractor_inn']) ?>
+                                                <div style="font-size: 11px; color: var(--text-secondary); opacity: 0.7; margin-top: 2px;">
+                                                    ИНН: <?= e($payment['contractor_inn']) ?>
                                                 </div>
                                                 <?php endif; ?>
                                             </td>
                                             <td style="text-align: right; vertical-align: middle;">
-                                                <span style="font-size: 15px; font-weight: 700; color: <?= $payment['flow_type'] === 'income' ? '#27ae60' : '#e74c3c' ?>; white-space: nowrap;">
+                                                <span style="font-size: 14px; font-weight: 600; color: var(--text-primary); white-space: nowrap;">
                                                     <?= number_format($payment['amount'], 2, ',', ' ') ?> <?= $payment['currency'] ?>
                                                 </span>
                                             </td>
@@ -299,13 +440,13 @@ $pageTitle = 'Все платежи';
                                                 </span>
                                             </td>
                                             <td style="text-align: center; vertical-align: middle;">
-                                                <div class="btn-group btn-group-sm">
-                                                    <a href="view.php?id=<?= $payment['id'] ?>" class="btn btn-outline-primary" title="Просмотр">
-                                                        <i class="bi bi-eye"></i>
+                                                <div class="btn-group-sm">
+                                                    <a href="view.php?id=<?= $payment['id'] ?>" class="btn-icon" title="Просмотр">
+                                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
                                                     </a>
                                                     <?php if (canEditInModule('finance') && $payment['status'] === 'draft'): ?>
-                                                    <a href="payment_edit.php?id=<?= $payment['id'] ?>" class="btn btn-outline-warning" title="Редактировать">
-                                                        <i class="bi bi-pencil"></i>
+                                                    <a href="payment_edit.php?id=<?= $payment['id'] ?>" class="btn-icon" title="Редактировать">
+                                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
                                                     </a>
                                                     <?php endif; ?>
                                                 </div>
@@ -323,7 +464,7 @@ $pageTitle = 'Все платежи';
                     <?php if (!empty($payments)): ?>
                     <div style="margin-top: 16px; padding: 16px; background: white; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
                         <div style="display: flex; justify-content: space-between; align-items: center;">
-                            <div style="font-weight: 600; color: #374151;">
+                            <div style="font-weight: 600; color: var(--text-primary);">
                                 <i class="bi bi-bar-chart-fill"></i> Всего в списке: <?= count($payments) ?> платежей
                             </div>
                             <div style="display: flex; gap: 24px;">

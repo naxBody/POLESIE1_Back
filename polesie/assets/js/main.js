@@ -244,64 +244,86 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
-    // === УЛУЧШЕННОЕ СОХРАНЕНИЕ СОСТОЯНИЯ БОКОВОЙ НАВИГАЦИИ ===
-    // Предотвращаем сброс скролла страницы вверх
-    if (history.scrollRestoration) {
+    // === ИСПРАВЛЕННАЯ ЛОГИКА БОКОВОЙ НАВИГАЦИИ ===
+    // 1. Предотвращаем сброс скролла страницы вверх браузером
+    if ('scrollRestoration' in history) {
         history.scrollRestoration = 'manual';
     }
     
     const sidebarContainer = document.querySelector('.sidebar-nav') || document.querySelector('.sidebar');
+    const currentPath = window.location.pathname.replace(/\/$/, "");
     
-    // Функция восстановления состояния
-    function restoreNavigationState() {
-        const savedSectionIndex = localStorage.getItem('polesie_sidebar_section_index');
+    // Функция нормализации пути
+    function normalizePath(path) {
+        return path ? path.replace(/\/$/, "").replace(/^\.?\//, "") : "";
+    }
+    
+    const currentPathClean = normalizePath(currentPath);
+    let activeLinkFound = null;
+
+    // 2. Находим активную ссылку и подсвечиваем ТОЛЬКО её
+    const allNavLinks = document.querySelectorAll('.sidebar-nav-item, .sidebar a.nav-link');
+    
+    allNavLinks.forEach(link => {
+        const href = link.getAttribute('href');
+        if (!href || href === '#' || href.startsWith('#')) {
+            return;
+        }
+
+        const linkPath = normalizePath(href.split('?')[0]);
         
-        if (savedSectionIndex !== null) {
-            const index = parseInt(savedSectionIndex, 10);
-            const sections = document.querySelectorAll('.sidebar-nav-section');
+        // Сбрасываем активность
+        link.classList.remove('active');
+        
+        // Проверяем точное совпадение
+        if (linkPath === currentPathClean) {
+            activeLinkFound = link;
+            link.classList.add('active');
             
-            if (sections[index]) {
-                const section = sections[index];
-                const activeLink = section.querySelector('.sidebar-nav-item.active');
-                
-                // Если есть активная ссылка внутри сохраненной секции, убедимся, что она видна
-                if (activeLink && sidebarContainer) {
-                    const linkTop = activeLink.offsetTop;
-                    const containerHeight = sidebarContainer.offsetHeight;
-                    const currentScroll = sidebarContainer.scrollTop;
-                    
-                    // Прокручиваем только сайдбар, если элемент не виден
-                    if (linkTop < currentScroll || linkTop > currentScroll + containerHeight - 50) {
-                        sidebarContainer.scrollTo({
-                            top: linkTop - 20,
-                            behavior: 'auto' // Мгновенно, без анимации при загрузке
-                        });
-                    }
+            // Раскрываем родительское меню (если есть)
+            const parentCollapse = link.closest('.collapse');
+            if (parentCollapse) {
+                parentCollapse.classList.add('show');
+                const toggleBtn = document.querySelector(`[data-toggle="collapse"][href="#${parentCollapse.id}"]`);
+                if (toggleBtn) {
+                    toggleBtn.classList.add('active');
+                    toggleBtn.setAttribute('aria-expanded', 'true');
                 }
             }
         }
+    });
+
+    // 3. Прокрутка сайдбара к активному элементу (если он найден)
+    if (activeLinkFound && sidebarContainer) {
+        setTimeout(() => {
+            const linkTop = activeLinkFound.offsetTop;
+            const containerHeight = sidebarContainer.offsetHeight;
+            const currentScroll = sidebarContainer.scrollTop;
+            
+            // Прокручиваем только если элемент не виден
+            if (linkTop < currentScroll || linkTop > currentScroll + containerHeight - 50) {
+                sidebarContainer.scrollTo({
+                    top: linkTop - 20,
+                    behavior: 'auto' // Мгновенно
+                });
+            }
+        }, 50); // Небольшая задержка для уверенности, что DOM отрисован
     }
     
-    // Обработка кликов по ссылкам навигации
+    // 4. Сохранение позиции секции при клике (опционально, если нужно запоминать раздел)
     const navLinks = document.querySelectorAll('.sidebar-nav-item');
     navLinks.forEach(link => {
         link.addEventListener('click', function() {
-            // Находим родительскую секцию
             const parentSection = this.closest('.sidebar-nav-section');
             if (parentSection) {
                 const allSections = Array.from(document.querySelectorAll('.sidebar-nav-section'));
                 const sectionIndex = allSections.indexOf(parentSection);
-                
                 if (sectionIndex !== -1) {
                     localStorage.setItem('polesie_sidebar_section_index', sectionIndex.toString());
                 }
             }
-            // Не вызываем preventDefault, чтобы переход работал нормально
         });
     });
-    
-    // Восстанавливаем состояние после загрузки DOM
-    restoreNavigationState();
 });
 
 /**

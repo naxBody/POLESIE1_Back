@@ -250,13 +250,13 @@ $pageTitle = 'Все платежи';
         
         /* Table action buttons - larger icons like in contractors page */
         .data-table .btn-icon {
-            width: 36px;
-            height: 36px;
+            width: 40px;
+            height: 40px;
         }
         
         .data-table .btn-icon svg {
-            width: 16px;
-            height: 16px;
+            width: 20px;
+            height: 20px;
         }
         
         .btn-group-sm {

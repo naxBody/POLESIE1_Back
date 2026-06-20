@@ -393,7 +393,7 @@ $pageTitle = 'Платеж №' . $payment['document_number'];
             <?php include BASE_PATH . '/includes/topbar.php'; ?>
             
             <div class="content-area">
-                <?php if ($message): ?>
+                <?php if (isset($message) && $message): ?>
                 <div class="alert alert-<?= $messageType ?>"><?= e($message) ?></div>
                 <?php endif; ?>
                 

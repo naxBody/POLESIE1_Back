@@ -161,22 +161,21 @@ $pageTitle = 'Все платежи';
             <?php include BASE_PATH . '/includes/topbar.php'; ?>
             
             <div class="content-area">
-                <div style="padding: 24px;">
-                    <!-- Заголовок -->
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-                        <div>
-                            <h1 style="font-size: 24px; font-weight: 700; color: #1f2937; margin: 0;"><i class="bi bi-cash-stack"></i> Все платежи</h1>
-                            <p style="color: #6b7280; margin: 4px 0 0 0;"><i class="bi bi-list-ul"></i> Реестр платежных документов</p>
-                        </div>
-                        <div style="display: flex; gap: 10px;">
-                            <?php if (canCreateInModule('finance')): ?>
-                            <a href="payment_create.php" class="btn btn-primary"><i class="bi bi-plus-lg"></i> Новый платеж</a>
-                            <?php endif; ?>
-                            <a href="index.php" class="btn btn-secondary"><i class="bi bi-house"></i> На главную</a>
-                        </div>
+                <!-- Заголовок -->
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                    <div>
+                        <h1 style="font-size: 24px; font-weight: 700; color: #1f2937; margin: 0;"><i class="bi bi-credit-card"></i> Все платежи</h1>
+                        <p style="color: #6b7280; margin: 4px 0 0 0;"><i class="bi bi-list-ul"></i> Реестр платежных документов</p>
                     </div>
-                    
-                    <!-- Фильтры -->
+                    <div style="display: flex; gap: 10px;">
+                        <?php if (canCreateInModule('finance')): ?>
+                        <a href="payment_create.php" class="btn btn-primary"><i class="bi bi-plus-lg"></i> Новый платеж</a>
+                        <?php endif; ?>
+                        <a href="index.php" class="btn btn-secondary"><i class="bi bi-house"></i> На главную</a>
+                    </div>
+                </div>
+                
+                <!-- Фильтры -->
                     <div class="filters-panel">
                         <form method="GET" action="">
                             <div class="filters-grid">
@@ -349,7 +348,6 @@ $pageTitle = 'Все платежи';
                         </div>
                     </div>
                     <?php endif; ?>
-                </div>
             </div>
         </div>
     </div>

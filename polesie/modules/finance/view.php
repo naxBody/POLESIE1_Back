@@ -104,8 +104,8 @@ $pageTitle = 'Платеж №' . $payment['document_number'];
             padding: 24px;
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
             margin-bottom: 24px;
-            margin-left: 20px;
-            margin-right: 20px;
+            margin-left: 0;
+            margin-right: 0;
         }
         .info-card-title {
             font-size: 14px;

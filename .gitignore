@@ -1,1 +1,25 @@
-Nothing should be ignored based on the provided file changes. The modified file 'polesie/modules/finance/payment_edit.php' is a source code file that should not be added to .gitignore. Since there are no build artifacts, dependencies, or temporary files in the changes, no additional ignore rules are needed.
+# Examples 1:
+
+# Example 2 (Project with artifacts):
+# Compiled and build artifacts
+*.pyc
+pycache/
+*.o
+*.obj
+dist/
+build/
+# Dependencies
+.venv/
+venv/
+node_modules/
+# Logs and temp files
+*.log
+*.tmp
+*.swp
+# Environment
+.env
+.env.local
+.env.*
+# Editors
+.vscode/
+.idea/

@@ -434,6 +434,9 @@ $pageTitle = 'Платеж №' . $payment['document_number'];
                                     <button type="submit" class="btn btn-danger"><i class="bi bi-x-circle-fill"></i> Отменить</button>
                                 </form>
                             <?php endif; ?>
+                            <a href="print_payment.php?id=<?= $payment['id'] ?>" target="_blank" class="btn btn-success">
+                                <i class="bi bi-file-earmark-arrow-down-fill"></i> Экспорт
+                            </a>
                             <button onclick="togglePrintPreview()" class="btn btn-secondary"><i class="bi bi-printer"></i> Печать</button>
                             <button onclick="window.print()" class="btn btn-primary"><i class="bi bi-file-earmark-pdf"></i> PDF</button>
                     </div>

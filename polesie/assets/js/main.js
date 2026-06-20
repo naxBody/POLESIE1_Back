@@ -245,82 +245,63 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
     // === УЛУЧШЕННОЕ СОХРАНЕНИЕ СОСТОЯНИЯ БОКОВОЙ НАВИГАЦИИ ===
-    
-    // Функция для получения уникального идентификатора секции
-    function getSectionId(sectionElement) {
-        const title = sectionElement.querySelector('.sidebar-nav-title');
-        if (title) {
-            return 'section_' + title.textContent.trim().toLowerCase().replace(/\s+/g, '_');
-        }
-        return null;
+    // Предотвращаем сброс скролла страницы вверх
+    if (history.scrollRestoration) {
+        history.scrollRestoration = 'manual';
     }
     
-    // Находим активную ссылку и сохраняем её родительскую секцию
-    const activeLink = document.querySelector('.sidebar-nav-item.active');
-    if (activeLink) {
-        const parentSection = activeLink.closest('.sidebar-nav-section');
-        if (parentSection) {
-            const sectionId = getSectionId(parentSection);
-            if (sectionId) {
-                // Сохраняем ID секции в localStorage
-                localStorage.setItem('sidebar_active_section_id', sectionId);
-                
-                // Также сохраняем индекс секции для надежности
-                const allSections = Array.from(document.querySelectorAll('.sidebar-nav-section'));
-                const sectionIndex = allSections.indexOf(parentSection);
-                localStorage.setItem('sidebar_active_section_index', sectionIndex.toString());
-            }
-        }
-    }
+    const sidebarContainer = document.querySelector('.sidebar-nav') || document.querySelector('.sidebar');
     
-    // Восстанавливаем состояние при загрузке страницы
-    const savedSectionId = localStorage.getItem('sidebar_active_section_id');
-    const savedSectionIndex = localStorage.getItem('sidebar_active_section_index');
-    
-    if (savedSectionId || savedSectionIndex !== null) {
-        const allSections = document.querySelectorAll('.sidebar-nav-section');
+    // Функция восстановления состояния
+    function restoreNavigationState() {
+        const savedSectionIndex = localStorage.getItem('polesie_sidebar_section_index');
         
-        allSections.forEach((section, index) => {
-            const sectionId = getSectionId(section);
+        if (savedSectionIndex !== null) {
+            const index = parseInt(savedSectionIndex, 10);
+            const sections = document.querySelectorAll('.sidebar-nav-section');
             
-            // Проверяем соответствие по ID или индексу
-            const isMatch = (savedSectionId && sectionId === savedSectionId) || 
-                           (savedSectionIndex !== null && index.toString() === savedSectionIndex);
-            
-            if (isMatch) {
-                // Не добавляем класс active самой секции (его нет в CSS),
-                // просто убеждаемся, что активная ссылка внутри неё подсвечена
-                // Класс active уже есть у .sidebar-nav-item.active благодаря PHP
+            if (sections[index]) {
+                const section = sections[index];
+                const activeLink = section.querySelector('.sidebar-nav-item.active');
+                
+                // Если есть активная ссылка внутри сохраненной секции, убедимся, что она видна
+                if (activeLink && sidebarContainer) {
+                    const linkTop = activeLink.offsetTop;
+                    const containerHeight = sidebarContainer.offsetHeight;
+                    const currentScroll = sidebarContainer.scrollTop;
+                    
+                    // Прокручиваем только сайдбар, если элемент не виден
+                    if (linkTop < currentScroll || linkTop > currentScroll + containerHeight - 50) {
+                        sidebarContainer.scrollTo({
+                            top: linkTop - 20,
+                            behavior: 'auto' // Мгновенно, без анимации при загрузке
+                        });
+                    }
+                }
             }
-        });
+        }
     }
     
-    // Обработка кликов по ссылкам навигации - БЕЗ preventDefault
+    // Обработка кликов по ссылкам навигации
     const navLinks = document.querySelectorAll('.sidebar-nav-item');
     navLinks.forEach(link => {
         link.addEventListener('click', function() {
-            // Удаляем активные классы у всех ссылок
-            navLinks.forEach(l => l.classList.remove('active'));
-            
-            // Добавляем активный класс текущей ссылке
-            this.classList.add('active');
-            
-            // Сохраняем секцию
+            // Находим родительскую секцию
             const parentSection = this.closest('.sidebar-nav-section');
             if (parentSection) {
-                const sectionId = getSectionId(parentSection);
-                if (sectionId) {
-                    localStorage.setItem('sidebar_active_section_id', sectionId);
-                    
-                    const allSections = Array.from(document.querySelectorAll('.sidebar-nav-section'));
-                    const sectionIndex = allSections.indexOf(parentSection);
-                    localStorage.setItem('sidebar_active_section_index', sectionIndex.toString());
+                const allSections = Array.from(document.querySelectorAll('.sidebar-nav-section'));
+                const sectionIndex = allSections.indexOf(parentSection);
+                
+                if (sectionIndex !== -1) {
+                    localStorage.setItem('polesie_sidebar_section_index', sectionIndex.toString());
                 }
             }
-            
-            // НЕ вызываем preventDefault - позволяем переходу произойти естественно
+            // Не вызываем preventDefault, чтобы переход работал нормально
         });
     });
+    
+    // Восстанавливаем состояние после загрузки DOM
+    restoreNavigationState();
 });
 
 /**

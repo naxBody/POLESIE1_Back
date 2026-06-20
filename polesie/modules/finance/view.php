@@ -459,91 +459,9 @@ $pageTitle = 'Платеж №' . $payment['document_number'];
                             от <?= formatDate($payment['document_date']) ?>
                         </div>
                         
-                        <table class="print-details-table">
-                            <tr>
-                                <td class="label">Тип операции:</td>
-                                <td><strong><?= $payment['flow_type'] === 'income' ? 'Доход' : 'Расход' ?></strong></td>
-                            </tr>
-                            <tr>
-                                <td class="label">Тип платежа:</td>
-                                <td><?= e($payment['payment_type_name']) ?> (<?= e($payment['category']) ?>)</td>
-                            </tr>
-                            <?php if ($payment['contractor_name']): ?>
-                            <tr>
-                                <td class="label">Контрагент:</td>
-                                <td><strong><?= e($payment['contractor_name']) ?></strong></td>
-                            </tr>
-                            <tr>
-                                <td class="label">ИНН контрагента:</td>
-                                <td><?= e($payment['contractor_inn'] ?? '—') ?></td>
-                            </tr>
-                            <?php endif; ?>
-                            <tr>
-                                <td class="label">Банк получателя:</td>
-                                <td><?= e($payment['bank_name']) ?> (БИК: <?= e($payment['bank_bic']) ?>)</td>
-                            </tr>
-                            <tr>
-                                <td class="label">Счет:</td>
-                                <td style="font-family: monospace;"><?= e($payment['bank_account']) ?></td>
-                            </tr>
-                            <?php if ($payment['expense_article_name']): ?>
-                            <tr>
-                                <td class="label">Статья затрат:</td>
-                                <td><?= e($payment['expense_article_name']) ?></td>
-                            </tr>
-                            <?php endif; ?>
-                            <?php if ($payment['order_number']): ?>
-                            <tr>
-                                <td class="label">Заказ:</td>
-                                <td><?= e($payment['order_number']) ?></td>
-                            </tr>
-                            <?php endif; ?>
-                            <?php if ($payment['document_reference']): ?>
-                            <tr>
-                                <td class="label">Основание:</td>
-                                <td><?= e($payment['document_reference']) ?></td>
-                            </tr>
-                            <?php endif; ?>
-                        </table>
-                        
-                        <div class="print-amount-box">
-                            <div class="amount"><?= formatMoney($payment['amount']) ?></div>
-                            <?php if ($payment['vat_amount'] > 0): ?>
-                            <div class="words">В том числе НДС (<?= $payment['vat_rate'] ?>%): <?= formatMoney($payment['vat_amount']) ?></div>
-                            <?php else: ?>
-                            <div class="words">Без НДС</div>
-                            <?php endif; ?>
-                        </div>
-                        
-                        <div style="margin: 20px 0;">
-                            <strong style="font-size: 13px; color: #6b7280;">Назначение платежа:</strong>
-                            <p style="font-size: 13px; line-height: 1.6; margin: 8px 0 0 0;"><?= nl2br(e($payment['payment_purpose'] ?: $payment['description'] ?: 'Не указано')) ?></p>
-                        </div>
-                        
-                        <div class="print-signatures">
-                            <div class="print-signature-block">
-                                <div class="label">Руководитель</div>
-                                <div class="name">_________________</div>
-                                <div class="position">Генеральный директор</div>
-                            </div>
-                            <div class="print-signature-block">
-                                <div class="label">Главный бухгалтер</div>
-                                <div class="name">_________________</div>
-                                <div class="position">Главный бухгалтер</div>
-                            </div>
-                            <div class="print-stamp-area">
-                                <i class="fas fa-stamp" style="font-size: 40px; opacity: 0.3;"></i>
-                                <div style="margin-top: 5px;">М.П.</div>
-                            </div>
-                        </div>
-                        
-                        <div class="print-footer">
-                            Документ создан: <?= date('d.m.Y H:i', strtotime($payment['created_at'])) ?> | 
-                            Автор: <?= e($payment['created_by_name']) ?> | 
-                            Статус: <?= e($payment['status_name']) ?>
-                        </div>
                     </div>
                     
+                    <!-- Основная информация для просмотра -->
                     <div class="view-container">
                         <!-- Основная информация о платеже - как в документе -->
                         <div class="info-card" style="margin-bottom: 24px;">

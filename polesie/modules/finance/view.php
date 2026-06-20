@@ -660,7 +660,7 @@ $pageTitle = 'Платеж №' . $payment['document_number'];
                                 </div>
                                 <?php endif; ?>
                                 <div class="info-row">
-                                    <span class="info-label"><i class="bi bi-currency-dollar"></i> Валюта:</span>
+                                    <span class="info-label"><i class="bi bi-credit-card"></i> Валюта:</span>
                                     <span class="info-value"><?= $payment['currency'] ?></span>
                                 </div>
                             </div>

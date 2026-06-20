@@ -291,7 +291,7 @@ $pageTitle = 'Все платежи';
                                 <rect x="2" y="5" width="20" height="14" rx="2"></rect>
                                 <line x1="2" y1="10" x2="22" y2="10"></line>
                             </svg>
-                            Платежи
+                            Все платежи
                         </h2>
                         <p>Реестр платежных документов</p>
                     </div>
@@ -406,7 +406,7 @@ $pageTitle = 'Все платежи';
                                             </td>
                                             <td style="vertical-align: middle;">
                                                 <div style="display: flex; align-items: center; gap: 8px;">
-                                                    <span style="font-size: 11px; padding: 4px 10px; border-radius: 6px; background: <?= $payment['flow_type'] === 'income' ? '#d1fae5' : '#fee2e2' ?>; color: <?= $payment['flow_type'] === 'income' ? '#065f46' : '#991b1b' ?>; font-weight: 600; white-space: nowrap;">
+                                                    <span style="font-size: 11px; padding: 4px 10px; border-radius: 6px; background: #f3f4f6; color: var(--text-secondary); font-weight: 600; white-space: nowrap;">
                                                         <i class="fas <?= $payment['flow_type'] === 'income' ? 'fa-arrow-down' : 'fa-arrow-up' ?>"></i> <?= $payment['flow_type'] === 'income' ? 'Доход' : 'Расход' ?>
                                                     </span>
                                                     <span style="font-size: 13px; color: var(--text-secondary); font-weight: 500;">
@@ -441,12 +441,12 @@ $pageTitle = 'Все платежи';
                                             </td>
                                             <td style="text-align: center; vertical-align: middle;">
                                                 <div class="btn-group-sm">
-                                                    <a href="view.php?id=<?= $payment['id'] ?>" class="btn-icon" title="Просмотр">
-                                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                                                    <a href="view.php?id=<?= $payment['id'] ?>" class="btn btn-sm btn-icon" title="Просмотр">
+                                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
                                                     </a>
                                                     <?php if (canEditInModule('finance') && $payment['status'] === 'draft'): ?>
-                                                    <a href="payment_edit.php?id=<?= $payment['id'] ?>" class="btn-icon" title="Редактировать">
-                                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                                                    <a href="payment_edit.php?id=<?= $payment['id'] ?>" class="btn btn-sm btn-icon" title="Редактировать">
+                                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
                                                     </a>
                                                     <?php endif; ?>
                                                 </div>

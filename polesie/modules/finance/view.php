@@ -94,16 +94,18 @@ $pageTitle = 'Платеж №' . $payment['document_number'];
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <style>
         .view-container {
-            max-width: 900px;
-            margin: 0 auto;
-            padding: 20px;
+            max-width: 100%;
+            margin: 0;
+            padding: 0;
         }
         .info-card {
             background: white;
             border-radius: 12px;
-            padding: 24px;
+            padding: 20px;
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            margin-bottom: 24px;
+            margin-bottom: 20px;
+            margin-left: 20px;
+            margin-right: 20px;
         }
         .info-card-title {
             font-size: 14px;

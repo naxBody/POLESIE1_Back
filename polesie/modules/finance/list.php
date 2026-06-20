@@ -164,8 +164,7 @@ $pageTitle = 'Все платежи';
                 <!-- Заголовок -->
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
                     <div>
-                        <h1 style="font-size: 24px; font-weight: 700; color: #1f2937; margin: 0;"><i class="bi bi-credit-card"></i> Все платежи</h1>
-                        <p style="color: #6b7280; margin: 4px 0 0 0;"><i class="bi bi-list-ul"></i> Реестр платежных документов</p>
+                        <p style="color: #6b7280; margin: 0;"><i class="bi bi-list-ul"></i> Реестр платежных документов</p>
                     </div>
                     <div style="display: flex; gap: 10px;">
                         <?php if (canCreateInModule('finance')): ?>

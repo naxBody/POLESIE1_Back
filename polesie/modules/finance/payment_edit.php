@@ -38,7 +38,23 @@ $stmt = $pdo->prepare("
         ba.account_number as bank_account_number, ba.account_holder as bank_account_holder,
         ea.name as expense_article_name,
         o.order_number,
-        u.full_name as created_by_name
+        u.full_name as created_by_name,
+        CASE pd.status
+            WHEN 'draft' THEN 'Черновик'
+            WHEN 'pending' THEN 'На согласовании'
+            WHEN 'approved' THEN 'Утвержден'
+            WHEN 'posted' THEN 'Проведен'
+            WHEN 'cancelled' THEN 'Отменен'
+            ELSE pd.status
+        END as status_name,
+        CASE pd.status
+            WHEN 'draft' THEN '#95a5a6'
+            WHEN 'pending' THEN '#f39c12'
+            WHEN 'approved' THEN '#3498db'
+            WHEN 'posted' THEN '#27ae60'
+            WHEN 'cancelled' THEN '#e74c3c'
+            ELSE '#95a5a6'
+        END as status_color
     FROM payment_documents pd
     JOIN payment_types pt ON pd.payment_type_id = pt.id
     LEFT JOIN contractors c ON pd.contractor_id = c.id
@@ -192,12 +208,13 @@ $pageTitle = 'Редактирование платежа №' . $payment['docum
         .form-container {
             max-width: 900px;
             margin: 0 auto;
+            padding: 0 24px;
         }
         .form-section {
             background: white;
             border-radius: 12px;
-            padding: 24px;
-            margin-bottom: 24px;
+            padding: 20px 24px;
+            margin-bottom: 20px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.07);
             border: 1px solid #f0f0f0;
         }
@@ -205,8 +222,8 @@ $pageTitle = 'Редактирование платежа №' . $payment['docum
             font-size: 15px;
             font-weight: 600;
             color: #1f2937;
-            margin: 0 0 20px 0;
-            padding-bottom: 12px;
+            margin: 0 0 16px 0;
+            padding-bottom: 10px;
             border-bottom: 2px solid #e5e7eb;
             display: flex;
             align-items: center;
@@ -219,10 +236,10 @@ $pageTitle = 'Редактирование платежа №' . $payment['docum
         .form-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 20px;
+            gap: 16px;
         }
         .form-group {
-            margin-bottom: 16px;
+            margin-bottom: 14px;
         }
         .form-group.full-width {
             grid-column: 1 / -1;
@@ -232,7 +249,7 @@ $pageTitle = 'Редактирование платежа №' . $payment['docum
             font-size: 13px;
             font-weight: 500;
             color: #374151;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             display: flex;
             align-items: center;
             gap: 6px;
@@ -249,7 +266,7 @@ $pageTitle = 'Редактирование платежа №' . $payment['docum
         .form-group select,
         .form-group textarea {
             width: 100%;
-            padding: 11px 14px;
+            padding: 9px 12px;
             border: 1.5px solid #e5e7eb;
             border-radius: 8px;
             font-size: 14px;
@@ -278,9 +295,9 @@ $pageTitle = 'Редактирование платежа №' . $payment['docum
             display: flex;
             gap: 12px;
             justify-content: flex-end;
-            margin-top: 24px;
-            padding-top: 20px;
-            border-top: 1px solid #e5e7eb;
+            margin-top: 0;
+            padding: 0;
+            border-top: none;
         }
         .alert {
             padding: 14px 18px;
@@ -374,8 +391,8 @@ $pageTitle = 'Редактирование платежа №' . $payment['docum
             <?php include BASE_PATH . '/includes/topbar.php'; ?>
             
             <div class="content-area">
-                <div style="padding: 24px;">
-                    <div class="page-header">
+                <div style="padding: 0;">
+                    <div class="page-header" style="margin-bottom: 20px; padding: 16px 24px;">
                         <div class="page-title">
                             <i class="bi bi-pencil-square page-title-icon"></i>
                             <div>
@@ -403,6 +420,34 @@ $pageTitle = 'Редактирование платежа №' . $payment['docum
                     <?php endif; ?>
                     
                     <div class="form-container">
+                        <!-- Информация о платеже -->
+                        <div class="form-section" style="padding: 16px 24px; margin-bottom: 16px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                                <div>
+                                    <div style="font-size: 18px; font-weight: 600; color: #1f2937;"><?= e($payment['document_number']) ?></div>
+                                    <div style="font-size: 13px; color: #6b7280; margin-top: 4px;">от <?= formatDate($payment['created_at']) ?></div>
+                                </div>
+                                <span class="badge" style="background: <?= e($payment['status_color']) ?>20; color: <?= e($payment['status_color']) ?>; font-size: 13px; padding: 6px 12px; border-radius: 6px; font-weight: 600;">
+                                    <i class="bi bi-circle-fill" style="font-size: 8px; vertical-align: middle; margin-right: 6px;"></i>
+                                    <?= e($payment['status_name']) ?>
+                                </span>
+                            </div>
+                            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; padding-top: 12px; border-top: 1px solid #e5e7eb;">
+                                <div>
+                                    <div style="font-size: 12px; color: #6b7280; margin-bottom: 4px;">Тип платежа</div>
+                                    <div style="font-size: 14px; font-weight: 500; color: #1f2937;"><?= e($payment['payment_type_name']) ?></div>
+                                </div>
+                                <div>
+                                    <div style="font-size: 12px; color: #6b7280; margin-bottom: 4px;">Сумма</div>
+                                    <div style="font-size: 14px; font-weight: 600; color: #1f2937;"><?= number_format($payment['amount'], 2, ',', ' ') ?> BYN</div>
+                                </div>
+                                <div>
+                                    <div style="font-size: 12px; color: #6b7280; margin-bottom: 4px;">НДС</div>
+                                    <div style="font-size: 14px; font-weight: 500; color: #1f2937;"><?= $payment['vat_rate'] > 0 ? number_format($payment['vat_amount'], 2, ',', ' ') . ' BYN (' . $payment['vat_rate'] . '%)' : 'Без НДС' ?></div>
+                                </div>
+                            </div>
+                        </div>
+                        
                         <form method="POST" action="">
                             <!-- Основная информация -->
                             <div class="form-section">
@@ -503,7 +548,7 @@ $pageTitle = 'Редактирование платежа №' . $payment['docum
                             </div>
                             
                             <!-- Действия -->
-                            <div class="form-actions">
+                            <div style="margin: 0 -24px -20px -24px; padding: 16px 24px; background: #f9fafb; border-top: 1px solid #e5e7eb; border-radius: 0 0 12px 12px; display: flex; gap: 12px; justify-content: flex-end;">
                                 <a href="view.php?id=<?= $paymentId ?>" class="btn btn-secondary">
                                     <i class="bi bi-x-lg"></i> Отмена
                                 </a>

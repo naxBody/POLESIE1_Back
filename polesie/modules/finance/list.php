@@ -291,7 +291,7 @@ $pageTitle = 'Все платежи';
                                 <rect x="2" y="5" width="20" height="14" rx="2"></rect>
                                 <line x1="2" y1="10" x2="22" y2="10"></line>
                             </svg>
-                            Все платежи
+                            Платежи
                         </h2>
                         <p>Реестр платежных документов</p>
                     </div>
@@ -469,16 +469,16 @@ $pageTitle = 'Все платежи';
                             </div>
                             <div style="display: flex; gap: 24px;">
                                 <div>
-                                    <span style="color: #6b7280; font-size: 13px;"><i class="bi bi-arrow-up-circle-fill" style="color: #27ae60;"></i> Доходы:</span>
-                                    <strong style="color: #27ae60; margin-left: 8px;">
+                                    <span style="color: #6b7280; font-size: 13px;"><i class="bi bi-arrow-up-circle-fill" style="color: var(--text-secondary);"></i> Доходы:</span>
+                                    <strong style="color: var(--text-primary); margin-left: 8px;">
                                         <?= formatMoney(array_sum(array_filter(array_column($payments, 'amount'), function($key, $index) use ($payments) {
                                             return $payments[$index]['flow_type'] === 'income';
                                         }, ARRAY_FILTER_USE_BOTH))) ?>
                                     </strong>
                                 </div>
                                 <div>
-                                    <span style="color: #6b7280; font-size: 13px;"><i class="bi bi-arrow-down-circle-fill" style="color: #e74c3c;"></i> Расходы:</span>
-                                    <strong style="color: #e74c3c; margin-left: 8px;">
+                                    <span style="color: #6b7280; font-size: 13px;"><i class="bi bi-arrow-down-circle-fill" style="color: var(--text-secondary);"></i> Расходы:</span>
+                                    <strong style="color: var(--text-primary); margin-left: 8px;">
                                         <?= formatMoney(array_sum(array_filter(array_column($payments, 'amount'), function($key, $index) use ($payments) {
                                             return $payments[$index]['flow_type'] === 'expense';
                                         }, ARRAY_FILTER_USE_BOTH))) ?>

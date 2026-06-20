@@ -248,15 +248,15 @@ $pageTitle = 'Все платежи';
             border-color: var(--danger-color);
         }
         
-        /* Table action buttons - larger icons */
+        /* Table action buttons - larger icons like in contractors page */
         .data-table .btn-icon {
-            width: 40px;
-            height: 40px;
+            width: 36px;
+            height: 36px;
         }
         
         .data-table .btn-icon svg {
-            width: 20px;
-            height: 20px;
+            width: 16px;
+            height: 16px;
         }
         
         .btn-group-sm {

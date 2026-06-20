@@ -245,6 +245,12 @@ a[href^="tel:"]:hover, a[href^="mailto:"]:hover {
     font-size: 16px;
 }
 
+.sidebar-nav-icon svg {
+    width: 18px;
+    height: 18px;
+    stroke: currentColor;
+}
+
 /* Основной контент */
 .main-content {
     flex: 1;
@@ -316,6 +322,7 @@ a[href^="tel:"]:hover, a[href^="mailto:"]:hover {
 .topbar-icon svg {
     width: 28px;
     height: 28px;
+    stroke: currentColor;
 }
 
 .topbar-title {

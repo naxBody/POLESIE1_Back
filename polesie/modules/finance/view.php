@@ -803,31 +803,6 @@ $pageTitle = 'Платеж №' . $payment['document_number'];
                                 <?php endif; ?>
                             </div>
                         </div>
-                        
-                        <!-- История изменений -->
-                        <div class="timeline">
-                            <div class="info-card-title" style="margin-bottom: 16px;">История изменений статуса</div>
-                            <?php foreach ($history as $item): ?>
-                            <div class="timeline-item">
-                                <div class="timeline-date">
-                                    <i class="bi bi-clock"></i> <?= date('d.m.Y H:i', strtotime($item['changed_at'])) ?>
-                                </div>
-                                <div class="timeline-content">
-                                    <div style="font-weight: 600; color: var(--text-primary);"><i class="bi bi-person"></i> <?= e($item['changed_by_name']) ?></div>
-                                    <div style="font-size: 13px; color: var(--text-secondary); margin: 4px 0;">
-                                        <span style="color: #95a5a6;"><?= e($item['old_status'] ?? 'Создание') ?></span>
-                                        <i class="fas fa-arrow-right" style="margin: 0 6px; font-size: 10px;"></i>
-                                        <strong style="color: <?= $item['new_status'] === 'posted' ? '#27ae60' : ($item['new_status'] === 'approved' ? '#3498db' : ($item['new_status'] === 'pending' ? '#f39c12' : ($item['new_status'] === 'cancelled' ? '#e74c3c' : '#95a5a6'))) ?>"><?= e($item['new_status']) ?></strong>
-                                    </div>
-                                    <?php if ($item['comment']): ?>
-                                    <div style="font-size: 13px; margin-top: 6px; color: var(--text-primary); background: #f9fafb; padding: 8px; border-radius: 6px; border-left: 3px solid #3498db;">
-                                        <i class="bi bi-chat-left-text"></i> <?= e($item['comment']) ?>
-                                    </div>
-                                    <?php endif; ?>
-                                </div>
-                            </div>
-                            <?php endforeach; ?>
-                        </div>
                     </div>
         </div>
     </div>

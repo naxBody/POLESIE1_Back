@@ -10,19 +10,8 @@ if (!isset($GLOBALS['font_awesome_loaded'])) {
     <div class="sidebar-header">
         <div class="sidebar-logo">
             <div class="sidebar-logo-icon">
-                <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" width="26" height="26">
-                    <defs>
-                        <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                            <stop offset="0%" style="stop-color:#60a5fa;stop-opacity:1" />
-                            <stop offset="100%" style="stop-color:#2563eb;stop-opacity:1" />
-                        </linearGradient>
-                    </defs>
-                    <!-- Звезда/искра -->
-                    <path d="M20 2L23.5 9L31 9L25 14L27 21L20 17L13 21L15 14L9 9L16.5 9L20 2Z" fill="url(#logoGradient)" stroke="white" stroke-width="1.5" stroke-linejoin="round"/>
-                    <!-- Молния внутри -->
-                    <path d="M21 18L18 24L22 24L19 30" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity="0.9"/>
-                    <!-- Круг в центре -->
-                    <circle cx="20" cy="17" r="2.5" fill="white" opacity="0.8"/>
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path>
                 </svg>
             </div>
             <span class="sidebar-logo-text">Полесьеэлектромаш</span>

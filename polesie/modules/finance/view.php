@@ -647,7 +647,7 @@ $pageTitle = 'Платеж №' . $payment['document_number'];
                         <div class="info-grid">
                             <!-- Основная информация -->
                             <div class="info-card">
-                                <div class="info-card-title"><i class="bi bi-cash-coin"></i> Сумма платежа</div>
+                                <div class="info-card-title"><i class="bi bi-credit-card"></i> Сумма платежа</div>
                                 <div class="amount-display"><?= formatMoney($payment['amount']) ?></div>
                                 <?php if ($payment['vat_amount'] > 0): ?>
                                 <div class="info-row">

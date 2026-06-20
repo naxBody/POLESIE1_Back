@@ -238,7 +238,7 @@ $pageTitle = 'Все платежи';
                                             <th style="width: 10%;"><i class="bi bi-calendar3"></i> Дата</th>
                                             <th style="width: 18%;"><i class="bi bi-tags"></i> Тип / Категория</th>
                                             <th style="width: 20%;"><i class="bi bi-building"></i> Контрагент</th>
-                                            <th style="width: 15%; text-align: right;"><i class="bi bi-cash-coin"></i> Сумма</th>
+                                            <th style="width: 15%; text-align: right;"><i class="bi bi-credit-card"></i> Сумма</th>
                                             <th style="width: 15%;"><i class="bi bi-patch-check"></i> Статус</th>
                                             <th style="width: 10%; text-align: center;"><i class="bi bi-gear"></i> Действия</th>
                                         </tr>

@@ -96,11 +96,12 @@ $pageTitle = 'Платеж №' . $payment['document_number'];
         .view-container {
             max-width: 900px;
             margin: 0 auto;
+            padding: 0;
         }
         .info-card {
             background: white;
             border-radius: 12px;
-            padding: 20px;
+            padding: 24px;
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
             margin-bottom: 24px;
         }
@@ -108,7 +109,7 @@ $pageTitle = 'Платеж №' . $payment['document_number'];
             font-size: 14px;
             font-weight: 600;
             color: #6b7280;
-            margin-bottom: 16px;
+            margin-bottom: 20px;
             text-transform: uppercase;
             display: flex;
             align-items: center;
@@ -117,7 +118,7 @@ $pageTitle = 'Платеж №' . $payment['document_number'];
         .info-label {
             color: #6b7280;
             font-size: 13px;
-            margin-bottom: 4px;
+            margin-bottom: 6px;
         }
         .info-value {
             font-weight: 500;
@@ -544,9 +545,9 @@ $pageTitle = 'Платеж №' . $payment['document_number'];
                         </div>
                     </div>
                     
-                    <div class="view-container">
+                    <div class="view-container" style="padding: 20px;">
                         <!-- Основная информация о платеже - как в документе -->
-                        <div class="info-card" style="margin-bottom: 24px;">
+                        <div class="info-card">
                             <div class="info-card-title"><i class="bi bi-file-earmark-text"></i> Основная информация</div>
                             <div style="display: flex; flex-direction: column; gap: 16px;">
                                 <div>
@@ -572,7 +573,7 @@ $pageTitle = 'Платеж №' . $payment['document_number'];
                         </div>
                         
                         <!-- Сумма и назначение -->
-                        <div class="info-card" style="margin-bottom: 24px;">
+                        <div class="info-card">
                             <div class="info-card-title">Сумма и назначение платежа</div>
                             <div style="font-size: 28px; font-weight: 700; color: var(--text-primary); margin: 12px 0;"><?= formatMoney($payment['amount']) ?> <?= $payment['currency'] ?></div>
                             <?php if ($payment['vat_amount'] > 0): ?>
@@ -594,7 +595,7 @@ $pageTitle = 'Платеж №' . $payment['document_number'];
                         </div>
                         
                         <!-- Контрагент -->
-                        <div class="info-card" style="margin-bottom: 24px;">
+                        <div class="info-card">
                             <div class="info-card-title">Контрагент</div>
                             <?php if ($payment['contractor_name']): ?>
                             <div style="display: flex; flex-direction: column; gap: 16px;">
@@ -627,7 +628,7 @@ $pageTitle = 'Платеж №' . $payment['document_number'];
                         </div>
                         
                         <!-- Банковские реквизиты -->
-                        <div class="info-card" style="margin-bottom: 24px;">
+                        <div class="info-card">
                             <div class="info-card-title">Банковские реквизиты</div>
                             <div style="display: flex; flex-direction: column; gap: 16px;">
                                 <div>
@@ -652,7 +653,7 @@ $pageTitle = 'Платеж №' . $payment['document_number'];
                         </div>
                         
                         <!-- Классификация -->
-                        <div class="info-card" style="margin-bottom: 24px;">
+                        <div class="info-card">
                             <div class="info-card-title">Классификация</div>
                             <div style="display: flex; flex-direction: column; gap: 16px;">
                                 <div>
@@ -673,7 +674,7 @@ $pageTitle = 'Платеж №' . $payment['document_number'];
                         </div>
                         
                         <!-- Связанные документы -->
-                        <div class="info-card" style="margin-bottom: 24px;">
+                        <div class="info-card">
                             <div class="info-card-title">Связанные документы</div>
                             <?php if ($payment['order_number'] || $payment['document_reference']): ?>
                             <div style="display: flex; flex-direction: column; gap: 16px;">
@@ -696,7 +697,7 @@ $pageTitle = 'Платеж №' . $payment['document_number'];
                         </div>
                         
                         <!-- Авторы и даты -->
-                        <div class="info-card" style="margin-bottom: 24px;">
+                        <div class="info-card">
                             <div class="info-card-title">Авторы и даты</div>
                             <div style="display: flex; flex-direction: column; gap: 16px;">
                                 <div>
